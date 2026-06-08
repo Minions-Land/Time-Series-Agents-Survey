@@ -96,6 +96,9 @@
 \newcommand{\layerTSK}{\textsf{\textbf{TSK}}}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcommand{\fulltextcol}[1]{\dimexpr#1\textwidth-2\tabcolsep\relax}
+\newcommand{\fulllinecol}[1]{\dimexpr#1\linewidth-2\tabcolsep\relax}
+\setlength{\LTcapwidth}{\textwidth}
 
 \title{\vspace*{-0.45in}{\color{surveyBlue}\sffamily\bfseries\Huge Time Series Agents}\\[0.22em]
 {\color{surveyBlue}\sffamily\Large A Component-Centric Survey of LLM Agents for Temporal Analysis}}
@@ -213,7 +216,7 @@ Table~\ref{tab:component-vocab} first makes the core components explicit. The ke
 \setlength{\tabcolsep}{2.0pt}
 \setlength{\LTcapwidth}{\textwidth}
 \renewcommand{\arraystretch}{1.08}
-\begin{longtable}{L{0.105\textwidth} L{0.16\textwidth} L{0.225\textwidth} L{0.26\textwidth} L{0.20\textwidth}}
+\begin{longtable}{L{\fulltextcol{0.105}} L{\fulltextcol{0.16}} L{\fulltextcol{0.225}} L{\fulltextcol{0.27}} L{\fulltextcol{0.24}}}
 \caption{Core runtime components for Time Series Agents. The first column groups general Harness areas, while the last two columns separate cross-task temporal support from task-specific temporal workflows.}
 \label{tab:component-vocab}\\
 \toprule
@@ -224,17 +227,17 @@ Table~\ref{tab:component-vocab} first makes the core components explicit. The ke
 \textbf{Harness} & \textbf{Component} & \textbf{General-agent role} & \textbf{General TS specialization} & \textbf{Task-specific specialization}\\
 \midrule
 \endhead
-\multirow[t]{5}{0.105\textwidth}{\textbf{Mechanism}} & \Planning{} & Organizes long-horizon execution through decomposition, search, or workflow orchestration. & Inspect, clean, retrieve context, select tools, validate, diagnose, revise, report. & Forecast lifecycle; incident workflow; classification aggregation; QA decomposition.\\
+\multirow[t]{5}{\fulltextcol{0.105}}{\textbf{Mechanism}} & \Planning{} & Organizes long-horizon execution through decomposition, search, or workflow orchestration. & Inspect, clean, retrieve context, select tools, validate, diagnose, revise, report. & Forecast lifecycle; incident workflow; classification aggregation; QA decomposition.\\
 & \Memory{} & Maintains working, semantic, experiential, long-term, and shared memory. & Temporal fingerprints, context keys, event histories, prior traces, reusable temporal procedures. & Post-mortem forecast cases; anomaly rule histories; class exemplar memory.\\
 & \ToolUse{} & Expands the action space through tools, environment interaction, verification tools, and workflows. & Statistical models, TSFMs, visualizers, retrievers, simulators, validators. & Forecasting libraries; anomaly detectors; imputation engines; TSQA tools.\\
 & \Control{} & Routes feedback, enforces constraints, manages retries, and accepts or rejects state transitions. & Chronological splits, leakage guards, unit/frequency checks, allowed-context policies. & Horizon-specific backtests; anomaly deployment gates; answer faithfulness checks.\\
 & \HarnessOptimization{} & Improves prompts, interfaces, policies, memories, traces, and skills using feedback. & Distilled temporal trajectories, learned tool policies, regression monitoring under shift. & Forecast metric optimization; rule repair; benchmark-generation refinement.\\
 \midrule
-\multirow[t]{3}{0.105\textwidth}{\textbf{Interface}} & \CodeReasoning{} & Externalizes reasoning into executable and inspectable computation. & Statistical routines, decomposition, metrics, visualization, notebooks. & Forecast diagnostics; anomaly localization; classification evidence.\\
+\multirow[t]{3}{\fulltextcol{0.105}}{\textbf{Interface}} & \CodeReasoning{} & Externalizes reasoning into executable and inspectable computation. & Statistical routines, decomposition, metrics, visualization, notebooks. & Forecast diagnostics; anomaly localization; classification evidence.\\
 & \CodeActing{} & Converts model decisions into executable actions, tool calls, policies, or skills. & Typed temporal actions: load, slice, resample, aggregate, align, retrieve, evaluate. & Forecast, detect, classify, impute, generate questions, revise outputs.\\
 & \CodeEnv{} & Represents task state, environment dynamics, observations, feedback, and artifacts. & Time-indexed workspace with series, metadata, covariates, context, splits, tool outputs, logs. & Forecast ledgers; anomaly windows; class exemplars; QA evidence states.\\
 \midrule
-\multirow[t]{2}{0.105\textwidth}{\textbf{Scaling}} & \hcomp{Multi-Agent Orchestration} & Coordinates roles through shared state, debate, review, or red-teaming. & Shared temporal evidence state across numeric, visual, textual, planning, and reviewer roles. & Forecaster/\allowbreak reporter roles; anomaly analyst/\allowbreak reviewer roles; modality-specific QA roles.\\
+\multirow[t]{2}{\fulltextcol{0.105}}{\textbf{Scaling}} & \hcomp{Multi-Agent Orchestration} & Coordinates roles through shared state, debate, review, or red-teaming. & Shared temporal evidence state across numeric, visual, textual, planning, and reviewer roles. & Forecaster/\allowbreak reporter roles; anomaly analyst/\allowbreak reviewer roles; modality-specific QA roles.\\
 & \hcomp{Shared Artifacts and Collective Verification} & Uses repositories, tests, traces, execution states, workflows, and review artifacts. & Shared time-series workspaces, validation reports, audit logs, cost records, rollback artifacts. & Forecast ledgers, anomaly rules, generated exams, deployment reviews.\\
 \bottomrule
 \end{longtable}
@@ -356,8 +359,9 @@ Under this rule, the current ledger contains 45 counted Time Series Agent or age
 \begin{landscape}
 {\scriptsize
 \setlength{\tabcolsep}{2.0pt}
+\setlength{\LTcapwidth}{\linewidth}
 \renewcommand{\arraystretch}{1.08}
-\begin{longtable}{L{0.115\linewidth} C{0.055\linewidth} L{0.115\linewidth} C{0.045\linewidth} L{0.19\linewidth} L{0.205\linewidth} L{0.225\linewidth}}
+\begin{longtable}{L{\fulllinecol{0.12}} C{\fulllinecol{0.055}} L{\fulllinecol{0.12}} C{\fulllinecol{0.045}} L{\fulllinecol{0.20}} L{\fulllinecol{0.21}} L{\fulllinecol{0.25}}}
 \caption{Maintained ledger for Time Series Agent works. \layerGH{} = \GeneralHarness{}; \layerGTS{} = \GeneralTSHarness{}; \layerTSK{} = \TaskSpecificHarness{}. Month records the public posting month when it can be stably identified; entries without a stable month remain in the aggregate distribution but are omitted from Figure~\ref{fig:contribution-trend}.}
 \label{tab:agent-ledger}\\
 \toprule
@@ -422,7 +426,7 @@ TS-Reasoner \citep{tsreasoner2026} & -- & Inference / analysis & \layerGTS{} & D
 
 Table~\ref{tab:general-harness-contrib} isolates the contributions that are primarily about making an LLM operate as an agent, independent of the temporal domain. These components are important, but they should not be mistaken for time-series-domain novelty by themselves.
 
-\begin{longtable}{L{0.22\textwidth} L{0.34\textwidth} L{0.34\textwidth}}
+\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.39}} L{\fulltextcol{0.39}}}
 \caption{General Harness components and representative contributions in Time Series Agent work.}
 \label{tab:general-harness-contrib}\\
 \toprule
@@ -446,7 +450,7 @@ Table~\ref{tab:general-harness-contrib} isolates the contributions that are prim
 
 Table~\ref{tab:general-ts-harness-contrib} summarizes the cross-task temporal substrate. These components are not tied to one task such as forecasting; they are reusable across temporal analysis tasks.
 
-\begin{longtable}{L{0.22\textwidth} L{0.34\textwidth} L{0.34\textwidth}}
+\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.39}} L{\fulltextcol{0.39}}}
 \caption{General Time-Series Harness Module components.}
 \label{tab:general-ts-harness-contrib}\\
 \toprule
@@ -470,7 +474,7 @@ Cross-task evaluation state & TimeSage-MT \citep{timesagemt2026}, TimeSeriesExam
 
 The remaining tables list \TaskSpecificHarness{} designs by concrete work and task family. This split is necessary because a forecasting module, an anomaly module, and a classification module can all sit on the same \GeneralTSHarness{}, but their actions, validators, memories, and artifacts differ. We also include task-specific reasoning and evidence-acquisition methods that are not counted as complete agents in the ledger, because they define reusable modules that Time Series Agents can incorporate.
 
-\begin{longtable}{L{0.22\textwidth} L{0.18\textwidth} L{0.32\textwidth} L{0.18\textwidth}}
+\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.18}} L{\fulltextcol{0.40}} L{\fulltextcol{0.20}}}
 \caption{Forecasting and forecast-deployment Task-Specific Time-Series Harness Modules. Rows are concrete works; each design states the module that the system adds on top of a general agent runtime and a cross-task temporal substrate.}
 \label{tab:forecasting-task-harness}\\
 \toprule
@@ -497,12 +501,12 @@ KairosAgent \citep{kairosagent2026} & Semantic forecasting & Multi-turn refineme
 TimeClaw-EEL \citep{timeclaw2026explore} & Agent learning for forecasting & Explore--compare--distill--reinject loop converts successful temporal trajectories into reusable experience. & Experience learning\\
 MetaCaster \citep{metacaster2026} & Few-shot forecaster construction & Agent-as-Engineer module generates data, trains lightweight forecasters, and selects deployable candidates. & Forecaster generation\\
 Time-R1 \citep{timer12025} & Reasoning-trained forecasting & Fine-grained multi-objective reward and RL schedule train slow-thinking forecast reasoning. & Reasoning policy\\
-TimeMaster \citep{timemaster2025} & Visualized TS forecasting/classification & Structured reasoning/classification/extension output with reward-driven multimodal reasoning training. & Rewarded reasoning\\
+TimeMaster \citep{timemaster2025} & Visualized TS forecasting and classification & Structured reasoning/\allowbreak classification/\allowbreak extension output with reward-driven multimodal reasoning training. & Rewarded reasoning\\
 TFRBench \citep{tfrbench2026} & Forecast reasoning evaluation & Multi-agent verification loop synthesizes numerically grounded reasoning traces for cross-channel, trend, and event reasoning. & Reasoning benchmark\\
 \bottomrule
 \end{longtable}
 
-\begin{longtable}{L{0.22\textwidth} L{0.18\textwidth} L{0.32\textwidth} L{0.18\textwidth}}
+\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.18}} L{\fulltextcol{0.40}} L{\fulltextcol{0.20}}}
 \caption{Question answering, temporal reasoning, and domain-decision Task-Specific Time-Series Harness Modules.}
 \label{tab:qa-reasoning-task-harness}\\
 \toprule
@@ -531,7 +535,7 @@ WeatherTGD \citep{weathertgd2026} & Weather captioning & Statistical, physical, 
 \bottomrule
 \end{longtable}
 
-\begin{longtable}{L{0.22\textwidth} L{0.18\textwidth} L{0.32\textwidth} L{0.18\textwidth}}
+\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.18}} L{\fulltextcol{0.40}} L{\fulltextcol{0.20}}}
 \caption{Classification, activity-recognition, and annotation Task-Specific Time-Series Harness Modules.}
 \label{tab:classification-task-harness}\\
 \toprule
@@ -550,7 +554,7 @@ TimeMaster \citep{timemaster2025} & Multimodal classification & Structured outpu
 \bottomrule
 \end{longtable}
 
-\begin{longtable}{L{0.22\textwidth} L{0.18\textwidth} L{0.32\textwidth} L{0.18\textwidth}}
+\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.18}} L{\fulltextcol{0.40}} L{\fulltextcol{0.20}}}
 \caption{Anomaly-detection, diagnosis, and root-cause Task-Specific Time-Series Harness Modules.}
 \label{tab:anomaly-task-harness}\\
 \toprule
@@ -571,7 +575,7 @@ Tree-of-Evidence \citep{treeofevidence2026} & Clinical/fault evidence search & B
 \bottomrule
 \end{longtable}
 
-\begin{longtable}{L{0.22\textwidth} L{0.18\textwidth} L{0.32\textwidth} L{0.18\textwidth}}
+\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.18}} L{\fulltextcol{0.40}} L{\fulltextcol{0.20}}}
 \caption{Benchmark-generation, evaluation, streaming, and deployment Task-Specific Time-Series Harness Modules.}
 \label{tab:benchmark-streaming-task-harness}\\
 \toprule
@@ -583,7 +587,7 @@ Tree-of-Evidence \citep{treeofevidence2026} & Clinical/fault evidence search & B
 \midrule
 \endhead
 TimeSage-MT \citep{timesagemt2026} & Multi-turn agent benchmark & Dialogue turns, cross-turn temporal state, analytical skill library, and reference-code scoring expose failures in memory and decision tasks. & Process benchmark\\
-TimeSeriesExamAgent \citep{timeseriesexamagent2026} & Benchmark generation & Dataset-aware templates, question generation, verification, refinement, and question-bank memory. & Scalable task generation\\
+TimeSeries\allowbreak Exam\allowbreak Agent \citep{timeseriesexamagent2026} & Benchmark generation & Dataset-aware templates, question generation, verification, refinement, and question-bank memory. & Scalable task generation\\
 AION \citep{aion2026} & Practical harness / tasks & Task files, workspaces, artifacts, evaluators, and validation protocols define realistic TS-agent task interfaces. & Practical evaluation\\
 TFRBench \citep{tfrbench2026} & Forecast reasoning benchmark & Reasoning traces are generated and checked through an iterative multi-agent verification loop. & Reasoning evaluation\\
 CALM \citep{calm2025} & Streaming adaptation & Non-stationary stream state, LLM-as-judge feedback, continuous adaptation, and regression checks. & Stream monitoring\\
@@ -614,7 +618,7 @@ For process-level evaluation, the following metrics should be reported in additi
 
 The field needs reusable infrastructure rather than isolated demonstrations. A practical repository stack should contain:
 
-\begin{longtable}{L{0.24\textwidth} L{0.36\textwidth} L{0.30\textwidth}}
+\begin{longtable}{L{\fulltextcol{0.24}} L{\fulltextcol{0.40}} L{\fulltextcol{0.36}}}
 \caption{Suggested repository stack for Time Series Agent research.}\\
 \toprule
 \textbf{Layer} & \textbf{Content} & \textbf{Purpose}\\
