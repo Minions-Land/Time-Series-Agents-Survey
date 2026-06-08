@@ -68,8 +68,10 @@
 
 \newcommand{\keyterm}[1]{\textbf{#1}}
 \newcommand{\hcomp}[1]{\textsf{\textbf{#1}}}
-\newcommand{\GeneralHarness}{\hcomp{general Harness}}
-\newcommand{\TSHarnessModule}{\hcomp{Time-series Harness Module}}
+\newcommand{\GeneralHarness}{\hcomp{General Harness}}
+\newcommand{\TSHarnessModule}{\hcomp{Time-Series Harness Module}}
+\newcommand{\GeneralTSHarness}{\hcomp{General Time-Series Harness Module}}
+\newcommand{\TaskSpecificHarness}{\hcomp{Task-Specific Time-Series Harness Module}}
 \newcommand{\HarnessInterface}{\hcomp{Harness Interface}}
 \newcommand{\HarnessMechanisms}{\hcomp{Harness Mechanisms}}
 \newcommand{\ScalingHarness}{\hcomp{Scaling the Harness}}
@@ -85,6 +87,9 @@
 \newcommand{\domain}{\textsf{Domain}}
 \newcommand{\general}{\textsf{General}}
 \newcommand{\cfeat}[2]{\textsf{\textbf{#1}}: #2}
+\newcommand{\layerGH}{\textsf{\textbf{GH}}}
+\newcommand{\layerGTS}{\textsf{\textbf{GTS}}}
+\newcommand{\layerTSK}{\textsf{\textbf{TSK}}}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
 
@@ -108,7 +113,7 @@
   bottom=12pt
 ]
 \textbf{Abstract.}
-Time series research is moving from isolated prediction models toward agentic systems that inspect temporal data, retrieve context, call analytical tools, validate intermediate evidence, revise outputs, and support downstream decisions. This transition creates a conceptual gap for the community: existing surveys explain large language models for time series, time-series foundation models, or multimodal temporal reasoning, but they do not fully specify what makes an LLM-based system an agent for temporal analysis. This survey provides a component-level guide to that gap. It clarifies the operational meaning of an Agent and a Time Series Agent, identifies the runtime components that turn an LLM into a stateful, tool-using, verifiable system, and reviews what current Time Series Agents have implemented. We distinguish general-agent infrastructure from time-series-domain modules, summarize design boundaries for building new systems, and organize benchmarks and evaluation protocols so that future Time Series Agents can be compared not only by final predictive accuracy, but also by tool correctness, temporal faithfulness, context use, trace quality, and decision-oriented reliability.
+Time series research is moving from isolated prediction models toward agentic systems that inspect temporal data, retrieve context, call analytical tools, validate intermediate evidence, revise outputs, and support downstream decisions. This transition creates a conceptual gap for the community: existing surveys explain large language models for time series, time-series foundation models, or multimodal temporal reasoning, but they do not fully specify what makes an LLM-based system an agent for temporal analysis. This survey provides a component-level guide to that gap. It clarifies the operational meaning of an Agent and a Time Series Agent, identifies the runtime components that turn an LLM into a stateful, tool-using, verifiable system, and reviews what current Time Series Agents have implemented. We distinguish general-agent infrastructure, cross-task time-series Harness modules, and task-specific Harness modules for forecasting, anomaly detection, classification, QA, benchmark generation, and deployment. We further maintain a work-level component ledger so that future Time Series Agents can be compared not only by final predictive accuracy, but also by contribution locus, tool correctness, temporal faithfulness, context use, trace quality, and decision-oriented reliability.
 \end{tcolorbox}
 
 \textbf{Keywords}: time series agents, LLM agents, temporal reasoning, time series foundation models, contextualized time series, tool use, memory, benchmark.
@@ -118,6 +123,8 @@ Time series research is moving from isolated prediction models toward agentic sy
 \section{Introduction}
 
 Time series analysis has long been organized around task-specific predictors: forecasting, classification, anomaly detection, imputation, segmentation, and representation learning. This model-centric paradigm has produced a mature ecosystem spanning classical statistical methods, deep neural architectures, foundation models, and LLM-enhanced temporal models \citep{zhang2024llmts,jiang2024empowering}. These systems are essential, but most of them are designed to answer a bounded modeling question once the task, data split, features, context, and evaluation protocol have already been specified.
+
+The task space is broader than forecasting. Time-series systems may be asked to forecast future values, classify sequence-level or window-level labels, detect anomalies and root causes, impute missing observations, answer questions about temporal evidence, retrieve event context, generate benchmarks, revise deployed forecasts, or support downstream decisions. These tasks share temporal constraints, but they do not require identical runtime components. A forecasting agent needs horizon-aware validation, model selection, ensembling, and revision contracts; an anomaly agent needs window localization, rule generation, and incident evidence; a classification agent needs channel-aware evidence and class exemplars; a QA agent needs faithful tool calls and answer grounding. This task heterogeneity is why a single undifferentiated time-series module is too coarse.
 
 However, real temporal analysis rarely ends with a single model output. A practitioner must inspect data quality, verify temporal granularity, identify regime shifts, retrieve events, select tools, compare models, validate against chronological splits, explain evidence, revise forecasts under constraints, and turn predictions into operational decisions. These steps require a system-level runtime, not only a stronger backbone model.
 
@@ -137,19 +144,19 @@ LLM agents provide a natural system abstraction for this broader workflow. In th
 \textbf{Agent} = \text{LLM} + \text{Harness}.
 \]
 \[
-\textbf{Time Series Agent} = \text{LLM} + \text{(general) Harness} + \text{Time series Harness Module}.
+\textbf{Time Series Agent} = \text{LLM} + \text{(general) Harness} + \text{Time-Series Harness Module}.
 \]
 \end{tcolorbox}
 
-The LLM supplies language understanding, planning, and judgment; the general runtime supplies the interface and control surfaces that make actions executable, stateful, auditable, and revisable. Time series add a domain layer that a generic agent does not automatically provide. Temporal data require chronological causality, leakage control, frequency and unit semantics, temporal alignment, missingness handling, non-stationarity awareness, uncertainty treatment, and metric-verifiable numerical outputs. The \TSHarnessModule{} is therefore the part of the system that makes temporal objects native to the agent runtime rather than treating them as ordinary text.
+The LLM supplies language understanding, planning, and judgment; the general runtime supplies the interface and control surfaces that make actions executable, stateful, auditable, and revisable. Time series add a domain layer that a generic agent does not automatically provide. Temporal data require chronological causality, leakage control, frequency and unit semantics, temporal alignment, missingness handling, non-stationarity awareness, uncertainty treatment, and metric-verifiable numerical outputs. The \TSHarnessModule{} is therefore the part of the system that makes temporal objects native to the agent runtime rather than treating them as ordinary text. We further divide it into two levels: a \GeneralTSHarness{} that is useful across time-series tasks, and a \TaskSpecificHarness{} that is tied to forecasting, anomaly detection, classification, QA, imputation, benchmark generation, or another concrete task family.
 
-This framing separates two kinds of contribution that are often conflated. A paper may improve the general-agent layer: planning, tool use, reflection, memory retrieval, tool synthesis, debate, control, or system optimization. Or it may improve the time-series-domain layer: time-indexed workspaces, temporal tool schemas, context-series alignment, forecast revision constraints, temporal validation, domain memory, or time-series benchmark protocols. Mature Time Series Agents usually combine both layers, but the contribution should identify which layer is novel.
+This framing separates three kinds of contribution that are often conflated. A paper may improve the \GeneralHarness{}: planning, tool use, reflection, memory retrieval, tool synthesis, debate, control, or system optimization. It may improve the \GeneralTSHarness{}: time-indexed workspaces, typed temporal operations, context-series alignment, leakage-aware control, metric-verifiable outputs, temporal memory, or shared benchmark protocols. Or it may improve a \TaskSpecificHarness{}: forecast validation and revision, anomaly-rule synthesis, classification exemplar reasoning, TSQA tool schemas, imputation operators, or task-specific data generation. Mature Time Series Agents usually combine all three layers, but the contribution should identify which layer is novel.
 
 \subsection{Position relative to existing surveys}
 
 Existing surveys cover important subsets of the landscape. Classical and deep-learning surveys organize time-series research around forecasting, change-point detection, anomaly detection, and neural architectures \citep{lim2021deepts,aminikhanghahi2017changepoint,darban2024anomaly,wen2023transformers}. As larger temporal backbones emerged, surveys on time-series foundation models and synthetic data summarized pretraining, adaptation, scaling, data generation, and evaluation practices \citep{liang2024foundation,liu2025synthetic}. LLM-oriented surveys then focused on serialization, prompting, tokenization, reprogramming, cross-modal alignment, model integration, and the limits of LLMs as direct numerical forecasters \citep{zhang2024llmts,jiang2024empowering,liu2025crossmodality}. Multimodal time-series surveys further organize text, image, sensor, event, and structured temporal evidence \citep{jiang2025multimodal,liu2025crossmodality}. More recent studies move toward prompting-to-agent transitions and reasoning-oriented temporal systems, using dimensions such as decomposition and verification, ensembling, tool use, knowledge access, multimodality, agent loops, and LLM alignment regimes \citep{promptstoagents2026,changsurvey2026}.
 
-These surveys establish useful maps, but they are not sufficient as a design basis for Time Series Agents. The agent-oriented literature can always add new labels as the field evolves--for example, from tool use and memory to retrieval, debate, workflow orchestration, self-reflection, tool synthesis, execution learning, and capability evolution. A moving list of labels is unstable as the core organizing principle. More importantly, the Harness view already places these labels inside a known agent runtime: \HarnessInterface{} covers \CodeReasoning{}, \CodeActing{}, and \CodeEnv{}; \HarnessMechanisms{} covers \Planning{}, \Memory{}, \ToolUse{}, \Control{}, and \HarnessOptimization{}; and \ScalingHarness{} covers shared artifacts, multi-agent coordination, review, and collective verification \citep{li2026harnesssurvey,ning2026codeharness}. The central question for Time Series Agent research is therefore not whether a paper can be assigned to one more component label, but where its contribution is located. It may improve the \GeneralHarness{} shared by LLM agents, or it may introduce a \TSHarnessModule{} that is specific to temporal data: time-indexed workspaces, typed temporal operations, context-series alignment, leakage-aware control, metric-verifiable outputs, temporal memory, and domain workflows. This survey is organized around that contribution-level separation.
+These surveys establish useful maps, but they are not sufficient as a design basis for Time Series Agents. The agent-oriented literature can always add new labels as the field evolves--for example, from tool use and memory to retrieval, debate, workflow orchestration, self-reflection, tool synthesis, execution learning, and capability evolution. A moving list of labels is unstable as the core organizing principle. More importantly, the Harness view already places these labels inside a known agent runtime: \HarnessInterface{} covers \CodeReasoning{}, \CodeActing{}, and \CodeEnv{}; \HarnessMechanisms{} covers \Planning{}, \Memory{}, \ToolUse{}, \Control{}, and \HarnessOptimization{}; and \ScalingHarness{} covers shared artifacts, multi-agent coordination, review, and collective verification \citep{li2026harnesssurvey,ning2026codeharness}. The central question for Time Series Agent research is therefore not whether a paper can be assigned to one more component label, but where its contribution is located. It may improve the \GeneralHarness{} shared by LLM agents, the \GeneralTSHarness{} shared across temporal tasks, or a \TaskSpecificHarness{} for forecasting, anomaly detection, classification, QA, imputation, benchmark generation, or deployment. This survey is organized around that contribution-level separation.
 
 \subsection{Contributions}
 
@@ -157,8 +164,8 @@ This survey makes four contributions.
 
 \begin{enumerate}
   \item We establish an operational framing of Time Series Agents as LLM-based systems whose general runtime is extended by a time-series-domain module.
-  \item We separate the design space into general-agent infrastructure and time-series-specific runtime support, clarifying whether a method contributes to agent design, temporal-domain design, or their interface.
-  \item We organize existing systems through two aligned component maps: one for general-agent design and one for time-series-domain module design.
+  \item We separate the design space into \GeneralHarness{}, \GeneralTSHarness{}, and \TaskSpecificHarness{} layers, clarifying whether a method contributes to agent design, cross-task temporal runtime support, or task-specific temporal workflows.
+  \item We organize existing systems through a maintained component ledger and a set of aligned tables covering general-agent design, cross-task time-series modules, and task-specific modules.
   \item We outline design and evaluation principles for future systems, with emphasis on temporal faithfulness, tool correctness, process-level evaluation, reproducible infrastructure, and downstream decision support.
 \end{enumerate}
 
@@ -180,7 +187,7 @@ This decomposition is domain-agnostic. It tells us what an agent runtime must pr
 
 \subsection{Why time series require a Time-series Harness Module}
 
-Time series are ordered, scale-sensitive, and context-dependent temporal objects. A \TSHarnessModule{} must protect at least six properties:
+Time series are ordered, scale-sensitive, and context-dependent temporal objects. A \TSHarnessModule{} must protect at least six cross-task properties:
 
 \begin{itemize}
   \item \keyterm{Temporal causality}: future observations, labels, and events must not leak into past decisions.
@@ -191,35 +198,41 @@ Time series are ordered, scale-sensitive, and context-dependent temporal objects
   \item \keyterm{Metric-verifiable outputs}: forecasts, diagnoses, and decisions must be checked by task-specific metrics, evidence traces, and leakage-aware validation.
 \end{itemize}
 
-This is why Time Series Agents are not equivalent to prompting an LLM with a CSV. The \TSHarnessModule{} changes what the LLM can observe, which actions it can take, how intermediate evidence is stored, how outputs are verified, and how experience is reused.
+These properties define the \GeneralTSHarness{}: the reusable temporal substrate shared by forecasting, classification, anomaly detection, QA, imputation, retrieval, benchmark generation, and decision support. A second level is task-specific. Forecasting modules introduce horizon contracts, backtesting, model-selection policies, forecast reconciliation, ensembling, and revision ledgers. Anomaly modules introduce localization, incident windows, rule synthesis, root-cause evidence, and deployment gates. Classification modules introduce channel-wise evidence, exemplar memories, label calibration, and confidence aggregation. QA modules introduce temporal question schemas, faithful tool execution, and evidence-grounded answer checking. Imputation modules introduce missingness mechanisms, mask-aware operators, and reconstruction validation. This is why Time Series Agents are not equivalent to prompting an LLM with a CSV. The \TSHarnessModule{} changes what the LLM can observe, which actions it can take, how intermediate evidence is stored, how outputs are verified, and how experience is reused.
 
 \section{Component Map for Time Series Agents}
 
-Table~\ref{tab:component-vocab} first makes the core components explicit. The key point is that a Time Series Agent is not defined by a particular LLM backbone, but by how the \GeneralHarness{} is extended with a \TSHarnessModule{}. We therefore compare systems by the components they implement: interface, mechanisms, scaling design, and temporal-domain specialization.
+Table~\ref{tab:component-vocab} first makes the core components explicit. The key point is that a Time Series Agent is not defined by a particular LLM backbone, but by how the \GeneralHarness{} is extended with a \TSHarnessModule{}. We therefore compare systems by the components they implement: interface, mechanisms, scaling design, cross-task temporal runtime support, and task-specific temporal specialization.
 
-\begin{longtable}{L{0.18\textwidth} L{0.23\textwidth} L{0.25\textwidth} L{0.24\textwidth}}
+\begin{landscape}
+{\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{longtable}{L{0.12\linewidth} L{0.15\linewidth} L{0.22\linewidth} L{0.26\linewidth} L{0.20\linewidth}}
 \caption{Core runtime components for Time Series Agents and their specialization to temporal analysis.}
 \label{tab:component-vocab}\\
 \toprule
-\textbf{Layer} & \textbf{Component term} & \textbf{General-agent role} & \textbf{Time-series specialization}\\
+\textbf{Layer} & \textbf{Component term} & \textbf{General-agent role} & \textbf{General TS specialization} & \textbf{Task-specific specialization}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Layer} & \textbf{Component term} & \textbf{General-agent role} & \textbf{Time-series specialization}\\
+\textbf{Layer} & \textbf{Component term} & \textbf{General-agent role} & \textbf{General TS specialization} & \textbf{Task-specific specialization}\\
 \midrule
 \endhead
-\HarnessInterface{} & \CodeReasoning{} & Externalizes intermediate reasoning into executable and inspectable computation. & Uses statistical routines, temporal decomposition, metric calculation, visualization, and executable notebooks to ground numerical claims.\\
-\HarnessInterface{} & \CodeActing{} & Converts model decisions into executable actions, tool calls, policies, or reusable skills. & Provides typed temporal actions such as load, slice, resample, aggregate, decompose, forecast, detect anomaly, retrieve event, revise forecast, and evaluate.\\
-\HarnessInterface{} & \CodeEnv{} & Represents task state, environment dynamics, observations, feedback, and artifacts. & Maintains a time-indexed workspace with series, metadata, covariates, context, visible/hidden splits, tool outputs, forecast artifacts, and audit logs.\\
-\HarnessMechanisms{} & \Planning{} & Organizes long-horizon execution through decomposition, structure-grounded plans, search, or workflow orchestration. & Decomposes temporal work into data inspection, cleaning, context retrieval, model/tool selection, validation, diagnosis, revision, reporting, and decision support.\\
-\HarnessMechanisms{} & \Memory{} & Maintains working state, semantic memory, experiential memory, long-term memory, and shared multi-agent memory. & Stores temporal fingerprints, context keys, event histories, prior analysis traces, post-mortems, domain cases, and reusable temporal procedures with provenance and leakage controls.\\
-\HarnessMechanisms{} & \ToolUse{} & Expands the action space through function-oriented tools, environment-interaction tools, verification-driven tools, and workflow-orchestration tools. & Wraps statistical models, forecasting models, TSFMs, anomaly detectors, visualizers, retrievers, simulators, metric calculators, and temporal validators as callable tools.\\
-\HarnessMechanisms{} & \Control{} & Routes execution feedback, enforces constraints, manages retries, and decides whether state transitions are acceptable. & Enforces chronological splits, leakage guards, unit/frequency checks, allowed-context policies, uncertainty checks, and evidence-grounded answer constraints.\\
-\HarnessMechanisms{} & \HarnessOptimization{} & Improves prompts, tool interfaces, policies, memories, traces, and reusable skills using execution feedback or telemetry. & Distills successful temporal trajectories into reusable analytical routines, learns tool-selection or revision policies, and monitors regression under evolving distributions.\\
-\ScalingHarness{} & \hcomp{Multi-Agent Orchestration} & Coordinates specialized agents through roles, shared state, debate, review, or red-teaming. & Separates numeric, visual, textual, planning, forecasting, diagnostic, and reviewer roles while preserving a common temporal evidence state.\\
-\ScalingHarness{} & \hcomp{Shared Artifacts and Collective Verification} & Uses repositories, tests, traces, execution states, structured workflows, and review artifacts for collaboration. & Maintains shared forecast ledgers, anomaly rules, task files, validation reports, revision histories, review gates, cost records, and deployment rollback artifacts.\\
+\HarnessInterface{} & \CodeReasoning{} & Externalizes reasoning into executable and inspectable computation. & Statistical routines, decomposition, metrics, visualization, notebooks. & Forecast diagnostics; anomaly localization; classification evidence.\\
+\HarnessInterface{} & \CodeActing{} & Converts model decisions into executable actions, tool calls, policies, or skills. & Typed temporal actions: load, slice, resample, aggregate, align, retrieve, evaluate. & Forecast, detect, classify, impute, generate questions, revise outputs.\\
+\HarnessInterface{} & \CodeEnv{} & Represents task state, environment dynamics, observations, feedback, and artifacts. & Time-indexed workspace with series, metadata, covariates, context, splits, tool outputs, logs. & Forecast ledgers; anomaly windows; class exemplars; QA evidence states.\\
+\HarnessMechanisms{} & \Planning{} & Organizes long-horizon execution through decomposition, search, or workflow orchestration. & Inspect, clean, retrieve context, select tools, validate, diagnose, revise, report. & Forecast lifecycle; incident workflow; classification aggregation; QA decomposition.\\
+\HarnessMechanisms{} & \Memory{} & Maintains working, semantic, experiential, long-term, and shared memory. & Temporal fingerprints, context keys, event histories, prior traces, reusable temporal procedures. & Post-mortem forecast cases; anomaly rule histories; class exemplar memory.\\
+\HarnessMechanisms{} & \ToolUse{} & Expands the action space through tools, environment interaction, verification tools, and workflows. & Statistical models, TSFMs, visualizers, retrievers, simulators, validators. & Forecasting libraries; anomaly detectors; imputation engines; TSQA tools.\\
+\HarnessMechanisms{} & \Control{} & Routes feedback, enforces constraints, manages retries, and accepts or rejects state transitions. & Chronological splits, leakage guards, unit/frequency checks, allowed-context policies. & Horizon-specific backtests; anomaly deployment gates; answer faithfulness checks.\\
+\HarnessMechanisms{} & \HarnessOptimization{} & Improves prompts, interfaces, policies, memories, traces, and skills using feedback. & Distilled temporal trajectories, learned tool policies, regression monitoring under shift. & Forecast metric optimization; rule repair; benchmark-generation refinement.\\
+\ScalingHarness{} & \hcomp{Multi-Agent Orchestration} & Coordinates roles through shared state, debate, review, or red-teaming. & Shared temporal evidence state across numeric, visual, textual, planning, and reviewer roles. & Forecaster/\allowbreak reporter roles; anomaly analyst/\allowbreak reviewer roles; modality-specific QA roles.\\
+\ScalingHarness{} & \hcomp{Shared Artifacts and Collective Verification} & Uses repositories, tests, traces, execution states, workflows, and review artifacts. & Shared time-series workspaces, validation reports, audit logs, cost records, rollback artifacts. & Forecast ledgers, anomaly rules, generated exams, deployment reviews.\\
 \bottomrule
 \end{longtable}
+}
+\end{landscape}
 
 \section{Literature Landscape}
 
@@ -245,7 +258,7 @@ Multi-agent systems coordinate heterogeneous evidence or roles. TS-Debate separa
 
 \subsection{Adjacent LLM agents for data science}
 
-Time Series Agents also inherit ideas from LLM agents for data science and machine-learning engineering. Prior work shows how agents can write code, inspect intermediate outputs, reuse cases, modify files, run experiments, and reason over machine-learning pipelines \citep{datainterpreter2025,dsagent2024,mlagentbench2024}. These systems are not time-series agents by themselves, but they define \GeneralHarness{} mechanisms--code execution, experiment management, stateful artifacts, and evaluation feedback--that can be specialized by a \TSHarnessModule{}. In our component map, they mainly inform the general-agent layer, whereas time-series agent systems specialize those mechanisms for temporal data.
+Time Series Agents also inherit ideas from LLM agents for data science and machine-learning engineering. Prior work shows how agents can write code, inspect intermediate outputs, reuse cases, modify files, run experiments, and reason over machine-learning pipelines \citep{datainterpreter2025,dsagent2024,mlagentbench2024}. These systems are not time-series agents by themselves, but they define \GeneralHarness{} mechanisms--code execution, experiment management, stateful artifacts, and evaluation feedback--that can be specialized by a \GeneralTSHarness{} and then by task-specific temporal modules. In our component map, they mainly inform the general-agent layer, whereas time-series agent systems specialize those mechanisms for temporal data and concrete temporal tasks.
 
 \subsection{Self-evolving and component-explicit systems}
 
@@ -253,125 +266,216 @@ Recent systems make runtime components trainable or self-extending. They formula
 
 This direction is especially relevant when the system explicitly designs the \TSHarnessModule{} rather than only a task-specific prompt or workflow. A time-series-native runtime can host series in a task-local workspace, expose executable temporal tools, store episodic multimodal memory, and evolve new tools from verified trajectories, thereby connecting forecasting with contextual reasoning and domain-specific temporal analysis \citep{timeclaw2026harness}.
 
-\section{Component-Level Map of Existing Systems}
+\section{Layered Component Ledger of Existing Systems}
 
-The following two tables separate the same set of works into two views. Table~\ref{tab:general-design} records the general-agent design: how the LLM is given interfaces, planning structures, memory, feedback, optimization, or multi-agent coordination. Table~\ref{tab:ts-module-design} records the time-series-domain module: how temporal objects, tools, context, validation, and domain-specific workflows are represented. To improve readability, each table uses short component tags rather than full-sentence descriptions. In Table~\ref{tab:general-design}, \textsf{\textbf{I}} denotes interface/action design, \textsf{\textbf{P}} planning or workflow design, \textsf{\textbf{M}} memory or reflection, and \textsf{\textbf{C}} control, optimization, or scaling. In Table~\ref{tab:ts-module-design}, \textsf{\textbf{W}} denotes temporal workspace, \textsf{\textbf{A}} temporal actions, \textsf{\textbf{G}} grounding or temporal memory, and \textsf{\textbf{V}} validation or domain contribution.
+The contribution split is most useful when it is auditable at the work level. We therefore maintain a work-by-work ledger and use it as the basis for the tables below. Each work may contain multiple components, but for the percentage claim we assign one primary contribution locus: \layerGH{} for \GeneralHarness{}, \layerGTS{} for \GeneralTSHarness{}, and \layerTSK{} for \TaskSpecificHarness{}. Pure temporal foundation models and adjacent data-science agents are discussed elsewhere, but are not counted in this agent-harness statistic.
+
+Under this rule, the current ledger contains 29 counted Time Series Agent or agent-benchmark systems. The primary contribution distribution is: \layerGH{} 4/29 = 13.8\%, \layerGTS{} 7/29 = 24.1\%, and \layerTSK{} 18/29 = 62.1\%. This is an auditable snapshot of the systems covered here rather than a claim about every future system. The practical implication is clear: most current innovation is still task-specific, especially for forecasting and anomaly workflows. Cross-task time-series Harness design is emerging, but remains less developed than the number of task-specific agents suggests.
+
+\begin{longtable}{L{0.34\textwidth} C{0.13\textwidth} C{0.13\textwidth} L{0.30\textwidth}}
+\caption{Primary contribution distribution in the maintained Time Series Agent ledger.}\\
+\toprule
+\textbf{Primary contribution locus} & \textbf{Count} & \textbf{Share} & \textbf{Interpretation}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Primary contribution locus} & \textbf{Count} & \textbf{Share} & \textbf{Interpretation}\\
+\midrule
+\endhead
+\GeneralHarness{} & 4 / 29 & 13.8\% & General agent-loop, multi-agent, or optimization advances.\\
+\GeneralTSHarness{} & 7 / 29 & 24.1\% & Cross-task temporal workspace, tool, memory, or validation infrastructure.\\
+\TaskSpecificHarness{} & 18 / 29 & 62.1\% & Forecasting, anomaly, classification, QA, benchmark, streaming, or deployment modules.\\
+\bottomrule
+\end{longtable}
 
 \begin{landscape}
 {\scriptsize
 \setlength{\tabcolsep}{2.0pt}
 \renewcommand{\arraystretch}{1.08}
-\begin{longtable}{L{0.10\linewidth} L{0.12\linewidth} L{0.18\linewidth} L{0.18\linewidth} L{0.17\linewidth} L{0.19\linewidth}}
-\caption{General-agent design in surveyed Time Series Agent and adjacent systems. Compact tags: \textsf{\textbf{I}} interface/actions; \textsf{\textbf{P}} planning/workflow; \textsf{\textbf{M}} memory/reflection; \textsf{\textbf{C}} control, optimization, or scaling.}
-\label{tab:general-design}\\
+\begin{longtable}{L{0.11\linewidth} L{0.12\linewidth} C{0.055\linewidth} L{0.21\linewidth} L{0.22\linewidth} L{0.23\linewidth}}
+\caption{Maintained ledger for Time Series Agent works. \layerGH{} = \GeneralHarness{}; \layerGTS{} = \GeneralTSHarness{}; \layerTSK{} = \TaskSpecificHarness{}.}
+\label{tab:agent-ledger}\\
 \toprule
-\textbf{Work} & \textbf{Scope} & \textbf{I: Interface / actions} & \textbf{P: Planning / workflow} & \textbf{M: Memory / reflection} & \textbf{C: Control / optimization / scaling}\\
+\textbf{Work} & \textbf{Task family} & \textbf{Primary} & \textbf{General Harness contribution} & \textbf{General TS Harness contribution} & \textbf{Task-specific Harness contribution}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Work} & \textbf{Scope} & \textbf{I: Interface / actions} & \textbf{P: Planning / workflow} & \textbf{M: Memory / reflection} & \textbf{C: Control / optimization / scaling}\\
+\textbf{Work} & \textbf{Task family} & \textbf{Primary} & \textbf{General Harness contribution} & \textbf{General TS Harness contribution} & \textbf{Task-specific Harness contribution}\\
 \midrule
 \endhead
-\multicolumn{6}{l}{\textit{Tool-grounded reasoning and QA}}\\
-\midrule
-TS-Agent \citep{tsagent2025} & Raw-series reasoning and QA & \cfeat{I}{ReAct over observations} & \cfeat{P}{iterative insight gathering} & \cfeat{M}{task evidence buffer} & \cfeat{C}{critic quality gate}\\
-TimeART \citep{timeart2026} & Tool-augmented TSQA & \cfeat{I}{trained tool-call traces} & \cfeat{P}{multi-stage tool reasoning} & \cfeat{M}{reflection traces} & \cfeat{C}{feedback-tuned reliability}\\
-TSAG \citep{tsag2026} & Financial time-series QA & \cfeat{I}{structured finance queries} & \cfeat{P}{tool selection + parameters} & \cfeat{M}{retrieved outputs} & \cfeat{C}{faithfulness scoring}\\
-FETA \citep{feta2025} & Training-free classification & \cfeat{I}{channel agents + exemplars} & \cfeat{P}{confidence aggregation} & \cfeat{M}{exemplar memory} & \cfeat{C}{self-confidence weighting}\\
-ZARA \citep{zara2025} & Motion sensor reasoning & \cfeat{I}{retrieval evidence interface} & \cfeat{P}{candidate-activity loop} & \cfeat{M}{knowledge-base cues} & \cfeat{C}{label evidence filtering}\\
-\midrule
-\multicolumn{6}{l}{\textit{Forecasting workflows and assistants}}\\
-\midrule
-TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} & End-to-end forecasting analysis & \cfeat{I}{roles over data, models, reports} & \cfeat{P}{Curator--Planner--Forecaster--Reporter} & \cfeat{M}{artifacts + reports} & \cfeat{C}{validation + ensembling}\\
-FLAIRR-TS \citep{flairr2025} & Retrieval-refined forecasting & \cfeat{I}{retrieval/revision actions} & \cfeat{P}{retrieve--refine--forecast} & \cfeat{M}{retrieved examples} & \cfeat{C}{forecast-driven revision}\\
-TimeCAP \citep{timecap2025} & Event-aware prediction & \cfeat{I}{context augmentation} & \cfeat{P}{contextualize--augment--predict} & \cfeat{M}{task context} & \cfeat{C}{prediction feedback}\\
-TimeXL \citep{timexl2025} & Explainable multimodal prediction & \cfeat{I}{predict/explain loop} & \cfeat{P}{coupled prediction and explanation} & \cfeat{M}{multimodal evidence} & \cfeat{C}{evidence check}\\
-Nexus \citep{nexus2026} & Context-aware forecasting & \cfeat{I}{signal/context interface} & \cfeat{P}{macro/micro stages} & \cfeat{M}{organized context evidence} & \cfeat{C}{validation + synthesis}\\
-MoiraiAgent \citep{moiraiagent2026} & TSFM-based forecasting agent & \cfeat{I}{TSFM-as-tool} & \cfeat{P}{copilot orchestration} & \cfeat{M}{prompts + forecast artifacts} & \cfeat{C}{forecast comparison}\\
-TimeCopilot \citep{timecopilot2026} & Forecasting assistant & \cfeat{I}{interactive assistant} & \cfeat{P}{user-guided orchestration} & \cfeat{M}{user/task context} & \cfeat{C}{checks + revisions}\\
-Last-Mile \citep{lastmile2026} & Forecast revision and deployment & \cfeat{I}{constrained baseline edits} & \cfeat{P}{action-centric map-reduce} & \cfeat{M}{post-mortem cases} & \cfeat{C}{immutable baseline + traces}\\
-\midrule
-\multicolumn{6}{l}{\textit{Coordination, policy learning, and self-evolving systems}}\\
-\midrule
-TS-Debate \citep{tsdebate2026} & Multimodal zero-shot reasoning & \cfeat{I}{modality-specific agents} & \cfeat{P}{debate + conflict resolution} & \cfeat{M}{modality evidence} & \cfeat{C}{verification + calibration}\\
-MAS4TS \citep{mas4ts2026} & Visual multi-task reasoning & \cfeat{I}{role-specific agents} & \cfeat{P}{Analyzer--Reasoner--Executor} & \cfeat{M}{shared role memory} & \cfeat{C}{execution checking}\\
-Cast-R1 \citep{castr12026} & Forecasting as sequential decision-making & \cfeat{I}{state/action policy} & \cfeat{P}{sequential decisions} & \cfeat{M}{trajectory state} & \cfeat{C}{SFT/RL from metrics}\\
-KairosAgent \citep{kairosagent2026} & Multimodal forecasting & \cfeat{I}{reasoner + forecaster/tools} & \cfeat{P}{multi-turn refinement} & \cfeat{M}{semantic context} & \cfeat{C}{turn-level RL credit}\\
-TimeClaw-EEL \citep{timeclaw2026explore} & Exploratory execution learning & \cfeat{I}{metric-feedback tools} & \cfeat{P}{explore--compare--distill--reinject} & \cfeat{M}{distilled experience} & \cfeat{C}{tool dropout + metric selection}\\
-TimeClaw-Harness \citep{timeclaw2026harness} & Contextualized temporal reasoning & \cfeat{I}{typed runtime operations} & \cfeat{P}{iterative execution} & \cfeat{M}{episodic multimodal traces} & \cfeat{C}{capability evolution}\\
-AION \citep{aion2026} & Practical time-series agent system & \cfeat{I}{agents/skills/rules/evaluators} & \cfeat{P}{protocolized review} & \cfeat{M}{task/rule/skill memory} & \cfeat{C}{workspace + validation protocol}\\
-MetaCaster \citep{metacaster2026} & Few-shot lightweight forecaster construction & \cfeat{I}{Agent-as-Engineer} & \cfeat{P}{generate--train--select} & \cfeat{M}{few-shot + synthetic traces} & \cfeat{C}{meta-harness optimization}\\
-\midrule
-\multicolumn{6}{l}{\textit{Anomaly systems, benchmarks, and adjacent models}}\\
-\midrule
-Argos \citep{argos2025} & Production anomaly detection & \cfeat{I}{rule proposal/deployment} & \cfeat{P}{autonomous rule workflow} & \cfeat{M}{rule history} & \cfeat{C}{validate--repair--deploy gates}\\
-AnomaMind \citep{anomamind2026} & Anomaly diagnosis & \cfeat{I}{diagnostic tool loop} & \cfeat{P}{coarse-to-fine diagnosis} & \cfeat{M}{reusable patterns} & \cfeat{C}{reflection/RL feedback}\\
-TimeSage-MT \citep{timesagemt2026} & Multi-turn benchmark and agent & \cfeat{I}{multi-turn + code execution} & \cfeat{P}{nine skill groups} & \cfeat{M}{turn state} & \cfeat{C}{reference-code scoring}\\
-Dr-CiK \citep{drcik2026} & Foresight-driven benchmark & \cfeat{I}{active retrieval/filtering} & \cfeat{P}{retrieve--filter--distill--forecast} & \cfeat{M}{retained evidence} & \cfeat{C}{distractor ablation}\\
-TimeSeries\allowbreak Exam\allowbreak Agent \citep{timeseriesexamagent2026} & Benchmark generation & \cfeat{I}{templates + generators} & \cfeat{P}{generate--verify--refine} & \cfeat{M}{question bank} & \cfeat{C}{quality refinement loop}\\
-TimeOmni-1/VL \citep{timeomni2026,timeomnivl2026} & TS reasoning and generation model & \cfeat{I}{model I/O component} & \cfeat{P}{not a workflow agent} & \cfeat{M}{not an agent memory module} & \cfeat{C}{model training objective}\\
+TS-Agent \citep{tsagent2025} & Raw-series reasoning / QA & \layerGTS{} & ReAct-style observe--reason--act loop. & Raw-series observation state and statistical insight tools. & Temporal QA answer refinement.\\
+TimeART \citep{timeart2026} & TSQA / reasoning & \layerGTS{} & Tool-call traces and reflection during training. & TimeToolBench-style analytical tool substrate. & TSQA training and evaluation.\\
+TSAG \citep{tsag2026} & Financial QA & \layerTSK{} & Query planning and parameter extraction. & Executable temporal query interface. & Finance-specific schema, tools, and faithfulness checks.\\
+FETA \citep{feta2025} & Classification & \layerTSK{} & Channel-level agents and confidence aggregation. & Channel-separated temporal views. & Exemplar-based training-free classification.\\
+ZARA \citep{zara2025} & Activity recognition & \layerTSK{} & Retrieval-augmented candidate loop. & Sensor-window evidence representation. & Motion-cue retrieval and activity priors.\\
+TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} & Forecasting & \layerTSK{} & Curator--Planner--Forecaster--Reporter roles. & Dataset, artifact, visualization, and report workspace. & Forecasting lifecycle automation, validation, ensembling.\\
+FLAIRR-TS \citep{flairr2025} & Forecasting & \layerTSK{} & Retrieve--refine--forecast loop. & Context snippets attached to forecast state. & Retrieval-refined forecast revision.\\
+TimeCAP \citep{timecap2025} & Event-aware prediction & \layerTSK{} & Contextualize--augment--predict workflow. & Event-window alignment. & Event-conditioned prediction actions.\\
+TimeXL \citep{timexl2025} & Multimodal prediction & \layerTSK{} & Predict/explain interaction loop. & Multimodal temporal evidence state. & Explanation-grounded prediction.\\
+LLM-Agent Forecasting \citep{yeh2025empowering} & Forecasting & \layerTSK{} & Agentic forecast orchestration. & Forecast task state and feedback. & Forecast-specific agent workflow.\\
+Nexus \citep{nexus2026} & Forecasting & \layerTSK{} & Macro/micro multi-stage reasoning. & Signal/context workspace. & Context-aware forecasting pipeline.\\
+MoiraiAgent \citep{moiraiagent2026} & Forecasting & \layerTSK{} & Copilot-style tool orchestration. & TSFM-as-tool forecast artifacts. & TSFM-centered forecasting assistant.\\
+TimeCopilot \citep{timecopilot2026} & Forecasting & \layerTSK{} & Interactive assistant loop. & Session workspace and task context. & User-facing forecast analysis and revision.\\
+Last-Mile \citep{lastmile2026} & Forecast revision & \layerTSK{} & Constrained edit interface. & Baseline, ledger, audit trail. & Deployment-aware forecast revision.\\
+Cast-R1 \citep{castr12026} & Forecasting policy & \layerGH{} & Sequential decision policy and RL-style optimization. & Forecast trajectory state. & Forecast metric reward and action set.\\
+KairosAgent \citep{kairosagent2026} & Forecasting & \layerTSK{} & Multi-turn refinement with turn-level credit. & Multimodal forecast state. & TSFM + semantic forecasting module.\\
+MetaCaster \citep{metacaster2026} & Forecaster construction & \layerTSK{} & Agent-as-Engineer pipeline. & Few-shot temporal context and generated-data traces. & Lightweight forecaster generation, training, and selection.\\
+TS-Debate \citep{tsdebate2026} & Multimodal reasoning & \layerGH{} & Multi-agent debate and conflict resolution. & Shared temporal evidence across modalities. & Zero-shot multimodal TS reasoning.\\
+MAS4TS \citep{mas4ts2026} & Visual reasoning & \layerGH{} & Analyzer--Reasoner--Executor coordination. & Visual/statistical temporal evidence. & Visual time-series task execution.\\
+TimeClaw-EEL \citep{timeclaw2026explore} & Agent learning & \layerGH{} & Explore--compare--distill--reinject loop. & Metric observations over temporal trajectories. & Forecasting/weather/finance task metrics.\\
+TimeClaw-Harness \citep{timeclaw2026harness} & Contextualized reasoning & \layerGTS{} & Iterative tool execution and capability evolution. & Native temporal workspace, executable tools, episodic multimodal memory. & CiK, TSRBench, and TSAIA task protocols.\\
+AION \citep{aion2026} & Practical TS agent & \layerGTS{} & Agents, skills, rules, evaluators, and review protocols. & Task files, workspaces, artifacts, validation interface. & Realistic task protocols.\\
+TS-Reasoner \citep{tsreasoner2026} & Inference / analysis & \layerGTS{} & Domain-oriented inference loop. & Time-series inference tools and evidence state. & Analysis tasks over temporal data.\\
+TimeSage-MT \citep{timesagemt2026} & Multi-turn benchmark / agent & \layerGTS{} & Multi-turn agent interface with code execution. & Cross-turn temporal task state and analytical skill library. & Skill-level scoring across temporal tasks.\\
+TimeSeries\allowbreak Exam\allowbreak Agent \citep{timeseriesexamagent2026} & Benchmark generation & \layerTSK{} & Generate--verify--refine loop. & Dataset-aware temporal concept state. & Scalable TS reasoning benchmark generation.\\
+Dr-CiK \citep{drcik2026} & Forecasting context retrieval & \layerTSK{} & Retrieve--filter--distill workflow. & Future-relevant document evidence. & Forecasting under distractors.\\
+Argos \citep{argos2025} & Anomaly detection & \layerTSK{} & Autonomous rule proposal and review gates. & Cloud-metric workspace and monitoring context. & Anomaly-rule validation, repair, deployment.\\
+AnomaMind \citep{anomamind2026} & Anomaly diagnosis & \layerTSK{} & Coarse-to-fine diagnostic loop with reflection/RL. & Anomaly windows, features, and reusable patterns. & Localization and diagnosis workflow.\\
+CALM \citep{calm2025} & Streaming adaptation & \layerGTS{} & Continuous adaptation with LLM-as-judge feedback. & Non-stationary stream monitoring state. & Stream adaptation and regression checks.\\
 \bottomrule
 \end{longtable}
 }
 \end{landscape}
 
-\begin{landscape}
-{\scriptsize
-\setlength{\tabcolsep}{2.0pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{longtable}{L{0.10\linewidth} L{0.12\linewidth} L{0.18\linewidth} L{0.19\linewidth} L{0.19\linewidth} L{0.16\linewidth}}
-\caption{Time-series-domain module design in the same surveyed systems. Compact tags: \textsf{\textbf{W}} workspace; \textsf{\textbf{A}} temporal actions; \textsf{\textbf{G}} grounding or temporal memory; \textsf{\textbf{V}} validation or domain contribution.}
-\label{tab:ts-module-design}\\
+\subsection{General Harness contributions}
+
+Table~\ref{tab:general-harness-contrib} isolates the contributions that are primarily about making an LLM operate as an agent, independent of the temporal domain. These components are important, but they should not be mistaken for time-series-domain novelty by themselves.
+
+\begin{longtable}{L{0.22\textwidth} L{0.34\textwidth} L{0.34\textwidth}}
+\caption{General Harness components and representative contributions in Time Series Agent work.}
+\label{tab:general-harness-contrib}\\
 \toprule
-\textbf{Work} & \textbf{Scope} & \textbf{W: Temporal workspace} & \textbf{A: Temporal actions} & \textbf{G: Grounding / memory} & \textbf{V: Validation / domain contribution}\\
+\textbf{General Harness component} & \textbf{Representative works} & \textbf{Contribution pattern}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Work} & \textbf{Scope} & \textbf{W: Temporal workspace} & \textbf{A: Temporal actions} & \textbf{G: Grounding / memory} & \textbf{V: Validation / domain contribution}\\
+\textbf{General Harness component} & \textbf{Representative works} & \textbf{Contribution pattern}\\
 \midrule
 \endhead
-\multicolumn{6}{l}{\textit{Tool-grounded reasoning and QA}}\\
-\midrule
-TS-Agent \citep{tsagent2025} & Raw-series reasoning and QA & \cfeat{W}{raw series + statistical observations} & \cfeat{A}{trend/seasonality/anomaly/shape tools} & \cfeat{G}{statistics-grounded evidence} & \cfeat{V}{raw-series QA}\\
-TimeART \citep{timeart2026} & Tool-augmented TSQA & \cfeat{W}{tool traces as temporal evidence} & \cfeat{A}{TimeToolBench operations} & \cfeat{G}{early task experience} & \cfeat{V}{tool-augmented TSQA}\\
-TSAG \citep{tsag2026} & Financial time-series QA & \cfeat{W}{markets, indicators, finance schema} & \cfeat{A}{database + temporal queries} & \cfeat{G}{executable financial context} & \cfeat{V}{finance faithfulness}\\
-FETA \citep{feta2025} & Training-free classification & \cfeat{W}{channel-separated views} & \cfeat{A}{exemplar retrieval/comparison} & \cfeat{G}{class exemplars} & \cfeat{V}{training-free MTS classification}\\
-ZARA \citep{zara2025} & Motion sensor reasoning & \cfeat{W}{sensor windows + activities} & \cfeat{A}{motion-cue retrieval} & \cfeat{G}{activity priors + statistics} & \cfeat{V}{motion time-series reasoning}\\
-\midrule
-\multicolumn{6}{l}{\textit{Forecasting workflows and assistants}}\\
-\midrule
-TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} & End-to-end forecasting analysis & \cfeat{W}{curated data, forecasts, plots, reports} & \cfeat{A}{model library, validation, ensembling} & \cfeat{G}{curation/model traces} & \cfeat{V}{full forecasting lifecycle}\\
-FLAIRR-TS \citep{flairr2025} & Retrieval-refined forecasting & \cfeat{W}{forecast state + context snippets} & \cfeat{A}{retrieve/refine/forecast} & \cfeat{G}{comparable temporal contexts} & \cfeat{V}{retrieval-refined forecast}\\
-TimeCAP \citep{timecap2025} & Event-aware prediction & \cfeat{W}{event-window alignment} & \cfeat{A}{contextualize/augment/predict} & \cfeat{G}{events bound to series} & \cfeat{V}{event-aware prediction}\\
-TimeXL \citep{timexl2025} & Explainable multimodal prediction & \cfeat{W}{series, text, explanations} & \cfeat{A}{predict/explain actions} & \cfeat{G}{multimodal evidence} & \cfeat{V}{explanation-grounded prediction}\\
-Nexus \citep{nexus2026} & Context-aware forecasting & \cfeat{W}{signal/context workspace} & \cfeat{A}{context integration + forecast} & \cfeat{G}{temporal relevance organization} & \cfeat{V}{decomposition-aware forecast}\\
-MoiraiAgent \citep{moiraiagent2026} & TSFM-based forecasting agent & \cfeat{W}{forecast state + model outputs} & \cfeat{A}{TSFM tool calls} & \cfeat{G}{context-aware artifacts} & \cfeat{V}{TSFM-in-agent workflow}\\
-TimeCopilot \citep{timecopilot2026} & Forecasting assistant & \cfeat{W}{interactive forecast workspace} & \cfeat{A}{analysis + forecast tools} & \cfeat{G}{user/task session context} & \cfeat{V}{assistant-facing forecasting}\\
-Last-Mile \citep{lastmile2026} & Forecast revision and deployment & \cfeat{W}{protected baseline + ledger} & \cfeat{A}{constrained revision/retrieval} & \cfeat{G}{post-mortem revision memory} & \cfeat{V}{deployment constraints + audit}\\
-\midrule
-\multicolumn{6}{l}{\textit{Coordination, policy learning, and self-evolving systems}}\\
-\midrule
-TS-Debate \citep{tsdebate2026} & Multimodal zero-shot reasoning & \cfeat{W}{numeric/visual/text channels} & \cfeat{A}{modality evidence extraction} & \cfeat{G}{cross-modal calibration evidence} & \cfeat{V}{multimodal zero-shot reasoning}\\
-MAS4TS \citep{mas4ts2026} & Visual multi-task reasoning & \cfeat{W}{plots + statistics} & \cfeat{A}{visual/statistical tools} & \cfeat{G}{shared visual evidence} & \cfeat{V}{visual TS reasoning}\\
-Cast-R1 \citep{castr12026} & Forecasting as sequential decision-making & \cfeat{W}{forecast state/action history} & \cfeat{A}{feature/model/revision actions} & \cfeat{G}{trajectory memory} & \cfeat{V}{metric-driven policy learning}\\
-KairosAgent \citep{kairosagent2026} & Multimodal forecasting & \cfeat{W}{multimodal forecast state} & \cfeat{A}{TSFM + analysis tools} & \cfeat{G}{semantic context fusion} & \cfeat{V}{forecasting RL}\\
-TimeClaw-EEL \citep{timeclaw2026explore} & Exploratory execution learning & \cfeat{W}{trajectories + metric observations} & \cfeat{A}{tool dropout + analysis/forecasting} & \cfeat{G}{hierarchical distilled experience} & \cfeat{V}{metric-supervised distillation}\\
-TimeClaw-Harness \citep{timeclaw2026harness} & Contextualized temporal reasoning & \cfeat{W}{native temporal workspace} & \cfeat{A}{executable tools + evolved routines} & \cfeat{G}{episodic multimodal memory} & \cfeat{V}{CiK/TSRBench/TSAIA + evolution}\\
-AION \citep{aion2026} & Practical time-series agent system & \cfeat{W}{task file, workspace, artifacts} & \cfeat{A}{TS skills/rules/evaluators} & \cfeat{G}{task/rule/skill memory} & \cfeat{V}{realistic protocols}\\
-MetaCaster \citep{metacaster2026} & Few-shot lightweight forecaster construction & \cfeat{W}{few-shot + generated-data artifacts} & \cfeat{A}{synthetic data + lightweight training} & \cfeat{G}{few-shot context} & \cfeat{V}{deployable forecasters}\\
-\midrule
-\multicolumn{6}{l}{\textit{Anomaly systems, benchmarks, and adjacent models}}\\
-\midrule
-Argos \citep{argos2025} & Production anomaly detection & \cfeat{W}{cloud metrics + rule artifacts} & \cfeat{A}{propose/validate/repair/deploy rules} & \cfeat{G}{rule history + monitoring context} & \cfeat{V}{reproducible anomaly rules}\\
-AnomaMind \citep{anomamind2026} & Anomaly diagnosis & \cfeat{W}{anomaly windows, features, state} & \cfeat{A}{adaptive feature prep + engines} & \cfeat{G}{anomaly pattern memory} & \cfeat{V}{diagnosis/localization}\\
-TimeSage-MT \citep{timesagemt2026} & Multi-turn benchmark and agent & \cfeat{W}{multi-turn task state} & \cfeat{A}{skill library + reference code} & \cfeat{G}{cross-turn state} & \cfeat{V}{multi-turn benchmark}\\
-Dr-CiK \citep{drcik2026} & Foresight-driven benchmark & \cfeat{W}{document corpus + forecast state} & \cfeat{A}{retrieve/filter/distill/forecast} & \cfeat{G}{future-relevant evidence} & \cfeat{V}{active context retrieval}\\
-TimeSeries\allowbreak Exam\allowbreak Agent \citep{timeseriesexamagent2026} & Benchmark generation & \cfeat{W}{datasets + templates} & \cfeat{A}{question generation + verification} & \cfeat{G}{question-bank concepts} & \cfeat{V}{scalable benchmark generation}\\
-TimeOmni-1/VL \citep{timeomni2026,timeomnivl2026} & TS reasoning and generation model & \cfeat{W}{temporal model I/O} & \cfeat{A}{usable as temporal tool} & \cfeat{G}{not a domain memory module} & \cfeat{V}{adjacent model component}\\
+\HarnessInterface{} / \ToolUse{} & TS-Agent, TimeART, TSAG, MoiraiAgent & Tool-call interfaces, structured action schemas, executable observations, tool-result feedback.\\
+\Planning{} / workflow & TimeSeriesScientist, Nexus, TimeCopilot, Last-Mile & Multi-stage decomposition, role specialization, user-guided orchestration, revision workflows.\\
+\Memory{} / reflection & FLAIRR-TS, Last-Mile, TimeClaw-EEL, AION & Retrieved cases, post-mortem memories, distilled experience, task/rule/skill memories.\\
+\Control{} / verification & TSAG, TS-Debate, Argos, TimeSage-MT & Faithfulness checks, debate calibration, validation gates, reference-code scoring.\\
+\HarnessOptimization{} & Cast-R1, TimeClaw-EEL, KairosAgent, MetaCaster & Policy learning, trajectory comparison, metric-supervised distillation, meta-harness optimization.\\
+\ScalingHarness{} & TS-Debate, MAS4TS, TimeSeriesScientist, AION & Multi-agent roles, shared artifacts, review protocols, collective verification.\\
 \bottomrule
 \end{longtable}
-}
-\end{landscape}
+
+\subsection{General Time-Series Harness Module}
+
+Table~\ref{tab:general-ts-harness-contrib} summarizes the cross-task temporal substrate. These components are not tied to one task such as forecasting; they are reusable across temporal analysis tasks.
+
+\begin{longtable}{L{0.22\textwidth} L{0.34\textwidth} L{0.34\textwidth}}
+\caption{General Time-Series Harness Module components.}
+\label{tab:general-ts-harness-contrib}\\
+\toprule
+\textbf{General TS component} & \textbf{Representative works} & \textbf{Reusable temporal design}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{General TS component} & \textbf{Representative works} & \textbf{Reusable temporal design}\\
+\midrule
+\endhead
+Native temporal workspace & TS-Agent, TimeClaw-Harness, AION, TimeSage-MT & Series, timestamps, covariates, artifacts, tool outputs, and validation states are kept as runtime objects.\\
+Typed temporal operations & TimeART, TimeClaw-Harness, TS-Reasoner & Load, slice, align, retrieve, visualize, evaluate, and execute analysis tools through temporal action schemas.\\
+Temporal grounding of context & TimeCAP, Nexus, Dr-CiK, TimeClaw-Harness & External events, documents, and multimodal evidence are bound to intervals, horizons, and relevance assumptions.\\
+Leakage-aware control & AION, TimeSage-MT, Last-Mile & Chronological boundaries, allowed context, validation interfaces, and audit traces are explicit.\\
+Temporal memory and experience & TimeClaw-EEL, TimeClaw-Harness, AION, CALM & Prior traces, temporal fingerprints, distilled experience, rule histories, and non-stationary stream feedback are reused with provenance.\\
+Cross-task evaluation state & TimeSage-MT, TimeSeriesExamAgent, AION & Multi-turn state, skill-level scoring, generated question banks, and realistic task files support process-level evaluation.\\
+\bottomrule
+\end{longtable}
+
+\subsection{Task-specific Harness Modules}
+
+The remaining tables group \TaskSpecificHarness{} designs by task family. This split is necessary because a forecasting module, an anomaly module, and a classification module can all sit on the same \GeneralTSHarness{}, but their actions, validators, memories, and artifacts differ.
+
+\begin{longtable}{L{0.20\textwidth} L{0.30\textwidth} L{0.40\textwidth}}
+\caption{Forecasting and forecast-deployment Harness Modules.}
+\label{tab:forecasting-task-harness}\\
+\toprule
+\textbf{Task-specific module} & \textbf{Representative works} & \textbf{Design}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Task-specific module} & \textbf{Representative works} & \textbf{Design}\\
+\midrule
+\endhead
+Forecast lifecycle automation & TimeSeriesScientist, TimeCopilot & Data curation, diagnostics, model selection, validation, ensembling, reporting, and user interaction.\\
+Context-aware forecasting & TimeCAP, TimeXL, Nexus, Dr-CiK & Event alignment, multimodal evidence, decomposition, and distractor-aware context retrieval.\\
+TSFM-as-tool forecasting & MoiraiAgent, KairosAgent & Foundation models are exposed as callable forecasting tools inside an agent workflow.\\
+Forecast revision and deployment & FLAIRR-TS, Last-Mile, LLM-Agent Forecasting & Retrieval-refinement, constrained baseline edits, revision ledgers, and deployment audit trails.\\
+Forecast policy learning & Cast-R1, KairosAgent, TimeClaw-EEL & Sequential decision policies, turn-level credit assignment, trajectory comparison, and metric-supervised learning.\\
+Forecaster construction & MetaCaster & Few-shot context, synthetic data generation, lightweight model training, and deployable forecaster selection.\\
+\bottomrule
+\end{longtable}
+
+\begin{longtable}{L{0.22\textwidth} L{0.30\textwidth} L{0.38\textwidth}}
+\caption{Question answering and temporal-reasoning Harness Modules.}
+\label{tab:qa-reasoning-task-harness}\\
+\toprule
+\textbf{Task-specific module} & \textbf{Representative works} & \textbf{Design}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Task-specific module} & \textbf{Representative works} & \textbf{Design}\\
+\midrule
+\endhead
+Raw-series QA and TSQA & TS-Agent, TimeART, TSAG & Statistical insight tools, analytical tool traces, query schemas, parameter extraction, answer faithfulness.\\
+Financial temporal QA & TSAG & Market indicators, financial database operations, finance-specific query constraints.\\
+Multimodal temporal reasoning & TS-Debate, MAS4TS & Modality-specific agents, debate or role pipelines, shared visual/numeric/text evidence.\\
+\bottomrule
+\end{longtable}
+
+\begin{longtable}{L{0.22\textwidth} L{0.30\textwidth} L{0.38\textwidth}}
+\caption{Classification and activity-recognition Harness Modules.}
+\label{tab:classification-task-harness}\\
+\toprule
+\textbf{Task-specific module} & \textbf{Representative works} & \textbf{Design}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Task-specific module} & \textbf{Representative works} & \textbf{Design}\\
+\midrule
+\endhead
+Training-free classification & FETA & Channel-wise agent views, class exemplars, confidence aggregation.\\
+Motion and activity reasoning & ZARA & Sensor-window representation, motion-cue retrieval, activity priors, candidate-label filtering.\\
+\bottomrule
+\end{longtable}
+
+\begin{longtable}{L{0.22\textwidth} L{0.30\textwidth} L{0.38\textwidth}}
+\caption{Anomaly-detection and diagnosis Harness Modules.}
+\label{tab:anomaly-task-harness}\\
+\toprule
+\textbf{Task-specific module} & \textbf{Representative works} & \textbf{Design}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Task-specific module} & \textbf{Representative works} & \textbf{Design}\\
+\midrule
+\endhead
+Production anomaly detection & Argos & Rule proposal, validation, repair, deployment gates, monitoring context, rule history.\\
+Anomaly diagnosis & AnomaMind & Coarse-to-fine diagnosis, adaptive feature preparation, anomaly windows, reusable diagnosis patterns.\\
+\bottomrule
+\end{longtable}
+
+\begin{longtable}{L{0.22\textwidth} L{0.30\textwidth} L{0.38\textwidth}}
+\caption{Benchmark-generation, evaluation, and streaming Harness Modules.}
+\label{tab:benchmark-streaming-task-harness}\\
+\toprule
+\textbf{Task-specific module} & \textbf{Representative works} & \textbf{Design}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Task-specific module} & \textbf{Representative works} & \textbf{Design}\\
+\midrule
+\endhead
+Multi-turn temporal benchmark & TimeSage-MT & Multi-turn state, analytical skill library, reference-code scoring.\\
+Benchmark generation & TimeSeriesExamAgent & Dataset-aware templates, question generation, verification, refinement, question-bank memory.\\
+Streaming adaptation & CALM & Non-stationary stream state, LLM-as-judge feedback, continuous adaptation, regression checks.\\
+\bottomrule
+\end{longtable}
+
+Dedicated imputation-agent systems are not yet prominent in the maintained ledger. In current systems, imputation usually appears as a temporal operation or tool-library capability rather than as the primary task-specific module.
 
 \section{Evaluation: From Output Metrics to Process Metrics}
 
@@ -402,11 +506,12 @@ The field needs reusable infrastructure rather than isolated demonstrations. A p
 \textbf{Layer} & \textbf{Content} & \textbf{Purpose}\\
 \midrule
 \endhead
-TS-Agent-Core & Time-indexed workspace, data adapters, chronological split contracts, context binding, tool schemas, trace schema, validation interface. & Standardize the \TSHarnessModule{} across tasks and agents.\\
-TS-Tool-Library & Statistical, spectral, anomaly, forecasting, visualization, retrieval, TSFM, and LM-based TS model wrappers. & Make existing models callable agent components.\\
-TS-AgentBench & Multi-turn tasks, tool-trace scoring, evidence faithfulness, context retrieval, revision traces, cost, leakage, and governance metrics. & Evaluate systems at the process level.\\
+TS-Agent-Core & Time-indexed workspace, data adapters, chronological split contracts, context binding, tool schemas, trace schema, validation interface. & Standardize the \GeneralTSHarness{} across tasks and agents.\\
+Task-specific modules & Forecast lifecycle, anomaly diagnosis, classification evidence, TSQA schemas, imputation operators, benchmark generation, and deployment revision templates. & Make task-specific Harness design explicit and reusable.\\
+TS-Tool-Library & Statistical, spectral, anomaly, forecasting, imputation, visualization, retrieval, TSFM, and LM-based TS model wrappers. & Make existing models callable agent components.\\
+TS-AgentBench & Multi-turn tasks, tool-trace scoring, evidence faithfulness, context retrieval, revision traces, cost, leakage, task-specific metrics, and governance metrics. & Evaluate both process quality and task-specific utility.\\
 Agent-as-Engineer pipeline & MetaCaster-style synthetic data generation, lightweight forecaster training, forecaster selection, and meta-harness optimization. & Convert agentic reasoning into deployable temporal artifacts.\\
-Deployment workflow templates & Forecasting lifecycle, last-mile revision, anomaly diagnosis, TSQA, contextual decision support, review and rollback protocols. & Support reproducible research and practical adoption.\\
+Component ledger & Work-level labels for \GeneralHarness{}, \GeneralTSHarness{}, and \TaskSpecificHarness{} contributions. & Keep claims and future updates auditable.\\
 \bottomrule
 \end{longtable}
 
@@ -428,9 +533,9 @@ Current infrastructure-oriented systems point to three practical requirements: a
 
 \section{Conclusion}
 
-This survey argues that Time Series Agents are best understood as LLMs coupled with both a general Harness and a Time-series Harness Module. The general Harness provides the interface, mechanisms, and scaling substrate that make an LLM into an agent. The Time-series Harness Module supplies the temporal workspace, typed operations, temporal grounding of context, leakage-aware validation, temporal memory, and domain tools required for reliable temporal analysis.
+This survey argues that Time Series Agents are best understood as LLMs coupled with a \GeneralHarness{} and a \TSHarnessModule{}. The \GeneralHarness{} provides the interface, mechanisms, and scaling substrate that make an LLM into an agent. The \TSHarnessModule{} should be separated into a \GeneralTSHarness{} and a set of \TaskSpecificHarness{} components. The cross-task layer supplies temporal workspaces, typed operations, temporal grounding of context, leakage-aware validation, temporal memory, and domain tools. The task-specific layer supplies the concrete forecasting, anomaly, classification, QA, benchmark-generation, imputation, or deployment workflows required by applications.
 
-This framing absorbs previous model-centric work rather than replacing it. Classical models, deep forecasters, TSFMs, LLM-based time-series models, multimodal temporal models, and statistical procedures all become callable components inside the \TSHarnessModule{}. The frontier is therefore shifting from standalone forecasting models to executable, verifiable, stateful, and adaptive temporal analysis systems. Future work should make its contribution locus explicit: whether it improves the general-agent layer, the time-series-domain layer, or the interface between them.
+This framing absorbs previous model-centric work rather than replacing it. Classical models, deep forecasters, TSFMs, LLM-based time-series models, multimodal temporal models, and statistical procedures all become callable components inside the \TSHarnessModule{}. The frontier is therefore shifting from standalone forecasting models to executable, verifiable, stateful, and adaptive temporal analysis systems. Future work should make its contribution locus explicit: whether it improves the \GeneralHarness{}, the \GeneralTSHarness{}, or a \TaskSpecificHarness{} for a concrete time-series task.
 
 \bibliographystyle{plainnat}
 \bibliography{TS_AGENT_HARNESS_SURVEY}
