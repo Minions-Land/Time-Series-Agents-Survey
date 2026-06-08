@@ -79,9 +79,15 @@
 \newcommand{\HarnessInterface}{\hcomp{Harness Interface}}
 \newcommand{\HarnessMechanisms}{\hcomp{Harness Mechanisms}}
 \newcommand{\ScalingHarness}{\hcomp{Scaling the Harness}}
-\newcommand{\CodeReasoning}{\hcomp{Code for Reasoning}}
-\newcommand{\CodeActing}{\hcomp{Code for Acting}}
-\newcommand{\CodeEnv}{\hcomp{Code for Environment Modeling}}
+\newcommand{\Reasoning}{\hcomp{Reasoning}}
+\newcommand{\Acting}{\hcomp{Acting}}
+\newcommand{\EnvironmentModeling}{\hcomp{Environment Modeling}}
+\newcommand{\ExecutionEnvironment}{\hcomp{Execution Environment}}
+\newcommand{\StateArtifacts}{\hcomp{State Store and Artifacts}}
+\newcommand{\Lifecycle}{\hcomp{Lifecycle Orchestration}}
+\newcommand{\Verification}{\hcomp{Verification and Evaluation}}
+\newcommand{\Observability}{\hcomp{Observability and Governance}}
+\newcommand{\MultiAgentScaling}{\hcomp{Multi-Agent Scaling}}
 \newcommand{\Planning}{\hcomp{Planning}}
 \newcommand{\Memory}{\hcomp{Memory and Context Engineering}}
 \newcommand{\ToolUse}{\hcomp{Tool Use}}
@@ -163,7 +169,7 @@ This framing separates three kinds of contribution that are often conflated. A p
 
 Existing surveys cover important subsets of the landscape. Classical and deep-learning surveys organize time-series research around forecasting, change-point detection, anomaly detection, and neural architectures \citep{lim2021deepts,aminikhanghahi2017changepoint,darban2024anomaly,wen2023transformers}. As larger temporal backbones emerged, surveys on time-series foundation models and synthetic data summarized pretraining, adaptation, scaling, data generation, and evaluation practices \citep{liang2024foundation,liu2025synthetic}. LLM-oriented surveys then focused on serialization, prompting, tokenization, reprogramming, cross-modal alignment, model integration, and the limits of LLMs as direct numerical forecasters \citep{zhang2024llmts,jiang2024empowering,liu2025crossmodality}. Multimodal time-series surveys further organize text, image, sensor, event, and structured temporal evidence \citep{jiang2025multimodal,liu2025crossmodality}. More recent studies move toward prompting-to-agent transitions and reasoning-oriented temporal systems, using dimensions such as decomposition and verification, ensembling, tool use, knowledge access, multimodality, agent loops, and LLM alignment regimes \citep{promptstoagents2026,changsurvey2026}.
 
-These surveys establish useful maps, but they are not sufficient as a design basis for Time Series Agents. The agent-oriented literature can always add new labels as the field evolves--for example, from tool use and memory to retrieval, debate, workflow orchestration, self-reflection, tool synthesis, execution learning, and capability evolution. A moving list of labels is unstable as the core organizing principle. More importantly, the Harness view already places these labels inside a known agent runtime: \HarnessInterface{} covers \CodeReasoning{}, \CodeActing{}, and \CodeEnv{}; \HarnessMechanisms{} covers \Planning{}, \Memory{}, \ToolUse{}, \Control{}, and \HarnessOptimization{}; and \ScalingHarness{} covers shared artifacts, multi-agent coordination, review, and collective verification \citep{li2026harnesssurvey,ning2026codeharness}. The central question for Time Series Agent research is therefore not whether a paper can be assigned to one more component label, but where its contribution is located. It may improve the \GeneralHarness{} shared by LLM agents, the \GeneralTSHarness{} shared across temporal tasks, or a \TaskSpecificHarness{} for forecasting, anomaly detection, classification, QA, imputation, benchmark generation, or deployment. This survey is organized around that contribution-level separation.
+These surveys establish useful maps, but they are not sufficient as a design basis for Time Series Agents. Agent systems are better grounded in the runtime components that make an LLM executable, stateful, controllable, and evaluable: \Reasoning{}, \Acting{}, \EnvironmentModeling{}, \ExecutionEnvironment{}, \ToolUse{}, \Memory{}, \Planning{}, \Lifecycle{}, \Control{}, \Verification{}, \Observability{}, \HarnessOptimization{}, and \MultiAgentScaling{} \citep{li2026harnesssurvey,ning2026codeharness,lee2026metaharness,lin2026agenticharness}. These components already cover labels such as retrieval, debate, workflow orchestration, self-reflection, tool synthesis, execution learning, and capability evolution. The central question for Time Series Agent research is therefore not whether a paper can be assigned to one more agent label, but where its contribution is located. It may improve the \GeneralHarness{} shared by LLM agents, the \GeneralTSHarness{} shared across temporal tasks, or a \TaskSpecificHarness{} for forecasting, anomaly detection, classification, QA, imputation, benchmark generation, or deployment. This survey is organized around that contribution-level separation.
 
 \subsection{Contributions}
 
@@ -180,14 +186,15 @@ This survey makes four contributions.
 
 \subsection{From LLMs to agents}
 
-A standalone LLM produces text conditioned on a prompt. An agent is not only a stronger prompt. It is an LLM coupled with a runtime that controls the interaction between model outputs and the external environment. Recent agent-harness literature describes this surrounding layer as tools, APIs, sandboxes, memory, validators, state representations, permission boundaries, execution loops, and feedback channels \citep{li2026harnesssurvey,ning2026codeharness,lee2026metaharness}.
+A standalone LLM produces text conditioned on a prompt. An agent is not only a stronger prompt. It is an LLM coupled with a runtime that controls the interaction between model outputs and the external environment. Recent agent-harness literature describes this surrounding layer through reasoning and acting interfaces, environment models, execution environments, tool protocols, context and memory systems, orchestration loops, verification interfaces, observability, governance, and optimization mechanisms \citep{li2026harnesssurvey,ning2026codeharness,lee2026metaharness,lin2026agenticharness}.
 
-Drawing on the agent-harness engineering literature, general agent design can be understood through three layers \citep{li2026harnesssurvey,ning2026codeharness}:
+For our purposes, the \GeneralHarness{} contains the following domain-agnostic runtime functions:
 
 \begin{itemize}
-  \item \HarnessInterface{}: the medium through which the model reasons, acts, and represents environment state. Code-centric systems use executable, inspectable, and stateful artifacts such as programs, tool definitions, tests, repositories, simulators, and logs.
-  \item \HarnessMechanisms{}: the operational layer that sustains the agent beyond a single generation step through \Planning{}, \Memory{}, \ToolUse{}, \Control{}, and \HarnessOptimization{}.
-  \item \ScalingHarness{}: the multi-agent and collaborative layer built around shared artifacts, shared execution states, structured workflows, coordination, review, and collective verification.
+  \item \Reasoning{}, \Acting{}, and \EnvironmentModeling{}: the interfaces through which the model externalizes reasoning, invokes actions, and represents task state.
+  \item \ExecutionEnvironment{}, \ToolUse{}, \Memory{}, and \StateArtifacts{}: the execution substrate, external capabilities, context, persistent state, and shared artifacts available to the agent.
+  \item \Planning{}, \Lifecycle{}, \Control{}, and \Verification{}: the mechanisms that organize long-horizon execution, enforce constraints, route feedback, and evaluate intermediate or final outputs.
+  \item \Observability{}, \HarnessOptimization{}, and \MultiAgentScaling{}: the operational layer for tracing, governance, harness improvement, shared workspaces, role coordination, review, and collective verification.
 \end{itemize}
 
 This decomposition is domain-agnostic. It tells us what an agent runtime must provide, but not what a time-series runtime must preserve. The domain module supplies that missing specialization.
@@ -209,7 +216,7 @@ These properties define the \GeneralTSHarness{}: the reusable temporal substrate
 
 \section{Component Map for Time Series Agents}
 
-Table~\ref{tab:component-vocab} first makes the core components explicit. The key point is that a Time Series Agent is not defined by a particular LLM backbone, but by how the \GeneralHarness{} is extended with a \TSHarnessModule{}. We therefore compare systems by the components they implement: interface, mechanisms, scaling design, cross-task temporal runtime support, and task-specific temporal specialization.
+Table~\ref{tab:component-vocab} first makes the core components explicit. The key point is that a Time Series Agent is not defined by a particular LLM backbone, but by how the \GeneralHarness{} is extended with a \TSHarnessModule{}. We therefore compare systems by the runtime functions they implement, the cross-task temporal support they add, and the task-specific temporal workflows they specialize.
 
 \begingroup
 \scriptsize
@@ -233,12 +240,16 @@ Table~\ref{tab:component-vocab} first makes the core components explicit. The ke
 & \Control{} & Routes feedback, enforces constraints, manages retries, and accepts or rejects state transitions. & Chronological splits, leakage guards, unit/frequency checks, allowed-context policies. & Horizon-specific backtests; anomaly deployment gates; answer faithfulness checks.\\
 & \HarnessOptimization{} & Improves prompts, interfaces, policies, memories, traces, and skills using feedback. & Distilled temporal trajectories, learned tool policies, regression monitoring under shift. & Forecast metric optimization; rule repair; benchmark-generation refinement.\\
 \midrule
-\multirow[t]{3}{\fulltextcol{0.105}}{\textbf{Interface}} & \CodeReasoning{} & Externalizes reasoning into executable and inspectable computation. & Statistical routines, decomposition, metrics, visualization, notebooks. & Forecast diagnostics; anomaly localization; classification evidence.\\
-& \CodeActing{} & Converts model decisions into executable actions, tool calls, policies, or skills. & Typed temporal actions: load, slice, resample, aggregate, align, retrieve, evaluate. & Forecast, detect, classify, impute, generate questions, revise outputs.\\
-& \CodeEnv{} & Represents task state, environment dynamics, observations, feedback, and artifacts. & Time-indexed workspace with series, metadata, covariates, context, splits, tool outputs, logs. & Forecast ledgers; anomaly windows; class exemplars; QA evidence states.\\
+\multirow[t]{5}{\fulltextcol{0.105}}{\textbf{Interface}} & \Reasoning{} & Externalizes reasoning into inspectable intermediate representations, programs, traces, or structured rationales. & Statistical routines, decomposition, metrics, visualization, notebooks. & Forecast diagnostics; anomaly localization; classification evidence.\\
+& \Acting{} & Converts model decisions into executable actions, tool calls, policies, or skills. & Typed temporal actions: load, slice, resample, aggregate, align, retrieve, evaluate. & Forecast, detect, classify, impute, generate questions, revise outputs.\\
+& \EnvironmentModeling{} & Represents task state, environment dynamics, observations, feedback, and artifacts. & Time-indexed workspace with series, metadata, covariates, context, splits, tool outputs, logs. & Forecast ledgers; anomaly windows; class exemplars; QA evidence states.\\
+& \ExecutionEnvironment{} & Provides sandboxes, runtime isolation, files, repositories, interpreters, simulators, and execution feedback. & Reproducible temporal workspaces with data adapters, calendars, units, and split contracts. & Forecast backtest environment; incident replay environment; QA/evaluation sandbox.\\
+& \StateArtifacts{} & Stores files, traces, tool outputs, intermediate products, and reusable artifacts across turns or agents. & Series objects, covariate tables, context bundles, validation reports, and audit logs. & Forecast ledgers; anomaly rules; class exemplars; generated exams.\\
 \midrule
-\multirow[t]{2}{\fulltextcol{0.105}}{\textbf{Scaling}} & \hcomp{Multi-Agent Orchestration} & Coordinates roles through shared state, debate, review, or red-teaming. & Shared temporal evidence state across numeric, visual, textual, planning, and reviewer roles. & Forecaster/\allowbreak reporter roles; anomaly analyst/\allowbreak reviewer roles; modality-specific QA roles.\\
-& \hcomp{Shared Artifacts and Collective Verification} & Uses repositories, tests, traces, execution states, workflows, and review artifacts. & Shared time-series workspaces, validation reports, audit logs, cost records, rollback artifacts. & Forecast ledgers, anomaly rules, generated exams, deployment reviews.\\
+\multirow[t]{4}{\fulltextcol{0.105}}{\textbf{Operation}} & \Lifecycle{} & Connects task intake, planning, execution, revision, reporting, handoff, and termination. & Temporal task contracts, allowed context, chronological checkpoints, and replayable workflows. & Forecast lifecycle; anomaly escalation; benchmark-generation lifecycle.\\
+& \Verification{} & Evaluates traces, tool results, final artifacts, and feedback against explicit criteria. & Leakage checks, temporal faithfulness, metric computation, evidence grounding, and uncertainty checks. & Horizon backtests; anomaly localization metrics; QA answer faithfulness.\\
+& \Observability{} & Records traces, costs, failures, permissions, review decisions, and governance constraints. & Temporal audit trails, provenance, versioned context, drift indicators, and cost records. & Deployment ledgers; incident reports; clinical or financial review logs.\\
+& \MultiAgentScaling{} & Coordinates roles through shared state, debate, review, or red-teaming. & Shared temporal evidence state across numeric, visual, textual, planning, and reviewer roles. & Forecaster/\allowbreak reporter roles; anomaly analyst/\allowbreak reviewer roles; modality-specific QA roles.\\
 \bottomrule
 \end{longtable}
 \endgroup
