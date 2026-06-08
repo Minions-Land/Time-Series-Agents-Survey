@@ -94,6 +94,7 @@
 \newcommand{\layerGH}{\textsf{\textbf{GH}}}
 \newcommand{\layerGTS}{\textsf{\textbf{GTS}}}
 \newcommand{\layerTSK}{\textsf{\textbf{TSK}}}
+\newcommand{\vharness}[1]{\rotatebox[origin=c]{90}{\scriptsize\textsf{\textbf{#1}}}}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
 
@@ -210,31 +211,31 @@ Table~\ref{tab:component-vocab} first makes the core components explicit. The ke
 
 \begin{landscape}
 {\small
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{2.5pt}
 \setlength{\LTcapwidth}{0.95\linewidth}
 \renewcommand{\arraystretch}{1.08}
-\begin{longtable}{L{0.12\linewidth} L{0.15\linewidth} L{0.22\linewidth} L{0.26\linewidth} L{0.20\linewidth}}
+\begin{longtable}{C{0.05\linewidth} L{0.17\linewidth} L{0.235\linewidth} L{0.275\linewidth} L{0.20\linewidth}}
 \caption{Core runtime components for Time Series Agents, organized by general Harness area and specialized by cross-task temporal support and task-specific temporal workflows.}
 \label{tab:component-vocab}\\
 \toprule
-\textbf{Harness} & \textbf{Component} & \textbf{General-agent role} & \textbf{General TS specialization} & \textbf{Task-specific specialization}\\
+\rotatebox[origin=c]{90}{\scriptsize\textbf{Harness}} & \textbf{Component} & \textbf{General-agent role} & \textbf{General TS specialization} & \textbf{Task-specific specialization}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Harness} & \textbf{Component} & \textbf{General-agent role} & \textbf{General TS specialization} & \textbf{Task-specific specialization}\\
+\rotatebox[origin=c]{90}{\scriptsize\textbf{Harness}} & \textbf{Component} & \textbf{General-agent role} & \textbf{General TS specialization} & \textbf{Task-specific specialization}\\
 \midrule
 \endhead
-\multirow[t]{5}{*}{\hcomp{Mechanism}} & \Planning{} & Organizes long-horizon execution through decomposition, search, or workflow orchestration. & Inspect, clean, retrieve context, select tools, validate, diagnose, revise, report. & Forecast lifecycle; incident workflow; classification aggregation; QA decomposition.\\
+\multirow[c]{5}{*}{\vharness{Mechanism}} & \Planning{} & Organizes long-horizon execution through decomposition, search, or workflow orchestration. & Inspect, clean, retrieve context, select tools, validate, diagnose, revise, report. & Forecast lifecycle; incident workflow; classification aggregation; QA decomposition.\\
 & \Memory{} & Maintains working, semantic, experiential, long-term, and shared memory. & Temporal fingerprints, context keys, event histories, prior traces, reusable temporal procedures. & Post-mortem forecast cases; anomaly rule histories; class exemplar memory.\\
 & \ToolUse{} & Expands the action space through tools, environment interaction, verification tools, and workflows. & Statistical models, TSFMs, visualizers, retrievers, simulators, validators. & Forecasting libraries; anomaly detectors; imputation engines; TSQA tools.\\
 & \Control{} & Routes feedback, enforces constraints, manages retries, and accepts or rejects state transitions. & Chronological splits, leakage guards, unit/frequency checks, allowed-context policies. & Horizon-specific backtests; anomaly deployment gates; answer faithfulness checks.\\
 & \HarnessOptimization{} & Improves prompts, interfaces, policies, memories, traces, and skills using feedback. & Distilled temporal trajectories, learned tool policies, regression monitoring under shift. & Forecast metric optimization; rule repair; benchmark-generation refinement.\\
 \midrule
-\multirow[t]{3}{*}{\hcomp{Interface}} & \CodeReasoning{} & Externalizes reasoning into executable and inspectable computation. & Statistical routines, decomposition, metrics, visualization, notebooks. & Forecast diagnostics; anomaly localization; classification evidence.\\
+\multirow[c]{3}{*}{\vharness{Interface}} & \CodeReasoning{} & Externalizes reasoning into executable and inspectable computation. & Statistical routines, decomposition, metrics, visualization, notebooks. & Forecast diagnostics; anomaly localization; classification evidence.\\
 & \CodeActing{} & Converts model decisions into executable actions, tool calls, policies, or skills. & Typed temporal actions: load, slice, resample, aggregate, align, retrieve, evaluate. & Forecast, detect, classify, impute, generate questions, revise outputs.\\
 & \CodeEnv{} & Represents task state, environment dynamics, observations, feedback, and artifacts. & Time-indexed workspace with series, metadata, covariates, context, splits, tool outputs, logs. & Forecast ledgers; anomaly windows; class exemplars; QA evidence states.\\
 \midrule
-\multirow[t]{2}{*}{\hcomp{Scaling}} & \hcomp{Multi-Agent Orchestration} & Coordinates roles through shared state, debate, review, or red-teaming. & Shared temporal evidence state across numeric, visual, textual, planning, and reviewer roles. & Forecaster/\allowbreak reporter roles; anomaly analyst/\allowbreak reviewer roles; modality-specific QA roles.\\
+\multirow[c]{2}{*}{\vharness{Scaling}} & \hcomp{Multi-Agent Orchestration} & Coordinates roles through shared state, debate, review, or red-teaming. & Shared temporal evidence state across numeric, visual, textual, planning, and reviewer roles. & Forecaster/\allowbreak reporter roles; anomaly analyst/\allowbreak reviewer roles; modality-specific QA roles.\\
 & \hcomp{Shared Artifacts and Collective Verification} & Uses repositories, tests, traces, execution states, workflows, and review artifacts. & Shared time-series workspaces, validation reports, audit logs, cost records, rollback artifacts. & Forecast ledgers, anomaly rules, generated exams, deployment reviews.\\
 \bottomrule
 \end{longtable}
@@ -277,37 +278,54 @@ This direction is especially relevant when the system explicitly designs the \TS
 
 The contribution split is most useful when it is auditable at the work level. We therefore maintain a work-by-work ledger and use it as the basis for the tables below. Each work may contain multiple components, but for the percentage claim we assign one primary contribution locus: \layerGH{} for \GeneralHarness{}, \layerGTS{} for \GeneralTSHarness{}, and \layerTSK{} for \TaskSpecificHarness{}. Pure temporal foundation models and adjacent data-science agents are discussed elsewhere, but are not counted in this agent-harness statistic.
 
-Under this rule, the current ledger contains 29 counted Time Series Agent or agent-benchmark systems. The primary contribution distribution is: \layerGH{} 4/29 = 13.8\%, \layerGTS{} 7/29 = 24.1\%, and \layerTSK{} 18/29 = 62.1\%. This is an auditable snapshot of the systems covered here rather than a claim about every future system. The practical implication is clear: most current innovation is still task-specific, especially for forecasting and anomaly workflows. Cross-task time-series Harness design is emerging, but remains less developed than the number of task-specific agents suggests.
+Under this rule, the current ledger contains 29 counted Time Series Agent or agent-benchmark systems. The primary contribution distribution is: \layerGH{} 4/29 = 13.8\%, \layerGTS{} 7/29 = 24.1\%, and \layerTSK{} 18/29 = 62.1\%. This is an auditable snapshot of the systems covered here rather than a claim about every future system. The practical implication is clear: most current innovation is still task-specific, especially for forecasting and anomaly workflows. Cross-task time-series Harness design is emerging, but remains less developed than the number of task-specific agents suggests. Figure~\ref{fig:contribution-trend} further plots the publication-month trend for the subset whose public posting month can be identified.
 
 \begin{figure}[t]
 \centering
-\resizebox{0.96\textwidth}{!}{%
-\begin{tikzpicture}
-  \def\barwidth{12.6}
-  \def\barheight{0.55}
-  \coordinate (barstart) at (0,0);
-  \fill[surveyBlue] (0,0) rectangle (1.74,\barheight);
-  \fill[surveyGold] (1.74,0) rectangle (4.78,\barheight);
-  \fill[surveyGreen] (4.78,0) rectangle (\barwidth,\barheight);
-  \draw[white,line width=0.6pt] (1.74,0) -- (1.74,\barheight);
-  \draw[white,line width=0.6pt] (4.78,0) -- (4.78,\barheight);
-  \draw[black!35,line width=0.3pt] (0,0) rectangle (\barwidth,\barheight);
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}[x=0.68cm,y=0.34cm]
+  \foreach \y/\label in {0/0,4/4,8/8,12/12} {
+    \draw[black!10] (0,\y) -- (17.7,\y);
+    \node[anchor=east,font=\scriptsize,text=black!65] at (-0.25,\y) {\label};
+  }
+  \draw[->,line width=0.45pt,black!55] (0,0) -- (18.1,0);
+  \draw[->,line width=0.45pt,black!55] (0,0) -- (0,14.2);
+  \node[anchor=south,font=\scriptsize,text=black!65,rotate=90] at (-1.25,7) {Cumulative counted systems};
 
-  \node[anchor=south,font=\small\bfseries,text=surveyBlue] at (0.87,0.67) {GH};
-  \node[anchor=south,font=\small\bfseries,text=surveyGold] at (3.26,0.67) {GTS};
-  \node[anchor=south,font=\small\bfseries,text=surveyGreen] at (8.69,0.67) {TSK};
+  \foreach \x/\label in {0/Jan'25,3/Apr'25,6/Jul'25,9/Oct'25,12/Jan'26,15/Apr'26,17/Jun'26} {
+    \draw[black!35] (\x,0) -- (\x,-0.18);
+    \node[anchor=north,font=\scriptsize,text=black!65] at (\x,-0.42) {\label};
+  }
 
-  \node[anchor=north,font=\footnotesize,align=center] at (0.87,-0.12) {4/29\\13.8\%};
-  \node[anchor=north,font=\footnotesize,align=center] at (3.26,-0.12) {7/29\\24.1\%};
-  \node[anchor=north,font=\footnotesize,align=center] at (8.69,-0.12) {18/29\\62.1\%};
+  \draw[line width=1.35pt,color=surveyGreen]
+    plot coordinates {(0,1) (2,2) (7,4) (9,6) (13,7) (15,9) (16,12) (17,13)};
+  \draw[line width=1.35pt,color=surveyGold]
+    plot coordinates {(0,0) (7,1) (9,2) (12,3) (16,4) (17,6)};
+  \draw[line width=1.35pt,color=surveyBlue]
+    plot coordinates {(0,0) (12,1) (13,3) (16,4) (17,4)};
 
-  \node[anchor=west,font=\footnotesize] at (0,-1.15) {\textcolor{surveyBlue}{\rule{0.8em}{0.8em}} \ General Harness: general agent-loop, multi-agent, or optimization advances};
-  \node[anchor=west,font=\footnotesize] at (0,-1.55) {\textcolor{surveyGold}{\rule{0.8em}{0.8em}} \ General Time-Series Harness Module: cross-task temporal workspace, tool, memory, or validation infrastructure};
-  \node[anchor=west,font=\footnotesize] at (0,-1.95) {\textcolor{surveyGreen}{\rule{0.8em}{0.8em}} \ Task-Specific Time-Series Harness Module: forecasting, anomaly, classification, QA, benchmark, streaming, or deployment modules};
+  \foreach \x/\y in {0/1,2/2,7/4,9/6,13/7,15/9,16/12,17/13} {
+    \filldraw[fill=white,draw=surveyGreen,line width=0.9pt] (\x,\y) circle (0.12);
+  }
+  \foreach \x/\y in {7/1,9/2,12/3,16/4,17/6} {
+    \filldraw[fill=white,draw=surveyGold,line width=0.9pt] (\x,\y) circle (0.12);
+  }
+  \foreach \x/\y in {12/1,13/3,16/4,17/4} {
+    \filldraw[fill=white,draw=surveyBlue,line width=0.9pt] (\x,\y) circle (0.12);
+  }
+
+  \node[anchor=west,font=\small\bfseries,text=surveyGreen] at (17.35,13) {TSK};
+  \node[anchor=west,font=\small\bfseries,text=surveyGold] at (17.35,6) {GTS};
+  \node[anchor=west,font=\small\bfseries,text=surveyBlue] at (17.35,4) {GH};
+
+  \node[anchor=west,font=\scriptsize,text=black!70,align=left] at (10.4,1.4)
+    {\textcolor{surveyGreen}{\rule{0.9em}{0.9em}} Task-specific modules\\
+     \textcolor{surveyGold}{\rule{0.9em}{0.9em}} General TS Harness modules\\
+     \textcolor{surveyBlue}{\rule{0.9em}{0.9em}} General Harness designs};
 \end{tikzpicture}
 }
-\caption{Primary contribution distribution in the maintained Time Series Agent ledger. The stacked bar summarizes 29 counted systems by their primary contribution locus.}
-\label{fig:contribution-distribution}
+\caption{Temporal evolution of primary contribution loci among Time Series Agent systems. The trend uses 23 ledger entries with identifiable public posting months; six entries without a stable month are kept in Table~\ref{tab:agent-ledger} and in the aggregate 29-system distribution.}
+\label{fig:contribution-trend}
 \end{figure}
 
 \begin{landscape}
