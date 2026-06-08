@@ -84,6 +84,7 @@
 \newcommand{\tool}[1]{\texttt{#1}}
 \newcommand{\domain}{\textsf{Domain}}
 \newcommand{\general}{\textsf{General}}
+\newcommand{\cfeat}[2]{\textsf{\textbf{#1}}: #2}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
 
@@ -146,9 +147,9 @@ This framing separates two kinds of contribution that are often conflated. A pap
 
 \subsection{Position relative to existing surveys}
 
-Existing surveys cover important subsets of the landscape. Earlier surveys often focus on a specific modeling module or evidence modality: Transformer-oriented surveys review architectural adaptations and task deployments of Transformer backbones for time series \citep{wen2023transformers}; work on LLMs for time series emphasizes serialization, prompting, reprogramming, alignment, and the limitations of LLMs as direct numerical forecasters \citep{zhang2024llmts,jiang2024empowering}; surveys on multimodal time series organize text, image, sensor, and structured temporal evidence \citep{jiang2025multimodal,liu2025crossmodality}. More recent studies broaden the discussion toward prompting-to-agent transitions, reasoning-oriented temporal systems, and the runtime infrastructure that turns LLMs into stateful, executable, and verifiable agents \citep{promptstoagents2026,changsurvey2026,li2026harnesssurvey,ning2026codeharness}.
+Existing surveys cover important subsets of the landscape. Classical and deep-learning surveys organize time-series research around forecasting, change-point detection, anomaly detection, and neural architectures \citep{lim2021deepts,aminikhanghahi2017changepoint,darban2024anomaly,wen2023transformers}. As larger temporal backbones emerged, surveys on time-series foundation models and synthetic data summarized pretraining, adaptation, scaling, data generation, and evaluation practices \citep{liang2024foundation,liu2025synthetic}. LLM-oriented surveys then focused on serialization, prompting, tokenization, reprogramming, cross-modal alignment, model integration, and the limits of LLMs as direct numerical forecasters \citep{zhang2024llmts,jiang2024empowering,liu2025crossmodality}. Multimodal time-series surveys further organize text, image, sensor, event, and structured temporal evidence \citep{jiang2025multimodal,liu2025crossmodality}. More recent studies move toward prompting-to-agent transitions and reasoning-oriented temporal systems, using dimensions such as decomposition and verification, ensembling, tool use, knowledge access, multimodality, agent loops, and LLM alignment regimes \citep{promptstoagents2026,changsurvey2026}.
 
-These surveys are valuable, but they leave one central distinction under-specified. Module-centric surveys explain what temporal models, modalities, or tasks exist; newer agent-oriented surveys often describe tools, memory, workflows, retrieval, reflection, and coordination as separate organizing dimensions. Under the current agent-system view, however, these dimensions are not independent categories for Time Series Agents: they are components of the \GeneralHarness{}. The central gap is not the absence of additional labels, but the absence of a contribution-level separation between improvements to the general Harness shared by LLM agents and designs that are genuinely specific to the time-series Harness Module. This survey uses that distinction as its organizing principle. For each system, we ask whether the novelty lies in interfaces, planning, memory, tool routing, control, optimization, or multi-agent coordination at the general-agent layer, or in time-indexed workspaces, temporal tool schemas, context-series alignment, leakage control, metric-verifiable outputs, temporal memory, and domain workflows at the time-series layer. This separation clarifies the contribution locus of Time Series Agent research and explains why forecasting alone is only one callable capability inside a broader temporal analysis and decision system.
+These surveys establish useful maps, but they are not sufficient as a design basis for Time Series Agents. The agent-oriented literature can always add new labels as the field evolves--for example, from tool use and memory to retrieval, debate, workflow orchestration, self-reflection, tool synthesis, execution learning, and capability evolution. A moving list of labels is unstable as the core organizing principle. More importantly, the Harness view already places these labels inside a known agent runtime: \HarnessInterface{} covers \CodeReasoning{}, \CodeActing{}, and \CodeEnv{}; \HarnessMechanisms{} covers \Planning{}, \Memory{}, \ToolUse{}, \Control{}, and \HarnessOptimization{}; and \ScalingHarness{} covers shared artifacts, multi-agent coordination, review, and collective verification \citep{li2026harnesssurvey,ning2026codeharness}. The central question for Time Series Agent research is therefore not whether a paper can be assigned to one more component label, but where its contribution is located. It may improve the \GeneralHarness{} shared by LLM agents, or it may introduce a \TSHarnessModule{} that is specific to temporal data: time-indexed workspaces, typed temporal operations, context-series alignment, leakage-aware control, metric-verifiable outputs, temporal memory, and domain workflows. This survey is organized around that contribution-level separation.
 
 \subsection{Contributions}
 
@@ -254,50 +255,61 @@ This direction is especially relevant when the system explicitly designs the \TS
 
 \section{Component-Level Map of Existing Systems}
 
-The following two tables separate the same set of works into two views. Table~\ref{tab:general-design} records the general-agent design: how the LLM is given interfaces, planning structures, memory, feedback, optimization, or multi-agent coordination. Table~\ref{tab:ts-module-design} records the time-series-domain module: how temporal objects, tools, context, validation, and domain-specific workflows are represented.
+The following two tables separate the same set of works into two views. Table~\ref{tab:general-design} records the general-agent design: how the LLM is given interfaces, planning structures, memory, feedback, optimization, or multi-agent coordination. Table~\ref{tab:ts-module-design} records the time-series-domain module: how temporal objects, tools, context, validation, and domain-specific workflows are represented. To improve readability, each table uses short component tags rather than full-sentence descriptions. In Table~\ref{tab:general-design}, \textsf{\textbf{I}} denotes interface/action design, \textsf{\textbf{P}} planning or workflow design, \textsf{\textbf{M}} memory or reflection, and \textsf{\textbf{C}} control, optimization, or scaling. In Table~\ref{tab:ts-module-design}, \textsf{\textbf{W}} denotes temporal workspace, \textsf{\textbf{A}} temporal actions, \textsf{\textbf{G}} grounding or temporal memory, and \textsf{\textbf{V}} validation or domain contribution.
 
 \begin{landscape}
 {\scriptsize
-\setlength{\tabcolsep}{1.6pt}
-\renewcommand{\arraystretch}{1.12}
+\setlength{\tabcolsep}{2.0pt}
+\renewcommand{\arraystretch}{1.08}
 \begin{longtable}{L{0.10\linewidth} L{0.12\linewidth} L{0.18\linewidth} L{0.18\linewidth} L{0.17\linewidth} L{0.19\linewidth}}
-\caption{General-agent design in surveyed Time Series Agent and adjacent systems.}
+\caption{General-agent design in surveyed Time Series Agent and adjacent systems. Compact tags: \textsf{\textbf{I}} interface/actions; \textsf{\textbf{P}} planning/workflow; \textsf{\textbf{M}} memory/reflection; \textsf{\textbf{C}} control, optimization, or scaling.}
 \label{tab:general-design}\\
 \toprule
-\textbf{Work} & \textbf{Scope} & \textbf{Interface / action pattern} & \textbf{Workflow and planning} & \textbf{Memory / reflection} & \textbf{Control, optimization, or scaling}\\
+\textbf{Work} & \textbf{Scope} & \textbf{I: Interface / actions} & \textbf{P: Planning / workflow} & \textbf{M: Memory / reflection} & \textbf{C: Control / optimization / scaling}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Work} & \textbf{Scope} & \textbf{Interface / action pattern} & \textbf{Workflow and planning} & \textbf{Memory / reflection} & \textbf{Control, optimization, or scaling}\\
+\textbf{Work} & \textbf{Scope} & \textbf{I: Interface / actions} & \textbf{P: Planning / workflow} & \textbf{M: Memory / reflection} & \textbf{C: Control / optimization / scaling}\\
 \midrule
 \endhead
-TS-Agent \citep{tsagent2025} & Raw-series reasoning and QA & ReAct-style observe--reason--act loop over external observations. & Iterative insight gathering instead of one-shot answer generation. & Maintains accumulated evidence during the reasoning loop. & Critic and quality gate for answer refinement.\\
-TimeART \citep{timeart2026} & Tool-augmented TSQA & Tool-call interface trained through task traces. & Multi-stage tool-augmented reasoning. & Early experience and self-reflection are used during training. & Reflection and tool-use feedback improve reliability.\\
-TSAG \citep{tsag2026} & Financial time-series QA & Structured query and tool-call interface. & Tool selection plus parameter extraction before answer generation. & Minimal long-term memory; relies on retrieved tool outputs. & Tool-correctness and answer-faithfulness scoring.\\
-FETA \citep{feta2025} & Training-free classification & Channel-level agents reason over exemplars. & In-context reasoning with confidence-weighted aggregation. & Exemplar set acts as task-local memory. & Self-assessed confidence controls aggregation.\\
-ZARA \citep{zara2025} & Motion sensor reasoning & Retrieval-augmented evidence interface. & Iterative candidate-activity reasoning. & Retrieved knowledge base supports repeated cue selection. & Evidence filtering against candidate labels.\\
-TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} & End-to-end forecasting analysis & Agent roles operate over datasets, models, visualizations, and reports. & Curator--Planner--Forecaster--Reporter workflow. & Reports and intermediate artifacts carry state across roles. & Role specialization, validation, and ensembling.\\
-FLAIRR-TS \citep{flairr2025} & Retrieval-refined forecasting & Retrieval and revision actions. & Retrieve--refine--forecast loop. & Retrieved examples support refinement. & Forecast quality drives iterative revision.\\
-TimeCAP \citep{timecap2025} & Event-aware prediction & Context augmentation interface. & Contextualize--augment--predict workflow. & Task context is reused during augmentation. & Prediction feedback evaluates augmented context.\\
-TimeXL \citep{timexl2025} & Explainable multimodal prediction & LLM-in-the-loop prediction and explanation interface. & Prediction and explanation are coupled in the workflow. & Multimodal evidence is retained for explanation. & Explanation is checked against prediction evidence.\\
-Nexus \citep{nexus2026} & Context-aware forecasting & Context and signal interface. & Macro/micro decomposition with multi-stage reasoning. & Context evidence is organized for reuse within the task. & Forecast validation and evidence synthesis.\\
-MoiraiAgent \citep{moiraiagent2026} & TSFM-based forecasting agent & TSFM-as-tool interface. & Copilot-style orchestration around forecasting calls. & Context-aware prompts and forecast artifacts persist in the session. & Forecast comparison and assistant feedback.\\
-TimeCopilot \citep{timecopilot2026} & Forecasting assistant & Interactive assistant interface. & User-driven orchestration over analysis and forecasting tools. & User and task context persist across forecast sessions. & Practical checks, revisions, and user feedback.\\
-Last-Mile \citep{lastmile2026} & Forecast revision and deployment & Constrained action interface over a protected baseline. & Action-centric revision and map-reduce editing. & Post-mortem memory for recurring revision cases. & Immutable baseline, constrained edits, and reviewable traces.\\
-TS-Debate \citep{tsdebate2026} & Multimodal zero-shot reasoning & Separate agents reason over numeric, visual, and textual evidence. & Debate and conflict resolution. & Modality evidence retained for calibration. & Multi-agent debate, verification, and calibration.\\
-MAS4TS \citep{mas4ts2026} & Visual multi-task reasoning & Role-specific agents communicate over shared evidence. & Analyzer--Reasoner--Executor pipeline. & Shared memory among roles. & Role-based execution checking.\\
-Cast-R1 \citep{castr12026} & Forecasting as sequential decision-making & State/action interface for multi-step decisions. & Sequential decision process. & State memory over the trajectory. & Supervised and reinforcement learning from task metrics.\\
-KairosAgent \citep{kairosagent2026} & Multimodal forecasting & LLM reasoner connected to forecaster and tools. & Multi-turn refinement. & Semantic context supports revision. & Reinforcement learning from forecasting with turn-level credit.\\
-TimeClaw-EEL \citep{timeclaw2026explore} & Exploratory execution learning & Tool execution with metric feedback. & Explore--compare--distill--reinject loop. & Distilled experience reused across tasks. & Tool dropout and trajectory selection by metrics.\\
-TimeClaw-Harness \citep{timeclaw2026harness} & Contextualized temporal reasoning & LLM policy interacts with typed runtime operations. & Iterative tool execution with structured observations. & Episodic multimodal memory stores prior reasoning traces. & Capability evolution from verified recurring procedures.\\
-AION \citep{aion2026} & Practical time-series agent system & Agents, skills, rules, evaluators, and protocols. & Practical protocols with layered review. & Memory over tasks, rules, and skills. & Shared workspace, validation interface, and review protocol.\\
-MetaCaster \citep{metacaster2026} & Few-shot lightweight forecaster construction & Agent-as-Engineer interface over data generation and model selection. & Synthetic-data generation, training, and selection pipeline. & Few-shot task context and generated-data traces. & Meta-harness optimization for deployable artifacts.\\
-Argos \citep{argos2025} & Production anomaly detection & Rule proposal and deployment interface. & Autonomous rule generation workflow. & Rule history supports future monitoring tasks. & Validation, repair, deployment gates, and collaborative review.\\
-AnomaMind \citep{anomamind2026} & Anomaly diagnosis & Multi-turn diagnostic tool interaction. & Coarse-to-fine diagnostic workflow. & Reusable analysis patterns. & Self-reflection and reinforcement learning under workflow feedback.\\
-TimeSage-MT \citep{timesagemt2026} & Multi-turn benchmark and agent & Multi-turn task interface with code execution. & Multi-turn analytical workflow over nine capability groups. & Task state maintained across turns. & Reference-code and skill-level scoring.\\
-Dr-CiK \citep{drcik2026} & Foresight-driven benchmark & Active retrieval and document filtering interface. & Deep-research workflow: retrieve, filter, distill, forecast. & Retrieved evidence persists through forecasting. & Distractor-aware context ablations.\\
-TimeSeries\allowbreak Exam\allowbreak Agent \citep{timeseriesexamagent2026} & Benchmark generation & Template filling, generation, verification, and refinement. & Benchmark-creation workflow. & Generated question bank and dataset context. & Quality evaluation and refinement loop.\\
-TimeOmni-1/VL \citep{timeomni2026,timeomnivl2026} & TS reasoning and generation model & Model interface rather than an agent workflow. & Not primarily a workflow agent. & Not primarily an agent memory module. & Model training rather than agent control.\\
+\multicolumn{6}{l}{\textit{Tool-grounded reasoning and QA}}\\
+\midrule
+TS-Agent \citep{tsagent2025} & Raw-series reasoning and QA & \cfeat{I}{ReAct over observations} & \cfeat{P}{iterative insight gathering} & \cfeat{M}{task evidence buffer} & \cfeat{C}{critic quality gate}\\
+TimeART \citep{timeart2026} & Tool-augmented TSQA & \cfeat{I}{trained tool-call traces} & \cfeat{P}{multi-stage tool reasoning} & \cfeat{M}{reflection traces} & \cfeat{C}{feedback-tuned reliability}\\
+TSAG \citep{tsag2026} & Financial time-series QA & \cfeat{I}{structured finance queries} & \cfeat{P}{tool selection + parameters} & \cfeat{M}{retrieved outputs} & \cfeat{C}{faithfulness scoring}\\
+FETA \citep{feta2025} & Training-free classification & \cfeat{I}{channel agents + exemplars} & \cfeat{P}{confidence aggregation} & \cfeat{M}{exemplar memory} & \cfeat{C}{self-confidence weighting}\\
+ZARA \citep{zara2025} & Motion sensor reasoning & \cfeat{I}{retrieval evidence interface} & \cfeat{P}{candidate-activity loop} & \cfeat{M}{knowledge-base cues} & \cfeat{C}{label evidence filtering}\\
+\midrule
+\multicolumn{6}{l}{\textit{Forecasting workflows and assistants}}\\
+\midrule
+TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} & End-to-end forecasting analysis & \cfeat{I}{roles over data, models, reports} & \cfeat{P}{Curator--Planner--Forecaster--Reporter} & \cfeat{M}{artifacts + reports} & \cfeat{C}{validation + ensembling}\\
+FLAIRR-TS \citep{flairr2025} & Retrieval-refined forecasting & \cfeat{I}{retrieval/revision actions} & \cfeat{P}{retrieve--refine--forecast} & \cfeat{M}{retrieved examples} & \cfeat{C}{forecast-driven revision}\\
+TimeCAP \citep{timecap2025} & Event-aware prediction & \cfeat{I}{context augmentation} & \cfeat{P}{contextualize--augment--predict} & \cfeat{M}{task context} & \cfeat{C}{prediction feedback}\\
+TimeXL \citep{timexl2025} & Explainable multimodal prediction & \cfeat{I}{predict/explain loop} & \cfeat{P}{coupled prediction and explanation} & \cfeat{M}{multimodal evidence} & \cfeat{C}{evidence check}\\
+Nexus \citep{nexus2026} & Context-aware forecasting & \cfeat{I}{signal/context interface} & \cfeat{P}{macro/micro stages} & \cfeat{M}{organized context evidence} & \cfeat{C}{validation + synthesis}\\
+MoiraiAgent \citep{moiraiagent2026} & TSFM-based forecasting agent & \cfeat{I}{TSFM-as-tool} & \cfeat{P}{copilot orchestration} & \cfeat{M}{prompts + forecast artifacts} & \cfeat{C}{forecast comparison}\\
+TimeCopilot \citep{timecopilot2026} & Forecasting assistant & \cfeat{I}{interactive assistant} & \cfeat{P}{user-guided orchestration} & \cfeat{M}{user/task context} & \cfeat{C}{checks + revisions}\\
+Last-Mile \citep{lastmile2026} & Forecast revision and deployment & \cfeat{I}{constrained baseline edits} & \cfeat{P}{action-centric map-reduce} & \cfeat{M}{post-mortem cases} & \cfeat{C}{immutable baseline + traces}\\
+\midrule
+\multicolumn{6}{l}{\textit{Coordination, policy learning, and self-evolving systems}}\\
+\midrule
+TS-Debate \citep{tsdebate2026} & Multimodal zero-shot reasoning & \cfeat{I}{modality-specific agents} & \cfeat{P}{debate + conflict resolution} & \cfeat{M}{modality evidence} & \cfeat{C}{verification + calibration}\\
+MAS4TS \citep{mas4ts2026} & Visual multi-task reasoning & \cfeat{I}{role-specific agents} & \cfeat{P}{Analyzer--Reasoner--Executor} & \cfeat{M}{shared role memory} & \cfeat{C}{execution checking}\\
+Cast-R1 \citep{castr12026} & Forecasting as sequential decision-making & \cfeat{I}{state/action policy} & \cfeat{P}{sequential decisions} & \cfeat{M}{trajectory state} & \cfeat{C}{SFT/RL from metrics}\\
+KairosAgent \citep{kairosagent2026} & Multimodal forecasting & \cfeat{I}{reasoner + forecaster/tools} & \cfeat{P}{multi-turn refinement} & \cfeat{M}{semantic context} & \cfeat{C}{turn-level RL credit}\\
+TimeClaw-EEL \citep{timeclaw2026explore} & Exploratory execution learning & \cfeat{I}{metric-feedback tools} & \cfeat{P}{explore--compare--distill--reinject} & \cfeat{M}{distilled experience} & \cfeat{C}{tool dropout + metric selection}\\
+TimeClaw-Harness \citep{timeclaw2026harness} & Contextualized temporal reasoning & \cfeat{I}{typed runtime operations} & \cfeat{P}{iterative execution} & \cfeat{M}{episodic multimodal traces} & \cfeat{C}{capability evolution}\\
+AION \citep{aion2026} & Practical time-series agent system & \cfeat{I}{agents/skills/rules/evaluators} & \cfeat{P}{protocolized review} & \cfeat{M}{task/rule/skill memory} & \cfeat{C}{workspace + validation protocol}\\
+MetaCaster \citep{metacaster2026} & Few-shot lightweight forecaster construction & \cfeat{I}{Agent-as-Engineer} & \cfeat{P}{generate--train--select} & \cfeat{M}{few-shot + synthetic traces} & \cfeat{C}{meta-harness optimization}\\
+\midrule
+\multicolumn{6}{l}{\textit{Anomaly systems, benchmarks, and adjacent models}}\\
+\midrule
+Argos \citep{argos2025} & Production anomaly detection & \cfeat{I}{rule proposal/deployment} & \cfeat{P}{autonomous rule workflow} & \cfeat{M}{rule history} & \cfeat{C}{validate--repair--deploy gates}\\
+AnomaMind \citep{anomamind2026} & Anomaly diagnosis & \cfeat{I}{diagnostic tool loop} & \cfeat{P}{coarse-to-fine diagnosis} & \cfeat{M}{reusable patterns} & \cfeat{C}{reflection/RL feedback}\\
+TimeSage-MT \citep{timesagemt2026} & Multi-turn benchmark and agent & \cfeat{I}{multi-turn + code execution} & \cfeat{P}{nine skill groups} & \cfeat{M}{turn state} & \cfeat{C}{reference-code scoring}\\
+Dr-CiK \citep{drcik2026} & Foresight-driven benchmark & \cfeat{I}{active retrieval/filtering} & \cfeat{P}{retrieve--filter--distill--forecast} & \cfeat{M}{retained evidence} & \cfeat{C}{distractor ablation}\\
+TimeSeries\allowbreak Exam\allowbreak Agent \citep{timeseriesexamagent2026} & Benchmark generation & \cfeat{I}{templates + generators} & \cfeat{P}{generate--verify--refine} & \cfeat{M}{question bank} & \cfeat{C}{quality refinement loop}\\
+TimeOmni-1/VL \citep{timeomni2026,timeomnivl2026} & TS reasoning and generation model & \cfeat{I}{model I/O component} & \cfeat{P}{not a workflow agent} & \cfeat{M}{not an agent memory module} & \cfeat{C}{model training objective}\\
 \bottomrule
 \end{longtable}
 }
@@ -305,46 +317,57 @@ TimeOmni-1/VL \citep{timeomni2026,timeomnivl2026} & TS reasoning and generation 
 
 \begin{landscape}
 {\scriptsize
-\setlength{\tabcolsep}{1.6pt}
-\renewcommand{\arraystretch}{1.12}
+\setlength{\tabcolsep}{2.0pt}
+\renewcommand{\arraystretch}{1.08}
 \begin{longtable}{L{0.10\linewidth} L{0.12\linewidth} L{0.18\linewidth} L{0.19\linewidth} L{0.19\linewidth} L{0.16\linewidth}}
-\caption{Time-series-domain module design in the same surveyed systems.}
+\caption{Time-series-domain module design in the same surveyed systems. Compact tags: \textsf{\textbf{W}} workspace; \textsf{\textbf{A}} temporal actions; \textsf{\textbf{G}} grounding or temporal memory; \textsf{\textbf{V}} validation or domain contribution.}
 \label{tab:ts-module-design}\\
 \toprule
-\textbf{Work} & \textbf{Scope} & \textbf{Temporal object / workspace} & \textbf{Temporal tools and actions} & \textbf{Context, memory, and grounding} & \textbf{Validation / domain contribution}\\
+\textbf{Work} & \textbf{Scope} & \textbf{W: Temporal workspace} & \textbf{A: Temporal actions} & \textbf{G: Grounding / memory} & \textbf{V: Validation / domain contribution}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Work} & \textbf{Scope} & \textbf{Temporal object / workspace} & \textbf{Temporal tools and actions} & \textbf{Context, memory, and grounding} & \textbf{Validation / domain contribution}\\
+\textbf{Work} & \textbf{Scope} & \textbf{W: Temporal workspace} & \textbf{A: Temporal actions} & \textbf{G: Grounding / memory} & \textbf{V: Validation / domain contribution}\\
 \midrule
 \endhead
-TS-Agent \citep{tsagent2025} & Raw-series reasoning and QA & Raw numerical series plus structured statistical observations. & Trend, seasonality, anomaly, shape, and structural feature tools. & Evidence is grounded in returned statistics rather than only serialized values. & Temporal QA and reasoning over raw series.\\
-TimeART \citep{timeart2026} & Tool-augmented TSQA & Tool traces serve as temporal evidence. & TimeToolBench analytical tools for statistics, forecasting, anomaly, and patterns. & Early task experience improves time-series tool use. & Tool-augmented TSQA training and evaluation.\\
-TSAG \citep{tsag2026} & Financial time-series QA & Market series, indicators, and finance-specific query schema. & Financial database operations and temporal query tools. & Financial context is grounded through executable queries. & Tool correctness and answer faithfulness in finance.\\
-FETA \citep{feta2025} & Training-free classification & Multivariate channels are separated as reasoning views. & Structural exemplar retrieval and comparison. & Class exemplars provide domain-local memory. & Training-free multivariate classification.\\
-ZARA \citep{zara2025} & Motion sensor reasoning & Sensor windows and candidate activity states. & Retrieval over motion-derived cues and activity priors. & Motion statistics are converted into evidence-grounded textual knowledge. & Human activity reasoning over motion time series.\\
-TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} & End-to-end forecasting analysis & Curated datasets, forecast artifacts, visualizations, and reports. & Forecasting model library, validation tools, ensembling. & Data curation and model results are preserved in reports. & Full forecasting lifecycle automation.\\
-FLAIRR-TS \citep{flairr2025} & Retrieval-refined forecasting & Forecast state plus retrieved contextual snippets. & Retrieval and forecast-refinement actions. & Comparable temporal contexts guide revision. & Forecast refinement under retrieved evidence.\\
-TimeCAP \citep{timecap2025} & Event-aware prediction & Events aligned to temporal windows. & Context augmentation and prediction actions. & Event context is bound to target series. & Event-aware temporal prediction.\\
-TimeXL \citep{timexl2025} & Explainable multimodal prediction & Time series, text, and explanation artifacts. & Prediction and explanation actions. & Multimodal evidence is attached to prediction outputs. & Explainable multimodal temporal prediction.\\
-Nexus \citep{nexus2026} & Context-aware forecasting & Numerical signal and external context workspace. & Context integration and forecasting tools. & Context evidence is organized by temporal relevance. & Context-aware forecasting with temporal decomposition.\\
-MoiraiAgent \citep{moiraiagent2026} & TSFM-based forecasting agent & Forecasting task state and model outputs. & TSFM calls as forecasting tools. & Context-aware forecasting prompts and artifacts. & Universal TSFM components inside an agentic workflow.\\
-TimeCopilot \citep{timecopilot2026} & Forecasting assistant & Practical forecasting workspace. & Forecasting models and analysis tools. & User and task context maintained across sessions. & User-facing forecasting assistant.\\
-Last-Mile \citep{lastmile2026} & Forecast revision and deployment & Protected baseline, revision ledger, and audit trail. & Constrained revision actions and evidence retrieval. & Post-mortem memory captures recurring business revisions. & Deployment-ready forecast revision under constraints.\\
-TS-Debate \citep{tsdebate2026} & Multimodal zero-shot reasoning & Numeric, visual, and textual temporal evidence channels. & Modality-specific evidence extraction. & Cross-modal evidence is retained for calibration. & Multimodal time-series reasoning.\\
-MAS4TS \citep{mas4ts2026} & Visual multi-task reasoning & Visualized series and statistical evidence. & Visual/statistical task execution tools. & Shared visual evidence supports temporal reasoning. & Visual reasoning over temporal plots.\\
-Cast-R1 \citep{castr12026} & Forecasting as sequential decision-making & Forecasting state and action history. & Feature extraction, model selection, and revision actions. & State memory over the forecasting trajectory. & Forecasting policy learning from metrics.\\
-KairosAgent \citep{kairosagent2026} & Multimodal forecasting & Multimodal forecast state. & TSFM forecaster and analysis tools. & Semantic context is fused into forecast revision. & Reinforcement learning from forecasting.\\
-TimeClaw-EEL \citep{timeclaw2026explore} & Exploratory execution learning & Task trajectories and metric observations. & Analysis and forecasting tools with tool dropout. & Hierarchical distilled experience for temporal tasks. & Trajectory distillation using time-series metrics.\\
-TimeClaw-Harness \citep{timeclaw2026harness} & Contextualized temporal reasoning & Task-local workspace hosting native temporal objects. & Executable temporal tools and evolved routines. & Episodic multimodal memory with context keys and temporal fingerprints. & CiK, TSRBench, and TSAIA evaluation; verified capability evolution.\\
-AION \citep{aion2026} & Practical time-series agent system & Task file, workspace, task-local artifacts, and validation interface. & Time-series skills, rules, and evaluators. & Memory over temporal tasks, rules, and reusable skills. & Realistic task protocols and reliability mechanisms.\\
-MetaCaster \citep{metacaster2026} & Few-shot lightweight forecaster construction & Few-shot examples, generated-data workspace, and LT-Lib artifacts. & Synthetic data generation, lightweight forecaster training, and forecaster selection. & Few-shot context guides data generation and model choice. & Deployable lightweight forecasters from few-shot context.\\
-Argos \citep{argos2025} & Production anomaly detection & Cloud metrics and anomaly-rule artifacts. & Rule proposal, validation, repair, and deployment tools. & Rule history and monitoring context are retained. & Low-cost reproducible anomaly rules.\\
-AnomaMind \citep{anomamind2026} & Anomaly diagnosis & Anomaly windows, features, and diagnostic state. & Adaptive feature preparation and reusable anomaly analysis engines. & Reusable anomaly patterns support localization and diagnosis. & Agentic anomaly detection and diagnosis.\\
-TimeSage-MT \citep{timesagemt2026} & Multi-turn benchmark and agent & Multi-turn temporal task state. & Analytical skill library and reference-code execution. & State is maintained across temporal analysis turns. & Multi-turn time-series reasoning benchmark.\\
-Dr-CiK \citep{drcik2026} & Foresight-driven benchmark & Document corpus plus forecasting task state. & Retrieve, filter distractors, distill evidence, forecast. & Future-relevant context is retrieved under distractors. & Active context retrieval for forecasting.\\
-TimeSeries\allowbreak Exam\allowbreak Agent \citep{timeseriesexamagent2026} & Benchmark generation & Synthetic and real datasets plus exam templates. & Time-series question generation and verification. & Generated question bank stores dataset-specific temporal concepts. & Scalable time-series reasoning benchmark generation.\\
-TimeOmni-1/VL \citep{timeomni2026,timeomnivl2026} & TS reasoning and generation model & Model input/output interface for temporal understanding and generation. & Usable as a temporal model component or multimodal tool. & Not primarily a domain memory module. & Adjacent temporal model component for future agents.\\
+\multicolumn{6}{l}{\textit{Tool-grounded reasoning and QA}}\\
+\midrule
+TS-Agent \citep{tsagent2025} & Raw-series reasoning and QA & \cfeat{W}{raw series + statistical observations} & \cfeat{A}{trend/seasonality/anomaly/shape tools} & \cfeat{G}{statistics-grounded evidence} & \cfeat{V}{raw-series QA}\\
+TimeART \citep{timeart2026} & Tool-augmented TSQA & \cfeat{W}{tool traces as temporal evidence} & \cfeat{A}{TimeToolBench operations} & \cfeat{G}{early task experience} & \cfeat{V}{tool-augmented TSQA}\\
+TSAG \citep{tsag2026} & Financial time-series QA & \cfeat{W}{markets, indicators, finance schema} & \cfeat{A}{database + temporal queries} & \cfeat{G}{executable financial context} & \cfeat{V}{finance faithfulness}\\
+FETA \citep{feta2025} & Training-free classification & \cfeat{W}{channel-separated views} & \cfeat{A}{exemplar retrieval/comparison} & \cfeat{G}{class exemplars} & \cfeat{V}{training-free MTS classification}\\
+ZARA \citep{zara2025} & Motion sensor reasoning & \cfeat{W}{sensor windows + activities} & \cfeat{A}{motion-cue retrieval} & \cfeat{G}{activity priors + statistics} & \cfeat{V}{motion time-series reasoning}\\
+\midrule
+\multicolumn{6}{l}{\textit{Forecasting workflows and assistants}}\\
+\midrule
+TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} & End-to-end forecasting analysis & \cfeat{W}{curated data, forecasts, plots, reports} & \cfeat{A}{model library, validation, ensembling} & \cfeat{G}{curation/model traces} & \cfeat{V}{full forecasting lifecycle}\\
+FLAIRR-TS \citep{flairr2025} & Retrieval-refined forecasting & \cfeat{W}{forecast state + context snippets} & \cfeat{A}{retrieve/refine/forecast} & \cfeat{G}{comparable temporal contexts} & \cfeat{V}{retrieval-refined forecast}\\
+TimeCAP \citep{timecap2025} & Event-aware prediction & \cfeat{W}{event-window alignment} & \cfeat{A}{contextualize/augment/predict} & \cfeat{G}{events bound to series} & \cfeat{V}{event-aware prediction}\\
+TimeXL \citep{timexl2025} & Explainable multimodal prediction & \cfeat{W}{series, text, explanations} & \cfeat{A}{predict/explain actions} & \cfeat{G}{multimodal evidence} & \cfeat{V}{explanation-grounded prediction}\\
+Nexus \citep{nexus2026} & Context-aware forecasting & \cfeat{W}{signal/context workspace} & \cfeat{A}{context integration + forecast} & \cfeat{G}{temporal relevance organization} & \cfeat{V}{decomposition-aware forecast}\\
+MoiraiAgent \citep{moiraiagent2026} & TSFM-based forecasting agent & \cfeat{W}{forecast state + model outputs} & \cfeat{A}{TSFM tool calls} & \cfeat{G}{context-aware artifacts} & \cfeat{V}{TSFM-in-agent workflow}\\
+TimeCopilot \citep{timecopilot2026} & Forecasting assistant & \cfeat{W}{interactive forecast workspace} & \cfeat{A}{analysis + forecast tools} & \cfeat{G}{user/task session context} & \cfeat{V}{assistant-facing forecasting}\\
+Last-Mile \citep{lastmile2026} & Forecast revision and deployment & \cfeat{W}{protected baseline + ledger} & \cfeat{A}{constrained revision/retrieval} & \cfeat{G}{post-mortem revision memory} & \cfeat{V}{deployment constraints + audit}\\
+\midrule
+\multicolumn{6}{l}{\textit{Coordination, policy learning, and self-evolving systems}}\\
+\midrule
+TS-Debate \citep{tsdebate2026} & Multimodal zero-shot reasoning & \cfeat{W}{numeric/visual/text channels} & \cfeat{A}{modality evidence extraction} & \cfeat{G}{cross-modal calibration evidence} & \cfeat{V}{multimodal zero-shot reasoning}\\
+MAS4TS \citep{mas4ts2026} & Visual multi-task reasoning & \cfeat{W}{plots + statistics} & \cfeat{A}{visual/statistical tools} & \cfeat{G}{shared visual evidence} & \cfeat{V}{visual TS reasoning}\\
+Cast-R1 \citep{castr12026} & Forecasting as sequential decision-making & \cfeat{W}{forecast state/action history} & \cfeat{A}{feature/model/revision actions} & \cfeat{G}{trajectory memory} & \cfeat{V}{metric-driven policy learning}\\
+KairosAgent \citep{kairosagent2026} & Multimodal forecasting & \cfeat{W}{multimodal forecast state} & \cfeat{A}{TSFM + analysis tools} & \cfeat{G}{semantic context fusion} & \cfeat{V}{forecasting RL}\\
+TimeClaw-EEL \citep{timeclaw2026explore} & Exploratory execution learning & \cfeat{W}{trajectories + metric observations} & \cfeat{A}{tool dropout + analysis/forecasting} & \cfeat{G}{hierarchical distilled experience} & \cfeat{V}{metric-supervised distillation}\\
+TimeClaw-Harness \citep{timeclaw2026harness} & Contextualized temporal reasoning & \cfeat{W}{native temporal workspace} & \cfeat{A}{executable tools + evolved routines} & \cfeat{G}{episodic multimodal memory} & \cfeat{V}{CiK/TSRBench/TSAIA + evolution}\\
+AION \citep{aion2026} & Practical time-series agent system & \cfeat{W}{task file, workspace, artifacts} & \cfeat{A}{TS skills/rules/evaluators} & \cfeat{G}{task/rule/skill memory} & \cfeat{V}{realistic protocols}\\
+MetaCaster \citep{metacaster2026} & Few-shot lightweight forecaster construction & \cfeat{W}{few-shot + generated-data artifacts} & \cfeat{A}{synthetic data + lightweight training} & \cfeat{G}{few-shot context} & \cfeat{V}{deployable forecasters}\\
+\midrule
+\multicolumn{6}{l}{\textit{Anomaly systems, benchmarks, and adjacent models}}\\
+\midrule
+Argos \citep{argos2025} & Production anomaly detection & \cfeat{W}{cloud metrics + rule artifacts} & \cfeat{A}{propose/validate/repair/deploy rules} & \cfeat{G}{rule history + monitoring context} & \cfeat{V}{reproducible anomaly rules}\\
+AnomaMind \citep{anomamind2026} & Anomaly diagnosis & \cfeat{W}{anomaly windows, features, state} & \cfeat{A}{adaptive feature prep + engines} & \cfeat{G}{anomaly pattern memory} & \cfeat{V}{diagnosis/localization}\\
+TimeSage-MT \citep{timesagemt2026} & Multi-turn benchmark and agent & \cfeat{W}{multi-turn task state} & \cfeat{A}{skill library + reference code} & \cfeat{G}{cross-turn state} & \cfeat{V}{multi-turn benchmark}\\
+Dr-CiK \citep{drcik2026} & Foresight-driven benchmark & \cfeat{W}{document corpus + forecast state} & \cfeat{A}{retrieve/filter/distill/forecast} & \cfeat{G}{future-relevant evidence} & \cfeat{V}{active context retrieval}\\
+TimeSeries\allowbreak Exam\allowbreak Agent \citep{timeseriesexamagent2026} & Benchmark generation & \cfeat{W}{datasets + templates} & \cfeat{A}{question generation + verification} & \cfeat{G}{question-bank concepts} & \cfeat{V}{scalable benchmark generation}\\
+TimeOmni-1/VL \citep{timeomni2026,timeomnivl2026} & TS reasoning and generation model & \cfeat{W}{temporal model I/O} & \cfeat{A}{usable as temporal tool} & \cfeat{G}{not a domain memory module} & \cfeat{V}{adjacent model component}\\
 \bottomrule
 \end{longtable}
 }
