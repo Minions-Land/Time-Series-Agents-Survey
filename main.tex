@@ -59,6 +59,9 @@
 \setlength{\parskip}{0.52em}
 \setlength{\textfloatsep}{10pt plus 3pt minus 3pt}
 \setlength{\intextsep}{9pt plus 3pt minus 3pt}
+\makeatletter
+\setlength{\@fptop}{0pt}
+\makeatother
 \emergencystretch=5em
 
 \setlist[itemize]{leftmargin=1.25em,itemsep=0.18em,topsep=0.15em}
@@ -294,78 +297,62 @@ The contribution split is most useful when it is auditable at the work level. We
 
 Under this rule, the current ledger contains 52 counted works: 37 claimed agent systems, 6 agent benchmarks or testbeds, and 9 module-level works that do not claim to be agents. The primary contribution distribution is: \layerGH{} 6/52 = 11.5\%, \layerGTS{} 8/52 = 15.4\%, and \layerTSK{} 38/52 = 73.1\%. This is an auditable snapshot of the systems and modules covered here rather than a claim about every future system. The practical implication is clear: most current innovation is still task-specific, especially for forecasting, anomaly workflows, classification, QA, and domain-specific interpretation. Cross-task time-series Harness design is emerging, but remains less developed than the number of task-specific agents and modules suggests. Figure~\ref{fig:contribution-trend} further plots the publication-month trend for the 47 ledger entries whose public posting month can be identified; the remaining five entries are retained in the aggregate distribution and in Table~\ref{tab:agent-ledger}.
 
-\begin{figure}[t]
+\begin{figure}[t!]
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[font=\sffamily]
   \tikzset{
     trendline/.style={line width=1.2pt,line cap=round,line join=round},
-    point/.style={circle,fill=white,inner sep=1.1pt,line width=0.8pt}
+    totaline/.style={line width=1.35pt,line cap=round,line join=round,color=black!72},
+    point/.style={circle,fill=white,inner sep=1.05pt,line width=0.75pt}
   }
 
-  \begin{scope}[x=0.29cm,y=0.13cm]
-    \fill[black!2,rounded corners=5pt] (-2.4,-6.2) rectangle (24.6,44.2);
-    \node[anchor=west,font=\bfseries\small,text=black!80] at (-1.1,41.6) {Cumulative count};
-    \foreach \y/\label in {0/0,10/10,20/20,30/30,40/40} {
+  \begin{scope}[x=0.43cm,y=0.105cm]
+    \fill[black!2,rounded corners=5pt] (-2.7,-7.2) rectangle (28.6,54.2);
+    \node[anchor=west,font=\bfseries\small,text=black!80] at (0.3,52.0) {Cumulative contribution ledger};
+    \foreach \y/\label in {0/0,10/10,20/20,30/30,40/40,50/50} {
       \draw[black!10] (0,\y) -- (22.4,\y);
       \node[anchor=east,font=\scriptsize,text=black!65] at (-0.5,\y) {\label};
     }
-    \draw[->,black!55,line width=0.45pt] (0,0) -- (23,0);
-    \draw[->,black!55,line width=0.45pt] (0,0) -- (0,41.2);
-    \node[anchor=south,font=\scriptsize,text=black!65,rotate=90] at (-2.0,20) {Works};
+    \draw[->,black!55,line width=0.45pt] (0,0) -- (23.2,0);
+    \draw[->,black!55,line width=0.45pt] (0,0) -- (0,51.3);
+    \node[anchor=south,font=\scriptsize,text=black!65,rotate=90] at (-2.1,25) {Cumulative works};
     \foreach \x/\label in {0/Aug'24,5/Jan'25,12/Aug'25,17/Jan'26,22/Jun'26} {
-      \draw[black!35] (\x,0) -- (\x,-0.6);
-      \node[anchor=north,font=\scriptsize,text=black!65] at (\x,-1.2) {\label};
+      \draw[black!35] (\x,0) -- (\x,-0.65);
+      \node[anchor=north,font=\scriptsize,text=black!65] at (\x,-1.25) {\label};
     }
-    \draw[trendline,color=surveyGreen] plot coordinates {(0,0) (2,1) (5,2) (7,4) (8,4) (10,6) (11,7) (12,10) (14,13) (15,15) (17,17) (18,21) (19,21) (20,26) (21,31) (22,34)};
-    \draw[trendline,color=surveyGold] plot coordinates {(0,1) (2,1) (5,1) (7,1) (8,1) (10,1) (11,1) (12,2) (14,3) (15,3) (17,4) (18,4) (19,4) (20,4) (21,6) (22,7)};
+
+    \path[fill=surveyBlue!22]
+      plot coordinates {(0,0) (2,0) (5,0) (7,0) (8,1) (10,1) (11,1) (12,1) (14,1) (15,1) (17,2) (18,4) (19,5) (20,5) (21,6) (22,6)}
+      -- (22,0) -- (0,0) -- cycle;
+    \path[fill=surveyGold!28]
+      plot coordinates {(0,1) (2,1) (5,1) (7,1) (8,2) (10,2) (11,2) (12,3) (14,4) (15,4) (17,6) (18,8) (19,9) (20,9) (21,12) (22,13)}
+      -- (22,6) -- (21,6) -- (20,5) -- (19,5) -- (18,4) -- (17,2) -- (15,1) -- (14,1) -- (12,1) -- (11,1) -- (10,1) -- (8,1) -- (7,0) -- (5,0) -- (2,0) -- (0,0) -- cycle;
+    \path[fill=surveyGreen!24]
+      plot coordinates {(0,1) (2,2) (5,3) (7,5) (8,6) (10,8) (11,9) (12,13) (14,17) (15,19) (17,23) (18,29) (19,30) (20,35) (21,43) (22,47)}
+      -- (22,13) -- (21,12) -- (20,9) -- (19,9) -- (18,8) -- (17,6) -- (15,4) -- (14,4) -- (12,3) -- (11,2) -- (10,2) -- (8,2) -- (7,1) -- (5,1) -- (2,1) -- (0,1) -- cycle;
+
     \draw[trendline,color=surveyBlue] plot coordinates {(0,0) (2,0) (5,0) (7,0) (8,1) (10,1) (11,1) (12,1) (14,1) (15,1) (17,2) (18,4) (19,5) (20,5) (21,6) (22,6)};
-    \foreach \x/\y in {0/0,2/1,5/2,7/4,8/4,10/6,11/7,12/10,14/13,15/15,17/17,18/21,19/21,20/26,21/31,22/34} {
-      \node[point,draw=surveyGreen] at (\x,\y) {};
+    \draw[trendline,color=surveyGold] plot coordinates {(0,1) (2,1) (5,1) (7,1) (8,2) (10,2) (11,2) (12,3) (14,4) (15,4) (17,6) (18,8) (19,9) (20,9) (21,12) (22,13)};
+    \draw[totaline] plot coordinates {(0,1) (2,2) (5,3) (7,5) (8,6) (10,8) (11,9) (12,13) (14,17) (15,19) (17,23) (18,29) (19,30) (20,35) (21,43) (22,47)};
+    \foreach \x/\y in {0/1,2/2,5/3,7/5,8/6,10/8,11/9,12/13,14/17,15/19,17/23,18/29,19/30,20/35,21/43,22/47} {
+      \node[point,draw=black!65] at (\x,\y) {};
     }
-    \foreach \x/\y in {0/1,2/1,5/1,7/1,8/1,10/1,11/1,12/2,14/3,15/3,17/4,18/4,19/4,20/4,21/6,22/7} {
-      \node[point,draw=surveyGold] at (\x,\y) {};
-    }
-    \foreach \x/\y in {0/0,2/0,5/0,7/0,8/1,10/1,11/1,12/1,14/1,15/1,17/2,18/4,19/5,20/5,21/6,22/6} {
-      \node[point,draw=surveyBlue] at (\x,\y) {};
-    }
-  \end{scope}
 
-  \begin{scope}[x=0.29cm,y=0.13cm,xshift=8.9cm]
-    \fill[black!2,rounded corners=5pt] (-2.4,-6.2) rectangle (24.6,34.2);
-    \node[anchor=west,font=\bfseries\small,text=black!80] at (-1.1,31.6) {Cumulative share};
-    \foreach \y/\label in {0/0,6.25/25,12.5/50,18.75/75,25/100} {
-      \draw[black!10] (0,\y) -- (22.4,\y);
-      \node[anchor=east,font=\scriptsize,text=black!65] at (-0.5,\y) {\label\%};
-    }
-    \draw[->,black!55,line width=0.45pt] (0,0) -- (23,0);
-    \draw[->,black!55,line width=0.45pt] (0,0) -- (0,26.5);
-    \node[anchor=south,font=\scriptsize,text=black!65,rotate=90] at (-2.0,13) {Share};
-    \foreach \x/\label in {0/Aug'24,5/Jan'25,12/Aug'25,17/Jan'26,22/Jun'26} {
-      \draw[black!35] (\x,0) -- (\x,-0.6);
-      \node[anchor=north,font=\scriptsize,text=black!65] at (\x,-1.2) {\label};
-    }
-    \draw[trendline,color=surveyGreen] plot coordinates {(0,0.00) (2,12.50) (5,16.67) (7,20.00) (8,16.67) (10,18.75) (11,19.44) (12,19.23) (14,19.12) (15,19.74) (17,18.48) (18,18.10) (19,17.50) (20,18.57) (21,18.02) (22,18.09)};
-    \draw[trendline,color=surveyGold] plot coordinates {(0,25.00) (2,12.50) (5,8.33) (7,5.00) (8,4.17) (10,3.12) (11,2.78) (12,3.85) (14,4.41) (15,3.95) (17,4.35) (18,3.45) (19,3.33) (20,2.86) (21,3.49) (22,3.72)};
-    \draw[trendline,color=surveyBlue] plot coordinates {(0,0.00) (2,0.00) (5,0.00) (7,0.00) (8,4.17) (10,3.12) (11,2.78) (12,1.92) (14,1.47) (15,1.32) (17,2.17) (18,3.45) (19,4.17) (20,3.57) (21,3.49) (22,3.19)};
-    \foreach \x/\y in {0/0.00,2/12.50,5/16.67,7/20.00,8/16.67,10/18.75,11/19.44,12/19.23,14/19.12,15/19.74,17/18.48,18/18.10,19/17.50,20/18.57,21/18.02,22/18.09} {
-      \node[point,draw=surveyGreen] at (\x,\y) {};
-    }
-    \foreach \x/\y in {0/25.00,2/12.50,5/8.33,7/5.00,8/4.17,10/3.12,11/2.78,12/3.85,14/4.41,15/3.95,17/4.35,18/3.45,19/3.33,20/2.86,21/3.49,22/3.72} {
-      \node[point,draw=surveyGold] at (\x,\y) {};
-    }
-    \foreach \x/\y in {0/0.00,2/0.00,5/0.00,7/0.00,8/4.17,10/3.12,11/2.78,12/1.92,14/1.47,15/1.32,17/2.17,18/3.45,19/4.17,20/3.57,21/3.49,22/3.19} {
-      \node[point,draw=surveyBlue] at (\x,\y) {};
-    }
-  \end{scope}
+    \node[anchor=west,font=\scriptsize,text=surveyGreen!70!black] at (22.55,31.0) {\layerTSK{} 34 (72.3\%)};
+    \node[anchor=west,font=\scriptsize,text=surveyGold!70!black] at (22.55,9.5) {\layerGTS{} 7 (14.9\%)};
+    \node[anchor=west,font=\scriptsize,text=surveyBlue!80!black] at (22.55,3.0) {\layerGH{} 6 (12.8\%)};
+    \node[anchor=west,font=\scriptsize,text=black!72] at (22.55,47.0) {47 dated works};
 
-  \node[anchor=west,font=\scriptsize,text=black!72] at (0.35,-0.95)
-    {\textcolor{surveyGreen}{\rule{0.9em}{0.9em}} \layerTSK{} Task-specific \quad
-     \textcolor{surveyGold}{\rule{0.9em}{0.9em}} \layerGTS{} General TS \quad
-     \textcolor{surveyBlue}{\rule{0.9em}{0.9em}} \layerGH{} General Harness};
+    \node[anchor=west,font=\scriptsize,text=black!72] at (0,-5.8)
+      {\textcolor{surveyGreen}{\rule{0.9em}{0.9em}} \layerTSK{} Task-specific \quad
+       \textcolor{surveyGold}{\rule{0.9em}{0.9em}} \layerGTS{} General TS \quad
+       \textcolor{surveyBlue}{\rule{0.9em}{0.9em}} \layerGH{} General Harness \quad
+       \textcolor{black!72}{\rule{0.9em}{0.15em}} cumulative total};
+  \end{scope}
 \end{tikzpicture}
 }
-\caption{Temporal evolution of primary contribution loci among Time Series Agent systems, benchmarks, and module-level works. The left panel shows cumulative absolute counts, and the right panel shows cumulative shares using the same dated ledger subset. The trend starts in August 2024, where the maintained ledger has no task-specific Time-Series Harness Module entry yet; by June 2026, task-specific modules dominate both absolute count and relative share.}
+\caption{Temporal evolution of primary contribution loci among Time Series Agent systems, benchmarks, and module-level works. The stacked area shows cumulative absolute counts, while the colored vertical composition at each month indicates the relative share of the dated ledger subset. By June 2026, task-specific modules dominate the dated subset both in absolute count and relative proportion.}
 \label{fig:contribution-trend}
 \end{figure}
 
