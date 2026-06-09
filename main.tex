@@ -100,6 +100,9 @@
 \newcommand{\layerGH}{\textsf{\textbf{GH}}}
 \newcommand{\layerGTS}{\textsf{\textbf{GTS}}}
 \newcommand{\layerTSK}{\textsf{\textbf{TSK}}}
+\newcommand{\claimAgent}{\textsf{Agent}}
+\newcommand{\claimBench}{\textsf{Bench}}
+\newcommand{\claimModule}{\textsf{Module}}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
 \newcommand{\fulltextcol}[1]{\dimexpr#1\textwidth-2\tabcolsep\relax}
@@ -178,7 +181,7 @@ This survey makes four contributions.
 \begin{enumerate}
   \item We establish an operational framing of Time Series Agents as LLM-based systems whose general runtime is extended by a time-series-domain module.
   \item We separate the design space into \GeneralHarness{}, \GeneralTSHarness{}, and \TaskSpecificHarness{} layers, clarifying whether a method contributes to agent design, cross-task temporal runtime support, or task-specific temporal workflows.
-  \item We organize existing systems through a maintained component ledger and a set of aligned tables covering general-agent design, cross-task time-series modules, and task-specific modules.
+  \item We organize existing systems through a maintained component ledger that records both contribution locus and agent-claim status, separating claimed agent systems from non-agent works that nevertheless contribute reusable Harness-level modules.
   \item We outline design and evaluation principles for future systems, with emphasis on temporal faithfulness, tool correctness, process-level evaluation, reproducible infrastructure, and downstream decision support.
 \end{enumerate}
 
@@ -285,11 +288,11 @@ Recent systems make runtime components trainable or self-extending. They formula
 
 This direction is especially relevant when the system explicitly designs the \TSHarnessModule{} rather than only a task-specific prompt or workflow. A time-series-native runtime can host series in a task-local workspace, expose executable temporal tools, store episodic multimodal memory, and evolve new tools from verified trajectories, thereby connecting forecasting with contextual reasoning and domain-specific temporal analysis \citep{timeclaw2026harness}.
 
-\section{Layered Component Ledger of Existing Systems}
+\section{Contribution Ledger of Existing Systems}
 
-The contribution split is most useful when it is auditable at the work level. We therefore maintain a work-by-work ledger and use it as the basis for the tables below. Each work may contain multiple components, but for the percentage claim we assign one primary contribution locus: \layerGH{} for \GeneralHarness{}, \layerGTS{} for \GeneralTSHarness{}, and \layerTSK{} for \TaskSpecificHarness{}. Pure temporal foundation models and adjacent data-science agents are discussed elsewhere, but are not counted in this agent-harness statistic.
+The contribution split is most useful when it is auditable at the work level. We therefore maintain a work-by-work ledger and use it as the basis for the tables below. Each work may contain multiple components, but for the percentage claim we assign one primary contribution locus: \layerGH{} for \GeneralHarness{}, \layerGTS{} for \GeneralTSHarness{}, and \layerTSK{} for \TaskSpecificHarness{}. The ledger also records whether the paper explicitly claims an agent, agentic, or multi-agent system. \claimAgent{} denotes a claimed agent system, \claimBench{} denotes an agent benchmark or testbed, and \claimModule{} denotes a work that does not claim to be an agent but contributes a reusable Harness-level module. Pure temporal foundation models and adjacent data-science agents are discussed elsewhere, but are not counted in this agent-harness statistic.
 
-Under this rule, the current ledger contains 45 counted Time Series Agent or agent-benchmark systems. The primary contribution distribution is: \layerGH{} 6/45 = 13.3\%, \layerGTS{} 8/45 = 17.8\%, and \layerTSK{} 31/45 = 68.9\%. This is an auditable snapshot of the systems covered here rather than a claim about every future system. The practical implication is clear: most current innovation is still task-specific, especially for forecasting, anomaly workflows, classification, and domain-specific interpretation. Cross-task time-series Harness design is emerging, but remains less developed than the number of task-specific agents suggests. Figure~\ref{fig:contribution-trend} further plots the publication-month trend for the 40 ledger entries whose public posting month can be identified; the remaining five entries are retained in the aggregate distribution and in Table~\ref{tab:agent-ledger}.
+Under this rule, the current ledger contains 52 counted works: 37 claimed agent systems, 6 agent benchmarks or testbeds, and 9 module-level works that do not claim to be agents. The primary contribution distribution is: \layerGH{} 6/52 = 11.5\%, \layerGTS{} 8/52 = 15.4\%, and \layerTSK{} 38/52 = 73.1\%. This is an auditable snapshot of the systems and modules covered here rather than a claim about every future system. The practical implication is clear: most current innovation is still task-specific, especially for forecasting, anomaly workflows, classification, QA, and domain-specific interpretation. Cross-task time-series Harness design is emerging, but remains less developed than the number of task-specific agents and modules suggests. Figure~\ref{fig:contribution-trend} further plots the publication-month trend for the 47 ledger entries whose public posting month can be identified; the remaining five entries are retained in the aggregate distribution and in Table~\ref{tab:agent-ledger}.
 
 \begin{figure}[t]
 \centering
@@ -301,29 +304,29 @@ Under this rule, the current ledger contains 45 counted Time Series Agent or age
   }
 
   \begin{scope}[x=0.29cm,y=0.13cm]
-    \fill[black!2,rounded corners=5pt] (-2.4,-6.2) rectangle (24.6,34.2);
-    \node[anchor=west,font=\bfseries\small,text=black!80] at (-1.1,31.6) {Cumulative count};
-    \foreach \y/\label in {0/0,10/10,20/20,30/30} {
+    \fill[black!2,rounded corners=5pt] (-2.4,-6.2) rectangle (24.6,44.2);
+    \node[anchor=west,font=\bfseries\small,text=black!80] at (-1.1,41.6) {Cumulative count};
+    \foreach \y/\label in {0/0,10/10,20/20,30/30,40/40} {
       \draw[black!10] (0,\y) -- (22.4,\y);
       \node[anchor=east,font=\scriptsize,text=black!65] at (-0.5,\y) {\label};
     }
     \draw[->,black!55,line width=0.45pt] (0,0) -- (23,0);
-    \draw[->,black!55,line width=0.45pt] (0,0) -- (0,31.2);
-    \node[anchor=south,font=\scriptsize,text=black!65,rotate=90] at (-2.0,15) {Systems};
+    \draw[->,black!55,line width=0.45pt] (0,0) -- (0,41.2);
+    \node[anchor=south,font=\scriptsize,text=black!65,rotate=90] at (-2.0,20) {Works};
     \foreach \x/\label in {0/Aug'24,5/Jan'25,12/Aug'25,17/Jan'26,22/Jun'26} {
       \draw[black!35] (\x,0) -- (\x,-0.6);
       \node[anchor=north,font=\scriptsize,text=black!65] at (\x,-1.2) {\label};
     }
-    \draw[trendline,color=surveyGreen] plot coordinates {(0,0) (2,1) (5,2) (7,4) (8,4) (12,7) (14,9) (15,11) (17,12) (18,15) (19,15) (20,19) (21,24) (22,27)};
-    \draw[trendline,color=surveyGold] plot coordinates {(0,1) (2,1) (5,1) (7,1) (8,1) (12,2) (14,3) (15,3) (17,4) (18,4) (19,4) (20,4) (21,6) (22,7)};
-    \draw[trendline,color=surveyBlue] plot coordinates {(0,0) (2,0) (5,0) (7,0) (8,1) (12,1) (14,1) (15,1) (17,2) (18,4) (19,5) (20,5) (21,6) (22,6)};
-    \foreach \x/\y in {0/0,2/1,5/2,7/4,8/4,12/7,14/9,15/11,17/12,18/15,19/15,20/19,21/24,22/27} {
+    \draw[trendline,color=surveyGreen] plot coordinates {(0,0) (2,1) (5,2) (7,4) (8,4) (10,6) (11,7) (12,10) (14,13) (15,15) (17,17) (18,21) (19,21) (20,26) (21,31) (22,34)};
+    \draw[trendline,color=surveyGold] plot coordinates {(0,1) (2,1) (5,1) (7,1) (8,1) (10,1) (11,1) (12,2) (14,3) (15,3) (17,4) (18,4) (19,4) (20,4) (21,6) (22,7)};
+    \draw[trendline,color=surveyBlue] plot coordinates {(0,0) (2,0) (5,0) (7,0) (8,1) (10,1) (11,1) (12,1) (14,1) (15,1) (17,2) (18,4) (19,5) (20,5) (21,6) (22,6)};
+    \foreach \x/\y in {0/0,2/1,5/2,7/4,8/4,10/6,11/7,12/10,14/13,15/15,17/17,18/21,19/21,20/26,21/31,22/34} {
       \node[point,draw=surveyGreen] at (\x,\y) {};
     }
-    \foreach \x/\y in {0/1,2/1,5/1,7/1,8/1,12/2,14/3,15/3,17/4,18/4,19/4,20/4,21/6,22/7} {
+    \foreach \x/\y in {0/1,2/1,5/1,7/1,8/1,10/1,11/1,12/2,14/3,15/3,17/4,18/4,19/4,20/4,21/6,22/7} {
       \node[point,draw=surveyGold] at (\x,\y) {};
     }
-    \foreach \x/\y in {0/0,2/0,5/0,7/0,8/1,12/1,14/1,15/1,17/2,18/4,19/5,20/5,21/6,22/6} {
+    \foreach \x/\y in {0/0,2/0,5/0,7/0,8/1,10/1,11/1,12/1,14/1,15/1,17/2,18/4,19/5,20/5,21/6,22/6} {
       \node[point,draw=surveyBlue] at (\x,\y) {};
     }
   \end{scope}
@@ -342,16 +345,16 @@ Under this rule, the current ledger contains 45 counted Time Series Agent or age
       \draw[black!35] (\x,0) -- (\x,-0.6);
       \node[anchor=north,font=\scriptsize,text=black!65] at (\x,-1.2) {\label};
     }
-    \draw[trendline,color=surveyGreen] plot coordinates {(0,0) (2,12.50) (5,16.68) (7,20.00) (8,16.68) (12,17.50) (14,17.30) (15,18.33) (17,16.68) (18,16.30) (19,15.63) (20,16.96) (21,16.68) (22,16.88)};
-    \draw[trendline,color=surveyGold] plot coordinates {(0,25.00) (2,12.50) (5,8.33) (7,5.00) (8,4.18) (12,5.00) (14,5.78) (15,5.00) (17,5.55) (18,4.35) (19,4.17) (20,3.57) (21,4.18) (22,4.38)};
-    \draw[trendline,color=surveyBlue] plot coordinates {(0,0) (2,0) (5,0) (7,0) (8,4.18) (12,2.50) (14,1.93) (15,1.68) (17,2.78) (18,4.35) (19,5.21) (20,4.46) (21,4.18) (22,3.75)};
-    \foreach \x/\y in {0/0,2/12.50,5/16.68,7/20.00,8/16.68,12/17.50,14/17.30,15/18.33,17/16.68,18/16.30,19/15.63,20/16.96,21/16.68,22/16.88} {
+    \draw[trendline,color=surveyGreen] plot coordinates {(0,0.00) (2,12.50) (5,16.67) (7,20.00) (8,16.67) (10,18.75) (11,19.44) (12,19.23) (14,19.12) (15,19.74) (17,18.48) (18,18.10) (19,17.50) (20,18.57) (21,18.02) (22,18.09)};
+    \draw[trendline,color=surveyGold] plot coordinates {(0,25.00) (2,12.50) (5,8.33) (7,5.00) (8,4.17) (10,3.12) (11,2.78) (12,3.85) (14,4.41) (15,3.95) (17,4.35) (18,3.45) (19,3.33) (20,2.86) (21,3.49) (22,3.72)};
+    \draw[trendline,color=surveyBlue] plot coordinates {(0,0.00) (2,0.00) (5,0.00) (7,0.00) (8,4.17) (10,3.12) (11,2.78) (12,1.92) (14,1.47) (15,1.32) (17,2.17) (18,3.45) (19,4.17) (20,3.57) (21,3.49) (22,3.19)};
+    \foreach \x/\y in {0/0.00,2/12.50,5/16.67,7/20.00,8/16.67,10/18.75,11/19.44,12/19.23,14/19.12,15/19.74,17/18.48,18/18.10,19/17.50,20/18.57,21/18.02,22/18.09} {
       \node[point,draw=surveyGreen] at (\x,\y) {};
     }
-    \foreach \x/\y in {0/25.00,2/12.50,5/8.33,7/5.00,8/4.18,12/5.00,14/5.78,15/5.00,17/5.55,18/4.35,19/4.17,20/3.57,21/4.18,22/4.38} {
+    \foreach \x/\y in {0/25.00,2/12.50,5/8.33,7/5.00,8/4.17,10/3.12,11/2.78,12/3.85,14/4.41,15/3.95,17/4.35,18/3.45,19/3.33,20/2.86,21/3.49,22/3.72} {
       \node[point,draw=surveyGold] at (\x,\y) {};
     }
-    \foreach \x/\y in {0/0,2/0,5/0,7/0,8/4.18,12/2.50,14/1.93,15/1.68,17/2.78,18/4.35,19/5.21,20/4.46,21/4.18,22/3.75} {
+    \foreach \x/\y in {0/0.00,2/0.00,5/0.00,7/0.00,8/4.17,10/3.12,11/2.78,12/1.92,14/1.47,15/1.32,17/2.17,18/3.45,19/4.17,20/3.57,21/3.49,22/3.19} {
       \node[point,draw=surveyBlue] at (\x,\y) {};
     }
   \end{scope}
@@ -362,7 +365,7 @@ Under this rule, the current ledger contains 45 counted Time Series Agent or age
      \textcolor{surveyBlue}{\rule{0.9em}{0.9em}} \layerGH{} General Harness};
 \end{tikzpicture}
 }
-\caption{Temporal evolution of primary contribution loci among Time Series Agent systems. The left panel shows cumulative absolute counts, and the right panel shows cumulative shares using the same ledger subset. The trend starts in August 2024, where the maintained ledger has no task-specific Time-Series Harness Module entry yet; by June 2026, task-specific modules dominate both absolute count and relative share.}
+\caption{Temporal evolution of primary contribution loci among Time Series Agent systems, benchmarks, and module-level works. The left panel shows cumulative absolute counts, and the right panel shows cumulative shares using the same dated ledger subset. The trend starts in August 2024, where the maintained ledger has no task-specific Time-Series Harness Module entry yet; by June 2026, task-specific modules dominate both absolute count and relative share.}
 \label{fig:contribution-trend}
 \end{figure}
 
@@ -371,62 +374,69 @@ Under this rule, the current ledger contains 45 counted Time Series Agent or age
 \setlength{\tabcolsep}{2.0pt}
 \setlength{\LTcapwidth}{\linewidth}
 \renewcommand{\arraystretch}{1.08}
-\begin{longtable}{L{\fulllinecol{0.12}} C{\fulllinecol{0.055}} L{\fulllinecol{0.12}} C{\fulllinecol{0.045}} L{\fulllinecol{0.20}} L{\fulllinecol{0.21}} L{\fulllinecol{0.25}}}
-\caption{Maintained ledger for Time Series Agent works. \layerGH{} = \GeneralHarness{}; \layerGTS{} = \GeneralTSHarness{}; \layerTSK{} = \TaskSpecificHarness{}. Month records the public posting month when it can be stably identified; entries without a stable month remain in the aggregate distribution but are omitted from Figure~\ref{fig:contribution-trend}.}
+\begin{longtable}{L{\fulllinecol{0.11}} C{\fulllinecol{0.05}} L{\fulllinecol{0.11}} C{\fulllinecol{0.055}} C{\fulllinecol{0.045}} L{\fulllinecol{0.18}} L{\fulllinecol{0.19}} L{\fulllinecol{0.26}}}
+\caption{Maintained ledger for Time Series Agent systems, benchmarks, and Harness-level modules. \claimAgent{} denotes a work that explicitly claims an agent system; \claimBench{} denotes an agent benchmark or testbed; \claimModule{} denotes a work that does not claim to be an agent but contributes a reusable Harness-level module. \layerGH{} = \GeneralHarness{}; \layerGTS{} = \GeneralTSHarness{}; \layerTSK{} = \TaskSpecificHarness{}.}
 \label{tab:agent-ledger}\\
 \toprule
-\textbf{Work} & \textbf{Month} & \textbf{Task family} & \textbf{Locus} & \textbf{General Harness contribution} & \textbf{General TS Harness contribution} & \textbf{Task-specific Harness contribution}\\
+\textbf{Work} & \textbf{Month} & \textbf{Task family} & \textbf{Claim} & \textbf{Loc.} & \textbf{General Harness contribution} & \textbf{General TS Harness contribution} & \textbf{Task-specific Harness contribution}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Work} & \textbf{Month} & \textbf{Task family} & \textbf{Locus} & \textbf{General Harness contribution} & \textbf{General TS Harness contribution} & \textbf{Task-specific Harness contribution}\\
+\textbf{Work} & \textbf{Month} & \textbf{Task family} & \textbf{Claim} & \textbf{Loc.} & \textbf{General Harness contribution} & \textbf{General TS Harness contribution} & \textbf{Task-specific Harness contribution}\\
 \midrule
 \endhead
-Agentic RAG for TSA \citep{agenticrag2024} & Aug'24 & Cross-task TSA & \layerGTS{} & Hierarchical multi-agent routing and prompt-pool retrieval. & Task-specialized SLM agents over time-series requests. & Instruction-tuned task agents for multiple TS tasks.\\
-TESSA \citep{tessa2024} & Oct'24 & Annotation / interpretation & \layerTSK{} & Two-agent annotation workflow. & Time-wise and text-wise feature interface. & General and domain-specific annotation generation.\\
-Argos \citep{argos2025} & Jan'25 & Anomaly detection & \layerTSK{} & Autonomous rule proposal and review gates. & Cloud-metric workspace and monitoring context. & Anomaly-rule validation, repair, deployment.\\
-TimeXL \citep{timexl2025} & Mar'25 & Multimodal prediction & \layerTSK{} & Predict/explain interaction loop. & Multimodal temporal evidence state. & Explanation-grounded prediction.\\
-FinArena \citep{finarena2025} & Mar'25 & Financial forecasting / decision & \layerTSK{} & Human-agent collaboration and expert-agent decision loop. & Multimodal financial temporal evidence. & Stock trend prediction and risk-profile trading decisions.\\
-Competition Agents \citep{competitionagents2025} & Apr'25 & News-driven forecasting & \layerGH{} & Competitive multi-agent discussion and reflective support. & News-event influence state for forecasting. & News-driven forecast reasoning under misleading information.\\
-ZARA \citep{zara2025} & Aug'25 & Activity recognition & \layerTSK{} & Retrieval-augmented candidate loop. & Sensor-window evidence representation. & Motion-cue retrieval and activity priors.\\
-FLAIRR-TS \citep{flairr2025} & Aug'25 & Forecasting & \layerTSK{} & Forecaster-refiner agent loop. & Retrieved analogs attached to forecast prompt state. & Adaptive prompt refinement for forecasting.\\
-DCATS \citep{yeh2025empowering} & Aug'25 & Forecasting data curation & \layerTSK{} & Data-centric AutoML-style agent orchestration. & Metadata-aware forecast task state. & Data cleaning optimized for forecast-error reduction.\\
-CALM \citep{calm2025} & Aug'25 & Streaming adaptation & \layerGTS{} & Continuous adaptation with LLM-as-judge feedback. & Non-stationary stream monitoring state. & Stream adaptation and regression checks.\\
-TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} & Oct'25 & Forecasting & \layerTSK{} & Curator--Planner--Forecaster--Reporter roles. & Dataset, artifact, visualization, and report workspace. & Forecasting lifecycle automation, validation, ensembling.\\
-TS-Agent \citep{tsagent2025} & Oct'25 & Raw-series reasoning / QA & \layerGTS{} & ReAct-style observe--reason--act loop. & Raw-series observation state and statistical insight tools. & Temporal QA answer refinement.\\
-FETA \citep{feta2025} & Oct'25 & Classification & \layerTSK{} & Channel-level agents and confidence aggregation. & Channel-separated temporal views. & Exemplar-based training-free classification.\\
-AlphaCast \citep{alphacast2025} & Nov'25 & Interactive forecasting & \layerTSK{} & Context-reasoning-reflection workflow. & Feature, knowledge, case, and context support toolkit. & Human-wisdom plus LLM co-reasoning for forecasting.\\
-AI-Meteorologist \citep{aimeteorologist2025,hierarchicalmeteorologist2025} & Nov'25 & Weather interpretation & \layerTSK{} & Modular agent-based report generation. & Multi-variable meteorological time-series workspace. & Weather-front, anomaly, and localized-dynamics explanation.\\
-TimeART \citep{timeart2026} & Jan'26 & TSQA / reasoning & \layerGTS{} & Tool-call traces and reflection during training. & TimeToolBench-style analytical tool substrate. & TSQA training and evaluation.\\
-TS-Debate \citep{tsdebate2026} & Jan'26 & Multimodal reasoning & \layerGH{} & Multi-agent debate and conflict resolution. & Shared temporal evidence across modalities. & Zero-shot multimodal TS reasoning.\\
-ChatAD \citep{chatad2026} & Jan'26 & Anomaly detection / dialogue & \layerTSK{} & Multi-agent TS evolution and multi-turn instruction learning. & AD reasoning dialogue state and LLADBench evaluation. & Anomaly reasoning dataset, benchmark, and cross-task generalization.\\
-Cast-R1 \citep{castr12026} & Feb'26 & Forecasting policy & \layerGH{} & Sequential decision policy and RL-style optimization. & Forecast trajectory state. & Forecast metric reward and action set.\\
-AnomaMind \citep{anomamind2026} & Feb'26 & Anomaly diagnosis & \layerTSK{} & Coarse-to-fine diagnostic loop with reflection/RL. & Anomaly windows, features, and reusable patterns. & Localization and diagnosis workflow.\\
-MAS4TS \citep{mas4ts2026} & Feb'26 & Visual reasoning & \layerGH{} & Analyzer--Reasoner--Executor coordination. & Visual/statistical temporal evidence. & Visual time-series task execution.\\
-ARTIST \citep{artist2026} & Feb'26 & Reasoning / QA & \layerTSK{} & Controller-reasoner sequential decision architecture. & Adaptive temporal segment observation state. & Question-adaptive segment selection for TS reasoning.\\
-AgriWorld \citep{agriworld2026} & Feb'26 & Agricultural reasoning / forecasting & \layerTSK{} & Execute-observe-refine code-agent loop. & Remote-sensing and crop-simulation temporal tools. & Yield, stress, disease, and counterfactual agricultural tasks.\\
-WeatherTGD \citep{weathertgd2026} & Mar'26 & Weather captioning & \layerGH{} & Multi-agent textual-gradient refinement. & Weather observation evidence state. & Consensus-aware caption refinement over weather time series.\\
-SAGE-Sleep \citep{sagesleep2026} & Apr'26 & Sleep-care monitoring / QA & \layerTSK{} & User-initiated QA and system-initiated monitoring loop. & Queryable sensor time-series layer. & Personal-baseline deviation alerts and sleep-care responses.\\
-TSAG \citep{tsag2026} & Apr'26 & Financial QA & \layerTSK{} & Query planning and parameter extraction. & Executable temporal query interface. & Finance-specific schema, tools, and faithfulness checks.\\
-TimeSeries\allowbreak Exam\allowbreak Agent \citep{timeseriesexamagent2026} & Apr'26 & Benchmark generation & \layerTSK{} & Generate--verify--refine loop. & Dataset-aware temporal concept state. & Scalable TS reasoning benchmark generation.\\
-TFRBench \citep{tfrbench2026} & Apr'26 & Forecast reasoning benchmark & \layerTSK{} & Iterative verification and multi-agent reasoning-trace synthesis. & Dataset-grounded forecast reasoning state. & Cross-channel, trend, and event reasoning benchmark.\\
-Nexus \citep{nexus2026} & May'26 & Forecasting & \layerTSK{} & Macro/micro multi-stage reasoning. & Signal/context workspace. & Context-aware forecasting pipeline.\\
-TimeClaw-EEL \citep{timeclaw2026explore} & May'26 & Agent learning & \layerGH{} & Explore--compare--distill--reinject loop. & Metric observations over temporal trajectories. & Forecasting, weather, and finance task metrics.\\
-AION \citep{aion2026} & May'26 & Practical TS agent & \layerGTS{} & Agents, skills, rules, evaluators, and review protocols. & Task files, workspaces, artifacts, validation interface. & Realistic task protocols.\\
-KairosAgent \citep{kairosagent2026} & May'26 & Forecasting & \layerTSK{} & Multi-turn refinement with turn-level credit. & Multimodal forecast state. & TSFM and semantic forecasting module.\\
-Dr-CiK \citep{drcik2026} & May'26 & Forecasting context retrieval & \layerTSK{} & Retrieve--filter--distill workflow. & Future-relevant document evidence. & Forecasting under distractors.\\
-TimeSage-MT \citep{timesagemt2026} & May'26 & Multi-turn benchmark / agent & \layerGTS{} & Multi-turn agent interface with code execution. & Cross-turn temporal task state and analytical skill library. & Skill-level scoring across temporal tasks.\\
-MarsTSC \citep{marstsc2026} & May'26 & Classification & \layerTSK{} & Generator--Reflector--Modifier collaborative roles. & Self-evolving temporal knowledge bank. & Few-shot multimodal classification with cautious test-time updates.\\
-SAGE-AD \citep{sagead2026} & May'26 & Anomaly detection & \layerTSK{} & Specialized analyzer group and supervisor reporting. & Point, structural, seasonal, and pattern evidence channels. & Confidence-scored anomaly records and diagnostic reports.\\
-Last-Mile \citep{lastmile2026} & Jun'26 & Forecast revision & \layerTSK{} & Constrained edit interface. & Baseline, ledger, and audit trail. & Deployment-aware forecast revision.\\
-TimeClaw-Harness \citep{timeclaw2026harness} & Jun'26 & Contextualized reasoning & \layerGTS{} & Iterative tool execution and capability evolution. & Native temporal workspace, executable tools, episodic multimodal memory. & CiK, TSRBench, and TSAIA task protocols.\\
-TimeFore \citep{timefore2026} & Jun'26 & Forecast-based tabular QA & \layerTSK{} & Retriever--Forecaster--Analyzer collaborative roles. & SQL and temporal model outputs as shared evidence. & Future data forecasting and forecast-based reasoning.\\
-DAST \citep{dast2026} & Jun'26 & Anomaly detection & \layerTSK{} & VLM--LLM--VLM multi-agent pipeline. & Visual KPI stream and per-interface text evidence. & Cross-interface O-RAN anomaly localization and rationale.\\
-TimeCAP \citep{timecap2025} & -- & Event-aware prediction & \layerTSK{} & Contextualize--augment--predict workflow. & Event-window alignment. & Event-conditioned prediction actions.\\
-MoiraiAgent \citep{moiraiagent2026} & -- & Forecasting & \layerTSK{} & Copilot-style tool orchestration. & TSFM-as-tool forecast artifacts. & TSFM-centered forecasting assistant.\\
-TimeCopilot \citep{timecopilot2026} & -- & Forecasting & \layerTSK{} & Interactive assistant loop. & Session workspace and task context. & User-facing forecast analysis and revision.\\
-MetaCaster \citep{metacaster2026} & -- & Forecaster construction & \layerTSK{} & Agent-as-Engineer pipeline. & Few-shot temporal context and generated-data traces. & Lightweight forecaster generation, training, and selection.\\
-TS-Reasoner \citep{tsreasoner2026} & -- & Inference / analysis & \layerGTS{} & Domain-oriented inference loop. & Time-series inference tools and evidence state. & Analysis tasks over temporal data.\\
+Agentic RAG for TSA \citep{agenticrag2024} & Aug'24 & Cross-task TSA & \claimAgent{} & \layerGTS{} & Hierarchical multi-agent routing and prompt-pool retrieval. & Task-specialized SLM agents over time-series requests. & Instruction-tuned task agents for multiple TS tasks.\\
+TESSA \citep{tessa2024} & Oct'24 & Annotation / interpretation & \claimAgent{} & \layerTSK{} & Two-agent annotation workflow. & Time-wise and text-wise feature interface. & General and domain-specific annotation generation.\\
+Argos \citep{argos2025} & Jan'25 & Anomaly detection & \claimAgent{} & \layerTSK{} & Autonomous rule proposal and review gates. & Cloud-metric workspace and monitoring context. & Anomaly-rule validation repair deployment.\\
+TimeXL \citep{timexl2025} & Mar'25 & Multimodal prediction & \claimModule{} & \layerTSK{} & Prediction reflection and refinement loop with collaborating LLMs. & Multimodal temporal evidence state. & Explanation-grounded prediction.\\
+FinArena \citep{finarena2025} & Mar'25 & Financial forecasting / decision & \claimAgent{} & \layerTSK{} & Human-agent collaboration and expert-agent decision loop. & Multimodal financial temporal evidence. & Stock trend prediction and risk-profile trading decisions.\\
+Competition Agents \citep{competitionagents2025} & Apr'25 & News-driven forecasting & \claimAgent{} & \layerGH{} & Competitive multi-agent discussion and reflective support. & News-event influence state for forecasting. & News-driven forecast reasoning under misleading information.\\
+Time-R1 \citep{timer12025} & Jun'25 & Reasoning-trained forecasting & \claimModule{} & \layerTSK{} & SFT plus reinforced slow-thinking policy training. & Forecast task state with horizon and metric-aware reward. & Forecast reasoning traces optimized by time-series-specific rewards.\\
+TimeMaster \citep{timemaster2025} & Jun'25 & Multimodal forecasting / classification & \claimModule{} & \layerTSK{} & Reward-driven multimodal reasoning training. & Visualized time-series evidence and structured output state. & Forecasting and classification reasoning with composite rewards.\\
+Time-RA \citep{timera2025} & Jul'25 & Anomaly diagnosis & \claimModule{} & \layerTSK{} & LLM-feedback loop for reasoning-data construction. & Raw series, text, plots, and structured reasoning annotations. & Generative anomaly diagnosis traces and multimodal evidence.\\
+ZARA \citep{zara2025} & Aug'25 & Activity recognition & \claimAgent{} & \layerTSK{} & Retrieval-augmented candidate loop. & Sensor-window evidence representation. & Motion-cue retrieval and activity priors.\\
+FLAIRR-TS \citep{flairr2025} & Aug'25 & Forecasting & \claimAgent{} & \layerTSK{} & Forecaster-refiner agent loop. & Retrieved analogs attached to forecast prompt state. & Adaptive prompt refinement for forecasting.\\
+DCATS \citep{yeh2025empowering} & Aug'25 & Forecasting data curation & \claimAgent{} & \layerTSK{} & Data-centric AutoML-style agent orchestration. & Metadata-aware forecast task state. & Data cleaning optimized for forecast-error reduction.\\
+CALM \citep{calm2025} & Aug'25 & Streaming adaptation & \claimModule{} & \layerGTS{} & Continuous adaptation with LLM-as-judge feedback. & Non-stationary stream monitoring state. & Stream adaptation and regression checks.\\
+TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} & Oct'25 & Forecasting & \claimAgent{} & \layerTSK{} & Curator--Planner--Forecaster--Reporter roles. & Dataset, artifact, visualization, and report workspace. & Forecasting lifecycle automation, validation, ensembling.\\
+TS-Agent \citep{tsagent2025} & Oct'25 & Raw-series reasoning / QA & \claimAgent{} & \layerGTS{} & ReAct-style observe--reason--act loop. & Raw-series observation state and statistical insight tools. & Temporal QA answer refinement.\\
+FETA \citep{feta2025} & Oct'25 & Classification & \claimAgent{} & \layerTSK{} & Channel-level agents and confidence aggregation. & Channel-separated temporal views. & Exemplar-based training-free classification.\\
+COUNTS \citep{counts2025} & Oct'25 & Numerical TS reasoning & \claimModule{} & \layerTSK{} & SFT and GRPO reasoning-policy training with verifiable rewards. & Discrete time-series token interface. & Chain-of-thought reasoning across temporal analysis tasks.\\
+AlphaCast \citep{alphacast2025} & Nov'25 & Interactive forecasting & \claimAgent{} & \layerTSK{} & Context-reasoning-reflection workflow. & Feature, knowledge, case, and context support toolkit. & Human-wisdom plus LLM co-reasoning for forecasting.\\
+AI-Meteorologist \citep{aimeteorologist2025,hierarchicalmeteorologist2025} & Nov'25 & Weather interpretation & \claimAgent{} & \layerTSK{} & Modular agent-based report generation. & Multi-variable meteorological time-series workspace. & Weather-front, anomaly, and localized-dynamics explanation.\\
+TimeART \citep{timeart2026} & Jan'26 & TSQA / reasoning & \claimAgent{} & \layerGTS{} & Tool-call traces and reflection during training. & TimeToolBench-style analytical tool substrate. & TSQA training and evaluation.\\
+TS-Debate \citep{tsdebate2026} & Jan'26 & Multimodal reasoning & \claimAgent{} & \layerGH{} & Multi-agent debate and conflict resolution. & Shared temporal evidence across modalities. & Zero-shot multimodal TS reasoning.\\
+ChatAD \citep{chatad2026} & Jan'26 & Anomaly detection / dialogue & \claimAgent{} & \layerTSK{} & Multi-agent TS evolution and multi-turn instruction learning. & AD reasoning dialogue state and LLADBench evaluation. & Anomaly reasoning dataset, benchmark, and cross-task generalization.\\
+STReasoner \citep{streasoner2026} & Jan'26 & Spatio-temporal reasoning & \claimAgent{} & \layerTSK{} & Spatial-aware reinforcement learning and reasoning optimization. & Spatio-temporal evidence state and ST-Bench tasks. & Etiological, entity, correlation, and in-context forecasting reasoning.\\
+Cast-R1 \citep{castr12026} & Feb'26 & Forecasting policy & \claimAgent{} & \layerGH{} & Sequential decision policy and RL-style optimization. & Forecast trajectory state. & Forecast metric reward and action set.\\
+AnomaMind \citep{anomamind2026} & Feb'26 & Anomaly diagnosis & \claimAgent{} & \layerTSK{} & Coarse-to-fine diagnostic loop with reflection/RL. & Anomaly windows, features, and reusable patterns. & Localization and diagnosis workflow.\\
+MAS4TS \citep{mas4ts2026} & Feb'26 & Visual reasoning & \claimAgent{} & \layerGH{} & Analyzer--Reasoner--Executor coordination. & Visual/statistical temporal evidence. & Visual time-series task execution.\\
+ARTIST \citep{artist2026} & Feb'26 & Reasoning / QA & \claimModule{} & \layerTSK{} & Controller-reasoner sequential decision architecture. & Adaptive temporal segment observation state. & Question-adaptive segment selection for TS reasoning.\\
+AgriWorld \citep{agriworld2026} & Feb'26 & Agricultural reasoning / forecasting & \claimAgent{} & \layerTSK{} & Execute-observe-refine code-agent loop. & Remote-sensing and crop-simulation temporal tools. & Yield, stress, disease, and counterfactual agricultural tasks.\\
+VeriTime \citep{veritime2026} & Feb'26 & Multi-task TS reasoning & \claimModule{} & \layerTSK{} & Process-verifiable CoT synthesis and difficulty scheduling. & Task-aware temporal reasoning data. & Reasoning traces for tailored LLM temporal reasoning.\\
+WeatherTGD \citep{weathertgd2026} & Mar'26 & Weather captioning & \claimAgent{} & \layerGH{} & Multi-agent textual-gradient refinement. & Weather observation evidence state. & Consensus-aware caption refinement over weather time series.\\
+SAGE-Sleep \citep{sagesleep2026} & Apr'26 & Sleep-care monitoring / QA & \claimAgent{} & \layerTSK{} & User-initiated QA and system-initiated monitoring loop. & Queryable sensor time-series layer. & Personal-baseline deviation alerts and sleep-care responses.\\
+TSAG \citep{tsag2026} & Apr'26 & Financial QA & \claimAgent{} & \layerTSK{} & Query planning and parameter extraction. & Executable temporal query interface. & Finance-specific schema, tools, and faithfulness checks.\\
+TimeSeries\allowbreak Exam\allowbreak Agent \citep{timeseriesexamagent2026} & Apr'26 & Benchmark generation & \claimBench{} & \layerTSK{} & Generate--verify--refine loop. & Dataset-aware temporal concept state. & Scalable TS reasoning benchmark generation.\\
+TFRBench \citep{tfrbench2026} & Apr'26 & Forecast reasoning benchmark & \claimBench{} & \layerTSK{} & Iterative verification and multi-agent reasoning-trace synthesis. & Dataset-grounded forecast reasoning state. & Cross-channel, trend, and event reasoning benchmark.\\
+Tree-of-Evidence \citep{treeofevidence2026} & Apr'26 & Evidence acquisition / diagnosis & \claimModule{} & \layerTSK{} & System-2 evidence search over candidate evidence bottlenecks. & Compact time-window and text evidence state. & Faithful multimodal grounding for clinical/fault evidence.\\
+Nexus \citep{nexus2026} & May'26 & Forecasting & \claimAgent{} & \layerTSK{} & Macro/micro multi-stage reasoning. & Signal/context workspace. & Context-aware forecasting pipeline.\\
+TimeClaw-EEL \citep{timeclaw2026explore} & May'26 & Agent learning & \claimAgent{} & \layerGH{} & Explore--compare--distill--reinject loop. & Metric observations over temporal trajectories. & Forecasting, weather, and finance task metrics.\\
+AION \citep{aion2026} & May'26 & Practical TS agent & \claimBench{} & \layerGTS{} & Agents, skills, rules, evaluators, and review protocols. & Task files, workspaces, artifacts, validation interface. & Realistic task protocols.\\
+KairosAgent \citep{kairosagent2026} & May'26 & Forecasting & \claimAgent{} & \layerTSK{} & Multi-turn refinement with turn-level credit. & Multimodal forecast state. & TSFM and semantic forecasting module.\\
+Dr-CiK \citep{drcik2026} & May'26 & Forecasting context retrieval & \claimBench{} & \layerTSK{} & Retrieve--filter--distill workflow. & Future-relevant document evidence. & Forecasting under distractors.\\
+TimeSage-MT \citep{timesagemt2026} & May'26 & Multi-turn benchmark / agent & \claimBench{} & \layerGTS{} & Multi-turn agent interface with code execution. & Cross-turn temporal task state and analytical skill library. & Skill-level scoring across temporal tasks.\\
+MarsTSC \citep{marstsc2026} & May'26 & Classification & \claimAgent{} & \layerTSK{} & Generator--Reflector--Modifier collaborative roles. & Self-evolving temporal knowledge bank. & Few-shot multimodal classification with cautious test-time updates.\\
+SAGE-AD \citep{sagead2026} & May'26 & Anomaly detection & \claimAgent{} & \layerTSK{} & Specialized analyzer group and supervisor reporting. & Point, structural, seasonal, and pattern evidence channels. & Confidence-scored anomaly records and diagnostic reports.\\
+Last-Mile \citep{lastmile2026} & Jun'26 & Forecast revision & \claimAgent{} & \layerTSK{} & Constrained edit interface. & Baseline, ledger, and audit trail. & Deployment-aware forecast revision.\\
+TimeClaw-Harness \citep{timeclaw2026harness} & Jun'26 & Contextualized reasoning & \claimAgent{} & \layerGTS{} & Iterative tool execution and capability evolution. & Native temporal workspace, executable tools, episodic multimodal memory. & CiK, TSRBench, and TSAIA task protocols.\\
+TimeFore \citep{timefore2026} & Jun'26 & Forecast-based tabular QA & \claimBench{} & \layerTSK{} & Retriever--Forecaster--Analyzer collaborative roles. & SQL and temporal model outputs as shared evidence. & Future data forecasting and forecast-based reasoning.\\
+DAST \citep{dast2026} & Jun'26 & Anomaly detection & \claimAgent{} & \layerTSK{} & VLM--LLM--VLM multi-agent pipeline. & Visual KPI stream and per-interface text evidence. & Cross-interface O-RAN anomaly localization and rationale.\\
+TimeCAP \citep{timecap2025} & -- & Event-aware prediction & \claimAgent{} & \layerTSK{} & Contextualize--augment--predict workflow. & Event-window alignment. & Event-conditioned prediction actions.\\
+MoiraiAgent \citep{moiraiagent2026} & -- & Forecasting & \claimAgent{} & \layerTSK{} & Copilot-style tool orchestration. & TSFM-as-tool forecast artifacts. & TSFM-centered forecasting assistant.\\
+TimeCopilot \citep{timecopilot2026} & -- & Forecasting & \claimAgent{} & \layerTSK{} & Interactive assistant loop. & Session workspace and task context. & User-facing forecast analysis and revision.\\
+MetaCaster \citep{metacaster2026} & -- & Forecaster construction & \claimAgent{} & \layerTSK{} & Agent-as-Engineer pipeline. & Few-shot temporal context and generated-data traces. & Lightweight forecaster generation, training, and selection.\\
+TS-Reasoner \citep{tsreasoner2026} & -- & Inference / analysis & \claimAgent{} & \layerGTS{} & Domain-oriented inference loop. & Time-series inference tools and evidence state. & Analysis tasks over temporal data.\\
 \bottomrule
 \end{longtable}
 }
@@ -482,7 +492,7 @@ Cross-task evaluation state & TimeSage-MT \citep{timesagemt2026}, TimeSeriesExam
 
 \subsection{Task-specific Harness Modules}
 
-The remaining tables list \TaskSpecificHarness{} designs by concrete work and task family. This split is necessary because a forecasting module, an anomaly module, and a classification module can all sit on the same \GeneralTSHarness{}, but their actions, validators, memories, and artifacts differ. We also include task-specific reasoning and evidence-acquisition methods that are not counted as complete agents in the ledger, because they define reusable modules that Time Series Agents can incorporate.
+The remaining tables list \TaskSpecificHarness{} designs by concrete work and task family. This split is necessary because a forecasting module, an anomaly module, and a classification module can all sit on the same \GeneralTSHarness{}, but their actions, validators, memories, and artifacts differ. We also include task-specific reasoning, supervision, adaptation, and evidence-acquisition methods with \claimModule{} status in the ledger, because they define reusable modules that Time Series Agents can incorporate even when the original work does not claim to be an agent system.
 
 \begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.18}} L{\fulltextcol{0.40}} L{\fulltextcol{0.20}}}
 \caption{Forecasting and forecast-deployment Task-Specific Time-Series Harness Modules. Rows are concrete works; each design states the module that the system adds on top of a general agent runtime and a cross-task temporal substrate.}
@@ -610,7 +620,7 @@ Dedicated imputation-agent systems are not yet prominent in the maintained ledge
 
 \section{Evaluation: From Output Metrics to Process Metrics}
 
-Evaluating a Time Series Agent requires more than scoring the final answer. A process-level benchmark should record the task contract, allowed context, chronological boundary, tool trace, evidence chain, final artifact, and post-hoc feedback. We distinguish four evaluation layers.
+Evaluating a Time Series Agent requires more than scoring the final answer. A process-level benchmark should record the task contract, allowed context, chronological boundary, tool trace, evidence chain, final artifact, and post-hoc feedback. We distinguish five evaluation layers.
 
 \begin{enumerate}
   \item \keyterm{Model capability benchmarks}. Standard forecasting, classification, anomaly-detection, and transfer suites remain relevant for evaluating temporal model components inside an agent runtime \citep{zhang2024llmts,jiang2024empowering}.
