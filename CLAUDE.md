@@ -9,6 +9,8 @@ Work directly in this project's canonical directory:
 Basic rules:
 - Keep code, docs, environments, caches, logs, temporary output, and experiments inside this root or an explicitly registered path under /mnt/aliyunsb.
 - Start Codex/Claude/shell/SSH/tmux from this root or a subdirectory. Unique tmux names and pm run are optional.
+- The current session may directly launch project-local commands, workers, tests, and experiments; a model provider is an API backend, not an approver or launcher.
+- Missing external runtime bindings do not block project-local work; bindings describe only intentionally shared payloads outside this project root.
 - Load credentials from the central ProjectManagement .secrets vault; never copy keys into files, logs, prompts, Git, or Feishu.
 - Use small Git commits and push ordinary progress directly without approval. Run only the smallest relevant tests; avoid unbounded recursive scans and full-tree hashes.
 - Experiment Supervisor is optional and is not a coding/session gate.
