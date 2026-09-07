@@ -167,13 +167,15 @@ LLM agents provide a natural system abstraction for this broader workflow. In th
 \textbf{LLM-based agent system} \approx \text{LLM} + \text{Harness}.
 \]
 \[
-\textbf{Time Series Agent system} \approx \text{LLM} + \text{(general) Harness} + \text{Time-Series Harness Module}.
+\begin{gathered}\text{LLM Time Series Agent} = \text{LLM} + \text{General Harness}\\ +\;\text{Time Series Harness Module}.\end{gathered}
 \]
 \end{tcolorbox}
 
 The LLM supplies language understanding, planning, and judgment; the general runtime supplies the interface and control surfaces that make actions executable, stateful, auditable, and revisable. Time series add a domain layer that a generic agent does not automatically provide. Temporal workflows expose recurring failure modes involving chronological admissibility, frequency and unit semantics, temporal alignment, and output auditability; related concerns such as missingness, non-stationarity, and uncertainty cut across these obligations rather than forming independent taxonomy axes. The \TSHarnessModule{} is therefore the part of the system that makes temporal objects native to the agent runtime rather than treating them as ordinary text. We further divide it into two levels: a \GeneralTSHarness{} that is useful across time-series tasks, and a \TaskSpecificHarness{} that is tied to forecasting, anomaly detection, classification, QA, imputation, benchmark generation, or another concrete task family.
 
-This separation is the main methodological choice of the survey. We do not ask only whether a system uses tools, memory, workflow orchestration, debate, or reflection, because these are already Harness functions that can appear in any LLM agent. We instead code where a paper's primary claimed contribution enters the runtime. If a work improves planning, reflection, tool orchestration, control, or multi-agent coordination without introducing temporal assumptions, we treat it as a \GeneralHarness{} contribution. If it makes temporal data native across tasks through time-indexed state, typed temporal operations, context--series alignment, leakage-aware control, temporal memory, or auditable outputs, we treat it as a \GeneralTSHarness{} contribution. If it encodes horizon-specific forecasting, anomaly localization, classification exemplars, TSQA checking, imputation masks, benchmark generation, or deployment revision contracts, we treat it as a \TaskSpecificHarness{} contribution. Mature Time Series Agents usually combine all three~\cite{timesagemt2026,promptstoagents2026,timeseriesexamagent2026,kairosagent2026,dsagent2024,tsreasoner2026,flairr2025}, but the contribution should make clear which part is new. This also explains why existing time-series models can become callable tools inside agents, and why non-agent papers can still matter when they contribute reusable Harness-level modules.
+A mechanism belongs to GH when its design remains useful beyond time-series applications without relying on temporal assumptions. Within the Time Series Harness Module, it belongs to GTS when changing task family preserves the core temporal runtime, and to TSK when that change requires redesigning task-dependent state, actions, rewards, or verification.
+
+These judgments apply to mechanisms rather than entire papers: one system can combine general memory and reflection, cross-task temporal tools, and a forecasting-specific validation loop. Changing from financial forecasting to traffic forecasting changes the application domain but preserves the forecasting task family; it therefore does not by itself establish cross-task generality.
 
 \subsection{Position relative to existing surveys}
 
@@ -218,7 +220,7 @@ This survey makes four contributions.
 
 \begin{enumerate}
   \item We organize Time Series Agents through three runtime layers: general agent infrastructure, cross-task temporal mechanisms, and task-specific workflows.
-  \item We use \GeneralHarness{}, \GeneralTSHarness{}, and \TaskSpecificHarness{} as coding categories for locating a paper's primary claimed contribution, with a counterfactual task-family-contract rule at the GTS/TSK boundary.
+  \item We use \GeneralHarness{}, \GeneralTSHarness{}, and \TaskSpecificHarness{} as mechanism-level categories that can coexist within a paper, with a counterfactual task-family-contract rule at the GTS/TSK boundary.
   \item We apply the protocol through documented inclusion criteria, an explicit and auditable classification rubric, and a versioned work-level ledger that separates inclusion, primary locus, secondary mechanisms, contribution type, and self-claim metadata.
   \item We synthesize six non-exhaustive temporal design obligations, an auditable component crosswalk, and candidate evaluation routes whose established, adjacent, proposed, and open measurement status is reported explicitly.
 \end{enumerate}
@@ -232,6 +234,44 @@ This survey makes four contributions.
 
 
 \section{Agent Components and Time-series Specialization}
+
+\subsection{How to distinguish GH, GTS, and TSK}
+
+We classify each mechanism by the assumptions it requires and what must change when it is reused. The three labels can coexist within one paper; Table~\ref{tab:mechanism-decision} summarizes their boundaries.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}lXXX@{}}
+\toprule
+Layer & Judgment & Reuse test & Example\\
+\midrule
+GH & Independent of temporal assumptions. & Replace time-series data with another domain; retain the mechanism. & General memory retrieval, reflection, planning, or orchestration.\\
+GTS & Requires temporal data, but supports different task families. & Replace forecasting with detection or QA; retain core temporal state and operations. & Time-indexed workspaces, temporal slicing, alignment, and leakage guards.\\
+TSK & Core design depends on a task-family objective. & Changing task family requires new state, actions, reward, or verifier. & Horizon-specific backtesting or anomaly-localization verification.\\
+\bottomrule
+\end{tabularx}
+\caption{Mechanism-level criteria for GH, GTS, and TSK. A paper may contribute to several layers.}
+\label{tab:mechanism-decision}
+\end{table}
+
+\subsection{Task families within the Time Series Harness Module}
+
+Following the problem-driven taxonomy of Chen et al.\ \citep{chen2026tsagentsurvey}, we organize task-facing modules into four families: forecasting and reasoning, augmentation and synthesis, anomaly detection and diagnosis, and decision support. These families describe what a system does; GTS and TSK describe how broadly its temporal mechanisms can be reused. Each family may therefore combine shared GTS mechanisms with task-specific implementations.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}lXX@{}}
+\toprule
+Task family & Shared temporal mechanisms (GTS) & Task-specific specialization (TSK)\\
+\midrule
+Forecasting and reasoning & Temporal retrieval, alignment, executable statistics. & Horizon validation; QA evidence checking; classification outputs.\\
+Augmentation and synthesis & Time-indexed representations and temporal consistency checks. & Label-preserving augmentation; scenario-conditioned generation.\\
+Detection and diagnosis & Window operations, temporal context, evidence storage. & Anomaly localization, root-cause hypotheses, incident verification.\\
+Decision support & Historical evidence and availability-aware state. & Trading, traffic, or grid actions with task-specific constraints and feedback.\\
+\bottomrule
+\end{tabularx}
+\caption{Four task families adapted from Chen et al.\ \citep{chen2026tsagentsurvey}, expanded through the GTS/TSK distinction.}
+\end{table}
 
 \subsection{From LLMs to agents}
 
@@ -342,36 +382,32 @@ Output auditability with conditional uncertainty validation & Analytical account
 
 Table~\ref{tab:invariant-component-matrix} is an author-proposed illustrative crosswalk, not an empirical measurement, a validation of the six obligations, or a uniquely determined architecture. The unit of coding is one ordered pair consisting of an obligation and a Harness component. For each pair we ask three questions in order: (Q1) within the component responsibility stated in Table~\ref{tab:component-vocab}, must the component consume or produce an obligation-specific object, field, or rule? If not, the cell is blank. (Q2) Can the component locally prevent, reject, or detect a violation using an explicit criterion? If so, the cell is marked $\bullet$ for direct enforcement or detection. (Q3) Otherwise, does it directly store, transport, schedule, or expose the obligation-specific information for an enforcing component? If so, the cell is marked $\circ$ for a supporting or carrying role; otherwise it is blank. Generic usefulness, a merely possible future specialization, or an effect mediated entirely by another component does not qualify. Ambiguous cells are coded downward ($\bullet\!\rightarrow\!\circ\!\rightarrow$ blank) and retained for review. ``Direct'' is non-exclusive: several components may enforce different boundaries of the same obligation.
 
-\begin{landscape}
-\begin{table}[p]
-\centering
-\scriptsize
-\setlength{\tabcolsep}{3.2pt}
-\renewcommand{\arraystretch}{1.25}
-\caption{Author-proposed illustrative crosswalk between six non-exhaustive temporal design obligations (rows) and 14 \GeneralHarness{} components (columns). Symbols indicate functional responsibility, not empirical prevalence, exclusivity, taxonomy validity, or a unique architecture.}
-\label{tab:invariant-component-matrix}
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{L{4.0cm} *{14}{C{1.15cm}}}
+\begin{table}[!htbp]
+\centering\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabularx}{\textwidth}{@{}X*{6}{c}@{}}
 \toprule
-\textbf{Design obligation} & \rotatebox{60}{Plan} & \rotatebox{60}{Memory} & \rotatebox{60}{Tools} & \rotatebox{60}{Control} & \rotatebox{60}{Optimization} & \rotatebox{60}{Reasoning} & \rotatebox{60}{Acting} & \rotatebox{60}{Environment} & \rotatebox{60}{Execution} & \rotatebox{60}{Artifacts} & \rotatebox{60}{Lifecycle} & \rotatebox{60}{Verification} & \rotatebox{60}{Observability} & \rotatebox{60}{Multi-agent}\\
+Component & Causality & Fidelity & State & Operations & Context & Output\\
 \midrule
-Temporal causality & $\circ$ & $\bullet$ & $\bullet$ & $\bullet$ &  & $\circ$ & $\bullet$ & $\bullet$ & $\bullet$ & $\circ$ & $\circ$ & $\bullet$ & $\bullet$ & $\circ$\\
-Numerical fidelity &  &  & $\bullet$ & $\bullet$ &  & $\circ$ & $\bullet$ & $\circ$ & $\bullet$ & $\bullet$ & $\circ$ & $\bullet$ & $\circ$ & $\circ$\\
-Time-indexed state integrity & $\circ$ & $\bullet$ & $\circ$ & $\bullet$ &  &  & $\circ$ & $\bullet$ & $\bullet$ & $\bullet$ & $\circ$ & $\bullet$ & $\bullet$ & $\circ$\\
-Temporal operation semantics & $\circ$ & $\circ$ & $\bullet$ & $\bullet$ &  & $\bullet$ & $\bullet$ & $\circ$ & $\bullet$ & $\circ$ & $\circ$ & $\bullet$ & $\circ$ & $\circ$\\
-Temporal grounding of context & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ &  & $\circ$ & $\circ$ & $\bullet$ &  & $\circ$ & $\circ$ & $\bullet$ & $\circ$ & $\circ$\\
-Output auditability & $\circ$ &  & $\bullet$ & $\bullet$ &  & $\circ$ & $\circ$ & $\circ$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\circ$\\
+Planning & $\circ$ &  & $\circ$ & $\circ$ & $\bullet$ & $\circ$\\
+Memory & $\bullet$ &  & $\bullet$ & $\circ$ & $\bullet$ & \\
+Tool use & $\bullet$ & $\bullet$ & $\circ$ & $\bullet$ & $\bullet$ & $\bullet$\\
+Control & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$\\
+Optimization &  &  &  &  &  & \\
+Reasoning & $\circ$ & $\circ$ &  & $\bullet$ & $\circ$ & $\circ$\\
+Acting & $\bullet$ & $\bullet$ & $\circ$ & $\bullet$ & $\circ$ & $\circ$\\
+Environment & $\bullet$ & $\circ$ & $\bullet$ & $\circ$ & $\bullet$ & $\circ$\\
+Execution & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ &  & $\bullet$\\
+Artifacts & $\circ$ & $\bullet$ & $\bullet$ & $\circ$ & $\circ$ & $\bullet$\\
+Lifecycle & $\circ$ & $\circ$ & $\circ$ & $\circ$ & $\circ$ & $\bullet$\\
+Verification & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$\\
+Observability & $\bullet$ & $\circ$ & $\bullet$ & $\circ$ & $\circ$ & $\bullet$\\
+Multi-agent & $\circ$ & $\circ$ & $\circ$ & $\circ$ & $\circ$ & $\circ$\\
 \bottomrule
-\end{tabular}%
-}
-
-\vspace{0.5em}
-\begin{minipage}{0.96\linewidth}\scriptsize
-\textbf{Symbol key.} $\bullet$=direct enforcement or detection under an explicit component-local criterion; $\circ$=supporting or carrying obligation-specific information without deciding validity; blank=no direct role under the stated component definition. A blank does not mean that the component is unimportant to the system as a whole.\\
-\textbf{Column key.} Plan=\Planning{}; Memory=\Memory{}; Tools=\ToolUse{}; Control=\Control{}; Optimization=\HarnessOptimization{}; Reasoning=\Reasoning{}; Acting=\Acting{}; Environment=\EnvironmentModeling{}; Execution=\ExecutionEnvironment{}; Artifacts=\StateArtifacts{}; Lifecycle=\Lifecycle{}; Verification=\Verification{}; Observability=\Observability{}; Multi-agent=\MultiAgentScaling{}.
-\end{minipage}
+\end{tabularx}
+\caption{Relationship between general agent components and temporal requirements. $\bullet$ denotes direct enforcement or detection; $\circ$ denotes a supporting role; a blank indicates no direct role in this mapping. State, operations, context, and output refer to time-indexed state integrity, temporal operation semantics, temporal grounding of context, and output auditability.}
+\label{tab:invariant-component-matrix}
 \end{table}
-\end{landscape}
 
 The crosswalk is intended to be falsifiable. For example, an as-of retrieval tool that rejects data later than a decision cutoff directly enforces temporal causality ($\bullet$), whereas a lifecycle that merely schedules training and evaluation carries a chronological plan without independently checking access ($\circ$). Likewise, an observability layer that merely records a metric supports output auditability ($\circ$); it becomes a direct enforcement or detection point only if it recomputes a metric, detects a declared evidence-completeness or uncertainty-validation breach, or blocks release under an acceptance rule. The next layer is task-specific: it does not introduce a new parallel principle, but instantiates the applicable obligation under a forecasting, anomaly, classification, QA, benchmark, or deployment output contract. A fresh model coder then received only the frozen protocol and an 84-cell packet with no prior symbols or rationales. It reproduced 59/84 three-level codes (70.2\%; nominal Cohen's $\kappa=0.506$). Twenty of the 25 disagreements lay on the $\bullet$/$\circ$ boundary, including 19 canonical $\bullet\!\rightarrow\!\circ$ cases. When $\bullet$ and $\circ$ are collapsed into any obligation-specific role versus blank, agreement is 79/84 (94.0\%). The author-coded v1 matrix was frozen before this probe, and no disagreement was used to tune the protocol or canonical cells. This is a model-based sensitivity probe, not human inter-rater reliability, independent expert validation, or evidence that the matrix is uniquely correct; the moderate three-level result is an additional reason to read the matrix as an illustrative design crosswalk.
 
@@ -424,7 +460,7 @@ Screening, locus, and self-claim are independent judgments. A paper can therefor
 
 \textbf{Classification.} Table~\ref{tab:locus-rubric} gives the decision rule supplied to coders. For a system or method, the operative boundary between \layerGTS{} and \layerTSK{} is structural. A mechanism is \layerGTS{} when it requires a temporal object but can instantiate different queries, answer schemas, or output adapters without redesigning its core temporal state, action space, tool semantics, reward, or verifier. A dynamically instantiated query contract is therefore not, by itself, sufficient for \layerTSK{}. The mechanism is \layerTSK{} only when those core elements are structurally tied to a fixed task-family output contract---for example, a forecasting horizon and metric reward, a label space, or an anomaly definition---such that changing task family requires redesign. Demonstration on multiple task families raises confidence but does not itself change the locus.
 
-\begin{table}[t]
+\begin{table}[!htbp]
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
@@ -441,7 +477,7 @@ Screening, locus, and self-claim are independent judgments. A paper can therefor
 \label{tab:locus-rubric}
 \end{table}
 
-When a work touches several levels, primary locus is the level tested by the main experiment or claimed by the main contribution; ties are resolved by title claim, then main experiment, then contribution order. Secondary contributions remain visible in the ledger's descriptive columns but do not enter the primary-count statistic.
+Mechanism descriptions retain all applicable layers. The existing primary-locus counts summarize the dominant emphasis recorded in the original work-level classification; they do not impose an exclusive category on a paper or measure the prevalence of every mechanism. The detailed profiles below show the mechanisms at each layer.
 
 \textbf{Model-based coding reproducibility probe.} After freezing the v2.3 corpus and the clarified task-family-contract rule, a fresh model coder that had not participated in rubric design, corpus adjudication, or prior reviews received only the final rubric and a blinded 54-work packet. It agreed with the canonical labels on 47/54 works (87.0\%); chance correction under the observed class marginals gives Cohen's $\kappa=0.656$. Per-class F1 is 0.667 for \layerGH{}, 0.737 for \layerGTS{}, and 0.916 for \layerTSK{}, exposing that the two smaller boundary classes remain less reproducible than the task-specific majority. Seven disagreements remain. We report this as a model-based reproducibility probe rather than human inter-rater reliability, and we do not use these fresh disagreements to revise either the rubric or canonical labels; doing so would turn the same cases into a post-hoc agreement estimate. The full confusion matrix and case-level disagreements are archived with the frozen blind output.
 
@@ -508,103 +544,92 @@ The 77-work collection was assembled incrementally, so its percentages describe 
 \label{fig:contribution-trend}
 \end{figure}
 
-\begin{landscape}
-{\scriptsize
-\setlength{\tabcolsep}{2.0pt}
-\setlength{\LTcapwidth}{\linewidth}
-\renewcommand{\arraystretch}{1.08}
-\begin{longtable}{L{\fulllinecol{0.11}} C{\fulllinecol{0.05}} L{\fulllinecol{0.11}} C{\fulllinecol{0.055}} C{\fulllinecol{0.045}} L{\fulllinecol{0.18}} L{\fulllinecol{0.19}} L{\fulllinecol{0.26}}}
-\caption{Maintained ledger for Time Series Agent systems, reusable methods, and benchmarks through the 2026-08-30 first-public-version cutoff. \textbf{Type} is \typeSMshort{} (\typeSM{}, a runnable system or reusable method) or \typeBenchshort{} (\typeBench{}, an evaluation benchmark or testbed). A \selfclaim{} after a work name marks the metadata case that the paper does \emph{not} explicitly call itself an agent (this metadata does not affect inclusion or level). \layerGH{} = \GeneralHarness{}; \layerGTS{} = \GeneralTSHarness{}; \layerTSK{} = \TaskSpecificHarness{}.}
-\label{tab:agent-ledger}\\
-\toprule
-\textbf{Work} & \textbf{Month} & \textbf{Task family} & \textbf{Type} & \textbf{Level} & \textbf{General Harness contribution} & \textbf{General TS Harness contribution} & \textbf{Task-specific Harness contribution}\\
-\midrule
+\begingroup\small
+\setlength{\tabcolsep}{5pt}
+\begin{longtable}{@{}p{0.27\textwidth}p{0.68\textwidth}@{}}
+\caption{Mechanism profiles of the 77 reviewed works. GH, GTS, and TSK descriptions coexist within each profile. Type denotes a system or method (SM) or an evaluation benchmark (B); $\dagger$ marks works that do not describe themselves as agents.}\label{tab:agent-ledger}\\
+\toprule Work and task & Mechanisms across runtime layers\\\midrule
 \endfirsthead
-\toprule
-\textbf{Work} & \textbf{Month} & \textbf{Task family} & \textbf{Type} & \textbf{Level} & \textbf{General Harness contribution} & \textbf{General TS Harness contribution} & \textbf{Task-specific Harness contribution}\\
-\midrule
+\toprule Work and task & Mechanisms across runtime layers\\\midrule
 \endhead
-Agentic RAG for TSA \citep{agenticrag2024} & Aug'24 & Cross-task TSA & \typeSMshort{} & \layerGTS{} & Hierarchical multi-agent routing and prompt-pool retrieval. & Task-specialized SLM agents over time-series requests. & Instruction-tuned task agents for multiple TS tasks.\\
-TS-Reasoner \citep{tsreasoner2026} & Oct'24 & Inference / analysis & \typeSMshort{} & \layerGTS{} & Domain-oriented inference loop. & Time-series inference tools and evidence state. & Analysis tasks over temporal data.\\
-TESSA \citep{tessa2024} & Oct'24 & Annotation / interpretation & \typeSMshort{} & \layerTSK{} & Two-agent annotation workflow. & Time-wise and text-wise feature interface. & General and domain-specific annotation generation.\\
-Argos \citep{argos2025} & Jan'25 & Anomaly detection & \typeSMshort{} & \layerTSK{} & Autonomous rule proposal and review gates. & Cloud-metric workspace and monitoring context. & Anomaly-rule validation repair deployment.\\
-TimeCAP \citep{timecap2025} & Feb'25 & Event-aware prediction & \typeSMshort{} & \layerTSK{} & Contextualize-augment-predict workflow. & Event-window alignment. & Event-conditioned prediction actions.\\
-TimeXL \citep{timexl2025}\selfclaim{} & Mar'25 & Multimodal prediction & \typeSMshort{} & \layerTSK{} & Prediction reflection and refinement loop with collaborating LLMs. & Multimodal temporal evidence state. & Explanation-grounded prediction.\\
-FinArena \citep{finarena2025} & Mar'25 & Financial forecasting / decision & \typeSMshort{} & \layerTSK{} & Human-agent collaboration and expert-agent decision loop. & Multimodal financial temporal evidence. & Stock trend prediction and risk-profile trading decisions.\\
-Competition Agents \citep{competitionagents2025} & Apr'25 & News-driven forecasting & \typeSMshort{} & \layerGH{} & Competitive multi-agent discussion and reflective support. & News-event influence state for forecasting. & News-driven forecast reasoning under misleading information.\\
-Time-R1 \citep{timer12025}\selfclaim{} & Jun'25 & Reasoning-trained forecasting & \typeSMshort{} & \layerTSK{} & SFT plus reinforced slow-thinking policy training. & Forecast task state with horizon and metric-aware reward. & Forecast reasoning traces optimized by time-series-specific rewards.\\
-TimeMaster \citep{timemaster2025}\selfclaim{} & Jun'25 & Multimodal forecasting / classification & \typeSMshort{} & \layerTSK{} & Reward-driven multimodal reasoning training. & Visualized time-series evidence and structured output state. & Forecasting and classification reasoning with composite rewards.\\
-Time-RA \citep{timera2025}\selfclaim{} & Jul'25 & Anomaly diagnosis & \typeSMshort{} & \layerTSK{} & LLM-feedback loop for reasoning-data construction. & Raw series text plots and structured reasoning annotations. & Generative anomaly diagnosis traces and multimodal evidence.\\
-DCATS \citep{yeh2025empowering} & Aug'25 & Forecasting data curation & \typeSMshort{} & \layerTSK{} & Data-centric AutoML-style agent orchestration. & Metadata-aware forecast task state. & Data cleaning optimized for forecast-error reduction.\\
-ZARA \citep{zara2025} & Aug'25 & Activity recognition & \typeSMshort{} & \layerTSK{} & Retrieval-augmented candidate loop. & Sensor-window evidence representation. & Motion-cue retrieval and activity priors.\\
-FLAIRR-TS \citep{flairr2025} & Aug'25 & Forecasting & \typeSMshort{} & \layerTSK{} & Forecaster-refiner agent loop. & Retrieved analogs attached to forecast prompt state. & Adaptive prompt refinement for forecasting.\\
-CALM \citep{calm2025}\selfclaim{} & Aug'25 & Streaming adaptation & \typeSMshort{} & \layerTSK{} & Continuous adaptation with LLM-as-judge feedback. & Non-stationary stream monitoring state. & Stream adaptation and regression checks.\\
-TimeCopilot \citep{timecopilot2026} & Aug'25 & Forecasting & \typeSMshort{} & \layerTSK{} & Interactive assistant loop. & Session workspace and task context. & User-facing forecast analysis and revision.\\
-TimeOmni-1 \citep{timeomni2026}\selfclaim{} & Sep'25 & Multi-task time-series reasoning & \typeSMshort{} & \layerTSK{} & Multi-stage supervised and reward-based reasoning optimization. & Unified visual time-series reasoning state across perception, extrapolation, and decision tasks. & Fixed TSR-Suite tasks, task-specific rewards, and answer contracts.\\
-COUNTS \citep{counts2025}\selfclaim{} & Oct'25 & Numerical TS reasoning & \typeSMshort{} & \layerTSK{} & SFT and GRPO reasoning-policy training with verifiable rewards. & Discrete time-series token interface. & Chain-of-thought reasoning across temporal analysis tasks.\\
-TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} & Oct'25 & Forecasting & \typeSMshort{} & \layerTSK{} & Curator--Planner--Forecaster--Reporter roles. & Dataset, artifact, visualization, and report workspace. & Forecasting lifecycle automation, validation, and ensembling.\\
-FETA \citep{feta2025} & Oct'25 & Classification & \typeSMshort{} & \layerTSK{} & Channel-level agents and confidence aggregation. & Channel-separated temporal views. & Exemplar-based training-free classification.\\
-TS-Agent \citep{tsagent2025} & Oct'25 & Raw-series reasoning / QA & \typeSMshort{} & \layerGTS{} & ReAct-style observe-reason-act loop. & Raw-series observation state and statistical insight tools. & Temporal QA answer refinement.\\
-AlphaCast \citep{alphacast2025} & Nov'25 & Interactive forecasting & \typeSMshort{} & \layerTSK{} & Context-reasoning-reflection workflow. & Feature knowledge case and context support toolkit. & Human-wisdom plus LLM co-reasoning for forecasting.\\
-AI-Meteorologist (companion reports) \citep{aimeteorologist2025} & Nov'25 & Weather interpretation & \typeSMshort{} & \layerTSK{} & Meteorologist--Writer--Illustrator orchestration and report compilation. & Multi-variable weather workspace with hourly, 6-hour, daily contexts, and climatology. & Weather-front, anomaly, and hazard interpretation with keyword--proof validation, warnings, and reports.\\
-HFMD Structured Agents \citep{epidemicagent2026} & Nov'25 & Epidemic forecasting & \typeSMshort{} & \layerTSK{} & Event Interpreter and Forecast Generator neuro-symbolic workflow. & External-event and climatology context aligned with disease time series and probabilistic state. & One-week HFMD forecasts, prediction intervals, coverage, and auditable rationales.\\
-STReasoner \citep{streasoner2026} & Jan'26 & Spatio-temporal reasoning & \typeSMshort{} & \layerTSK{} & Spatial-aware reinforcement learning and reasoning optimization. & Spatio-temporal evidence state and ST-Bench tasks. & Etiological, entity, correlation, and in-context forecasting reasoning.\\
-ChatAD \citep{chatad2026} & Jan'26 & Anomaly detection / dialogue & \typeSMshort{} & \layerTSK{} & Multi-agent TS evolution and multi-turn instruction learning. & AD reasoning dialogue state and LLADBench evaluation. & Anomaly reasoning dataset benchmark and cross-task generalization.\\
-TimeART \citep{timeart2026} & Jan'26 & TSQA / reasoning & \typeSMshort{} & \layerTSK{} & Tool-call traces and reflection during training. & TimeToolBench-style analytical tool substrate. & TSQA training and evaluation.\\
-TS-Debate \citep{tsdebate2026} & Jan'26 & Multimodal reasoning & \typeSMshort{} & \layerGH{} & Multi-agent debate and conflict resolution. & Shared temporal evidence across modalities. & Zero-shot multimodal TS reasoning.\\
-MAS4TS \citep{mas4ts2026} & Feb'26 & Visual reasoning & \typeSMshort{} & \layerGTS{} & Analyzer-Reasoner-Executor coordination. & Visual/statistical temporal evidence. & Visual time-series task execution.\\
-TemporalBench \citep{temporalbench2026} & Feb'26 & Contextual and event-informed TS evaluation & \typeBenchshort{} & \layerGTS{} & Tiered agent evaluation under controlled information settings. & Cross-domain temporal structure, context-grounding, and event-conditioning protocols. & Historical interpretation, forecasting, contextual reasoning, and event-conditioned task instances.\\
-VeriTime \citep{veritime2026}\selfclaim{} & Feb'26 & Multi-task TS reasoning & \typeSMshort{} & \layerTSK{} & Process-verifiable CoT synthesis and difficulty scheduling. & Task-aware temporal reasoning data. & Reasoning traces for tailored LLM temporal reasoning.\\
-AnomaMind \citep{anomamind2026} & Feb'26 & Anomaly diagnosis & \typeSMshort{} & \layerTSK{} & Coarse-to-fine diagnostic loop with reflection/RL. & Anomaly windows, features, and reusable patterns. & Localization and diagnosis workflow.\\
-Cast-R1 \citep{castr12026} & Feb'26 & Forecasting policy & \typeSMshort{} & \layerTSK{} & Sequential decision policy and RL-style optimization. & Forecast trajectory state. & Forecast metric reward and action set.\\
-AgriWorld \citep{agriworld2026} & Feb'26 & Agricultural reasoning / forecasting & \typeSMshort{} & \layerTSK{} & Execute--observe--refine code-agent loop. & Remote-sensing and crop-simulation temporal tools. & Yield, stress, disease, and counterfactual agricultural tasks.\\
-ARTIST \citep{artist2026}\selfclaim{} & Feb'26 & Reasoning / QA & \typeSMshort{} & \layerTSK{} & Controller-reasoner sequential decision architecture. & Adaptive temporal segment observation state. & Question-adaptive segment selection for TS reasoning.\\
-SAGE-Sleep \citep{sagesleep2026} & Mar'26 & Sleep-care monitoring / QA & \typeSMshort{} & \layerTSK{} & User-initiated QA and system-initiated monitoring loop. & Queryable sensor time-series layer. & Personal-baseline deviation alerts and sleep-care responses.\\
-WeatherTGD \citep{weathertgd2026} & Mar'26 & Weather captioning & \typeSMshort{} & \layerGH{} & Multi-agent textual-gradient refinement. & Weather observation evidence state. & Consensus-aware caption refinement over weather time series.\\
-TFRBench \citep{tfrbench2026} & Apr'26 & Forecast reasoning benchmark & \typeBenchshort{} & \layerTSK{} & Iterative verification and multi-agent reasoning-trace synthesis. & Dataset-grounded forecast reasoning state. & Cross-channel trend and event reasoning benchmark.\\
-Tree-of-Evidence \citep{treeofevidence2026}\selfclaim{} & Apr'26 & Evidence acquisition / diagnosis & \typeSMshort{} & \layerTSK{} & System-2 evidence search over candidate evidence bottlenecks. & Compact time-window and text evidence state. & Faithful multimodal grounding for clinical/fault evidence.\\
-TimeSeries\allowbreak Exam\allowbreak Agent \citep{timeseriesexamagent2026} & Apr'26 & Benchmark generation & \typeBenchshort{} & \layerTSK{} & Generate--verify--refine loop. & Dataset-aware temporal concept state. & Scalable TS reasoning benchmark generation.\\
-TSAG \citep{tsag2026} & Apr'26 & Financial QA & \typeSMshort{} & \layerTSK{} & Query planning and parameter extraction. & Executable temporal query interface. & Finance-specific schema, tools, and faithfulness checks.\\
-SAGE-AD \citep{sagead2026} & May'26 & Anomaly detection & \typeSMshort{} & \layerTSK{} & Specialized analyzer group and supervisor reporting. & Point, structural, seasonal, and pattern evidence channels. & Confidence-scored anomaly records and diagnostic reports.\\
-MarsTSC \citep{marstsc2026} & May'26 & Classification & \typeSMshort{} & \layerTSK{} & Generator--Reflector--Modifier collaborative roles. & Self-evolving temporal knowledge bank. & Few-shot multimodal classification with cautious test-time updates.\\
-TimeClaw-EEL \citep{timeclaw2026explore} & May'26 & Agent learning & \typeSMshort{} & \layerGH{} & Explore--compare--distill--reinject loop. & Metric observations over temporal trajectories. & Forecasting, weather, and finance task metrics.\\
-Nexus \citep{nexus2026} & May'26 & Forecasting & \typeSMshort{} & \layerTSK{} & Macro/micro multi-stage reasoning. & Signal/context workspace. & Context-aware forecasting pipeline.\\
-AION \citep{aion2026} & May'26 & Practical TS agent & \typeBenchshort{} & \layerGTS{} & Agents, skills, rules, evaluators, and review protocols. & Task files, workspaces, artifacts, and validation interface. & Realistic task protocols.\\
-Dr-CiK \citep{drcik2026} & May'26 & Forecasting context retrieval & \typeBenchshort{} & \layerTSK{} & Retrieve--filter--distill workflow. & Future-relevant document evidence. & Forecasting under distractors.\\
-KairosAgent \citep{kairosagent2026} & May'26 & Forecasting & \typeSMshort{} & \layerTSK{} & Multi-turn refinement with turn-level credit. & Multimodal forecast state. & TSFM and semantic forecasting module.\\
-TimeSage-MT \citep{timesagemt2026} & May'26 & Multi-turn benchmark / agent & \typeBenchshort{} & \layerGTS{} & Multi-turn agent interface with code execution. & Cross-turn temporal task state and analytical skill library. & Skill-level scoring across temporal tasks.\\
-Last-Mile \citep{lastmile2026} & Jun'26 & Forecast revision & \typeSMshort{} & \layerTSK{} & Constrained edit interface. & Baseline ledger and audit trail. & Deployment-aware forecast revision.\\
-TimeFore \citep{timefore2026} & Jun'26 & Forecast-based tabular QA & \typeBenchshort{} & \layerTSK{} & Retriever--Forecaster--Analyzer collaborative roles. & SQL and temporal model outputs as shared evidence. & Future data forecasting and forecast-based reasoning.\\
-TSQAgent / TSQBench \citep{tsqbench2026} & Jun'26 & Time-series data quality & \typeSMshort{} & \layerTSK{} & Perceiver--Inspector--Adjudicator multi-agent reasoning, reflection, and aggregation. & Time-series quality evidence workspace with dedicated quantitative analytical tools. & Quality-dimension identification, pairwise comparison, confidence, and evidence output.\\
-TimeClaw-Harness \citep{timeclaw2026harness} & Jun'26 & Contextualized reasoning & \typeSMshort{} & \layerGTS{} & Iterative tool execution and capability evolution. & Native temporal workspace executable tools episodic multimodal memory. & CiK TSRBench and TSAIA task protocols.\\
-DAST \citep{dast2026} & Jun'26 & Anomaly detection & \typeSMshort{} & \layerTSK{} & VLM--LLM--VLM multi-agent pipeline. & Visual KPI stream and per-interface text evidence. & Cross-interface O-RAN anomaly localization and rationale.\\
-BatteryLake \citep{batterylake2026} & Jul'26 & Battery data curation / benchmarking & \typeSMshort{} & \layerTSK{} & LLM metadata extraction, converter synthesis, abstention, and human review. & Governed temporal schemas, provenance, and physical-plausibility state. & Battery SOH/RUL dataset admission gates and benchmark-ready conversion.\\
-TopoBrick \citep{topobrick2026} & Jul'26 & Building IoT forecasting & \typeSMshort{} & \layerTSK{} & Structured sampling actions with LLM selection and verification. & Knowledge-graph-grounded, availability-aware temporal covariate state. & Exogenous-variable selection for zero-shot building forecasting.\\
-Neuro-Agentic Control \citep{neuroagentic2026} & Jul'26 & Industrial anomaly response / control & \typeSMshort{} & \layerTSK{} & LLM planner, counterfactual checking, rejection, and actuation loop. & TSFM latent simulation of intervention effects over sensor state. & Security-control actions and breach-prevention validation on SWaT.\\
-Fin-Analyst \citep{finanalyst2026} & Jul'26 & Financial forecasting / trading & \typeSMshort{} & \layerTSK{} & Eight specialist agents, meta-agent aggregation, and ablation workflow. & Point-in-time market evidence, technical indicators, and live evaluation state. & TSLA/BTC trading signals, returns, and risk-aware decisions.\\
-From Plots to Words \citep{plotstowords2026} & Jul'26 & Forecast explanation / accessibility & \typeSMshort{} & \layerTSK{} & Multi-agent explanation and model-aware evidence synthesis. & Joint numerical, visual, textual, and model-output evidence state. & Accessible textual explanations of time-series forecasts.\\
-HydroAgent \citep{hydroagent2026} & Jul'26 & Flood forecasting / warning & \typeSMshort{} & \layerTSK{} & Rule-bounded LLM skills, review checkpoints, and auditable workflow. & Hydrological model state and validation evidence. & Flood peak, volume, scheme selection, and warning decisions.\\
-CastFSR \citep{castfsr2026} & Aug'26 & Context-aware forecasting & \typeSMshort{} & \layerTSK{} & Fast-slow-reflect orchestration with retrieval and iterative revision. & Observation profiling, context retrieval, adaptive look-back state, and consistency checks. & Forecaster selection and context-conditioned forecast refinement.\\
-Oil-Well Explainable Agent \citep{oilwellagent2026} & Aug'26 & Anomaly diagnosis / explanation & \typeSMshort{} & \layerTSK{} & Grounded critique, confidence ranking, disagreement flags, and novelty naming. & Structured sensor metrics and upstream anomaly assertions. & Oil-well anomaly justification, validation, and novelty labels.\\
-TimeRLM \citep{timerlm2026} & Aug'26 & Long-context anomaly localization & \typeSMshort{} & \layerTSK{} & Recursive code/vision querying and interaction policy optimization. & Externalized long-signal context with evidence-preserving queries. & Anomaly localization, classification-with-evidence, and IoU scoring.\\
-TraceMAS \citep{tracemas2026} & Aug'26 & Knowledge-based forecasting & \typeSMshort{} & \layerTSK{} & Multi-agent document search, code generation, model revision, and trace inspection. & Causal maps connecting evidence, variables, data proxies, and forecast revisions. & Crude-oil forecast iteration and scenario inspection.\\
-CRAFTER \citep{crafter2026} & Aug'26 & Forecast correction / feature discovery & \typeSMshort{} & \layerTSK{} & LLM feature/code proposal with validation-grounded acceptance gate. & Residual and raw-channel evidence over frozen forecasters. & Corrective temporal feature discovery and post-hoc forecast correction.\\
-QuanTiMedAI \citep{quantimedai2026} & Aug'26 & Clinical mortality prediction & \typeSMshort{} & \layerTSK{} & Iterative performance-guided LLM feature selection and weighting. & Temporal-bin physiology state and derived severity channel. & Cardiac-arrest mortality prediction and AUROC validation.\\
-AgenticTwin \citep{agentictwin2026} & Aug'26 & Anomaly diagnosis & \typeSMshort{} & \layerTSK{} & Structured agent collaboration, grounded question answering, and mitigation reasoning. & Digital-twin sensor state and anomaly-classifier evidence. & Anomaly diagnosis, contextual explanation, and mitigation quality.\\
-AQuA \citep{aqua2026} & Aug'26 & Quantitative research / trading & \typeSMshort{} & \layerGH{} & Recursive proposal, sandboxed experimentation, evidence memory, and manager-mediated coordination. & Point-in-time splits, factor signals, and time-series model evaluation state. & Quantitative factor and model development for trading.\\
-TIEM \citep{tiem2026} & Aug'26 & Event-driven financial forecasting & \typeSMshort{} & \layerTSK{} & Evidence retrieval, case-based skill memory, and fusion reasoning. & Timestamp-gated evidence hypergraph and source-tagged temporal skills. & Catalyst-outcome financial forecast and leakage-controlled evaluation.\\
-TimeSage-EV \citep{timesageev2026} & Aug'26 & Live multi-task time-series analysis & \typeBenchshort{} & \layerGTS{} & Agent interface with tools, code, memory, and report generation. & Rolling cutoff-valid evidence state across recurring releases and six domains. & Structured answers, reports, keypoint scoring, and outlook tasks.\\
-ReasonCast \citep{reasoncast2026} & Aug'26 & Demand forecasting & \typeSMshort{} & \layerTSK{} & Selective intervention decision and structured semantic reasoning. & Event context, forecast prior, uncertainty, and temporal-shape state. & Demand direction, amplitude, peak, and forecast-utility reward.\\
-SCENARIODIFF \citep{scenariodiff2026} & Aug'26 & Multimodal forecasting & \typeSMshort{} & \layerTSK{} & Hierarchical agent evidence extraction and guidance generation. & Aligned textual context, scenario state, and event-relevant temporal anchors. & Forecast-horizon scenario and anchor guidance for diffusion forecasting.\\
-EvoTS-Agent \citep{evotsagent2026} & Aug'26 & Financial change-point detection & \typeSMshort{} & \layerTSK{} & Executable trajectory evolution through revision, alternative strategy, and recombination. & Dataset-regime characterization and validation state. & Change-point model selection and detection validation.\\
-Agentic Active Learning for Variable Stars \citep{agenticactivelearning2026} & Aug'26 & Astronomical anomaly discovery & \typeSMshort{} & \layerTSK{} & Iterative candidate review, relevance propagation, and multi-agent consensus. & Phase-folded light-curve images and embedding-space evidence. & Variable-star anomaly discovery and false-positive filtering.\\
-MetaCaster \citep{metacaster2026} & Aug'26 & Forecaster construction & \typeSMshort{} & \layerTSK{} & Agent-as-engineer data generation, training, selection, and meta-harness optimization. & Few-shot temporal context and generated-data traces. & Lightweight forecaster generation, training, and selection.\\
-TraceBench \citep{tracebench2026} & Aug'26 & Root-cause attribution & \typeBenchshort{} & \layerTSK{} & Agent exploration, code submission, and trajectory evaluation. & Controlled dynamical-system time-series observations and domain context. & Altered-parameter root-cause labels and per-sample attribution.\\
-MoiraiAgent \citep{moiraiagent2026} & -- & Forecasting & \typeSMshort{} & \layerTSK{} & Copilot-style tool orchestration. & TSFM-as-tool forecast artifacts. & TSFM-centered forecasting assistant.\\
-\bottomrule
-\end{longtable}
-}
-\end{landscape}
+Agentic RAG for TSA \citep{agenticrag2024} Aug'24; \typeSMshort{}\newline Cross-task TSA & \textbf{GH:} Hierarchical multi-agent routing and prompt-pool retrieval.\newline\textbf{GTS:} Task-specialized SLM agents over time-series requests.\newline\textbf{TSK:} Instruction-tuned task agents for multiple TS tasks.\\\midrule
+TS-Reasoner \citep{tsreasoner2026} Oct'24; \typeSMshort{}\newline Inference / analysis & \textbf{GH:} Domain-oriented inference loop.\newline\textbf{GTS:} Time-series inference tools and evidence state.\newline\textbf{TSK:} Analysis tasks over temporal data.\\\midrule
+TESSA \citep{tessa2024} Oct'24; \typeSMshort{}\newline Annotation / interpretation & \textbf{GH:} Two-agent annotation workflow.\newline\textbf{GTS:} Time-wise and text-wise feature interface.\newline\textbf{TSK:} General and domain-specific annotation generation.\\\midrule
+Argos \citep{argos2025} Jan'25; \typeSMshort{}\newline Anomaly detection & \textbf{GH:} Autonomous rule proposal and review gates.\newline\textbf{GTS:} Cloud-metric workspace and monitoring context.\newline\textbf{TSK:} Anomaly-rule validation repair deployment.\\\midrule
+TimeCAP \citep{timecap2025} Feb'25; \typeSMshort{}\newline Event-aware prediction & \textbf{GH:} Contextualize-augment-predict workflow.\newline\textbf{GTS:} Event-window alignment.\newline\textbf{TSK:} Event-conditioned prediction actions.\\\midrule
+TimeXL \citep{timexl2025}\selfclaim{} Mar'25; \typeSMshort{}\newline Multimodal prediction & \textbf{GH:} Prediction reflection and refinement loop with collaborating LLMs.\newline\textbf{GTS:} Multimodal temporal evidence state.\newline\textbf{TSK:} Explanation-grounded prediction.\\\midrule
+FinArena \citep{finarena2025} Mar'25; \typeSMshort{}\newline Financial forecasting / decision & \textbf{GH:} Human-agent collaboration and expert-agent decision loop.\newline\textbf{GTS:} Multimodal financial temporal evidence.\newline\textbf{TSK:} Stock trend prediction and risk-profile trading decisions.\\\midrule
+Competition Agents \citep{competitionagents2025} Apr'25; \typeSMshort{}\newline News-driven forecasting & \textbf{GH:} Competitive multi-agent discussion and reflective support.\newline\textbf{GTS:} News-event influence state for forecasting.\newline\textbf{TSK:} News-driven forecast reasoning under misleading information.\\\midrule
+Time-R1 \citep{timer12025}\selfclaim{} Jun'25; \typeSMshort{}\newline Reasoning-trained forecasting & \textbf{GH:} SFT plus reinforced slow-thinking policy training.\newline\textbf{GTS:} Forecast task state with horizon and metric-aware reward.\newline\textbf{TSK:} Forecast reasoning traces optimized by time-series-specific rewards.\\\midrule
+TimeMaster \citep{timemaster2025}\selfclaim{} Jun'25; \typeSMshort{}\newline Multimodal forecasting / classification & \textbf{GH:} Reward-driven multimodal reasoning training.\newline\textbf{GTS:} Visualized time-series evidence and structured output state.\newline\textbf{TSK:} Forecasting and classification reasoning with composite rewards.\\\midrule
+Time-RA \citep{timera2025}\selfclaim{} Jul'25; \typeSMshort{}\newline Anomaly diagnosis & \textbf{GH:} LLM-feedback loop for reasoning-data construction.\newline\textbf{GTS:} Raw series text plots and structured reasoning annotations.\newline\textbf{TSK:} Generative anomaly diagnosis traces and multimodal evidence.\\\midrule
+DCATS \citep{yeh2025empowering} Aug'25; \typeSMshort{}\newline Forecasting data curation & \textbf{GH:} Data-centric AutoML-style agent orchestration.\newline\textbf{GTS:} Metadata-aware forecast task state.\newline\textbf{TSK:} Data cleaning optimized for forecast-error reduction.\\\midrule
+ZARA \citep{zara2025} Aug'25; \typeSMshort{}\newline Activity recognition & \textbf{GH:} Retrieval-augmented candidate loop.\newline\textbf{GTS:} Sensor-window evidence representation.\newline\textbf{TSK:} Motion-cue retrieval and activity priors.\\\midrule
+FLAIRR-TS \citep{flairr2025} Aug'25; \typeSMshort{}\newline Forecasting & \textbf{GH:} Forecaster-refiner agent loop.\newline\textbf{GTS:} Retrieved analogs attached to forecast prompt state.\newline\textbf{TSK:} Adaptive prompt refinement for forecasting.\\\midrule
+CALM \citep{calm2025}\selfclaim{} Aug'25; \typeSMshort{}\newline Streaming adaptation & \textbf{GH:} Continuous adaptation with LLM-as-judge feedback.\newline\textbf{GTS:} Non-stationary stream monitoring state.\newline\textbf{TSK:} Stream adaptation and regression checks.\\\midrule
+TimeCopilot \citep{timecopilot2026} Aug'25; \typeSMshort{}\newline Forecasting & \textbf{GH:} Interactive assistant loop.\newline\textbf{GTS:} Session workspace and task context.\newline\textbf{TSK:} User-facing forecast analysis and revision.\\\midrule
+TimeOmni-1 \citep{timeomni2026}\selfclaim{} Sep'25; \typeSMshort{}\newline Multi-task time-series reasoning & \textbf{GH:} Multi-stage supervised and reward-based reasoning optimization.\newline\textbf{GTS:} Unified visual time-series reasoning state across perception, extrapolation, and decision tasks.\newline\textbf{TSK:} Fixed TSR-Suite tasks, task-specific rewards, and answer contracts.\\\midrule
+COUNTS \citep{counts2025}\selfclaim{} Oct'25; \typeSMshort{}\newline Numerical TS reasoning & \textbf{GH:} SFT and GRPO reasoning-policy training with verifiable rewards.\newline\textbf{GTS:} Discrete time-series token interface.\newline\textbf{TSK:} Chain-of-thought reasoning across temporal analysis tasks.\\\midrule
+TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} Oct'25; \typeSMshort{}\newline Forecasting & \textbf{GH:} Curator--Planner--Forecaster--Reporter roles.\newline\textbf{GTS:} Dataset, artifact, visualization, and report workspace.\newline\textbf{TSK:} Forecasting lifecycle automation, validation, and ensembling.\\\midrule
+FETA \citep{feta2025} Oct'25; \typeSMshort{}\newline Classification & \textbf{GH:} Channel-level agents and confidence aggregation.\newline\textbf{GTS:} Channel-separated temporal views.\newline\textbf{TSK:} Exemplar-based training-free classification.\\\midrule
+TS-Agent \citep{tsagent2025} Oct'25; \typeSMshort{}\newline Raw-series reasoning / QA & \textbf{GH:} ReAct-style observe-reason-act loop.\newline\textbf{GTS:} Raw-series observation state and statistical insight tools.\newline\textbf{TSK:} Temporal QA answer refinement.\\\midrule
+AlphaCast \citep{alphacast2025} Nov'25; \typeSMshort{}\newline Interactive forecasting & \textbf{GH:} Context-reasoning-reflection workflow.\newline\textbf{GTS:} Feature knowledge case and context support toolkit.\newline\textbf{TSK:} Human-wisdom plus LLM co-reasoning for forecasting.\\\midrule
+AI-Meteorologist (companion reports) \citep{aimeteorologist2025} Nov'25; \typeSMshort{}\newline Weather interpretation & \textbf{GH:} Meteorologist--Writer--Illustrator orchestration and report compilation.\newline\textbf{GTS:} Multi-variable weather workspace with hourly, 6-hour, daily contexts, and climatology.\newline\textbf{TSK:} Weather-front, anomaly, and hazard interpretation with keyword--proof validation, warnings, and reports.\\\midrule
+HFMD Structured Agents \citep{epidemicagent2026} Nov'25; \typeSMshort{}\newline Epidemic forecasting & \textbf{GH:} Event Interpreter and Forecast Generator neuro-symbolic workflow.\newline\textbf{GTS:} External-event and climatology context aligned with disease time series and probabilistic state.\newline\textbf{TSK:} One-week HFMD forecasts, prediction intervals, coverage, and auditable rationales.\\\midrule
+STReasoner \citep{streasoner2026} Jan'26; \typeSMshort{}\newline Spatio-temporal reasoning & \textbf{GH:} Spatial-aware reinforcement learning and reasoning optimization.\newline\textbf{GTS:} Spatio-temporal evidence state and ST-Bench tasks.\newline\textbf{TSK:} Etiological, entity, correlation, and in-context forecasting reasoning.\\\midrule
+ChatAD \citep{chatad2026} Jan'26; \typeSMshort{}\newline Anomaly detection / dialogue & \textbf{GH:} Multi-agent TS evolution and multi-turn instruction learning.\newline\textbf{GTS:} AD reasoning dialogue state and LLADBench evaluation.\newline\textbf{TSK:} Anomaly reasoning dataset benchmark and cross-task generalization.\\\midrule
+TimeART \citep{timeart2026} Jan'26; \typeSMshort{}\newline TSQA / reasoning & \textbf{GH:} Tool-call traces and reflection during training.\newline\textbf{GTS:} TimeToolBench-style analytical tool substrate.\newline\textbf{TSK:} TSQA training and evaluation.\\\midrule
+TS-Debate \citep{tsdebate2026} Jan'26; \typeSMshort{}\newline Multimodal reasoning & \textbf{GH:} Multi-agent debate and conflict resolution.\newline\textbf{GTS:} Shared temporal evidence across modalities.\newline\textbf{TSK:} Zero-shot multimodal TS reasoning.\\\midrule
+MAS4TS \citep{mas4ts2026} Feb'26; \typeSMshort{}\newline Visual reasoning & \textbf{GH:} Analyzer-Reasoner-Executor coordination.\newline\textbf{GTS:} Visual/statistical temporal evidence.\newline\textbf{TSK:} Visual time-series task execution.\\\midrule
+TemporalBench \citep{temporalbench2026} Feb'26; \typeBenchshort{}\newline Contextual and event-informed TS evaluation & \textbf{GH:} Tiered agent evaluation under controlled information settings.\newline\textbf{GTS:} Cross-domain temporal structure, context-grounding, and event-conditioning protocols.\newline\textbf{TSK:} Historical interpretation, forecasting, contextual reasoning, and event-conditioned task instances.\\\midrule
+VeriTime \citep{veritime2026}\selfclaim{} Feb'26; \typeSMshort{}\newline Multi-task TS reasoning & \textbf{GH:} Process-verifiable CoT synthesis and difficulty scheduling.\newline\textbf{GTS:} Task-aware temporal reasoning data.\newline\textbf{TSK:} Reasoning traces for tailored LLM temporal reasoning.\\\midrule
+AnomaMind \citep{anomamind2026} Feb'26; \typeSMshort{}\newline Anomaly diagnosis & \textbf{GH:} Coarse-to-fine diagnostic loop with reflection/RL.\newline\textbf{GTS:} Anomaly windows, features, and reusable patterns.\newline\textbf{TSK:} Localization and diagnosis workflow.\\\midrule
+Cast-R1 \citep{castr12026} Feb'26; \typeSMshort{}\newline Forecasting policy & \textbf{GH:} Sequential decision policy and RL-style optimization.\newline\textbf{GTS:} Forecast trajectory state.\newline\textbf{TSK:} Forecast metric reward and action set.\\\midrule
+AgriWorld \citep{agriworld2026} Feb'26; \typeSMshort{}\newline Agricultural reasoning / forecasting & \textbf{GH:} Execute--observe--refine code-agent loop.\newline\textbf{GTS:} Remote-sensing and crop-simulation temporal tools.\newline\textbf{TSK:} Yield, stress, disease, and counterfactual agricultural tasks.\\\midrule
+ARTIST \citep{artist2026}\selfclaim{} Feb'26; \typeSMshort{}\newline Reasoning / QA & \textbf{GH:} Controller-reasoner sequential decision architecture.\newline\textbf{GTS:} Adaptive temporal segment observation state.\newline\textbf{TSK:} Question-adaptive segment selection for TS reasoning.\\\midrule
+SAGE-Sleep \citep{sagesleep2026} Mar'26; \typeSMshort{}\newline Sleep-care monitoring / QA & \textbf{GH:} User-initiated QA and system-initiated monitoring loop.\newline\textbf{GTS:} Queryable sensor time-series layer.\newline\textbf{TSK:} Personal-baseline deviation alerts and sleep-care responses.\\\midrule
+WeatherTGD \citep{weathertgd2026} Mar'26; \typeSMshort{}\newline Weather captioning & \textbf{GH:} Multi-agent textual-gradient refinement.\newline\textbf{GTS:} Weather observation evidence state.\newline\textbf{TSK:} Consensus-aware caption refinement over weather time series.\\\midrule
+TFRBench \citep{tfrbench2026} Apr'26; \typeBenchshort{}\newline Forecast reasoning benchmark & \textbf{GH:} Iterative verification and multi-agent reasoning-trace synthesis.\newline\textbf{GTS:} Dataset-grounded forecast reasoning state.\newline\textbf{TSK:} Cross-channel trend and event reasoning benchmark.\\\midrule
+Tree-of-Evidence \citep{treeofevidence2026}\selfclaim{} Apr'26; \typeSMshort{}\newline Evidence acquisition / diagnosis & \textbf{GH:} System-2 evidence search over candidate evidence bottlenecks.\newline\textbf{GTS:} Compact time-window and text evidence state.\newline\textbf{TSK:} Faithful multimodal grounding for clinical/fault evidence.\\\midrule
+TimeSeries\allowbreak Exam\allowbreak Agent \citep{timeseriesexamagent2026} Apr'26; \typeBenchshort{}\newline Benchmark generation & \textbf{GH:} Generate--verify--refine loop.\newline\textbf{GTS:} Dataset-aware temporal concept state.\newline\textbf{TSK:} Scalable TS reasoning benchmark generation.\\\midrule
+TSAG \citep{tsag2026} Apr'26; \typeSMshort{}\newline Financial QA & \textbf{GH:} Query planning and parameter extraction.\newline\textbf{GTS:} Executable temporal query interface.\newline\textbf{TSK:} Finance-specific schema, tools, and faithfulness checks.\\\midrule
+SAGE-AD \citep{sagead2026} May'26; \typeSMshort{}\newline Anomaly detection & \textbf{GH:} Specialized analyzer group and supervisor reporting.\newline\textbf{GTS:} Point, structural, seasonal, and pattern evidence channels.\newline\textbf{TSK:} Confidence-scored anomaly records and diagnostic reports.\\\midrule
+MarsTSC \citep{marstsc2026} May'26; \typeSMshort{}\newline Classification & \textbf{GH:} Generator--Reflector--Modifier collaborative roles.\newline\textbf{GTS:} Self-evolving temporal knowledge bank.\newline\textbf{TSK:} Few-shot multimodal classification with cautious test-time updates.\\\midrule
+TimeClaw-EEL \citep{timeclaw2026explore} May'26; \typeSMshort{}\newline Agent learning & \textbf{GH:} Explore--compare--distill--reinject loop.\newline\textbf{GTS:} Metric observations over temporal trajectories.\newline\textbf{TSK:} Forecasting, weather, and finance task metrics.\\\midrule
+Nexus \citep{nexus2026} May'26; \typeSMshort{}\newline Forecasting & \textbf{GH:} Macro/micro multi-stage reasoning.\newline\textbf{GTS:} Signal/context workspace.\newline\textbf{TSK:} Context-aware forecasting pipeline.\\\midrule
+AION \citep{aion2026} May'26; \typeBenchshort{}\newline Practical TS agent & \textbf{GH:} Agents, skills, rules, evaluators, and review protocols.\newline\textbf{GTS:} Task files, workspaces, artifacts, and validation interface.\newline\textbf{TSK:} Realistic task protocols.\\\midrule
+Dr-CiK \citep{drcik2026} May'26; \typeBenchshort{}\newline Forecasting context retrieval & \textbf{GH:} Retrieve--filter--distill workflow.\newline\textbf{GTS:} Future-relevant document evidence.\newline\textbf{TSK:} Forecasting under distractors.\\\midrule
+KairosAgent \citep{kairosagent2026} May'26; \typeSMshort{}\newline Forecasting & \textbf{GH:} Multi-turn refinement with turn-level credit.\newline\textbf{GTS:} Multimodal forecast state.\newline\textbf{TSK:} TSFM and semantic forecasting module.\\\midrule
+TimeSage-MT \citep{timesagemt2026} May'26; \typeBenchshort{}\newline Multi-turn benchmark / agent & \textbf{GH:} Multi-turn agent interface with code execution.\newline\textbf{GTS:} Cross-turn temporal task state and analytical skill library.\newline\textbf{TSK:} Skill-level scoring across temporal tasks.\\\midrule
+Last-Mile \citep{lastmile2026} Jun'26; \typeSMshort{}\newline Forecast revision & \textbf{GH:} Constrained edit interface.\newline\textbf{GTS:} Baseline ledger and audit trail.\newline\textbf{TSK:} Deployment-aware forecast revision.\\\midrule
+TimeFore \citep{timefore2026} Jun'26; \typeBenchshort{}\newline Forecast-based tabular QA & \textbf{GH:} Retriever--Forecaster--Analyzer collaborative roles.\newline\textbf{GTS:} SQL and temporal model outputs as shared evidence.\newline\textbf{TSK:} Future data forecasting and forecast-based reasoning.\\\midrule
+TSQAgent / TSQBench \citep{tsqbench2026} Jun'26; \typeSMshort{}\newline Time-series data quality & \textbf{GH:} Perceiver--Inspector--Adjudicator multi-agent reasoning, reflection, and aggregation.\newline\textbf{GTS:} Time-series quality evidence workspace with dedicated quantitative analytical tools.\newline\textbf{TSK:} Quality-dimension identification, pairwise comparison, confidence, and evidence output.\\\midrule
+TimeClaw-Harness \citep{timeclaw2026harness} Jun'26; \typeSMshort{}\newline Contextualized reasoning & \textbf{GH:} Iterative tool execution and capability evolution.\newline\textbf{GTS:} Native temporal workspace executable tools episodic multimodal memory.\newline\textbf{TSK:} CiK TSRBench and TSAIA task protocols.\\\midrule
+DAST \citep{dast2026} Jun'26; \typeSMshort{}\newline Anomaly detection & \textbf{GH:} VLM--LLM--VLM multi-agent pipeline.\newline\textbf{GTS:} Visual KPI stream and per-interface text evidence.\newline\textbf{TSK:} Cross-interface O-RAN anomaly localization and rationale.\\\midrule
+BatteryLake \citep{batterylake2026} Jul'26; \typeSMshort{}\newline Battery data curation / benchmarking & \textbf{GH:} LLM metadata extraction, converter synthesis, abstention, and human review.\newline\textbf{GTS:} Governed temporal schemas, provenance, and physical-plausibility state.\newline\textbf{TSK:} Battery SOH/RUL dataset admission gates and benchmark-ready conversion.\\\midrule
+TopoBrick \citep{topobrick2026} Jul'26; \typeSMshort{}\newline Building IoT forecasting & \textbf{GH:} Structured sampling actions with LLM selection and verification.\newline\textbf{GTS:} Knowledge-graph-grounded, availability-aware temporal covariate state.\newline\textbf{TSK:} Exogenous-variable selection for zero-shot building forecasting.\\\midrule
+Neuro-Agentic Control \citep{neuroagentic2026} Jul'26; \typeSMshort{}\newline Industrial anomaly response / control & \textbf{GH:} LLM planner, counterfactual checking, rejection, and actuation loop.\newline\textbf{GTS:} TSFM latent simulation of intervention effects over sensor state.\newline\textbf{TSK:} Security-control actions and breach-prevention validation on SWaT.\\\midrule
+Fin-Analyst \citep{finanalyst2026} Jul'26; \typeSMshort{}\newline Financial forecasting / trading & \textbf{GH:} Eight specialist agents, meta-agent aggregation, and ablation workflow.\newline\textbf{GTS:} Point-in-time market evidence, technical indicators, and live evaluation state.\newline\textbf{TSK:} TSLA/BTC trading signals, returns, and risk-aware decisions.\\\midrule
+From Plots to Words \citep{plotstowords2026} Jul'26; \typeSMshort{}\newline Forecast explanation / accessibility & \textbf{GH:} Multi-agent explanation and model-aware evidence synthesis.\newline\textbf{GTS:} Joint numerical, visual, textual, and model-output evidence state.\newline\textbf{TSK:} Accessible textual explanations of time-series forecasts.\\\midrule
+HydroAgent \citep{hydroagent2026} Jul'26; \typeSMshort{}\newline Flood forecasting / warning & \textbf{GH:} Rule-bounded LLM skills, review checkpoints, and auditable workflow.\newline\textbf{GTS:} Hydrological model state and validation evidence.\newline\textbf{TSK:} Flood peak, volume, scheme selection, and warning decisions.\\\midrule
+CastFSR \citep{castfsr2026} Aug'26; \typeSMshort{}\newline Context-aware forecasting & \textbf{GH:} Fast-slow-reflect orchestration with retrieval and iterative revision.\newline\textbf{GTS:} Observation profiling, context retrieval, adaptive look-back state, and consistency checks.\newline\textbf{TSK:} Forecaster selection and context-conditioned forecast refinement.\\\midrule
+Oil-Well Explainable Agent \citep{oilwellagent2026} Aug'26; \typeSMshort{}\newline Anomaly diagnosis / explanation & \textbf{GH:} Grounded critique, confidence ranking, disagreement flags, and novelty naming.\newline\textbf{GTS:} Structured sensor metrics and upstream anomaly assertions.\newline\textbf{TSK:} Oil-well anomaly justification, validation, and novelty labels.\\\midrule
+TimeRLM \citep{timerlm2026} Aug'26; \typeSMshort{}\newline Long-context anomaly localization & \textbf{GH:} Recursive code/vision querying and interaction policy optimization.\newline\textbf{GTS:} Externalized long-signal context with evidence-preserving queries.\newline\textbf{TSK:} Anomaly localization, classification-with-evidence, and IoU scoring.\\\midrule
+TraceMAS \citep{tracemas2026} Aug'26; \typeSMshort{}\newline Knowledge-based forecasting & \textbf{GH:} Multi-agent document search, code generation, model revision, and trace inspection.\newline\textbf{GTS:} Causal maps connecting evidence, variables, data proxies, and forecast revisions.\newline\textbf{TSK:} Crude-oil forecast iteration and scenario inspection.\\\midrule
+CRAFTER \citep{crafter2026} Aug'26; \typeSMshort{}\newline Forecast correction / feature discovery & \textbf{GH:} LLM feature/code proposal with validation-grounded acceptance gate.\newline\textbf{GTS:} Residual and raw-channel evidence over frozen forecasters.\newline\textbf{TSK:} Corrective temporal feature discovery and post-hoc forecast correction.\\\midrule
+QuanTiMedAI \citep{quantimedai2026} Aug'26; \typeSMshort{}\newline Clinical mortality prediction & \textbf{GH:} Iterative performance-guided LLM feature selection and weighting.\newline\textbf{GTS:} Temporal-bin physiology state and derived severity channel.\newline\textbf{TSK:} Cardiac-arrest mortality prediction and AUROC validation.\\\midrule
+AgenticTwin \citep{agentictwin2026} Aug'26; \typeSMshort{}\newline Anomaly diagnosis & \textbf{GH:} Structured agent collaboration, grounded question answering, and mitigation reasoning.\newline\textbf{GTS:} Digital-twin sensor state and anomaly-classifier evidence.\newline\textbf{TSK:} Anomaly diagnosis, contextual explanation, and mitigation quality.\\\midrule
+AQuA \citep{aqua2026} Aug'26; \typeSMshort{}\newline Quantitative research / trading & \textbf{GH:} Recursive proposal, sandboxed experimentation, evidence memory, and manager-mediated coordination.\newline\textbf{GTS:} Point-in-time splits, factor signals, and time-series model evaluation state.\newline\textbf{TSK:} Quantitative factor and model development for trading.\\\midrule
+TIEM \citep{tiem2026} Aug'26; \typeSMshort{}\newline Event-driven financial forecasting & \textbf{GH:} Evidence retrieval, case-based skill memory, and fusion reasoning.\newline\textbf{GTS:} Timestamp-gated evidence hypergraph and source-tagged temporal skills.\newline\textbf{TSK:} Catalyst-outcome financial forecast and leakage-controlled evaluation.\\\midrule
+TimeSage-EV \citep{timesageev2026} Aug'26; \typeBenchshort{}\newline Live multi-task time-series analysis & \textbf{GH:} Agent interface with tools, code, memory, and report generation.\newline\textbf{GTS:} Rolling cutoff-valid evidence state across recurring releases and six domains.\newline\textbf{TSK:} Structured answers, reports, keypoint scoring, and outlook tasks.\\\midrule
+ReasonCast \citep{reasoncast2026} Aug'26; \typeSMshort{}\newline Demand forecasting & \textbf{GH:} Selective intervention decision and structured semantic reasoning.\newline\textbf{GTS:} Event context, forecast prior, uncertainty, and temporal-shape state.\newline\textbf{TSK:} Demand direction, amplitude, peak, and forecast-utility reward.\\\midrule
+SCENARIODIFF \citep{scenariodiff2026} Aug'26; \typeSMshort{}\newline Multimodal forecasting & \textbf{GH:} Hierarchical agent evidence extraction and guidance generation.\newline\textbf{GTS:} Aligned textual context, scenario state, and event-relevant temporal anchors.\newline\textbf{TSK:} Forecast-horizon scenario and anchor guidance for diffusion forecasting.\\\midrule
+EvoTS-Agent \citep{evotsagent2026} Aug'26; \typeSMshort{}\newline Financial change-point detection & \textbf{GH:} Executable trajectory evolution through revision, alternative strategy, and recombination.\newline\textbf{GTS:} Dataset-regime characterization and validation state.\newline\textbf{TSK:} Change-point model selection and detection validation.\\\midrule
+Agentic Active Learning for Variable Stars \citep{agenticactivelearning2026} Aug'26; \typeSMshort{}\newline Astronomical anomaly discovery & \textbf{GH:} Iterative candidate review, relevance propagation, and multi-agent consensus.\newline\textbf{GTS:} Phase-folded light-curve images and embedding-space evidence.\newline\textbf{TSK:} Variable-star anomaly discovery and false-positive filtering.\\\midrule
+MetaCaster \citep{metacaster2026} Aug'26; \typeSMshort{}\newline Forecaster construction & \textbf{GH:} Agent-as-engineer data generation, training, selection, and meta-harness optimization.\newline\textbf{GTS:} Few-shot temporal context and generated-data traces.\newline\textbf{TSK:} Lightweight forecaster generation, training, and selection.\\\midrule
+TraceBench \citep{tracebench2026} Aug'26; \typeBenchshort{}\newline Root-cause attribution & \textbf{GH:} Agent exploration, code submission, and trajectory evaluation.\newline\textbf{GTS:} Controlled dynamical-system time-series observations and domain context.\newline\textbf{TSK:} Altered-parameter root-cause labels and per-sample attribution.\\\midrule
+MoiraiAgent \citep{moiraiagent2026} --; \typeSMshort{}\newline Forecasting & \textbf{GH:} Copilot-style tool orchestration.\newline\textbf{GTS:} TSFM-as-tool forecast artifacts.\newline\textbf{TSK:} TSFM-centered forecasting assistant.\\\midrule
+\end{longtable}\endgroup
 
 \subsection{General Harness contributions}
 
