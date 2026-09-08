@@ -1,7 +1,5 @@
 # Reference audit
 
-Generated: 2026-09-08T12:52:28+00:00
-
 - Bib entries: 137
 - Identity status: {'matched': 135, 'review': 2}
 - PDF status: {'not_expected': 1, 'pending': 3, 'present': 133}

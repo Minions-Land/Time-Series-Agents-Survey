@@ -733,8 +733,6 @@ def audit(_: argparse.Namespace) -> None:
     report = [
         "# Reference audit",
         "",
-        f"Generated: {utc_now()}",
-        "",
         f"- Bib entries: {len(rows)}",
         f"- Identity status: {dict(sorted(identity.items()))}",
         f"- PDF status: {dict(sorted(pdf.items()))}",
