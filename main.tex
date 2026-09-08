@@ -177,6 +177,24 @@ A mechanism belongs to GH when its design remains useful beyond time-series appl
 
 These judgments apply to mechanisms rather than entire papers: one system can combine general memory and reflection, cross-task temporal tools, and a forecasting-specific validation loop. Changing from financial forecasting to traffic forecasting changes the application domain but preserves the forecasting task family; it therefore does not by itself establish cross-task generality.
 
+The resulting hierarchy is the organizing structure of this survey:
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Level} & \textbf{Question answered by the level}\\
+\midrule
+General Harness & What runtime mechanisms turn an LLM into an agent, independently of time-series assumptions?\\
+Time-Series Harness Module & What temporal objects, operations, context bindings, and validation interfaces make the runtime suitable for time-series analysis?\\
+General Time-Series Harness & Which temporal mechanisms remain reusable when the downstream time-series task changes?\\
+Task-Specific Harness & Which mechanisms are tied to a concrete task contract, such as a forecasting horizon, anomaly definition, or decision constraint?\\
+\bottomrule
+\end{tabularx}
+\caption{The hierarchical construction used throughout the survey. The General and Task-Specific Time-Series Harness levels are nested within the Time-Series Harness Module; a paper may contribute mechanisms at more than one level.}
+\label{tab:harness-hierarchy}
+\end{table}
+
 \subsection{Position relative to existing surveys}
 
 Existing surveys cover important subsets of the landscape. Classical and deep-learning surveys organize time-series research around forecasting, change-point detection, anomaly detection, and neural architectures \citep{lim2021deepts,aminikhanghahi2017changepoint,darban2024anomaly,wen2023transformers}. Surveys on time-series foundation models, synthetic data, LLM integration, and multimodal temporal modeling summarize pretraining, adaptation, serialization, prompting, tokenization, cross-modal alignment, data generation, and evaluation \citep{liang2024foundation,liu2025synthetic,zhang2024llmts,jiang2024empowering,liu2025crossmodality,jiang2025multimodal}.
@@ -291,7 +309,7 @@ A second level is task-specific. Forecasting modules introduce horizon contracts
 
 \section{Component Map for Time Series Agents}
 
-The component map follows the construction in the core formula. The \GeneralHarness{} is described by an author-normalized 14-component structural-functional vocabulary synthesized from Harness literature \citep{li2026harnesssurvey,ning2026codeharness,lee2026metaharness,lin2026agenticharness}. The Time-Series Harness Module then specifies which temporal objects, operations, context bindings, and validation requirements the runtime must support. Its cross-task mechanisms form the \GeneralTSHarness{}; its task-bound mechanisms form the \TaskSpecificHarness{}. The task categories reviewed in prior time-series surveys provide the output contracts that make this final distinction concrete. Thus the map proceeds from general runtime components, to temporal specialization, to task-specific instantiation.
+The component map follows the hierarchy in Table~\ref{tab:harness-hierarchy}. The \GeneralHarness{} is described by an author-normalized 14-component structural-functional vocabulary synthesized from Harness literature \citep{li2026harnesssurvey,ning2026codeharness,lee2026metaharness,lin2026agenticharness}. The Time-Series Harness Module then specifies which temporal objects, operations, context bindings, and validation requirements the runtime must support. Its cross-task mechanisms form the \GeneralTSHarness{}; its task-bound mechanisms form the \TaskSpecificHarness{}. The task categories reviewed in prior time-series surveys provide the output contracts that make this final distinction concrete. Thus the map proceeds from general runtime components, to temporal specialization, to task-specific instantiation.
 
 \subsection{General Harness: the author-normalized 14-component vocabulary}
 
