@@ -7,7 +7,7 @@
 - Expected paper PDFs present: 133
 - Expected paper PDFs missing: 3
 - Non-paper references with no PDF expected: 1
-- Google Scholar status: {'pending': 137}
+- Google Scholar status: {'pending': 134, 'verified': 3}
 - Entries with abbreviated `and others` authors: 16
 - Entries without DOI or arXiv ID: 1
 

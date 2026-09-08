@@ -686,10 +686,20 @@ def scholar_check(_: argparse.Namespace) -> None:
         candidate = entries[0]
         title_score = title_similarity(rows_by_key[key]["title_bib"], candidate.get("title", ""))
         year_matches = not candidate.get("year") or candidate.get("year") == rows_by_key[key]["year_bib"]
-        rows_by_key[key]["scholar_status"] = "verified" if title_score >= 0.92 and year_matches else "review"
+        bib_first_author = first_author_tokens(rows_by_key[key]["authors_bib"], bib_order=True)
+        scholar_first_author = first_author_tokens(candidate.get("author", ""))
+        author_matches = bool(bib_first_author) and bool(scholar_first_author) and bool(
+            bib_first_author & scholar_first_author
+        )
+        rows_by_key[key]["scholar_status"] = (
+            "verified" if title_score >= 0.92 and year_matches and author_matches else "review"
+        )
         rows_by_key[key]["scholar_checked_at"] = datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).replace(microsecond=0).isoformat()
         rows_by_key[key]["scholar_bib_path"] = str(path.relative_to(ROOT))
-        rows_by_key[key]["notes"] = f"Scholar title similarity={title_score:.3f}; year_match={year_matches}"
+        rows_by_key[key]["notes"] = (
+            f"Scholar title similarity={title_score:.3f}; year_match={year_matches}; "
+            f"first_author_match={author_matches}"
+        )
         checked += 1
     write_manifest(list(rows_by_key.values()))
     print(f"processed {checked} Scholar BibTeX receipts")
