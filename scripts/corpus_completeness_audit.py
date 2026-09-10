@@ -15,6 +15,7 @@ SCREENING = ROOT / "time_series_agent_screening_audit.csv"
 CHEN = ROOT / "references" / "reports" / "chen2026-system-coverage.csv"
 CHANG = ROOT / "references" / "source_snapshots" / "changsurvey2026" / "agentic-systems.csv"
 XU = ROOT / "references" / "source_snapshots" / "xu2026forecastagentsurvey" / "agentic-forecasting-systems.csv"
+PROMPTS = ROOT / "references" / "source_snapshots" / "promptstoagents2026" / "high-autonomy-papers.csv"
 OUTPUT = ROOT / "references" / "reports" / "corpus-completeness-audit.csv"
 REPORT = ROOT / "references" / "reports" / "corpus-completeness-audit.md"
 
@@ -42,6 +43,10 @@ def read(path: Path) -> list[dict[str, str]]:
 def normalized(value: str) -> str:
     value = re.sub(r"\\[A-Za-z]+\{([^}]*)\}", r"\1", value)
     return re.sub(r"[^a-z0-9]+", "", value.casefold())
+
+
+def normalized_doi(value: str) -> str:
+    return value.strip().casefold().removeprefix("https://doi.org/")
 
 
 def main() -> None:
@@ -82,6 +87,16 @@ def main() -> None:
         )
 
     known_titles = {normalized(row["title"]): row for row in rows}
+    known_arxiv = {
+        item["arxiv_id"]: known_titles[normalized(item["title_bib"])]
+        for item in manifest
+        if item["arxiv_id"]
+    }
+    known_doi = {
+        normalized_doi(item["doi"]): known_titles[normalized(item["title_bib"])]
+        for item in manifest
+        if item["doi"]
+    }
     for item in read(CHEN):
         if item["in_production_bib"] == "Yes":
             continue
@@ -157,6 +172,40 @@ def main() -> None:
             }
         )
         known_titles[title_key] = rows[-1]
+
+    for item in read(PROMPTS):
+        title_key = normalized(item["title"])
+        doi_candidates = [normalized_doi(part) for part in item["doi"].split(";") if part.strip()]
+        existing = known_arxiv.get(item["arxiv_id"]) if item["arxiv_id"] else None
+        if existing is None:
+            existing = next((known_doi[doi] for doi in doi_candidates if doi in known_doi), None)
+        if existing is None:
+            existing = known_titles.get(title_key)
+        if existing is not None:
+            if "promptstoagents2026" not in existing["candidate_source"]:
+                existing["candidate_source"] += ";promptstoagents2026_L3L4"
+            continue
+        rows.append(
+            {
+                "candidate_id": f"promptstoagents2026:{item['paper_id']}",
+                "citation_key": "",
+                "title": item["title"],
+                "year": item["year"],
+                "candidate_source": "promptstoagents2026_L3L4",
+                "in_production_bib": "No",
+                "in_classification_ledger": "No",
+                "screening_decision": "",
+                "coverage_status": "needs_scope_review",
+                "identity_status": "source_cited",
+                "scholar_status": "pending",
+                "review_note": f"High-autonomy candidate coded {item['A3_code']} ({item['A3_workflow_autonomy']}) in From Prompts to Agents; inspect the original paper before inclusion or exclusion.",
+            }
+        )
+        known_titles[title_key] = rows[-1]
+        if item["arxiv_id"]:
+            known_arxiv[item["arxiv_id"]] = rows[-1]
+        for doi in doi_candidates:
+            known_doi[doi] = rows[-1]
 
     with OUTPUT.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
