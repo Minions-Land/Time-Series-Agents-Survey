@@ -28,6 +28,17 @@ Task axes are also multi-label. They describe where a Harness mechanism is
 instantiated. A forecasting system that synthesizes training data and supports
 a downstream decision may therefore carry three task flags.
 
+## Competitor coverage
+
+`reports/chen2026-system-coverage.csv` audits the 47 systems in Table 3 of
+Chen et al., *LLM Agents for Time-Series: A Survey*, against both the production
+BibTeX and this classification ledger. The audit is generated from the cited
+table rows and bibliographic records in the official arXiv source snapshot, so
+method aliases are resolved through paper identity rather than name guessing.
+An absent system remains a coverage candidate until its original paper has
+been reviewed for scope and its bibliography has been verified; absence does
+not by itself imply either inclusion or exclusion.
+
 ## Evidence fields
 
 - `paper_claim_summary` records the main claim currently used by the survey.
@@ -60,6 +71,12 @@ membership agreement with the 77-work mechanism profile in `main.tex`.
 Use `bootstrap` only to reconstruct the initial ledger from the current
 manuscript and historical CSV files. It overwrites classification judgments and
 is not the normal update command.
+
+Regenerate the Chen et al. coverage audit with:
+
+```bash
+uv run scripts/audit_chen2026_coverage.py
+```
 
 When adding a paper:
 
