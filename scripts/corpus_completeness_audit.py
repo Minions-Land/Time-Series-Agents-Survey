@@ -18,6 +18,7 @@ XU = ROOT / "references" / "source_snapshots" / "xu2026forecastagentsurvey" / "a
 PROMPTS = ROOT / "references" / "source_snapshots" / "promptstoagents2026" / "high-autonomy-papers.csv"
 CHEN_REGISTRY = ROOT / "references" / "reports" / "chen2026-missing-system-registry.csv"
 PROMPT_REGISTRY = ROOT / "references" / "reports" / "promptstoagents-high-autonomy-registry.csv"
+COMPARISON_REGISTRY = ROOT / "references" / "reports" / "chang-xu-reviewed-registry.csv"
 SCOPE_DECISIONS = ROOT / "references" / "reports" / "production-bib-scope-decisions.csv"
 OUTPUT = ROOT / "references" / "reports" / "corpus-completeness-audit.csv"
 REPORT = ROOT / "references" / "reports" / "corpus-completeness-audit.md"
@@ -235,6 +236,7 @@ def main() -> None:
     # survey record only; it never upgrades a candidate to paper-verified.
     chen_registry = {normalized(row["title"]): row for row in read(CHEN_REGISTRY)}
     prompt_registry = {normalized(row["title"]): row for row in read(PROMPT_REGISTRY)}
+    comparison_registry = {normalized(row["title"]): row for row in read(COMPARISON_REGISTRY)}
     for row in rows:
         if row["in_classification_ledger"] == "Yes":
             continue
@@ -263,6 +265,16 @@ def main() -> None:
             row["coverage_status"] = "source_reviewed_not_included"
             row["review_note"] = registry["paper_claim_summary"] + " Evidence: " + registry["source_locator"]
         elif registry["scope_status"].startswith("include_candidate"):
+            row["coverage_status"] = "include_candidate_needs_coding"
+            row["review_note"] = registry["paper_claim_summary"] + " Evidence: " + registry["source_locator"]
+
+    for row in rows:
+        if row["in_classification_ledger"] == "Yes":
+            continue
+        registry = comparison_registry.get(normalized(row["title"]))
+        if registry is None:
+            continue
+        if registry["scope_status"].startswith("include_candidate"):
             row["coverage_status"] = "include_candidate_needs_coding"
             row["review_note"] = registry["paper_claim_summary"] + " Evidence: " + registry["source_locator"]
 
