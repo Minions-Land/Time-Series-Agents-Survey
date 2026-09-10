@@ -1,18 +1,18 @@
 # Classification ledger audit
 
-- Records: 77
-- Unique citation keys: 77
-- Primary loci: {'GH': 1, 'GTS': 16, 'TSK': 60}
-- Multi-label task-axis counts: {'anomaly_detection_diagnosis': 14, 'augmentation_synthesis': 7, 'decision_support': 9, 'forecasting_reasoning': 55}
-- BibTeX keys matched: 77/77
-- Reference manifest keys matched: 77/77
+- Records: 82
+- Unique citation keys: 82
+- Primary loci: {'GH': 2, 'GTS': 19, 'TSK': 61}
+- Multi-label task-axis counts: {'anomaly_detection_diagnosis': 16, 'augmentation_synthesis': 7, 'decision_support': 9, 'forecasting_reasoning': 59}
+- BibTeX keys matched: 82/82
+- Reference manifest keys matched: 82/82
 - Corpus completeness: not assessed by this structural validation
-- Errors: 0
+- Errors: 1
 - Warnings: 0
 
 ## Errors
 
-None.
+ledger/profile key mismatch: ledger_only=['castflow2026', 'genautoml2026', 'memcast2026', 'mosaic2026', 's2sfdd2026'], profile_only=[]
 
 ## Warnings
 
