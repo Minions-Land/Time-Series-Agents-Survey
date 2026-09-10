@@ -39,6 +39,12 @@ An absent system remains a coverage candidate until its original paper has
 been reviewed for scope and its bibliography has been verified; absence does
 not by itself imply either inclusion or exclusion.
 
+`reports/corpus-completeness-audit.csv` is the broader candidate queue. It
+combines every production-BibTeX entry with systems found in the Chen et al.
+table that are absent from that bibliography. Its `needs_scope_review` status
+is deliberately non-committal: neither citation by a prior survey nor presence
+in our bibliography proves that a work satisfies our runtime-scope rule.
+
 ## Evidence fields
 
 - `paper_claim_summary` records the main claim currently used by the survey.
@@ -76,6 +82,7 @@ Regenerate the Chen et al. coverage audit with:
 
 ```bash
 uv run scripts/audit_chen2026_coverage.py
+python3 scripts/corpus_completeness_audit.py
 ```
 
 When adding a paper:

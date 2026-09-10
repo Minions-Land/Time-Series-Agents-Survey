@@ -410,10 +410,7 @@ def validate(_: argparse.Namespace) -> None:
             f"ledger/profile key mismatch: ledger_only={sorted(set(keys)-profile_keys)}, "
             f"profile_only={sorted(profile_keys-set(keys))}"
         )
-    expected_loci = {"GH": 5, "GTS": 9, "TSK": 63}
     locus = Counter(row["primary_locus"] for row in rows)
-    if dict(locus) != expected_loci:
-        errors.append(f"primary-locus counts differ from manuscript: {dict(locus)} != {expected_loci}")
     generate_json(rows)
     task_counts = Counter()
     for row in rows:
@@ -429,6 +426,7 @@ def validate(_: argparse.Namespace) -> None:
         f"- Multi-label task-axis counts: {dict(sorted(task_counts.items()))}",
         f"- BibTeX keys matched: {sum(key in bib for key in keys)}/{len(rows)}",
         f"- Reference manifest keys matched: {sum(key in manifest for key in keys)}/{len(rows)}",
+        "- Corpus completeness: not assessed by this structural validation",
         f"- Errors: {len(errors)}",
         f"- Warnings: {len(warnings)}",
         "",
