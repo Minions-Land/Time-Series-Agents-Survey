@@ -1,8 +1,8 @@
 # Corpus completeness audit
 
-- Candidate work records: 168
-- Candidate sources: {'chen2026_table3': 31, 'production_bib': 137}
-- Coverage states: {'included_current_ledger': 77, 'needs_scope_review': 87, 'screened_not_included': 4}
+- Candidate work records: 181
+- Candidate sources: {'changsurvey2026_agent_tables': 5, 'chen2026_table3': 17, 'chen2026_table3;changsurvey2026_agent_tables': 8, 'chen2026_table3;changsurvey2026_agent_tables;xu2026forecastagentsurvey_tables': 6, 'production_bib': 123, 'production_bib;changsurvey2026_agent_tables': 8, 'production_bib;xu2026forecastagentsurvey_tables': 6, 'xu2026forecastagentsurvey_tables': 8}
+- Coverage states: {'included_current_ledger': 77, 'needs_scope_review': 100, 'screened_not_included': 4}
 - Current-ledger membership is a status under review, not evidence of corpus completeness.
 - `needs_scope_review` is not an inclusion decision.
 - Google Scholar verification remains independent of candidate discovery and scope review.

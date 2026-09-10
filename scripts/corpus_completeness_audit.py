@@ -13,6 +13,8 @@ MANIFEST = ROOT / "references" / "manifest.csv"
 LEDGER = ROOT / "paper_classification_ledger.csv"
 SCREENING = ROOT / "time_series_agent_screening_audit.csv"
 CHEN = ROOT / "references" / "reports" / "chen2026-system-coverage.csv"
+CHANG = ROOT / "references" / "source_snapshots" / "changsurvey2026" / "agentic-systems.csv"
+XU = ROOT / "references" / "source_snapshots" / "xu2026forecastagentsurvey" / "agentic-forecasting-systems.csv"
 OUTPUT = ROOT / "references" / "reports" / "corpus-completeness-audit.csv"
 REPORT = ROOT / "references" / "reports" / "corpus-completeness-audit.md"
 
@@ -104,6 +106,57 @@ def main() -> None:
                     "review_note": "Candidate identified from Chen et al. Table 3; inspect the original paper before inclusion or exclusion.",
                 }
             )
+            known_titles[normalized(title)] = rows[-1]
+
+    for item in read(CHANG):
+        title_key = normalized(item["title"])
+        if title_key in known_titles:
+            existing = known_titles[title_key]
+            if "changsurvey2026" not in existing["candidate_source"]:
+                existing["candidate_source"] += ";changsurvey2026_agent_tables"
+            continue
+        rows.append(
+            {
+                "candidate_id": f"changsurvey2026:{item['method']}",
+                "citation_key": "",
+                "title": item["title"],
+                "year": item["year"],
+                "candidate_source": "changsurvey2026_agent_tables",
+                "in_production_bib": "No",
+                "in_classification_ledger": "No",
+                "screening_decision": "",
+                "coverage_status": "needs_scope_review",
+                "identity_status": "source_cited",
+                "scholar_status": "pending",
+                "review_note": f"Candidate has non-zero T-Agent in Chang et al. {item['source_locator']}; inspect the original paper before inclusion or exclusion.",
+            }
+        )
+        known_titles[title_key] = rows[-1]
+
+    for item in read(XU):
+        title_key = normalized(item["title"])
+        if title_key in known_titles:
+            existing = known_titles[title_key]
+            if "xu2026forecastagentsurvey" not in existing["candidate_source"]:
+                existing["candidate_source"] += ";xu2026forecastagentsurvey_tables"
+            continue
+        rows.append(
+            {
+                "candidate_id": f"xu2026forecastagentsurvey:{item['method']}",
+                "citation_key": "",
+                "title": item["title"],
+                "year": item["year"],
+                "candidate_source": "xu2026forecastagentsurvey_tables",
+                "in_production_bib": "No",
+                "in_classification_ledger": "No",
+                "screening_decision": "",
+                "coverage_status": "needs_scope_review",
+                "identity_status": "source_cited",
+                "scholar_status": "pending",
+                "review_note": f"Agent-oriented forecasting candidate from Xu et al. {item['source_locator']}; inspect the original paper before inclusion or exclusion.",
+            }
+        )
+        known_titles[title_key] = rows[-1]
 
     with OUTPUT.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
