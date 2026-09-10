@@ -236,6 +236,13 @@ def main() -> None:
     for row in rows:
         registry = chen_registry.get(normalized(row["title"]))
         if registry is None:
+            title_key = normalized(row["title"])
+            registry = next(
+                (item for item in chen_registry.values()
+                 if normalized(item["chen_method"]) in title_key),
+                None,
+            )
+        if registry is None:
             continue
         if registry["original_paper_status"] == "paper_reviewed":
             row["coverage_status"] = "include_candidate_needs_coding"
