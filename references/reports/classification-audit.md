@@ -7,12 +7,12 @@
 - BibTeX keys matched: 82/82
 - Reference manifest keys matched: 82/82
 - Corpus completeness: not assessed by this structural validation
-- Errors: 1
+- Errors: 0
 - Warnings: 0
 
 ## Errors
 
-ledger/profile key mismatch: ledger_only=['castflow2026', 'genautoml2026', 'memcast2026', 'mosaic2026', 's2sfdd2026'], profile_only=[]
+None.
 
 ## Warnings
 

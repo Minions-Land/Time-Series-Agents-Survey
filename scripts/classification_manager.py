@@ -128,7 +128,7 @@ def clean_latex(value: str) -> str:
 
 def parse_profiles() -> list[dict[str, str]]:
     source = MAIN_TEX.read_text(encoding="utf-8")
-    start = source.index(r"\caption{Mechanism profiles of the 77 reviewed works.")
+    start = source.index(r"\caption{Mechanism profiles of the ")
     end = source.index(r"\bottomrule", start)
     row_re = re.compile(
         r"^(.*?)\\citep\{([^}]+)\}(.*?) & "
