@@ -236,6 +236,8 @@ def main() -> None:
     chen_registry = {normalized(row["title"]): row for row in read(CHEN_REGISTRY)}
     prompt_registry = {normalized(row["title"]): row for row in read(PROMPT_REGISTRY)}
     for row in rows:
+        if row["in_classification_ledger"] == "Yes":
+            continue
         registry = chen_registry.get(normalized(row["title"]))
         if registry is None:
             title_key = normalized(row["title"])
@@ -252,6 +254,8 @@ def main() -> None:
 
     # Apply source-reviewed statuses from the companion high-autonomy registry.
     for row in rows:
+        if row["in_classification_ledger"] == "Yes":
+            continue
         registry = prompt_registry.get(normalized(row["title"]))
         if registry is None:
             continue
