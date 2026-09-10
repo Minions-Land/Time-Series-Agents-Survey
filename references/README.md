@@ -53,6 +53,8 @@ uv run scripts/reference_manager.py validate-pdfs
 uv run scripts/reference_manager.py scholar-check
 uv run scripts/reference_manager.py audit
 uv run scripts/scholar_fetch.py --limit 10
+uv run scripts/classification_manager.py sync
+uv run scripts/classification_manager.py validate
 ```
 
 `inventory` is non-destructive: it rebuilds bibliographic columns while retaining
@@ -80,3 +82,10 @@ uses one normal session, saves only a matching raw receipt, and stops on HTTP
 403/429/503 or a Scholar challenge. It does not rotate proxies, retry around a
 challenge, or rewrite `TS_AGENT_HARNESS_SURVEY.bib`. Manual browser acquisition
 remains the fallback for entries left pending.
+
+Work-level claims and taxonomy assignments are maintained in
+`paper_classification_ledger.csv`, with a generated JSON mirror. See
+`references/CLASSIFICATION_LEDGER.md` for the two-axis schema and update rules.
+The classification ledger reads bibliographic and Scholar status from this
+reference manifest; it does not replace the production BibTeX or elevate an
+unverified metadata source to Scholar evidence.
