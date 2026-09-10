@@ -231,6 +231,14 @@ def main() -> None:
     # The registry preserves the full set of Chen Table 3 systems that were
     # absent from the production bibliography.  It is an identity/source
     # survey record only; it never upgrades a candidate to paper-verified.
+    chen_registry = {normalized(row["title"]): row for row in read(CHEN_REGISTRY)}
+    for row in rows:
+        registry = chen_registry.get(normalized(row["title"]))
+        if registry is None:
+            continue
+        if registry["original_paper_status"] == "paper_reviewed":
+            row["coverage_status"] = "include_candidate_needs_coding"
+            row["review_note"] = registry["paper_claim_summary"] + " Evidence: " + registry["paper_evidence_locator"]
 
     with OUTPUT.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
