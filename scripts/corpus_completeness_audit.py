@@ -16,6 +16,7 @@ CHEN = ROOT / "references" / "reports" / "chen2026-system-coverage.csv"
 CHANG = ROOT / "references" / "source_snapshots" / "changsurvey2026" / "agentic-systems.csv"
 XU = ROOT / "references" / "source_snapshots" / "xu2026forecastagentsurvey" / "agentic-forecasting-systems.csv"
 PROMPTS = ROOT / "references" / "source_snapshots" / "promptstoagents2026" / "high-autonomy-papers.csv"
+SCOPE_DECISIONS = ROOT / "references" / "reports" / "production-bib-scope-decisions.csv"
 OUTPUT = ROOT / "references" / "reports" / "corpus-completeness-audit.csv"
 REPORT = ROOT / "references" / "reports" / "corpus-completeness-audit.md"
 
@@ -37,7 +38,11 @@ FIELDS = [
 
 def read(path: Path) -> list[dict[str, str]]:
     with path.open(encoding="utf-8-sig", newline="") as handle:
-        return list(csv.DictReader(handle))
+        reader = csv.DictReader(handle)
+        rows = list(reader)
+        if None in (reader.fieldnames or ()) or any(None in row for row in rows):
+            raise ValueError(f"Malformed CSV columns in {path}")
+        return rows
 
 
 def normalized(value: str) -> str:
@@ -53,6 +58,7 @@ def main() -> None:
     manifest = read(MANIFEST)
     ledger = {row["citation_key"]: row for row in read(LEDGER)}
     screening = {row["citation_key"]: row for row in read(SCREENING)}
+    scope_decisions = {row["citation_key"]: row for row in read(SCOPE_DECISIONS)}
     rows = []
 
     for item in manifest:
@@ -60,12 +66,26 @@ def main() -> None:
         screen = screening.get(key, {})
         in_ledger = key in ledger
         decision = screen.get("decision", "")
+        preliminary = scope_decisions.get(key, {})
         if in_ledger:
             status = "included_current_ledger"
             note = "Membership exists; original-paper claim and taxonomy evidence may still require review."
         elif decision.startswith("EXCLUDE") or decision == "CITE_ONLY_RELATED_WORK":
             status = "screened_not_included"
             note = screen.get("notes", "Existing screening decision; recheck when source coverage changes.")
+        elif preliminary:
+            decision = preliminary["decision"]
+            if decision == "INCLUDE_CANDIDATE":
+                status = "include_candidate_needs_coding"
+            elif decision == "BOUNDARY_REVIEW":
+                status = "needs_scope_review"
+            else:
+                status = (
+                    "source_reviewed_not_included"
+                    if preliminary["review_status"] == "source_reviewed"
+                    else "preliminary_not_included"
+                )
+            note = preliminary["reason"] + " Evidence: " + preliminary["evidence_basis"]
         else:
             status = "needs_scope_review"
             note = "Bibliography membership alone does not decide corpus eligibility."
