@@ -16,6 +16,7 @@ CHEN = ROOT / "references" / "reports" / "chen2026-system-coverage.csv"
 CHANG = ROOT / "references" / "source_snapshots" / "changsurvey2026" / "agentic-systems.csv"
 XU = ROOT / "references" / "source_snapshots" / "xu2026forecastagentsurvey" / "agentic-forecasting-systems.csv"
 PROMPTS = ROOT / "references" / "source_snapshots" / "promptstoagents2026" / "high-autonomy-papers.csv"
+CHEN_REGISTRY = ROOT / "references" / "reports" / "chen2026-missing-system-registry.csv"
 SCOPE_DECISIONS = ROOT / "references" / "reports" / "production-bib-scope-decisions.csv"
 OUTPUT = ROOT / "references" / "reports" / "corpus-completeness-audit.csv"
 REPORT = ROOT / "references" / "reports" / "corpus-completeness-audit.md"
@@ -226,6 +227,10 @@ def main() -> None:
             known_arxiv[item["arxiv_id"]] = rows[-1]
         for doi in doi_candidates:
             known_doi[doi] = rows[-1]
+
+    # The registry preserves the full set of Chen Table 3 systems that were
+    # absent from the production bibliography.  It is an identity/source
+    # survey record only; it never upgrades a candidate to paper-verified.
 
     with OUTPUT.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
