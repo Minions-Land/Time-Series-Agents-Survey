@@ -48,6 +48,7 @@ def read(path: Path) -> list[dict[str, str]]:
 
 def normalized(value: str) -> str:
     value = re.sub(r"\\[A-Za-z]+\{([^}]*)\}", r"\1", value)
+    value = value.replace("{", "").replace("}", "")
     return re.sub(r"[^a-z0-9]+", "", value.casefold())
 
 
