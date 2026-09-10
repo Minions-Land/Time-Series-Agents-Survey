@@ -297,6 +297,9 @@ def main() -> None:
         "- Current-ledger membership is a status under review, not evidence of corpus completeness.",
         "- `needs_scope_review` is not an inclusion decision.",
         "- Google Scholar verification remains independent of candidate discovery and scope review.",
+        f"- Chen missing-system registry: {len(read(CHEN_REGISTRY))} records; paper-reviewed: {sum(row['original_paper_status'] == 'paper_reviewed' for row in read(CHEN_REGISTRY))}.",
+        f"- Companion high-autonomy registry: {len(read(PROMPT_REGISTRY))} records; paper-reviewed: {sum(row['original_paper_status'] == 'paper_reviewed' for row in read(PROMPT_REGISTRY))}.",
+        f"- Chang/Xu reviewed registry: {len(read(COMPARISON_REGISTRY))} records; paper-reviewed: {sum(row['original_paper_status'] == 'paper_reviewed' for row in read(COMPARISON_REGISTRY))}.",
         "",
         "The 31 Chen-source records correspond to 30 systems absent from the production bibliography; ElliottAgents cites two underlying papers.",
     ]
