@@ -1,11 +1,11 @@
 # Classification ledger audit
 
-- Records: 100
-- Unique citation keys: 100
-- Primary loci: {'GH': 2, 'GTS': 24, 'TSK': 74}
-- Multi-label task-axis counts: {'anomaly_detection_diagnosis': 18, 'augmentation_synthesis': 12, 'decision_support': 22, 'forecasting_reasoning': 66}
-- BibTeX keys matched: 100/100
-- Reference manifest keys matched: 100/100
+- Records: 136
+- Unique citation keys: 136
+- Primary loci: {'GH': 5, 'GTS': 9, 'TSK': 122}
+- Multi-label task-axis counts: {'anomaly_detection_diagnosis': 23, 'augmentation_synthesis': 18, 'decision_support': 23, 'forecasting_reasoning': 81}
+- BibTeX keys matched: 136/136
+- Reference manifest keys matched: 136/136
 - Corpus completeness: not assessed by this structural validation
 - Errors: 0
 - Warnings: 0
