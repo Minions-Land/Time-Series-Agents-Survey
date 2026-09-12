@@ -79,6 +79,7 @@ FIELDS = [
     "scholar_bib_path",
     "bib_sync_status",
     "classification_notes",
+    "source_evidence_json",
 ]
 
 MODULE_RULES = {
@@ -320,6 +321,7 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                     "evidence_basis": row["claim_evidence_basis"],
                     "review_status": row["claim_review_status"],
                 },
+                "source_evidence": json.loads(row["source_evidence_json"]) if row.get("source_evidence_json") else [],
                 "harness": {
                     "primary_locus": row["primary_locus"],
                     "primary_contribution": row["primary_contribution"],
