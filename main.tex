@@ -138,7 +138,7 @@
   bottom=12pt
 ]
 \textbf{Abstract.}
-Time-series analysis increasingly combines predictive models with LLM agents that retrieve temporal context, call analytical tools, validate intermediate results, and revise decisions. This survey asks how such systems are constructed from an LLM and its surrounding Harness. We first classify the general Harness using concepts synthesized from Harness surveys; we then separate the Time-Series Harness into mechanisms that generalize across temporal tasks and mechanisms tied to a particular task. Task categories enter at this point as the natural basis for identifying task-specific contracts. We use this framework to compare the contributions of 82 reviewed works and organize evaluation from agent execution to temporal consistency and task performance. The resulting synthesis identifies opportunities for reusable temporal infrastructure, reliable memory and tool use, component adaptation, and downstream decision support.
+Time-series analysis increasingly combines predictive models with LLM agents that retrieve temporal context, call analytical tools, validate intermediate results, and revise decisions. This survey asks how such systems are constructed from an LLM and its surrounding Harness. We first classify the general Harness using concepts synthesized from Harness surveys; we then separate the Time-Series Harness into mechanisms that generalize across temporal tasks and mechanisms tied to a particular task. Task categories enter at this point as the natural basis for identifying task-specific contracts. We use this framework to compare the contributions of 139 reviewed works and organize evaluation from agent execution to temporal consistency and task performance. The resulting synthesis identifies opportunities for reusable temporal infrastructure, reliable memory and tool use, component adaptation, and downstream decision support.
 \end{tcolorbox}
 
 \textbf{Keywords}: time series agents, LLM agents, temporal reasoning, time series foundation models, contextualized time series, tool use, memory, benchmark, harness.
@@ -881,7 +881,7 @@ TimeClaw-Harness \citep{timeclaw2026harness} & Contextualized TS tasks & CiK, TS
 
 Imputation is retained as a reserved task family, but the maintained ledger contains no dedicated imputation-agent system. In the reviewed snapshot, imputation appears as a temporal operation or tool-library capability rather than as the primary task-specific module.
 
-\section{Evaluation: From Output Metrics to Process Metrics}
+\section{Evaluation: From Output Metrics to Process Metrics}\label{sec:evaluation}
 
 Evaluation in this survey follows the same contribution-locus axis used throughout the paper: \GeneralHarness{} (\layerGH{}), \GeneralTSHarness{} (\layerGTS{}), and \TaskSpecificHarness{} (\layerTSK{}). The reason is structural. If a Time Series Agent is scored only by output accuracy---the forecast error, the classification score, the detection F1---then only one of the three layers has actually been measured, and it is not the layer where most agentic contribution is claimed. An agent can produce an accurate number through an unfaithful tool call, a leaked future window, or an unverifiable evidence chain, and an output-only metric will not notice. We therefore organize evaluation as \layerGH{} process metrics, \layerGTS{} cross-task temporal contracts, and \layerTSK{} per-task instantiations, mirroring the ledger of Section~5.
 
@@ -1005,7 +1005,40 @@ Output auditability & Core auditability EA/AP/OM; conditional uncertainty ED/EA 
 
 Two observations from Section~5 line up here, and the alignment is worth stating carefully. In the corrected ledger snapshot, the \layerGTS{} layer is both the least standardized to evaluate (Section~6.2) and the sparser of the two \emph{time-series-specific} layers in the ledger's \emph{primary}-contribution count (Section~5, \layerGTS{} 9/77 against \layerTSK{} 63/77; the \layerGH{} layer, at 5/77, is domain-independent general-agent infrastructure and therefore falls outside this time-series-specific comparison). This 81.8\% task-specific share is a distributional description of the reviewed corpus, not evidence about evaluation maturity or causal proof that cross-task infrastructure is underdeveloped. The word \emph{sparse} needs a qualification: it is partly an artifact of the single-primary-locus counting rule, since Table~\ref{tab:agent-ledger} shows that almost every system touches \layerGTS{} as a secondary contribution, and the reviewed literature often reports task-specific proxies or instantiations of the obligations rather than shared cross-task instruments. The honest statement is therefore not that the cross-task layer is unbuilt or unmeasured, but that it has not been raised to a first-class, cross-task \emph{contract}: it is contributed to and measured task by task, not as a layer in its own right under a shared applicability-and-failure protocol. These remain two independent observations---one about evaluation practice, one about contribution distribution---and the ledger statistic does not \emph{prove} anything about evaluation maturity. We offer the shared-root-cause reading---few first-class \layerGTS{} contributions and little standardized cross-task evaluation both following from the same failure to treat the temporal layer as a first-class object---as a conjecture to be tested, not as a conclusion the counts establish.
 
-\section{Research Infrastructure and Open Problems}
+\section{Benchmarks and Open-Source Evaluation Infrastructure}
+
+Once an agent has been assembled from an LLM, a General Harness, and a Time-Series Harness Module, evaluation must test both the runtime and the temporal work it performs. A single task score cannot determine whether an agent selected valid tools, respected the information boundary, preserved numerical semantics, grounded context, or produced a reproducible artifact. We therefore separate evaluation into two linked chapters: Section~\ref{sec:evaluation} defines the evaluation dimensions and evidence maturity; this section inventories benchmark families and open-source infrastructure that can instantiate those dimensions.
+
+\subsection{Benchmark landscape}
+
+Existing benchmarks cover different parts of the agent contract. Forecasting and prediction suites measure point or probabilistic accuracy under chronological splits; anomaly and diagnosis suites measure detection, localization, root-cause attribution, and evidence quality; contextual and multimodal suites test whether text, images, events, and numerical signals are aligned; and time-series question-answering suites test grounded analytical responses. Agent-oriented benchmarks add tool selection, code execution, trajectory quality, validation, cost, and revision behavior. These families should be reported separately because a strong task score does not establish process validity, and a valid process does not guarantee useful task output.
+
+For each benchmark, our ledger records the task contract, temporal split or availability rule, required tools and artifacts, process-level signals, task-level metrics, and whether the benchmark is an established evaluation or an adjacent proxy. The same paper may therefore appear in more than one benchmark family when it evaluates distinct contracts.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}lXX@{}}
+\toprule
+\textbf{Benchmark family} & \textbf{What it evaluates} & \textbf{What it cannot establish alone}\\
+\midrule
+Forecasting and prediction & Horizon-respecting accuracy, probabilistic calibration, revision utility, and deployment robustness. & General tool validity, memory provenance, or cross-task Harness reuse.\\
+Anomaly detection and diagnosis & Detection, localization, root-cause attribution, explanation, and mitigation evidence. & Whether the agent preserves temporal state or avoids leakage outside the tested protocol.\\
+Contextual and multimodal analysis & Alignment of signals with events, text, images, and domain context; distractor resistance. & General decision quality or faithful execution of arbitrary temporal tools.\\
+Time-series QA and reasoning & Answer correctness, evidence grounding, numerical reasoning, and multi-step analysis. & Forecast deployment behavior and downstream operational consequences.\\
+Agent-process evaluation & Tool selection, trace faithfulness, code execution, validation, cost, review burden, and reproducibility. & Task utility unless paired with a temporal task benchmark.\\
+\bottomrule
+\end{tabularx}
+\caption{Benchmark families should be combined by contract rather than collapsed into one score.}
+\label{tab:benchmark-families}
+\end{table}
+
+\subsection{Open-source projects and reusable evaluation assets}
+
+Open-source systems make the evaluation contract executable. TimeClaw provides temporal tools, trajectories, memory, and capability evolution; AION provides task files, workspaces, validation interfaces, and layered review; TimeSeriesGym evaluates machine-learning engineering workflows; and TSQA, MMTS-Bench, Time-MQA, TSRBench, and related resources provide task-level suites for reasoning and contextual analysis. These projects are complementary: a benchmark dataset supplies cases and labels, while a Harness repository supplies tools, state schemas, traces, and validators.
+
+A reproducible evaluation release should therefore include the benchmark data and splits, the agent and tool versions, the temporal availability policy, all intermediate artifacts, the trace and evidence schema, the validator implementation, and the cost and failure logs. Without these artifacts, a reported score cannot distinguish model capability from retrieval, tool, memory, or evaluator behavior.
+
+\section{Open Problems and Case Studies}
 
 \subsection{Reusable infrastructure}
 
@@ -1045,6 +1078,12 @@ Current infrastructure-oriented systems point to three practical requirements: a
 \keyterm{Self-evolving components without regression.} Recent systems suggest that tools, prompts, action-selection modules, skills, and memories can evolve \citep{timeclaw2026explore,timeclaw2026harness,aion2026,castr12026,kairosagent2026}. The open challenge is to verify improvement without overfitting to benchmarks or violating temporal constraints.
 
 \keyterm{Decision-centric evaluation.} The scope of the six temporal design obligations ends at output verification; decision-making is the next lifecycle stage and remains deliberately open rather than being relabeled as a seventh obligation. Many applications require inventory decisions, trading policies, grid control, diagnosis escalation, clinical triage, or maintenance scheduling. Time Series Agent benchmarks should therefore evaluate downstream action quality, counterfactual consequences, and accountability, not only predictive error.
+
+\subsection{Case study: LLM-side contributions in the ChatTS line}
+
+The ChatTS line illustrates why the LLM component must remain explicit in the taxonomy. ChatTS does not merely add a forecasting tool around a frozen language model; it contributes synthetic instruction data, time-series dialogue, and reasoning supervision that align the language model with temporal inputs and analytical operations. Its contribution is therefore recorded in the LLM-component field, while the resulting temporal interface and dialogue contract may also receive GTS or TSK labels. This is a simultaneous contribution, not a forced choice between ``model'' and ``Harness''.
+
+The case also gives a practical review rule. When a paper changes the language model's temporal perception, alignment, or reasoning capability, the reviewer should quote the training or alignment evidence separately from the runtime evidence. When it changes planning, tools, memory, state, or verification around an unchanged model, the contribution belongs primarily to the Harness. When both change, both records should be retained and the primary locus should be used only for aggregate counting.
 
 \section{Conclusion}
 
