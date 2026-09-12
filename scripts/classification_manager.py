@@ -133,19 +133,22 @@ def parse_profiles() -> list[dict[str, str]]:
     start = source.index(r"\caption{Mechanism profiles of the ")
     end = source.index(r"\bottomrule", start)
     row_re = re.compile(
-        r"^(.*?)\\citep\{([^}]+)\}(.*?) & "
+        r"^(?:(.*?)\\citep\{([^}]+)\}|(.*?)(?:\\RepoMoirai|\\RepoLLMTSFD))(.*?) & "
         r"\\textbf\{GH:\} (.*?)\\newline"
         r"\\textbf\{GTS:\} (.*?)\\newline"
         r"\\textbf\{TSK:\} (.*?)\\\\\\midrule$"
     )
     profiles = []
     for line in source[start:end].splitlines():
-        if r"\citep{" not in line or r"\textbf{GH:}" not in line:
+        if (r"\citep{" not in line and r"\RepoMoirai" not in line and r"\RepoLLMTSFD" not in line) or r"\textbf{GH:}" not in line:
             continue
         match = row_re.match(line)
         if not match:
             raise ValueError(f"Cannot parse mechanism-profile row: {line[:160]}")
-        work, key, metadata, gh, gts, tsk = match.groups()
+        work, key, alt_work, metadata, gh, gts, tsk = match.groups()
+        if key is None:
+            work = alt_work
+            key = "moiraiagent2026" if r"\RepoMoirai" in line else "zhang2025llm"
         month_match = re.search(r"(?:^|\s)([A-Z][a-z]{2})'(\d{2})", metadata)
         public_month = ""
         if month_match:
@@ -387,7 +390,8 @@ def validate(_: argparse.Namespace) -> None:
         errors.append("duplicate citation keys in classification ledger")
     for row in rows:
         key = row["citation_key"]
-        if key not in bib:
+        repo_only = manifest.get(key, {}).get("source_kind") == "github" and manifest.get(key, {}).get("pdf_expected", "").lower() == "false"
+        if key not in bib and not repo_only:
             errors.append(f"{key}: missing from production BibTeX")
         if key not in manifest:
             errors.append(f"{key}: missing from reference manifest")
