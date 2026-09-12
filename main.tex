@@ -22,6 +22,7 @@
 \usepackage{graphicx}
 \usepackage{tcolorbox}
 \usepackage{tikz}
+\usetikzlibrary{positioning}
 \usepackage{pdflscape}
 
 \geometry{
@@ -180,6 +181,24 @@ A mechanism belongs to GH when its design remains useful beyond time-series appl
 These judgments apply to mechanisms rather than entire papers: one system can combine general memory and reflection, cross-task temporal tools, and a forecasting-specific validation loop. Changing from financial forecasting to traffic forecasting changes the application domain but preserves the forecasting task family; it therefore does not by itself establish cross-task generality.
 
 The resulting hierarchy is the organizing structure of this survey:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[font=\sffamily, node distance=7mm, >=stealth]
+  \tikzset{box/.style={rounded corners=3pt, draw=surveyBlue, line width=.8pt, fill=surveyBlue!6, align=center, minimum height=10mm, text width=0.25\textwidth}, arrow/.style={->, line width=1pt, draw=surveyBlue!75}}
+  \node[box] (llm) {LLM\ Component\\language, reasoning, planning};
+  \node[box, right=of llm] (gh) {General Harness\\tools, memory, control, execution};
+  \node[box, right=of gh] (ts) {Time-Series Harness Module\\temporal state, operations, grounding, validation};
+  \node[box, below=of ts] (gts) {General Time-Series Harness\\reusable across temporal tasks};
+  \node[box, below=of gh] (tsk) {Task-Specific Harness\\task contract, reward, verifier};
+  \draw[arrow] (llm) -- (gh);
+  \draw[arrow] (gh) -- (ts);
+  \draw[arrow] (ts) -- (gts);
+  \draw[arrow] (ts) -- (tsk);
+\end{tikzpicture}
+\caption{Construction logic of a Time-Series Agent. The LLM contribution and Harness contributions are recorded separately; the temporal module branches into mechanisms reusable across tasks and mechanisms bound to a task contract.}
+\label{fig:agent-construction}
+\end{figure}
 
 \begin{table}[htbp]
 \centering\small
@@ -740,6 +759,22 @@ TimeClaw-Harness \citep{timeclaw2026harness} & Contextualized TS tasks & CiK, TS
 Imputation is retained as a reserved task family, but the maintained ledger contains no dedicated imputation-agent system. In the reviewed snapshot, imputation appears as a temporal operation or tool-library capability rather than as the primary task-specific module.
 
 \section{Evaluation: From Output Metrics to Process Metrics}\label{sec:evaluation}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[font=\sffamily, >=stealth]
+  \tikzset{layer/.style={rounded corners=4pt, draw=#1!70!black, fill=#1!16, minimum width=.82\textwidth, minimum height=13mm, align=center, line width=.9pt}}
+  \node[layer=surveyBlue] (p) {General Harness evaluation\\planning, tools, execution, state, traces, verification};
+  \node[layer=surveyGreen, below=5mm of p] (t) {General Time-Series Harness evaluation\\temporal causality, numerical fidelity, state integrity, temporal grounding};
+  \node[layer=surveyGold, below=5mm of t] (k) {Task-Specific evaluation\\forecasting, anomaly diagnosis, QA, augmentation, decision support};
+  \draw[->, line width=1pt] (p) -- (t);
+  \draw[->, line width=1pt] (t) -- (k);
+\end{tikzpicture}
+\caption{Evaluation should follow the same construction hierarchy as the agent: process validity first, temporal-contract validity second, and task utility third.}
+\label{fig:evaluation-stack}
+\end{figure}
+
+
 
 Evaluation in this survey follows the same contribution-locus axis used throughout the paper: \GeneralHarness{} (\layerGH{}), \GeneralTSHarness{} (\layerGTS{}), and \TaskSpecificHarness{} (\layerTSK{}). The reason is structural. If a Time Series Agent is scored only by output accuracy---the forecast error, the classification score, the detection F1---then only one of the three layers has actually been measured, and it is not the layer where most agentic contribution is claimed. An agent can produce an accurate number through an unfaithful tool call, a leaked future window, or an unverifiable evidence chain, and an output-only metric will not notice. We therefore organize evaluation as \layerGH{} process metrics, \layerGTS{} cross-task temporal contracts, and \layerTSK{} per-task instantiations, mirroring the ledger of Section~5.
 
