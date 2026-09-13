@@ -277,22 +277,13 @@ This survey makes four contributions.
 
 \subsection{The basic construction}
 
-We start with a simple construction. An LLM becomes useful as an agent when a surrounding system gives it tools, state, memory, execution, and checks. A time-series agent adds temporal data structures and operations to that system. We then ask how far each mechanism can be reused: the labels GH, GTS, and TSK can coexist within one paper, and Table~\ref{tab:mechanism-decision} summarizes their boundaries.
+We start with a simple construction. An LLM becomes useful as an agent when a surrounding system gives it tools, state, memory, execution, and checks. A time-series agent adds temporal data structures and operations to that system. We then ask how far each mechanism can be reused. The labels are mechanism-level descriptors and may coexist within one paper:
 
-\begin{table}[htbp]
-\centering\small
-\begin{tabularx}{\textwidth}{@{}lXXX@{}}
-\toprule
-Layer & Judgment & Reuse test & Example\\
-\midrule
-GH & Independent of temporal assumptions. & Replace time-series data with another domain; retain the mechanism. & General memory retrieval, reflection, planning, or orchestration.\\
-GTS & Requires temporal data, but supports different task families. & Replace forecasting with detection or QA; retain core temporal state and operations. & Time-indexed workspaces, temporal slicing, alignment, and leakage guards.\\
-TSK & Core design depends on a task-family objective. & Changing task family requires new state, actions, reward, or verifier. & Horizon-specific backtesting or anomaly-localization verification.\\
-\bottomrule
-\end{tabularx}
-\caption{Mechanism-level criteria for GH, GTS, and TSK. A paper may contribute to several layers.}
-\label{tab:mechanism-decision}
-\end{table}
+\begin{itemize}
+  \item \textbf{GH (General Harness)}: the mechanism does not rely on temporal assumptions and can be transferred to another domain while preserving its core design. Examples include general memory retrieval, reflection, planning, and orchestration.
+  \item \textbf{GTS (General Time-Series Harness)}: the mechanism requires temporal data or operations but remains reusable across time-series task families. Examples include time-indexed workspaces, temporal slicing, alignment, and leakage guards.
+  \item \textbf{TSK (Task-Specific Harness)}: the mechanism is structurally tied to a task-family contract, so changing the task requires redesigning its state, actions, reward, tool semantics, or verifier. Examples include horizon-specific backtesting and anomaly-localization verification.
+\end{itemize}
 
 Chen et al.\ \citep{chen2026tsagentsurvey} provide a useful task-oriented summary of the field, covering forecasting and reasoning, augmentation and synthesis, anomaly detection and diagnosis, and decision support. We use these families as descriptive entry points for the literature and for the task-facing examples below. They are not an additional layer in our framework: the central question remains how the Harness mechanism is reused across domains and task settings, and whether a task-specific contract must be redesigned.
 
@@ -468,24 +459,15 @@ After de-duplication, a work is in scope when temporal data are its primary obje
 
 Screening, locus, and self-claim are independent judgments. A paper can therefore enter the corpus without calling itself an agent, and an uncertain locus assignment is held as \emph{pending} rather than used to reverse the inclusion decision. No work in the current ledger remains pending.
 
-\textbf{Classification.} Table~\ref{tab:locus-rubric} gives the decision rule supplied to coders. For a system or method, the operative boundary between \layerGTS{} and \layerTSK{} is structural. A mechanism is \layerGTS{} when it requires a temporal object but can instantiate different queries, answer schemas, or output adapters without redesigning its core temporal state, action space, tool semantics, reward, or verifier. A dynamically instantiated query contract is therefore not, by itself, sufficient for \layerTSK{}. The mechanism is \layerTSK{} only when those core elements are structurally tied to a fixed task-family output contract---for example, a forecasting horizon and metric reward, a label space, or an anomaly definition---such that changing task family requires redesign. Demonstration on multiple task families raises confidence but does not itself change the locus.
+\textbf{Classification.} The primary-locus decision uses the same structural rule for systems, methods, and benchmarks:
 
-\begin{table}[!htbp]
-\centering
-\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{tabularx}{\textwidth}{L{0.17\textwidth} L{0.25\textwidth} L{0.28\textwidth} X}
-\toprule
-\textbf{Work type} & \textbf{\layerGH{}} & \textbf{\layerGTS{}} & \textbf{\layerTSK{}}\\
-\midrule
-\typeSM{} & Main contribution introduces no temporal-specific assumption. & Main mechanism is tied to the temporal substrate; dynamic queries or output adapters can change without redesigning its core runtime. & Core state, actions, reward, tool semantics, or verifier are structurally tied to a fixed task-family output contract.\\
-\typeBench{} & Measures domain-agnostic agent planning, tools, or control. & Measures cross-task temporal contracts or temporal-agent robustness. & Measures one temporal task family.\\
-\bottomrule
-\end{tabularx}
-\caption{Decision rubric for assigning the primary contribution locus.}
-\label{tab:locus-rubric}
-\end{table}
+\begin{itemize}
+  \item Assign \layerGH{} when the main mechanism introduces no temporal-specific assumption, or when a benchmark measures domain-agnostic agent planning, tools, or control.
+  \item Assign \layerGTS{} when the mechanism is tied to a temporal substrate but can support different task families without redesigning its core runtime, or when a benchmark measures cross-task temporal contracts or temporal-agent robustness.
+  \item Assign \layerTSK{} when the core state, actions, reward, tool semantics, or verifier is structurally tied to a fixed task-family output contract, or when a benchmark measures one temporal task family.
+\end{itemize}
+
+For a system or method, the operative boundary between \layerGTS{} and \layerTSK{} is structural. A dynamically instantiated query contract is not, by itself, sufficient for \layerTSK{}; changing task family must require redesign of a core runtime element. Demonstration on multiple task families raises confidence but does not itself change the locus.
 
 Mechanism descriptions retain all applicable layers. The existing primary-locus counts summarize the dominant emphasis recorded in the original work-level classification; they do not impose an exclusive category on a paper or measure the prevalence of every mechanism. The detailed profiles below show the mechanisms at each layer.
 
