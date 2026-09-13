@@ -1,6 +1,11 @@
-# 2026 Agent-survey handoff
+# 2026 Agent-survey handoff (abandoned)
 
-这份清单只包含本轮尚未同时取得“全文 PDF + Google Scholar 原始 BibTeX”的综述。Meng et al. 的 Harness 综述已经完成，不需要重复补。
+> **Status: abandoned by decision.** The seven entries below are no longer
+> acquisition targets and must not be added to the production bibliography,
+> paper taxonomy, notable table, or manuscript claims. The file is retained
+> only as an audit trail.
+
+这份清单记录了本轮曾经考虑、但现已放弃的综述。Meng et al. 的 Harness 综述已经完成，不需要重复补。
 
 ## 你需要为每篇论文补什么
 
@@ -58,4 +63,3 @@ agent-survey-handoff/
 - 只收到 Bib、没有 PDF：保留为 `bib_only`，不进行 claim-level 编码。
 - Scholar 没有精确条目：记录 `no_exact_scholar_result`，不猜测、不替换版本。
 - 全部通过后，才会进入正式 bibliography、notable table 和正文 claim。
-
