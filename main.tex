@@ -186,6 +186,8 @@ These judgments apply to mechanisms rather than entire papers: one system can co
 
 The resulting hierarchy is the organizing structure of this survey. Time-Series Agent is the outer concept; its LLM side is independent of the nested Harness side, where General Harness contains the General Time-Series Harness Module and the latter contains Task-Specific Harness Modules.
 
+Our central unit of evidence is a \emph{module-level paper card}. Each card links a work's verified identity and BibTeX record to its central claim, source quotation and locator, LLM-side contribution, Harness modules, task contract, evaluation evidence, and review status. This representation follows the three directions along which Time-Series Agents develop: stronger Agent capabilities, stronger temporal capabilities on the LLM side, and new time-series tasks. It therefore provides a common place for existing and future work: a new paper can add a card, extend a module, or introduce a task-specific branch without changing the construction hierarchy. The resulting goal is a stable reference survey rather than a fixed list of papers.
+
 \begin{table}[htbp]
 \centering\small
 \begin{tabularx}{\textwidth}{@{}lX@{}}
@@ -261,6 +263,7 @@ This survey makes four contributions.
   \item We separate general agent mechanisms, capabilities shared across time-series tasks, and mechanisms tied to one task, while allowing a work to contribute at several levels.
   \item We review the literature with explicit inclusion and comparison rules, and release a module-level ledger that records each paper's claim, evidence locator, contribution layer, task contract, and review status in a machine-readable form.
   \item We connect system capabilities to evaluation, benchmarks, open-source resources, and open problems, including the transition from prediction to decision support.
+  \item We show how the paper-card ledger turns the survey into an extensible research map: the same records that support classification also expose missing temporal contracts, evaluation gaps, and future research directions.
 \end{enumerate}
 
 \begin{figure}[H]
@@ -564,6 +567,8 @@ A reusable benchmark stack should therefore include a time-indexed workspace, ex
 Time-Series Agents need shared workspaces, temporal tool contracts, evidence schemas, validators, and reproducible execution. ModernTSF, TimeClaw, AION, and related projects show complementary pieces of this stack.
 
 \subsection{Open problems}
+
+The paper-card ledger makes these open problems explicit. Because each card separates the claim, module, task contract, and evidence, an empty or weakly populated region is a structural gap rather than an impression from a narrative reading. Across the reviewed cards, the clearest gaps occur at the interfaces between layers: model-side temporal understanding is rarely connected to auditable Harness state; reusable temporal modules are often evaluated through a single task; and task-specific systems seldom report decision feedback, revision behavior, or deployment cost. New papers can therefore be assessed by asking which card field or module they strengthen and which previously unsupported contract they make measurable.
 
 \noindent\textbf{Temporal and numerical faithfulness.} Agents need typed temporal operations, unit-aware representations, chronology guards, and end-to-end fidelity checks. A correct textual explanation can still be wrong if a tool uses the wrong frequency, rounds a value, or retrieves information after the forecast origin. Future systems should therefore validate numerical and temporal invariants at every interface, not only score the final answer.
 
