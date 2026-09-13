@@ -246,6 +246,44 @@ def derive_task_dimensions(row: dict[str, str], temporal: dict[str, list[str]]) 
     return output
 
 
+def exclusive_harness_layers(
+    gh: dict[str, list[str]],
+    gts: dict[str, list[str]],
+    task: dict,
+) -> tuple[dict[str, list[str]], dict[str, list[str]], dict]:
+    """Keep each module at its deepest Harness layer.
+
+    LLM-side labels are independent and are therefore not passed here.  For
+    the nested Harness layers, a populated task contract owns its dimension;
+    otherwise a populated GTS dimension owns it; GH receives only the
+    remaining reusable runtime dimensions.
+    """
+    task_out = {}
+    task_by_dim = {name: [] for name in DIMENSION_NAMES}
+    for task_name, item in task.items():
+        if not isinstance(item, dict):
+            task_out[task_name] = item
+            continue
+        copied = dict(item)
+        dims = copied.get("dimensions", empty_dimensions())
+        for name in DIMENSION_NAMES:
+            for label in dims.get(name, []):
+                if label not in task_by_dim[name]:
+                    task_by_dim[name].append(label)
+        task_out[task_name] = copied
+
+    gts_out = empty_dimensions()
+    gh_out = empty_dimensions()
+    for name in DIMENSION_NAMES:
+        if task_by_dim[name]:
+            continue
+        if gts.get(name):
+            gts_out[name] = list(gts[name])
+            continue
+        gh_out[name] = list(gh.get(name, []))
+    return gh_out, gts_out, task_out
+
+
 def module_contribution_record(row: dict[str, str]) -> dict:
     """Return module-level annotations with separate GH, GTS, and TSK coding."""
     gh_raw = parse_json_value(row.get("general_harness_dimensions", ""), {})
@@ -253,12 +291,20 @@ def module_contribution_record(row: dict[str, str]) -> dict:
     task_raw = parse_json_value(row.get("task_specific_modules_json", ""), {})
     gh = derive_general_dimensions(row)
     gts = derive_temporal_dimensions(row)
+    gh_exclusive, gts_exclusive, task_exclusive = exclusive_harness_layers(
+        gh, gts, derive_task_dimensions(row, gts)
+    )
     return {
         "unit": "non-empty fine-grained module annotation",
         "llm_side": parse_json_value(row.get("llm_side_subdimensions", ""), []),
-        "general_harness": gh,
-        "general_ts_harness": gts,
-        "task_specific": derive_task_dimensions(row, gts),
+        "general_harness": gh_exclusive,
+        "general_ts_harness": gts_exclusive,
+        "task_specific": task_exclusive,
+        "inclusive_dimensions": {
+            "general_harness": gh,
+            "general_ts_harness": gts,
+            "task_specific": derive_task_dimensions(row, gts),
+        },
         "source_dimensions": {
             "general_harness": gh_raw,
             "general_ts_harness": gts_raw,
@@ -471,6 +517,9 @@ def generate_json(rows: list[dict[str, str]]) -> None:
         general_ts_dimensions = derive_temporal_dimensions(row)
         gts_reason = parse_json_field(row, "general_ts_specificity_reason", [])
         task_modules = derive_task_dimensions(row, general_ts_dimensions)
+        exclusive_gh, exclusive_gts, task_modules = exclusive_harness_layers(
+            general_dimensions, general_ts_dimensions, task_modules
+        )
         module_contributions = parse_json_field(
             row, "module_level_contributions_json", module_contribution_record(row)
         )
@@ -531,7 +580,8 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                     "review_status": "paper_verified" if row.get("claim_review_status") == "paper_verified" else ("survey_coded_needs_pdf_review" if llm_summary else "not_recorded"),
                 },
                 "general_harness_modules": {
-                    "dimensions": general_dimensions,
+                    "dimensions": exclusive_gh,
+                    "inclusive_dimensions": general_dimensions,
                     "source_dimensions": parse_json_field(row, "general_harness_dimensions", {}),
                     "dimension_coding_basis": "derived_from_explicit_harness_modules",
                     "claim": row["general_harness_contribution"],
@@ -539,7 +589,8 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                     "review_status": "paper_verified" if row.get("claim_review_status") == "paper_verified" else "survey_coded_needs_pdf_review",
                 },
                 "general_ts_harness_modules": {
-                    "dimensions": general_ts_dimensions,
+                    "dimensions": exclusive_gts,
+                    "inclusive_dimensions": general_ts_dimensions,
                     "source_dimensions": parse_json_field(row, "general_ts_harness_dimensions", {}),
                     "dimension_coding_basis": "derived_from_temporal_specificity_reason_and_claim",
                     "claim": row["general_ts_harness_contribution"],
