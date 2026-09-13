@@ -598,8 +598,35 @@ A Time-Series Agent is built by combining an LLM, a General Harness, and a Time-
 
 \clearpage
 \appendix
-\section{Complete Work-Level Contribution Ledger}
+\section{Module-Level Contribution Ledger}
 \label{app:full-ledger}
+The machine-readable JSON ledger is a central research artifact of this survey. It records, for each work, the bibliographic identity, publication date, claim, source locator and quotation, LLM-side contribution, General Harness dimensions, General Time-Series Harness dimensions, Task-Specific Harness dimensions, task family, work type, and review status. The ledger is designed for extension: a new paper adds a supported module-level record rather than requiring a new organizing principle. The human-readable profiles below expose the same information in a form suitable for inspection.
+
+The coding unit is a concrete module contribution. A paper may contribute to several modules and may therefore appear in several dimensions. For Harness plotting, the exclusive layer is the deepest applicable one: a task-bound module is counted as Task-Specific, an otherwise reusable temporal module as General Time-Series, and only a domain-independent runtime module as General Harness. The inclusive descriptions are retained as source evidence, while every claim remains tied to a paper locator and an explicit review status.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{longtable}{L{\fulltextcol{0.18}} L{\fulltextcol{0.25}} L{\fulltextcol{0.14}} L{\fulltextcol{0.14}} L{\fulltextcol{0.14}} L{\fulltextcol{0.15}}}
+\caption{Human-readable view of representative module-level records from the JSON ledger. The complete profiles follow; source locators and quotations are retained in the machine-readable record.}\label{tab:ledger-sample}\\
+\toprule
+\textbf{Work} & \textbf{Claim recorded} & \textbf{LLM side} & \textbf{Harness layer} & \textbf{Task family} & \textbf{Evidence status}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Work} & \textbf{Claim recorded} & \textbf{LLM side} & \textbf{Harness layer} & \textbf{Task family} & \textbf{Evidence status}\\
+\midrule
+\endhead
+ChatTS \citep{chatts2025} & Synthetic temporal instruction data and alignment for time-series understanding and reasoning. & Alignment; instruction tuning & LLM-side & Cross-task reasoning & PDF locator recorded\\
+TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} & Role-based curation, planning, forecasting, validation, and reporting workflow. & -- & Task-Specific & Forecasting & PDF locator recorded\\
+TIMECLAW \citep{timeclaw2026harness} & Auditable temporal tools, episodic experience, and capability evolution in a time-series runtime. & -- & General Time-Series & Cross-task infrastructure & PDF locator recorded\\
+FinCon \citep{fincon2024} & Multi-agent financial evidence synthesis for portfolio decision making. & -- & Task-Specific & Decision support & PDF locator recorded\\
+ModernTSF & Callable models, datasets, artifacts, budgets, and recoverable execution for reproducible evaluation. & -- & Infrastructure & Benchmark / evaluation & Repository footnote\\
+\bottomrule
+\end{longtable}
+\endgroup
+
 The fine-grained component vocabulary used by the machine-readable ledger is reproduced here for auditability. The main text uses the seven-dimension comparison layer.
 
 \begingroup
@@ -644,7 +671,7 @@ The complete work-level profiles are provided here for auditability. The main te
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{1.02}
 \begin{longtable}{@{}p{0.27\textwidth}p{0.68\textwidth}@{}}
-\caption{Complete profiles of the 139 reviewed works. Each profile may contain General Harness (GH), General Time-Series Harness (GTS), and Task-Specific Harness (TSK) descriptions. SM denotes a system or method and B an evaluation benchmark; $\dagger$ marks works that do not describe themselves as agents.}\label{tab:agent-ledger}\\
+\caption{Profiles of the 139 reviewed works. Each profile records inclusive evidence across runtime layers; exclusive plotting uses the deepest applicable Harness layer. SM denotes a system or method and B an evaluation benchmark; $\dagger$ marks works that do not describe themselves as agents.}\label{tab:agent-ledger}\\
 \toprule Work and task & Mechanisms across runtime layers\\\midrule
 \endfirsthead
 \toprule Work and task & Mechanisms across runtime layers\\\midrule
