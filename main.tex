@@ -245,14 +245,14 @@ LLM-based Agents for Forecasting and Prediction \citep{xu2026forecastagentsurvey
 ATSF \citep{atsf2026} & Forecasting process / position paper & Perception, planning, action, reflection, memory; workflow/RL/hybrid paradigms & Position and project resource, not a survey corpus & Articulates a forecasting-side agentic process framing; it is not designed as a cross-task literature-coding study.\\
 AION \citep{aion2026} & Realistic TS task and practical Harness & Task file, workspace, validation interface; Harness groups and review principles & Executable Harness, artifacts, traces, validation, case study & Builds one practical Harness; it is not designed to classify primary contributions across papers.\\
 TimeClaw \citep{timeclaw2026harness} & Contextualized TS task, trajectory, and memory & Executable temporal tools, capability evolution, episodic multimodal memory & Reference implementation, trajectories, memory banks, multi-benchmark evaluation & Implements a cross-task native runtime; it is not designed as a literature locus protocol.\\
-This survey & Enumerated cross-task work snapshot & Primary contribution locus (GH/GTS/TSK) plus secondary descriptions; 14-component/6-obligation crosswalk & Screening criteria, rubric, versioned ledger, evidence matrix, model sensitivity probes & Operationalizes and applies a literature-level attribution protocol rather than proposing the Harness concept itself.\\
+This survey & Enumerated cross-task work snapshot & Primary contribution locus (GH/GTS/TSK) plus secondary descriptions; seven-dimension/6-obligation crosswalk & Screening criteria, rubric, versioned ledger, evidence matrix, model sensitivity probes & Operationalizes and applies a literature-level attribution protocol rather than proposing the Harness concept itself.\\
 \bottomrule
 \end{longtable}
 \endgroup
 
 The recent survey by Xu et al. organizes LLM-based forecasting and prediction agents around standalone LLMs, tool- and retrieval-augmented systems, and hybrid systems, while connecting methods to training, evaluation, applications, and risks \citep{xu2026forecastagentsurvey}. We include it as a direct competitor survey because it provides a forecasting-centered systems map and a careful account of contamination, leakage, calibration, cost, and deployment feedback. Its organizing unit is the forecasting/prediction system and its lifecycle; our organizing unit is the contribution locus of the underlying Harness. Thus its three system types are compatible with, but orthogonal to, our GH/GTS/TSK labels: a tool-augmented forecasting system may contribute to GH, GTS, TSK, or several of them depending on which mechanism the paper actually changes.
 
-We re-read the broader literature through this additional contribution-locus question. Visible tools, memory, multimodality, decomposition, verification, and agent loops remain useful descriptors, but they do not resolve the locus decision under our protocol. We therefore use an author-normalized, literature-informed 14-component \GeneralHarness{} vocabulary synthesized from general Harness architecture and engineering studies \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness}. The underlying functions are literature-derived, while the exact 14-way selection, naming, and grouping used here are author-proposed. This vocabulary acts as a control layer, while the temporal obligations and the primary-locus rule provide the domain-specific coding and evaluation lens.
+We re-read the broader literature through this additional contribution-locus question. Visible tools, memory, multimodality, decomposition, verification, and agent loops remain useful descriptors, but they do not resolve the locus decision under our protocol. We therefore use a seven-dimension \GeneralHarness{} comparison vocabulary synthesized from General Harness architecture, engineering, and agent-survey studies \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness,changsurvey2026,chen2026tsagentsurvey,xu2026forecastagentsurvey}. The surveyed sources use heterogeneous taxonomies; the seven dimensions are the common comparison layer we obtain by taking their recurring functional intersection. This vocabulary acts as a control layer, while the temporal obligations and the primary-locus rule provide the domain-specific coding and evaluation lens.
 
 \subsection{Contributions}
 
@@ -300,15 +300,7 @@ Chen et al.\ \citep{chen2026tsagentsurvey} provide a useful task-oriented summar
 
 For the LLM-based systems in scope, a standalone LLM produces text conditioned on a prompt, whereas we model an agent system as an LLM coupled with a runtime that controls the interaction between model outputs and the external environment. Recent agent-harness literature describes this surrounding layer through reasoning and acting interfaces, environment models, execution environments, tool protocols, context and memory systems, orchestration loops, verification interfaces, observability, governance, and optimization mechanisms \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness}. The cited works use heterogeneous source units---interface roles, mechanisms, architectural layers, and method-specific editable components---so \emph{component} is our operational umbrella term for a structural-functional vocabulary, not a claim that the sources share one component ontology.
 
-For our purposes, the \GeneralHarness{} contains the same three groups used in Table~\ref{tab:component-vocab}:
-
-\begin{itemize}
-  \item \MechanismGroup{}: \Planning{}, \Memory{}, \ToolUse{}, \Control{}, and \HarnessOptimization{} sustain the agent beyond a single generation step \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness}.
-  \item \InterfaceGroup{}: \Reasoning{}, \Acting{}, \EnvironmentModeling{}, \ExecutionEnvironment{}, and \StateArtifacts{} define what the agent can represent, execute, and persist \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness}.
-  \item \OperationGroup{}: \Lifecycle{}, \Verification{}, \Observability{}, and \MultiAgentScaling{} organize long-horizon execution, review, governance, and collaboration \citep{ning2026codeharness,lin2026agenticharness}.
-\end{itemize}
-
-This decomposition is domain-agnostic. It describes the functions represented in the in-scope general runtime, while the domain module specifies what a time-series runtime should preserve.
+The seven dimensions in Table~\ref{tab:component-vocab} form the domain-agnostic comparison layer. Their functions are supported across the reviewed Harness and agent surveys, while the detailed 14-component vocabulary is retained for ledger-level coding in Table~\ref{tab:fine-component-vocab}. This decomposition is domain-agnostic: it describes the runtime functions shared by general agents, while the domain module specifies what a time-series runtime should preserve.
 
 \subsection{Why temporal work requires additional capabilities}
 
@@ -331,43 +323,34 @@ A second level is task-specific. Forecasting modules introduce horizon contracts
 
 \section{Capabilities of a Time-Series Agent}
 
-The component map follows the hierarchy in Table~\ref{tab:harness-hierarchy}. The \GeneralHarness{} is described by an author-normalized 14-component structural-functional vocabulary synthesized from Harness literature \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness}. The Time-Series Harness Module then specifies which temporal objects, operations, context bindings, and validation requirements the runtime must support. Its cross-task mechanisms form the \GeneralTSHarness{}; its task-bound mechanisms form the \TaskSpecificHarness{}. The task categories reviewed in prior time-series surveys provide the output contracts that make this final distinction concrete. Thus the map proceeds from general runtime components, to temporal specialization, to task-specific instantiation.
+The component map follows the hierarchy in Table~\ref{tab:harness-hierarchy}. The \GeneralHarness{} is summarized by the seven-dimension comparison vocabulary and backed by a fine-grained structural-functional vocabulary for ledger coding \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness}. The Time-Series Harness Module then specifies which temporal objects, operations, context bindings, and validation requirements the runtime must support. Its cross-task mechanisms form the \GeneralTSHarness{}; its task-bound mechanisms form the \TaskSpecificHarness{}. The task categories reviewed in prior time-series surveys provide the output contracts that make this final distinction concrete. Thus the map proceeds from general runtime components, to temporal specialization, to task-specific instantiation.
 
 \subsection{General capabilities shared with other agents}
 
-Table~\ref{tab:component-vocab} states the domain-agnostic runtime vocabulary used in this survey. The component functions are grounded in prior Harness architecture and engineering studies \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness}; the table normalizes their terminology into one operational vocabulary for this survey rather than claiming a source-authored or uniquely determined architecture.
+Table~\ref{tab:component-vocab} states the seven-dimension domain-agnostic runtime vocabulary used in this survey. The dimensions are the recurring functional intersection across the Harness and agent surveys \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness,changsurvey2026,chen2026tsagentsurvey,xu2026forecastagentsurvey}; the detailed 14-component vocabulary used for ledger coding is provided in Table~\ref{tab:fine-component-vocab}.
 
 \begingroup
 \small
 \setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{longtable}{L{\fulltextcol{0.16}} L{\fulltextcol{0.25}} L{\fulltextcol{0.59}}}
-\caption{The author-normalized 14-component \GeneralHarness{} vocabulary. The underlying functions are literature-derived; the exact selection and grouping are author-proposed.}
+\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{L{\fulltextcol{0.24}} L{\fulltextcol{0.30}} L{\fulltextcol{0.46}}}
+\caption{A coarse-grained taxonomy of General Harness capabilities. The seven dimensions are an author-normalized comparison layer synthesized from General Harness and agent-survey literature; they are not mutually exclusive system types.}
 \label{tab:component-vocab}\\
 \toprule
-\textbf{Group} & \textbf{Component} & \textbf{General-agent role}\\
+\textbf{Unified dimension} & \textbf{Core question} & \textbf{What it includes}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Group} & \textbf{Component} & \textbf{General-agent role}\\
+\textbf{Unified dimension} & \textbf{Core question} & \textbf{What it includes}\\
 \midrule
 \endhead
-\multirow[t]{5}{\fulltextcol{0.16}}{\MechanismGroup{}} & \Planning{} & Organizes long-horizon execution through decomposition, search, or workflow orchestration.\\
-& \Memory{} & Maintains working, semantic, experiential, long-term, and shared memory.\\
-& \ToolUse{} & Expands the action space through tools, environment interaction, verification tools, and workflows.\\
-& \Control{} & Routes feedback, enforces constraints, manages retries, and accepts or rejects state transitions.\\
-& \HarnessOptimization{} & Improves prompts, interfaces, policies, memories, traces, and skills using feedback.\\
-\midrule
-\multirow[t]{5}{\fulltextcol{0.16}}{\InterfaceGroup{}} & \Reasoning{} & Externalizes reasoning into inspectable intermediate representations, programs, traces, or structured rationales.\\
-& \Acting{} & Converts model decisions into executable actions, tool calls, policies, or skills.\\
-& \EnvironmentModeling{} & Represents task state, environment dynamics, observations, feedback, and artifacts.\\
-& \ExecutionEnvironment{} & Provides sandboxes, runtime isolation, files, repositories, interpreters, simulators, and execution feedback.\\
-& \StateArtifacts{} & Stores files, traces, tool outputs, intermediate products, and reusable artifacts across turns or agents.\\
-\midrule
-\multirow[t]{4}{\fulltextcol{0.16}}{\OperationGroup{}} & \Lifecycle{} & Connects task intake, planning, execution, revision, reporting, handoff, and termination.\\
-& \Verification{} & Evaluates traces, tool results, final artifacts, and feedback against explicit criteria.\\
-& \Observability{} & Records traces, costs, failures, permissions, review decisions, and governance constraints.\\
-& \MultiAgentScaling{} & Coordinates roles through shared state, debate, review, or red-teaming.\\
+Interface and Interaction & How does the agent receive state and act on its environment? & Reasoning interfaces, action interfaces, environment modeling, user interaction, and state--action loops.\\
+Memory and Context & How does the agent preserve and organize information across steps? & Context management, working and long-term memory, state stores, retrieval, and experience reuse.\\
+Tools and Execution & How does the agent invoke external capabilities and execute actions? & Tool registries, APIs, retrieval, code execution, databases, forecasting models, and simulators.\\
+Control, Verification, and Feedback & How does the agent detect errors, revise behavior, and assess reliability? & Control loops, error recovery, validators, feedback, review, evaluation interfaces, and observability.\\
+Planning and Workflow & How does the agent organize multi-step work? & Task decomposition, planning, search, workflow orchestration, policy selection, and stopping conditions.\\
+Optimization and Evolution & How does the agent or Harness improve from experience? & Prompt, tool, memory, policy, and Harness optimization; reflection and trajectory-driven evolution.\\
+Coordination and Scaling & How do multiple agents divide work, communicate, and cooperate? & Role assignment, delegation, shared state, debate, review, and multi-agent orchestration.\\
 \bottomrule
 \end{longtable}
 \endgroup
@@ -403,7 +386,7 @@ Output auditability with conditional uncertainty validation & Analytical account
 
 \subsection{From shared temporal capabilities to task-specific ones}
 
-Table~\ref{tab:invariant-component-matrix} is an author-proposed illustrative crosswalk, not an empirical measurement, a validation of the six obligations, or a uniquely determined architecture. The unit of coding is one ordered pair consisting of an obligation and a Harness component. For each pair we ask three questions in order: (Q1) within the component responsibility stated in Table~\ref{tab:component-vocab}, must the component consume or produce an obligation-specific object, field, or rule? If not, the cell is blank. (Q2) Can the component locally prevent, reject, or detect a violation using an explicit criterion? If so, the cell is marked $\bullet$ for direct enforcement or detection. (Q3) Otherwise, does it directly store, transport, schedule, or expose the obligation-specific information for an enforcing component? If so, the cell is marked $\circ$ for a supporting or carrying role; otherwise it is blank. Generic usefulness, a merely possible future specialization, or an effect mediated entirely by another component does not qualify. Ambiguous cells are coded downward ($\bullet\!\rightarrow\!\circ\!\rightarrow$ blank) and retained for review. ``Direct'' is non-exclusive: several components may enforce different boundaries of the same obligation.
+Table~\ref{tab:invariant-component-matrix} is an author-proposed illustrative crosswalk, not an empirical measurement, a validation of the six obligations, or a uniquely determined architecture. The unit of coding is one ordered pair consisting of an obligation and a Harness component. For each pair we ask three questions in order: (Q1) within the component responsibility stated in Table~\ref{tab:fine-component-vocab}, must the component consume or produce an obligation-specific object, field, or rule? If not, the cell is blank. (Q2) Can the component locally prevent, reject, or detect a violation using an explicit criterion? If so, the cell is marked $\bullet$ for direct enforcement or detection. (Q3) Otherwise, does it directly store, transport, schedule, or expose the obligation-specific information for an enforcing component? If so, the cell is marked $\circ$ for a supporting or carrying role; otherwise it is blank. Generic usefulness, a merely possible future specialization, or an effect mediated entirely by another component does not qualify. Ambiguous cells are coded downward ($\bullet\!\rightarrow\!\circ\!\rightarrow$ blank) and retained for review. ``Direct'' is non-exclusive: several components may enforce different boundaries of the same obligation.
 
 \begin{table}[!htbp]
 \centering\small
@@ -579,7 +562,7 @@ The complete work-level ledger is maintained as machine-readable CSV/JSON and is
 
 \subsection{General agent mechanisms}
 
-The general mechanisms recur across the reviewed systems in several forms. Tool use and acting expose statistical models, code, visualizers, and validators; planning and workflow modules coordinate data preparation, model selection, revision, and reporting; memory and reflection retain cases, traces, and experience; control and verification check tool results and intermediate artifacts; and multi-agent designs distribute analysis, review, and synthesis. TRACE, FactorMAD, and SLEP illustrate this general layer while also instantiating it in forecasting, financial analysis, and anomaly diagnosis, respectively \citep{chen2025trace,duan2025factormad,wang2026large}. These patterns are represented by the 14-component vocabulary in Section~3 and coded for every work in the appendix ledger.
+The general mechanisms recur across the reviewed systems in several forms. Tool use and acting expose statistical models, code, visualizers, and validators; planning and workflow modules coordinate data preparation, model selection, revision, and reporting; memory and reflection retain cases, traces, and experience; control and verification check tool results and intermediate artifacts; and multi-agent designs distribute analysis, review, and synthesis. TRACE, FactorMAD, and SLEP illustrate this general layer while also instantiating it in forecasting, financial analysis, and anomaly diagnosis, respectively \citep{chen2025trace,duan2025factormad,wang2026large}. These patterns are represented by the seven General Harness dimensions in Section~3 and coded at finer resolution in the appendix ledger.
 
 
 \subsection{Shared time-series mechanisms}
@@ -827,6 +810,43 @@ This framing absorbs previous model-centric work rather than replacing it. Class
 \appendix
 \section{Complete Work-Level Contribution Ledger}
 \label{app:full-ledger}
+The fine-grained component vocabulary used by the machine-readable ledger is reproduced here for auditability. The main text uses the seven-dimension comparison layer.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{longtable}{L{\fulltextcol{0.16}} L{\fulltextcol{0.25}} L{\fulltextcol{0.59}}}
+\caption{Fine-grained 14-component \GeneralHarness{} vocabulary used for ledger-level coding. The underlying functions are literature-derived; the exact selection and grouping are author-proposed.}
+\label{tab:fine-component-vocab}\\
+\toprule
+\textbf{Group} & \textbf{Component} & \textbf{General-agent role}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Group} & \textbf{Component} & \textbf{General-agent role}\\
+\midrule
+\endhead
+\multirow[t]{5}{\fulltextcol{0.16}}{\MechanismGroup{}} & \Planning{} & Organizes long-horizon execution through decomposition, search, or workflow orchestration.\\
+& \Memory{} & Maintains working, semantic, experiential, long-term, and shared memory.\\
+& \ToolUse{} & Expands the action space through tools, environment interaction, verification tools, and workflows.\\
+& \Control{} & Routes feedback, enforces constraints, manages retries, and accepts or rejects state transitions.\\
+& \HarnessOptimization{} & Improves prompts, interfaces, policies, memories, traces, and skills using feedback.\\
+\midrule
+\multirow[t]{5}{\fulltextcol{0.16}}{\InterfaceGroup{}} & \Reasoning{} & Externalizes reasoning into inspectable intermediate representations, programs, traces, or structured rationales.\\
+& \Acting{} & Converts model decisions into executable actions, tool calls, policies, or skills.\\
+& \EnvironmentModeling{} & Represents task state, environment dynamics, observations, feedback, and artifacts.\\
+& \ExecutionEnvironment{} & Provides sandboxes, runtime isolation, files, repositories, interpreters, simulators, and execution feedback.\\
+& \StateArtifacts{} & Stores files, traces, tool outputs, intermediate products, and reusable artifacts across turns or agents.\\
+\midrule
+\multirow[t]{4}{\fulltextcol{0.16}}{\OperationGroup{}} & \Lifecycle{} & Connects task intake, planning, execution, revision, reporting, handoff, and termination.\\
+& \Verification{} & Evaluates traces, tool results, final artifacts, and feedback against explicit criteria.\\
+& \Observability{} & Records traces, costs, failures, permissions, review decisions, and governance constraints.\\
+& \MultiAgentScaling{} & Coordinates roles through shared state, debate, review, or red-teaming.\\
+\bottomrule
+\end{longtable}
+\endgroup
+
 The complete work-level profiles are provided here for auditability. The main text uses aggregate patterns and representative examples so that the conceptual argument remains readable. Repository-only resources are identified with footnotes rather than paper citations. The LLM-TSFD entry is linked to its author repository in a footnote.\footnote{Zhang et al., \emph{LLM-TSFD author repository}, \url{https://github.com/zq300/LLM-TSFD}.}
 
 \begingroup
