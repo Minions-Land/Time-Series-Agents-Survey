@@ -89,7 +89,7 @@ uv run scripts/classification_manager.py validate
 `TS_AGENT_HARNESS_SURVEY.bib` and `references/manifest.csv`; it preserves claim
 and classification judgments. `validate` checks unique keys, allowed loci,
 Harness module vocabulary, task coverage, Scholar-state agreement, and exact
-membership agreement with the 77-work mechanism profile in `main.tex`.
+membership agreement with the 139-work contribution profile in `main.tex`.
 
 Use `bootstrap` only to reconstruct the initial ledger from the current
 manuscript and historical CSV files. It overwrites classification judgments and
