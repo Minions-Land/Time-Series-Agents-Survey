@@ -171,7 +171,7 @@ LLM agents provide a natural system abstraction for this broader workflow. In th
 \begin{aligned}
 \textbf{LLM-based agent system} &\approx \text{LLM}+\text{Harness},\\
 \textbf{Time-Series Agent} &\approx \text{LLM}+\text{General Harness}\\
-&\quad +\text{Time-Series Harness Modules}+\text{Supporting Components}.
+&\quad +\text{Time-Series Harness Module}.
 \end{aligned}
 \]
 \end{tcolorbox}
@@ -182,25 +182,7 @@ A mechanism belongs to GH when its design remains useful beyond time-series appl
 
 These judgments apply to mechanisms rather than entire papers: one system can combine general memory and reflection, cross-task temporal tools, and a forecasting-specific validation loop. Changing from financial forecasting to traffic forecasting changes the application domain but preserves the forecasting task family; it therefore does not by itself establish cross-task generality.
 
-The resulting hierarchy is the organizing structure of this survey:
-
-\begin{figure}[htbp]
-\centering
-\begin{tikzpicture}[font=\sffamily, node distance=7mm, >=stealth]
-  \tikzset{box/.style={rounded corners=3pt, draw=surveyBlue, line width=.8pt, fill=surveyBlue!6, align=center, minimum height=10mm, text width=0.25\textwidth}, arrow/.style={->, line width=1pt, draw=surveyBlue!75}}
-  \node[box] (llm) {LLM\ Component\\language, reasoning, planning};
-  \node[box, right=of llm] (gh) {General Harness\\tools, memory, control, execution};
-  \node[box, right=of gh] (ts) {Time-Series Harness Module\\temporal state, operations, grounding, validation};
-  \node[box, below=of ts] (gts) {General Time-Series Harness\\reusable across temporal tasks};
-  \node[box, below=of gh] (tsk) {Task-Specific Harness\\task contract, reward, verifier};
-  \draw[arrow] (llm) -- (gh);
-  \draw[arrow] (gh) -- (ts);
-  \draw[arrow] (ts) -- (gts);
-  \draw[arrow] (ts) -- (tsk);
-\end{tikzpicture}
-\caption{Construction logic of a Time-Series Agent. The LLM contribution and Harness contributions are recorded separately; the temporal module branches into mechanisms reusable across tasks and mechanisms bound to a task contract.}
-\label{fig:agent-construction}
-\end{figure}
+The resulting hierarchy is the organizing structure of this survey.
 
 \begin{table}[htbp]
 \centering\small
@@ -217,6 +199,15 @@ Task-Specific Harness & Which mechanisms are tied to a concrete task contract, s
 \caption{The hierarchical construction used throughout the survey. The General and Task-Specific Time-Series Harness levels are nested within the Time-Series Harness Module; a paper may contribute mechanisms at more than one level.}
 \label{tab:harness-hierarchy}
 \end{table}
+
+The maintained ledger uses the module as its unit of analysis. A single paper can contribute a temporal representation, a memory mechanism, a verifier, and a task workflow at the same time; each contribution is recorded under the applicable module and dimension. Aggregate plots therefore count module-level contributions, allowing one work to appear in several categories.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{artifacts/contribution_timeline.png}
+\caption{Cumulative module-level contributions in the reviewed Time-Series Agent corpus. The curves count independently recorded LLM-side, General Harness, General Time-Series Harness, and Task-Specific Harness modules; a paper can contribute to multiple curves.}
+\label{fig:contribution-trend}
+\end{figure}
 
 \subsection{Position relative to existing surveys}
 
@@ -293,12 +284,12 @@ A Time-Series Agent is a system in which an LLM operates through a reusable runt
 \[
 \begin{aligned}
 \textbf{Time-Series Agent}={}&\textbf{LLM}+\textbf{General Harness}\\
-&+\textbf{Time-Series Harness Modules}+\textbf{Supporting Components}.
+&+\textbf{Time-Series Harness Module}.
 \end{aligned}
 \]
 \end{tcolorbox}
 
-The LLM supplies language understanding and reasoning. The General Harness supplies interaction, memory, tools, execution, control, planning, optimization, and coordination. Time-Series Harness Modules preserve temporal state, operations, context, and validation. Supporting components include statistical models, time-series foundation models, databases, simulators, retrieval systems, and evaluators.
+The LLM supplies language understanding and reasoning. The General Harness supplies interaction, memory, tools, execution, control, planning, optimization, and coordination. The Time-Series Harness Module preserves temporal state, operations, context, and validation; statistical models, time-series foundation models, databases, simulators, retrieval systems, and evaluators operate as callable components within it.
 
 The rest of the survey follows these construction layers. Section~3 isolates changes to the LLM; Section~4 describes the General Harness; Section~5 identifies the parts that become genuinely time-series-specific; Section~6 instantiates them under four task families; and Section~7 evaluates the resulting systems and the infrastructure needed to benchmark them.
 \section{LLM-Side Contributions for Time-Series Agents}
@@ -446,14 +437,7 @@ Anomaly agents localize events, propose or verify rules, retrieve incident evide
 
 Decision-support agents connect forecasts or diagnoses to actions under costs, constraints, uncertainty, and review requirements. Trading, traffic control, energy, climate, and health systems illustrate how a predictive output becomes a recommendation, policy, escalation, or operational record \citep{fincon2024,tradingagents2024,collmllight2026,climateagent2025,smartenergyagent2026}.
 
-The complete corpus is multi-label: a work may contribute to several Harness dimensions and several task families. The maintained ledger records the LLM-side contribution, the General Harness modules, the genuinely time-series-specific modules, and the task-specific modules separately. The contribution timeline below counts these fields independently so that a paper can contribute to more than one line.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{artifacts/contribution_timeline.png}
-\caption{Cumulative publication counts for the reviewed Time-Series Agent corpus. The LLM-side line records works with an explicit model-side temporal contribution; the three Harness lines use the primary contribution locus. A work may also carry secondary Harness labels in the ledger.}
-\label{fig:contribution-trend}
-\end{figure}
+The complete corpus is multi-label: a work may contribute to several Harness dimensions and several task families. The maintained ledger records the LLM-side contribution, the General Harness modules, the genuinely time-series-specific modules, and the task-specific modules separately.
 \section{Infrastructure and Benchmarks for Time-Series Agents}
 \label{sec:evaluation}
 
@@ -533,7 +517,13 @@ Time-Series Agents need shared workspaces, temporal tool contracts, evidence sch
 
 \section{Conclusion}
 
-A Time-Series Agent is built by combining an LLM, a General Harness, time-series-specific Harness modules, and supporting components. The survey separates the model-side contribution from the runtime contribution, organizes the General Harness through seven shared dimensions, extracts genuinely temporal mechanisms into the General Time-Series Harness, and instantiates them under forecasting, augmentation, anomaly diagnosis, and decision support. Evaluation then follows the same construction: process, temporal contract, and task outcome. The remaining research challenge is to make these layers interoperable and to evaluate them with a unified, reproducible benchmark.
+A Time-Series Agent is built by combining an LLM, a General Harness, and a Time-Series Harness Module. The survey separates the model-side contribution from the runtime contribution, organizes the General Harness through seven shared dimensions, extracts genuinely temporal mechanisms into the General Time-Series Harness, and instantiates them under forecasting, augmentation, anomaly diagnosis, and decision support. Evaluation then follows the same construction: process, temporal contract, and task outcome. The remaining research challenge is to make these layers interoperable and to evaluate them with a unified, reproducible benchmark.
+% Keep the references between the main conclusion and the audit appendix.
+\clearpage
+\bibliographystyle{plainnat}
+\bibliography{TS_AGENT_HARNESS_SURVEY}
+
+\clearpage
 \appendix
 \section{Complete Work-Level Contribution Ledger}
 \label{app:full-ledger}
@@ -736,8 +726,6 @@ Large-model-based smart agent \citep{wang2026large} Feb'26; \typeSMshort{}\newli
 \noindent\textsuperscript{a} Salesforce AI Research, \emph{MoiraiAgent} implementation: \href{https://github.com/SalesforceAIResearch/uni2ts/tree/main/project/moirai-agent}{GitHub repository}.\\
 \textsuperscript{b} Zhang et al., \emph{LLM-TSFD} author repository: \href{https://github.com/zq300/LLM-TSFD}{GitHub repository}.
 
-\bibliographystyle{plainnat}
-\bibliography{TS_AGENT_HARNESS_SURVEY}
 
 
 
