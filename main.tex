@@ -20,6 +20,7 @@
 \usepackage{microtype}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
+\usepackage{float}
 \usepackage{tcolorbox}
 \usepackage{tikz}
 \usetikzlibrary{positioning}
@@ -183,7 +184,7 @@ A mechanism belongs to GH when its design remains useful beyond time-series appl
 
 These judgments apply to mechanisms rather than entire papers: one system can combine general memory and reflection, cross-task temporal tools, and a forecasting-specific validation loop. Changing from financial forecasting to traffic forecasting changes the application domain but preserves the forecasting task family; it therefore does not by itself establish cross-task generality.
 
-The resulting hierarchy is the organizing structure of this survey.
+The resulting hierarchy is the organizing structure of this survey. Time-Series Agent is the outer concept; its LLM side is independent of the nested Harness side, where General Harness contains the General Time-Series Harness Module and the latter contains Task-Specific Harness Modules.
 
 \begin{table}[htbp]
 \centering\small
@@ -201,7 +202,7 @@ Task-Specific Harness & Which mechanisms are tied to a concrete task contract, s
 \label{tab:harness-hierarchy}
 \end{table}
 
-The maintained ledger uses the module as its unit of analysis. A single paper can contribute a temporal representation, a memory mechanism, a verifier, and a task workflow at the same time; each contribution is recorded under the applicable module and dimension. General Harness and General Time-Series Harness are therefore deliberately non-exclusive: the same capability family may appear once at the runtime layer and again with a temporal binding. For example, memory is General Harness when it stores reusable experience, but it is General Time-Series Harness when the stored state is indexed by availability time, data vintage, missingness, or revision. Aggregate plots count these module annotations separately, allowing one work to appear in several categories.
+The maintained ledger uses the module as its unit of analysis. A single paper can contribute a temporal representation, a memory mechanism, a verifier, and a task workflow at the same time; each contribution is recorded under the applicable module and dimension. Harness labels are exclusive by depth: a task-specific module is counted at TSK, a cross-task temporal module at GTS, and a reusable runtime module at GH. This deepest-layer rule prevents one component from occupying several nested levels in the aggregate plot. The LLM-side dimension remains independent and can co-occur with any Harness layer.
 
 \begin{figure}[htbp]
 \centering
@@ -245,7 +246,7 @@ LLM-based Agents for Forecasting \citep{xu2026forecastagentsurvey} & \yes & \yes
 \noindent\textit{Reading the table.} Existing surveys provide complementary views: agent mechanisms, reasoning topologies, task maps, or forecasting lifecycles. Our comparison adds an explicit runtime decomposition, a seven-dimension General Harness layer, a General-versus-Task-Specific Time-Series Harness distinction, a multi-label task view, and a module-level evidence ledger.
 
 
-The recent survey by Xu et al. organizes LLM-based forecasting and prediction agents around standalone LLMs, tool- and retrieval-augmented systems, and hybrid systems, while connecting methods to training, evaluation, applications, and risks \citep{xu2026forecastagentsurvey}. We include it as a direct competitor survey because it provides a forecasting-centered systems map and a careful account of contamination, leakage, calibration, cost, and deployment feedback. Its organizing unit is the forecasting/prediction system and its lifecycle; our organizing unit is the contribution locus of the underlying Harness. Thus its three system types are compatible with, but orthogonal to, our GH/GTS/TSK labels: a tool-augmented forecasting system may contribute to GH, GTS, TSK, or several of them depending on which mechanism the paper actually changes.
+The recent survey by Xu et al. organizes LLM-based forecasting and prediction agents around standalone LLMs, tool- and retrieval-augmented systems, and hybrid systems, while connecting methods to training, evaluation, applications, and risks \citep{xu2026forecastagentsurvey}. We include it as a direct competitor survey because it provides a forecasting-centered systems map and a careful account of contamination, leakage, calibration, cost, and deployment feedback. Its organizing unit is the forecasting/prediction system and its lifecycle; our organizing unit is the contribution locus of the underlying Harness. Thus its three system types are compatible with, but orthogonal to, our GH/GTS/TSK labels: a tool-augmented forecasting system may contribute components at different Harness depths, while each individual component is assigned only to its deepest applicable layer.
 
 We re-read the broader literature through this additional contribution-locus question. Visible tools, memory, multimodality, decomposition, verification, and agent loops remain useful descriptors, but they do not resolve the locus decision under our protocol. We therefore use a seven-dimension \GeneralHarness{} comparison vocabulary synthesized from General Harness architecture, engineering, and agent-survey studies \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness,changsurvey2026,chen2026tsagentsurvey,xu2026forecastagentsurvey}. The surveyed sources use heterogeneous taxonomies; the seven dimensions are the common comparison layer we obtain by taking their recurring functional intersection. This vocabulary acts as a control layer, while the temporal obligations and the primary-locus rule provide the domain-specific coding and evaluation lens.
 
@@ -260,10 +261,36 @@ This survey makes four contributions.
   \item We connect system capabilities to evaluation, benchmarks, open-source resources, and open problems, including the transition from prediction to decision support.
 \end{enumerate}
 
-\begin{figure}[!t]
+\begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth,height=0.56\textheight,keepaspectratio]{artifacts/Overview.png}
-\caption{Overview of our survey.}
+\begin{tikzpicture}[font=\sffamily,>=stealth]
+  \tikzset{
+    box/.style={rounded corners=5pt, draw=#1!70!black, fill=#1!12, line width=.9pt, align=center},
+    small/.style={rounded corners=3pt, draw=#1!65!black, fill=#1!8, align=center, inner sep=4pt}
+  }
+  \node[box=surveyBlue, minimum width=.23\textwidth, minimum height=42mm] (llm)
+    {\textbf{LLM side}\\[2pt]representation\\alignment\\temporal reasoning};
+  \node[box=surveyBlue, minimum width=.68\textwidth, minimum height=58mm, right=7mm of llm] (gh)
+    {};
+  \node[anchor=north, font=\bfseries\sffamily\large, surveyBlue!80!black] at (gh.north) {General Harness};
+  \node[small=surveyBlue, minimum width=.18\textwidth, minimum height=12mm, below=8mm of gh.north west, anchor=north west] (gh1)
+    {interface\\and interaction};
+  \node[small=surveyBlue, minimum width=.18\textwidth, minimum height=12mm, right=3mm of gh1] (gh2)
+    {memory\\and context};
+  \node[small=surveyBlue, minimum width=.18\textwidth, minimum height=12mm, right=3mm of gh2] (gh3)
+    {tools, control,\\planning, coordination};
+  \node[box=surveyGold, minimum width=.60\textwidth, minimum height=31mm, below=7mm of gh.south, anchor=north] (gts)
+    {\textbf{General Time-Series Harness Module}\\
+    temporal state, operations, grounding, validation\\
+    \scriptsize seven General-Harness dimensions with temporal contracts};
+  \node[box=surveyGreen, minimum width=.50\textwidth, minimum height=20mm, below=5mm of gts.south, anchor=north] (tsk)
+    {\textbf{Task-Specific Harness Modules}\\
+    forecasting \quad augmentation \quad anomaly diagnosis \quad decision support};
+  \draw[->, surveyBlue!80!black, line width=1pt] (gh.south) -- (gts.north);
+  \draw[->, surveyGold!80!black, line width=1pt] (gts.south) -- (tsk.north);
+  \node[font=\bfseries\sffamily\large, surveyBlue!80!black, above=2mm of gh.north] {Time-Series Agent};
+\end{tikzpicture}
+\caption{Overview of the survey's four contribution dimensions. The LLM side is independent; the Harness side is nested from General Harness to General Time-Series Harness Module to Task-Specific Harness Modules. Each component is counted only at its deepest applicable Harness layer.}
 \label{fig:overview}
 \end{figure}
 
@@ -459,7 +486,7 @@ Anomaly agents localize events, propose or verify rules, retrieve incident evide
 
 Decision-support agents connect forecasts or diagnoses to actions under costs, constraints, uncertainty, and review requirements. The interface represents the current state, available actions, timing, and authority; memory retains forecasts, observations, policies, and prior outcomes; and tools expose simulators, optimizers, external data, and human-review channels. Planning maps predictive or diagnostic evidence to a sequence of actions, while control checks risk limits, counterfactual consequences, and escalation rules. Coordination becomes important when specialists debate a recommendation or when a decision must be audited by a human operator. Trading, traffic control, energy, climate, and health systems illustrate how a predictive output becomes a recommendation, policy, escalation, or operational record \citep{fincon2024,tradingagents2024,collmllight2026,climateagent2025,smartenergyagent2026}.
 
-The complete corpus is multi-label: a work may contribute to several Harness dimensions and several task families. The maintained ledger records the LLM-side contribution, the General Harness modules, the genuinely time-series-specific modules, and the task-specific modules separately.
+The complete corpus is multi-label across components: a work may contribute to several Harness dimensions and several task families, but each individual component is assigned to its deepest applicable Harness layer. The maintained ledger records both the inclusive evidence fields and the exclusive plotting labels, alongside the independent LLM-side contribution.
 \section{Infrastructure and Benchmarks for Time-Series Agents}
 \label{sec:evaluation}
 
