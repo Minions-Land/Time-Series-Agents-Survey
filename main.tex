@@ -110,6 +110,8 @@
 \newcommand{\typeSMshort}{\textsf{S--M}}
 \newcommand{\typeBenchshort}{\textsf{Bench}}
 \newcommand{\selfclaim}{\textsuperscript{\dag}}
+\newcommand{\RepoMoirai}{\textsuperscript{a}}
+\newcommand{\RepoLLMTSFD}{\textsuperscript{b}}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
 \newcommand{\fulltextcol}[1]{\dimexpr#1\textwidth-2\tabcolsep\relax}
@@ -151,7 +153,7 @@ The task space is broader than forecasting. Time-series systems may be asked to 
 
 However, real temporal analysis rarely ends with a single model output~\cite{promptstoagents2026,chen2026tsagentsurvey,xu2026forecastagentsurvey,aion2026,timeclaw2026harness}. A practitioner must inspect data quality, verify temporal granularity, identify regime shifts, retrieve events, select tools, compare models, validate against chronological splits, explain evidence, revise forecasts under constraints, and turn predictions into operational decisions. Such a workflow requires a runtime that can plan, act, preserve temporal state, call specialized tools, validate intermediate artifacts, and revise its behavior, rather than only a stronger backbone model.
 
-A central reason to study forecasting and related predictive tasks is that their outputs provide evidence for subsequent decisions. A forecast estimates what may happen under a stated information set; a decision must additionally determine what to do given objectives, constraints, costs, uncertainty, risk tolerance, and available actions. The decision may be to order inventory, adjust a forecast, escalate a diagnosis, change a control policy, or defer action and acquire more evidence. This does not make every forecasting method an Agent, nor does it require every Time-Series Agent to execute an external action. The distinction is whether the system closes, or explicitly supports, the loop from temporal evidence and prediction to validated action, revision, or accountable recommendation. In this sense, decision support extends prediction with state, tools, verification, and feedback, while prediction remains an important capability that an Agent can call, compare, and audit.
+A central reason to study forecasting and related predictive tasks is that their outputs provide evidence for subsequent decisions. A forecast estimates what may happen under a stated information set; a decision must additionally determine what to do given objectives, constraints, costs, uncertainty, risk tolerance, and available actions. The decision may be to order inventory, adjust a forecast, escalate a diagnosis, change a control policy, or defer action and acquire more evidence. A Time-Series Agent closes, or explicitly supports, this loop from temporal evidence and prediction to validated action, revision, or accountable recommendation. Decision support therefore extends prediction with state, tools, verification, and feedback, while prediction remains a capability that an Agent can call, compare, and audit.
 
 LLM agents provide a natural system abstraction for this broader workflow. In the general agent literature, the runtime around an LLM provides external computation, action schemas, tools, memory, state, execution loops, validators, observability, and permission boundaries \citep{ning2026codeharness,lee2026metaharness}. We describe LLM-based agents through the following runtime abstraction:
 
@@ -166,10 +168,11 @@ LLM agents provide a natural system abstraction for this broader workflow. In th
   bottom=10pt
 ]
 \[
-\textbf{LLM-based agent system} \approx \text{LLM} + \text{Harness}.
-\]
-\[
-\textbf{Time Series Agent system} \approx \text{LLM} + \text{(general) Harness} + \text{Time-Series Harness Module}.
+\begin{aligned}
+\textbf{LLM-based agent system} &\approx \text{LLM}+\text{Harness},\\
+\textbf{Time-Series Agent} &\approx \text{LLM}+\text{General Harness}\\
+&\quad +\text{Time-Series Harness Modules}+\text{Supporting Components}.
+\end{aligned}
 \]
 \end{tcolorbox}
 
@@ -275,48 +278,48 @@ This survey makes four contributions.
 
 \section{What Is a Time-Series Agent?}
 
-\subsection{The basic construction}
+A Time-Series Agent is a system in which an LLM operates through a reusable runtime and time-series-specific modules:
 
-We start with a simple construction. An LLM becomes useful as an agent when a surrounding system gives it tools, state, memory, execution, and checks. A time-series agent adds temporal data structures and operations to that system. We then ask how far each mechanism can be reused. The labels are mechanism-level descriptors and may coexist within one paper:
+\begin{tcolorbox}[
+  colback=surveyWarn,
+  colframe=surveyWarn,
+  boxrule=0pt,
+  arc=7pt,
+  left=12pt,
+  right=12pt,
+  top=10pt,
+  bottom=10pt
+]
+\[
+\begin{aligned}
+\textbf{Time-Series Agent}={}&\textbf{LLM}+\textbf{General Harness}\\
+&+\textbf{Time-Series Harness Modules}+\textbf{Supporting Components}.
+\end{aligned}
+\]
+\end{tcolorbox}
 
-\begin{itemize}
-  \item \textbf{GH (General Harness)}: the mechanism does not rely on temporal assumptions and can be transferred to another domain while preserving its core design. Examples include general memory retrieval, reflection, planning, and orchestration.
-  \item \textbf{GTS (General Time-Series Harness)}: the mechanism requires temporal data or operations but remains reusable across time-series task families. Examples include time-indexed workspaces, temporal slicing, alignment, and leakage guards.
-  \item \textbf{TSK (Task-Specific Harness)}: the mechanism is structurally tied to a task-family contract, so changing the task requires redesigning its state, actions, reward, tool semantics, or verifier. Examples include horizon-specific backtesting and anomaly-localization verification.
-\end{itemize}
+The LLM supplies language understanding and reasoning. The General Harness supplies interaction, memory, tools, execution, control, planning, optimization, and coordination. Time-Series Harness Modules preserve temporal state, operations, context, and validation. Supporting components include statistical models, time-series foundation models, databases, simulators, retrieval systems, and evaluators.
 
-Chen et al.\ \citep{chen2026tsagentsurvey} provide a useful task-oriented summary of the field, covering forecasting and reasoning, augmentation and synthesis, anomaly detection and diagnosis, and decision support. We use these families as descriptive entry points for the literature and for the task-facing examples below. They are not an additional layer in our framework: the central question remains how the Harness mechanism is reused across domains and task settings, and whether a task-specific contract must be redesigned.
+The rest of the survey follows these construction layers. Section~3 isolates changes to the LLM; Section~4 describes the General Harness; Section~5 identifies the parts that become genuinely time-series-specific; Section~6 instantiates them under four task families; and Section~7 evaluates the resulting systems and the infrastructure needed to benchmark them.
+\section{LLM-Side Contributions for Time-Series Agents}
 
-\subsection{What the LLM and its surrounding system provide}
+The LLM is one of the three principal construction layers in a Time-Series Agent. This section records work that changes the model's ability to represent, align, understand, or reason about temporal data. The surrounding Harness is discussed in the following sections.
 
-For the LLM-based systems in scope, a standalone LLM produces text conditioned on a prompt, whereas we model an agent system as an LLM coupled with a runtime that controls the interaction between model outputs and the external environment. Recent agent-harness literature describes this surrounding layer through reasoning and acting interfaces, environment models, execution environments, tool protocols, context and memory systems, orchestration loops, verification interfaces, observability, governance, and optimization mechanisms \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness}. The cited works use heterogeneous source units---interface roles, mechanisms, architectural layers, and method-specific editable components---so \emph{component} is our operational umbrella term for a structural-functional vocabulary, not a claim that the sources share one component ontology.
+\subsection{Temporal representation and alignment}
 
-The seven dimensions in Table~\ref{tab:component-vocab} form the domain-agnostic comparison layer. Their functions are supported across the reviewed Harness and agent surveys, while the detailed 14-component vocabulary is retained for ledger-level coding in Table~\ref{tab:fine-component-vocab}. This decomposition is domain-agnostic: it describes the runtime functions shared by general agents, while the domain module specifies what a time-series runtime should preserve.
+These methods connect numerical sequences, time structure, and language representations. Time-LLM reprograms a frozen language model with text prototypes and a prompt prefix, while LLM4TS aligns a pretrained language model with time-series inputs for data-efficient forecasting \citep{jin2024timellm,chang2024llm4ts}. Multimodal systems extend the interface to visual or textual temporal context \citep{timevlm2025,timeomnivl2026}. Their contribution is the model-side representation and alignment that makes temporal signals available to language-model reasoning.
 
-\subsection{Why temporal work requires additional capabilities}
+\subsection{Temporal instruction, interaction, and reasoning}
 
-Time series are often ordered, scale-sensitive, and dependent on temporal context. These properties motivate---but do not logically entail---a non-exhaustive working set of runtime design obligations. The set is an author-proposed engineering synthesis of recurring temporal failure modes, informed by the literature surveyed below; it is not a derivation of a unique six-element ontology. The component-to-obligation mapping is many-to-many. Individual obligations apply only when their preconditions hold, such as a prospective information boundary, exact numerical semantics, the use of external context, or an output with probabilistic meaning. Missingness is handled within time-indexed state, uncertainty within output auditability when applicable, and non-stationarity across state and validation rather than as additional taxonomy axes. The six design obligations are:
+A second line teaches the model to discuss and reason over temporal evidence. ChatTS constructs synthetic time-series instruction data and time-series dialogue for understanding and reasoning \citep{chatts2025}. Its direct extension, Towards Time-Series Reasoning, combines a trainable temporal encoder with supervised reasoning traces for cross-domain perception and analysis \citep{chow2024tsreasoning}. These works make natural-language temporal interaction a learned model capability rather than only a prompt format.
 
-\begin{itemize}
-  \item \keyterm{Temporal causality}: when a prospective or as-of-time information boundary exists, future observations, labels, events, and revisions must not enter earlier state, actions, retrieval, decisions, or evaluation.
-  \item \keyterm{Numerical fidelity}: when values, units, scales, timestamps, or precision affect the declared semantics, representations and interfaces should preserve them within a stated tolerance.
-  \item \keyterm{Time-indexed state integrity}: when temporal objects persist across runtime steps, timestamps, frequency, missingness, covariates, channels, units, provenance, and revision history should remain semantically available and auditable.
-  \item \keyterm{Temporal operation semantics}: time-sensitive operations such as slicing, aggregation, decomposition, smoothing, forecasting, anomaly localization, event alignment, and metric computation should have explicit interval, horizon, and input--output semantics that can be replayed or checked.
-  \item \keyterm{Temporal grounding of context}: when textual, visual, tabular, or event context is consumed, it should be bound to the relevant intervals, lags, horizons, availability times, provenance, and causal assumptions.
-  \item \keyterm{Output auditability with conditional uncertainty validation}: analytical outputs should expose a task-appropriate validation route, such as an executable checker, metric, evidence trace, or documented human-review protocol. When an output carries probabilistic, confidence, or interval semantics, its uncertainty should additionally be evaluated on a declared reference population using a task-appropriate scoring rule.
-\end{itemize}
+\subsection{LLM adaptation and the model-side boundary}
 
-For compact matrix and summary-table labels, \emph{Output auditability} denotes the full sixth obligation, including conditional uncertainty validation when its probabilistic preconditions hold.
+LLM-side adaptation includes continued training, parameter-efficient adaptation, temporal adapters, and task-specific supervision. Foundational studies such as LLMTime establish what serialized numerical inputs can and cannot provide to a language model \citep{gruver2023llmtime,tan2024useful,merrill2024struggle}. We record the model-side change separately from Harness changes: a paper may contribute to this section and also introduce temporal tools, memory, or task contracts.
+\section{General Harness}
+\label{sec:general-harness}
 
-Together, these obligations form a reusable checklist for a \GeneralTSHarness{}. They are grouped by their shared temporal scope and failure consequences, not because they occupy the same ontological layer: their primary enforcement objects span constraints, representations, state, action interfaces, evidence binding, and output verification. An obligation may be marked \emph{not applicable} when its precondition is absent, or \emph{not currently evaluable} when it applies but the available artifact does not expose a valid test; neither status should be counted as a pass.
-
-A second level is task-specific. Forecasting modules introduce horizon contracts, backtesting, model-selection policies, forecast reconciliation, ensembling, and revision ledgers. Anomaly modules introduce localization, incident windows, rule synthesis, root-cause evidence, and deployment gates. Classification modules introduce channel-wise evidence, exemplar memories, label calibration, and confidence aggregation. QA modules introduce temporal question schemas, faithful tool execution, and evidence-grounded answer checking. Imputation modules introduce missingness mechanisms, mask-aware operators, and reconstruction validation; we retain imputation as a reserved task family although the current ledger contains no dedicated imputation-agent system. This is why Time Series Agents are not equivalent to prompting an LLM with a CSV. The \TSHarnessModule{} changes what the LLM can observe, which actions it can take, how intermediate evidence is stored, how outputs are verified, and how experience is reused. The six obligations span the analysis pipeline from data intake to output verification; turning a verified output into an accountable downstream \emph{decision} is the next lifecycle stage and remains an open frontier.
-
-\section{Capabilities of a Time-Series Agent}
-
-The component map follows the hierarchy in Table~\ref{tab:harness-hierarchy}. The \GeneralHarness{} is summarized by the seven-dimension comparison vocabulary and backed by a fine-grained structural-functional vocabulary for ledger coding \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness}. The Time-Series Harness Module then specifies which temporal objects, operations, context bindings, and validation requirements the runtime must support. Its cross-task mechanisms form the \GeneralTSHarness{}; its task-bound mechanisms form the \TaskSpecificHarness{}. The task categories reviewed in prior time-series surveys provide the output contracts that make this final distinction concrete. Thus the map proceeds from general runtime components, to temporal specialization, to task-specific instantiation.
-
-\subsection{General capabilities shared with other agents}
+The General Harness is the reusable runtime around the LLM. We include only mechanisms demonstrated in the reviewed Time-Series Agent corpus; General Agent surveys provide the vocabulary and comparative basis for the seven dimensions \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness,changsurvey2026,chen2026tsagentsurvey,xu2026forecastagentsurvey}.
 
 Table~\ref{tab:component-vocab} states the seven-dimension domain-agnostic runtime vocabulary used in this survey. The dimensions are the recurring functional intersection across the Harness and agent surveys \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness,changsurvey2026,chen2026tsagentsurvey,xu2026forecastagentsurvey}; the detailed 14-component vocabulary used for ledger coding is provided in Table~\ref{tab:fine-component-vocab}.
 
@@ -346,240 +349,119 @@ Coordination and Scaling & How do multiple agents divide work, communicate, and 
 \end{longtable}
 \endgroup
 
-\subsection{Capabilities specific to temporal data}
+The seven dimensions organize the evidence below. Each subsection first states the general mechanism and then points to its use in a Time-Series Agent. A paper can contribute to several dimensions.
 
-Table~\ref{tab:gts-invariants} presents the six author-proposed design obligations. They span different primary enforcement objects---constraints, representations, state, action interfaces, evidence binding, and output validation---and therefore should be read as a pipeline-spanning checklist rather than as mutually exclusive taxonomy dimensions or ontologically identical invariants. The final column illustrates task-specific instantiation without creating a second taxonomy axis.
+\subsection{Interface and Interaction}
 
-\begingroup
-\small
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{longtable}{L{\fulltextcol{0.18}} L{\fulltextcol{0.17}} L{\fulltextcol{0.34}} L{\fulltextcol{0.31}}}
-\caption{Six non-exhaustive \GeneralTSHarness{} design obligations and example task-specific instantiations.}
-\label{tab:gts-invariants}\\
-\toprule
-\textbf{Design obligation} & \textbf{Motivated by} & \textbf{Cross-task requirement and applicability} & \textbf{Task-specific instantiation}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Design obligation} & \textbf{Motivated by} & \textbf{Cross-task requirement and applicability} & \textbf{Task-specific instantiation}\\
-\midrule
-\endhead
-Temporal causality & Orderedness plus an as-of-time boundary & Declare an allowed-context cutoff and prevent later observations, labels, events, or revisions from entering earlier decisions. N/A for explicitly retrospective full-record analysis. & Horizon-respecting backtests; anomaly label-window separation; QA context truncation.\\
-Numerical fidelity & Scale sensitivity and exact-operation demands & Preserve values, scales, units, timestamps, and precision through representations and interfaces within a stated tolerance. & Forecast-value and unit checks; timestamp/threshold precision; mask-aware imputation values.\\
-Time-indexed state integrity & Ordered and metadata-dependent state & Preserve temporal schema, alignment, missingness, channels, units, provenance, and data vintage whenever state persists across runtime steps. & Forecast ledgers; anomaly windows; class exemplars; QA evidence states.\\
-Temporal operation semantics & Order-sensitive transformations & Give slicing, resampling, aggregation, alignment, decomposition, and metric computation explicit typed or otherwise checkable temporal semantics. & Horizon operators; anomaly localization; classification aggregation; TSQA tool checks.\\
-Temporal grounding of context & Dependence on external temporal context & When external context is used, bind it to intervals, lags, horizons, availability times, provenance, and causal-status assumptions. & Event-conditioned forecasting; distractor-aware retrieval; evidence-grounded QA.\\
-Output auditability with conditional uncertainty validation & Analytical accountability; probabilistic semantics when present & Expose an applicable checker, metric, evidence audit, or human-review protocol. When probabilistic semantics are present, add reliability or calibration diagnostics and/or proper scoring rules on a declared reference population. & Executable scoring and evidence checks; conditional coverage, reliability, or proper-scoring-rule evaluation.\\
-\bottomrule
-\end{longtable}
-\endgroup
+Inference interfaces expose the model's input state and intermediate reasoning; action interfaces turn a decision into a tool call or executable operation; environment modeling represents observations, artifacts, and feedback; user interaction supports natural-language requests and review; and the state--action loop connects successive steps. TS-Agent, TimeART, and TSAG instantiate these mechanisms with temporal analysis requests and executable analytical tools \citep{tsagent2025,timeart2026,tsag2026}.
 
-\subsection{From shared temporal capabilities to task-specific ones}
+\subsection{Memory and Context}
 
-Table~\ref{tab:invariant-component-matrix} is an author-proposed illustrative crosswalk, not an empirical measurement, a validation of the six obligations, or a uniquely determined architecture. The unit of coding is one ordered pair consisting of an obligation and a Harness component. For each pair we ask three questions in order: (Q1) within the component responsibility stated in Table~\ref{tab:fine-component-vocab}, must the component consume or produce an obligation-specific object, field, or rule? If not, the cell is blank. (Q2) Can the component locally prevent, reject, or detect a violation using an explicit criterion? If so, the cell is marked $\bullet$ for direct enforcement or detection. (Q3) Otherwise, does it directly store, transport, schedule, or expose the obligation-specific information for an enforcing component? If so, the cell is marked $\circ$ for a supporting or carrying role; otherwise it is blank. Generic usefulness, a merely possible future specialization, or an effect mediated entirely by another component does not qualify. Ambiguous cells are coded downward ($\bullet\!\rightarrow\!\circ\!\rightarrow$ blank) and retained for review. ``Direct'' is non-exclusive: several components may enforce different boundaries of the same obligation.
+Memory and context mechanisms preserve information across turns, retrieve prior cases, and expose relevant evidence. Time-series systems use event histories, prior trajectories, temporal fingerprints, and reusable analytical procedures in this layer \citep{agenticrag2024,timecap2025,timeclaw2026harness,forecastcompass2026}.
 
-\begin{table}[!htbp]
-\centering\small
-\setlength{\tabcolsep}{5pt}
-\begin{tabularx}{\textwidth}{@{}X*{6}{c}@{}}
-\toprule
-Component & Causality & Fidelity & State & Operations & Context & Output\\
-\midrule
-Planning & $\circ$ &  & $\circ$ & $\circ$ & $\bullet$ & $\circ$\\
-Memory & $\bullet$ &  & $\bullet$ & $\circ$ & $\bullet$ & \\
-Tool use & $\bullet$ & $\bullet$ & $\circ$ & $\bullet$ & $\bullet$ & $\bullet$\\
-Control & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$\\
-Optimization &  &  &  &  &  & \\
-Reasoning & $\circ$ & $\circ$ &  & $\bullet$ & $\circ$ & $\circ$\\
-Acting & $\bullet$ & $\bullet$ & $\circ$ & $\bullet$ & $\circ$ & $\circ$\\
-Environment & $\bullet$ & $\circ$ & $\bullet$ & $\circ$ & $\bullet$ & $\circ$\\
-Execution & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ &  & $\bullet$\\
-Artifacts & $\circ$ & $\bullet$ & $\bullet$ & $\circ$ & $\circ$ & $\bullet$\\
-Lifecycle & $\circ$ & $\circ$ & $\circ$ & $\circ$ & $\circ$ & $\bullet$\\
-Verification & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$\\
-Observability & $\bullet$ & $\circ$ & $\bullet$ & $\circ$ & $\circ$ & $\bullet$\\
-Multi-agent & $\circ$ & $\circ$ & $\circ$ & $\circ$ & $\circ$ & $\circ$\\
-\bottomrule
-\end{tabularx}
-\caption{Relationship between general agent components and temporal requirements. $\bullet$ denotes direct enforcement or detection; $\circ$ denotes a supporting role; a blank indicates no direct role in this mapping. State, operations, context, and output refer to time-indexed state integrity, temporal operation semantics, temporal grounding of context, and output auditability.}
-\label{tab:invariant-component-matrix}
-\end{table}
+\subsection{Tools and Execution}
 
-The crosswalk is intended to be falsifiable. For example, an as-of retrieval tool that rejects data later than a decision cutoff directly enforces temporal causality ($\bullet$), whereas a lifecycle that merely schedules training and evaluation carries a chronological plan without independently checking access ($\circ$). Likewise, an observability layer that merely records a metric supports output auditability ($\circ$); it becomes a direct enforcement or detection point only if it recomputes a metric, detects a declared evidence-completeness or uncertainty-validation breach, or blocks release under an acceptance rule. The next layer is task-specific: it does not introduce a new parallel principle, but instantiates the applicable obligation under a forecasting, anomaly, classification, QA, benchmark, or deployment output contract. A fresh model coder then received only the frozen protocol and an 84-cell packet with no prior symbols or rationales. It reproduced 59/84 three-level codes (70.2\%; nominal Cohen's $\kappa=0.506$). Twenty of the 25 disagreements lay on the $\bullet$/$\circ$ boundary, including 19 canonical $\bullet\!\rightarrow\!\circ$ cases. When $\bullet$ and $\circ$ are collapsed into any obligation-specific role versus blank, agreement is 79/84 (94.0\%). The author-coded v1 matrix was frozen before this probe, and no disagreement was used to tune the protocol or canonical cells. This is a model-based sensitivity probe, not human inter-rater reliability, independent expert validation, or evidence that the matrix is uniquely correct; the moderate three-level result is an additional reason to read the matrix as an illustrative design crosswalk.
+Tools and execution expand the action space through code, statistical models, TSFMs, visualizers, retrievers, simulators, and validators. Forecasting and anomaly systems place these components behind callable interfaces so the LLM can select, execute, compare, and report them \citep{timeseriesscientist2025,timecopilot2026,argos2025,anomamind2026}.
 
-\section{What Existing Work Contributes}
+\subsection{Control, Verification, and Feedback}
 
-\subsection{Temporal models as agent components}
+Control and verification route feedback, enforce constraints, manage retries, and check intermediate or final artifacts. Representative systems use reflection, critic review, validation gates, and faithfulness checks to revise a trajectory or reject an invalid result \citep{flairr2025,tsag2026,veritime2026,tracebench2026}.
 
-The component-centric view does not discard model-centric time series research. Instead, it changes its role. Classical statistical models, deep forecasters, TSFMs, LLM-based time series models, and multimodal temporal models become callable temporal tools inside the \TSHarnessModule{} \citep{ansari2024chronos,das2024timesfm,rasul2023lagllama,goswami2024moment,timegpt2023,jin2024timellm,unitime2024,chattime2025,timevlm2025,timeomnivl2026}. They may provide forecasting, representation learning, sequence generation, multimodal understanding, or domain adaptation. They are not sufficient to define an agent, but they are important capabilities that an agent can select, execute, compare, and verify. One consequence of this synthesis is that prior time-series models need not be treated as competitors to Time Series Agents as a category; they can be embedded as components of a broader agent runtime, consistent with the model-to-agent process view articulated in ATSF \citep{atsf2026}.
+\subsection{Planning and Workflow}
 
-This distinction also helps interpret the debate on LLMs for time series. Prior studies show that LLMs struggle with direct numerical forecasting or zero-shot time-series reasoning when signals are serialized as text \citep{tan2024useful,merrill2024struggle}. A domain module reduces this burden by keeping temporal objects native, exposing operations through typed tools, and using the LLM for planning, context integration, and evidence synthesis.
+Planning and workflow mechanisms decompose a request into data preparation, analysis, model selection, validation, reporting, and revision. Time-series agents use these mechanisms to connect tools and artifacts into a reproducible analysis procedure \citep{timeseriesscientist2025,timecap2025,climateagent2025,aion2026}.
 
-\subsection{Contextualized and multimodal time series}
+\subsection{Optimization and Evolution}
 
-Contextualized time series connect numerical signals with external events, documents, images, domain descriptions, and natural-language questions. Existing benchmarks evaluate whether models can use textual context for forecasting, answer temporal questions, reason over multimodal evidence, handle health signals, and solve event-informed tasks \citep{contextiskey2025,timemqa2025,mtbench2025,mmtsbench2026,tsaqa2026,tsrbench2026,hearts2026,temporalbench2026}. These evaluation settings motivate two domain components: temporal grounding of external context, and leakage-aware evaluation of context-conditioned reasoning.
+Optimization and evolution improve prompts, tools, policies, memories, or trajectories using feedback. TimeClaw, MetaCaster, CastFSR, and related systems treat experience, validation outcomes, or execution traces as material for capability improvement \citep{timeclaw2026explore,metacaster2026,castfsr2026,crafter2026}.
 
-The taxonomy records a separate LLM-component contribution alongside the Harness loci. This field captures work whose principal advance is in adapting, aligning, or supervising the language model itself---for example, ChatTS uses synthetic instruction data and time-series dialogue to align an LLM with temporal inputs and reasoning. Such a contribution can coexist with GH, GTS, or TSK labels; it is not collapsed into a Harness label.
+\subsection{Coordination and Scaling}
 
-The resulting literature can be read through three connected strands: time-series-only analysis, agentic temporal workflows, and contextualized or multimodal temporal reasoning \citep{timeclaw2026harness}. In a Time Series Agent, these strands correspond to different parts of the \TSHarnessModule{}: contextual methods contribute evidence and retrieval interfaces, TSQA benchmarks~\cite{tsaqa2026} contribute validation tasks, and multimodal temporal methods contribute cross-modal state representations.
+Coordination and scaling divide work among specialized roles, share state, and combine review or debate. Multi-agent time-series systems use numeric, visual, textual, analyst, reviewer, and executor roles to construct a joint result \citep{tsdebate2026,mas4ts2026,aimeteorologist2025,fincon2024}.
+\section{General Time-Series Harness}
+\label{sec:general-ts-harness}
 
-\subsection{Agentic systems for temporal workflows}
+The General Time-Series Harness is the time-series specialization of the seven General Harness dimensions. We include a mechanism here only when its core representation, operation, or validator depends on temporal order, index, frequency, window, horizon, regime, availability time, or leakage control. A generic chat loop, Python call, or reflection step remains General Harness.
 
-Representative Time Series Agent work makes temporal reasoning tool-grounded. TS-Agent reasons over raw time series through iterative statistical insight gathering \citep{tsagent2025}. TimeART trains tool-augmented time-series reasoning on TimeToolBench \citep{timeart2026}. TSAG evaluates financial tool selection and faithfulness \citep{tsag2026}. Agentic RAG for TSA routes requests through a hierarchy of task-specialized agents \citep{agenticrag2024}. FETA, ZARA, TESSA, and MarsTSC use multi-agent, retrieval-augmented, annotation, or self-evolving knowledge-bank mechanisms for classification, activity recognition, and annotation \citep{feta2025,zara2025,tessa2024,marstsc2026}. These works primarily contribute to interface design, tool use, role decomposition, and task-specific evidence construction.
+\subsection{Interface and Interaction}
 
-Workflow agents place temporal models inside end-to-end analysis procedures. Existing systems decompose forecasting into curation, planning, modeling, validation, reporting, retrieval, explanation, assistant interaction, and last-mile revision \citep{timeseriesscientist2025,timecap2025,timexl2025,flairr2025,nexus2026,timecopilot2026,lastmile2026,alphacast2025,finarena2025}. Similar workflow designs have also been developed for anomaly detection, diagnosis, and domain monitoring \citep{argos2025,anomamind2026,chatad2026,timera2025,sagead2026,dast2026,sagesleep2026}.
+Time-series interfaces expose as-of time, horizon, frequency, window, channel, and unit semantics. An action such as slice, align, aggregate, or forecast carries temporal arguments that determine what information is available and what output contract is produced.
 
-Multi-agent systems coordinate heterogeneous evidence or roles. TS-Debate separates numeric, visual, and textual evidence agents, while MAS4TS coordinates Analyzer, Reasoner, and Executor roles for visual time-series reasoning \citep{tsdebate2026,mas4ts2026}. WeatherTGD and AI-Meteorologist show the same pattern in meteorological interpretation, using specialized roles or structured report-generation modules to turn temporal observations into grounded narratives \citep{weathertgd2026,aimeteorologist2025,hierarchicalmeteorologist2025}. These works primarily contribute to multi-agent coordination, but their value depends on a shared temporal evidence state.
+\subsection{Memory and Context}
 
-\subsection{Adjacent LLM agents for data science}
+Temporal memory preserves time-indexed state, missingness, provenance, data vintage, event history, and revision records. The state remains queryable as it was known at a declared time, which distinguishes it from an ordinary conversation buffer.
 
-Time Series Agents also inherit ideas from LLM agents for data science and machine-learning engineering. Prior work shows how agents can write code, inspect intermediate outputs, reuse cases, modify files, run experiments, and reason over machine-learning pipelines . These systems are not time-series agents by themselves, but they define \GeneralHarness{} mechanisms--code execution, experiment management, stateful artifacts, and evaluation feedback--that can be specialized by a \GeneralTSHarness{} and then by task-specific temporal modules. In our component map, they mainly inform the general-agent layer, whereas time-series agent systems specialize those mechanisms for temporal data and concrete temporal tasks.
+\subsection{Tools and Execution}
 
-\subsection{Self-evolving and component-explicit systems}
+Time-series tools implement temporal slicing, resampling, aggregation, decomposition, backtesting, forecasting, anomaly localization, imputation, and context alignment. Their semantics must specify intervals, horizons, time zones, units, and missing-data behavior.
 
-Recent systems make runtime components trainable or self-extending. They formulate forecasting as sequential decision-making, compare execution trajectories using task metrics, distill successful procedures into reusable experience, synthesize task-specific forecasters or corrective features, and formalize realistic tasks through workspaces and validation interfaces \citep{castr12026,timeclaw2026explore,kairosagent2026,metacaster2026,crafter2026,aion2026}. A related task-specific direction trains reasoning policies, evidence-selection policies, or process-verifiable traces for temporal reasoning and forecasting \citep{timer12025,timemaster2025,veritime2026,artist2026,counts2025,streasoner2026,timeomni2026}. TimeOmni-1 is included as a non-self-claimed boundary case at \layerTSK{}: its contribution is a time-series reasoning policy rather than an external tool-using agent runtime, but it is treated consistently with COUNTS and VeriTime.
+\subsection{Control, Verification, and Feedback}
 
-This direction is especially relevant when the system explicitly designs the \TSHarnessModule{} rather than only a task-specific prompt or workflow. A time-series-native runtime can host series in a task-local workspace, expose executable temporal tools, store episodic multimodal memory, and evolve new tools from verified trajectories, thereby connecting forecasting with contextual reasoning and domain-specific temporal analysis \citep{timeclaw2026harness}.
+Temporal control checks chronological splits, allowed-context policies, leakage, units, frequency, drift, uncertainty, and evidence completeness. These checks operate on the temporal contract of the runtime, not only on the final task score.
 
-The July--August 2026 increment broadens the corpus across data curation, forecasting, anomaly analysis, and evaluation. BatteryLake and TopoBrick make temporal data and exogenous-variable handling part of the agent workflow \citep{batterylake2026,topobrick2026}; HydroAgent, CastFSR, ReasonCast, and MetaCaster specialize forecasting orchestration \citep{hydroagent2026,castfsr2026,reasoncast2026,metacaster2026}; TimeRLM, AgenticTwin, and EvoTS-Agent specialize anomaly localization or change-point analysis \citep{timerlm2026,agentictwin2026,evotsagent2026}. TimeSage-EV adds a live, rolling-cutoff cross-task benchmark, while TraceBench provides a controlled task-specific root-cause-attribution benchmark \citep{timesageev2026,tracebench2026}.
+\subsection{Planning and Workflow}
 
-\section{Patterns in Existing Time-Series Agents}
+Temporal workflows schedule rolling-origin evaluation, horizon-aware model selection, context retrieval by availability time, forecast revision, incident escalation, and report generation. The planning state therefore carries temporal checkpoints and reproducible data boundaries.
 
-The maintained ledger joins each work's bibliographic identity and first-public date, claim summary and evidence status, GH/GTS/TSK mechanism profile, Harness components, and multi-label task instantiations. Harness and task are recorded as separate axes: the former locates what the runtime contributes, while the latter records where those mechanisms are instantiated. The MoiraiAgent entry is a repository-level software resource rather than a paper citation; its source is given in a footnote.\footnote{Salesforce AI Research, \emph{MoiraiAgent project repository}, \url{https://github.com/SalesforceAIResearch/uni2ts/tree/main/project/moirai-agent}.}
+\subsection{Optimization and Evolution}
 
-The contribution split is most useful when it is auditable at the work level. We therefore maintain a work-by-work ledger and use it as the basis for the tables below, with documented screening criteria and an explicit, auditable classification protocol. \emph{Screening} decides inclusion by domain relevance alone: a work enters the count if its primary object is temporal data and it interacts with that data in an LLM runtime beyond being called as a plain model, or proposes an evaluation protocol for time-series agent behavior. \emph{Classification} then assigns, for the percentage claim, one primary contribution level---\layerGH{} for \GeneralHarness{}, \layerGTS{} for \GeneralTSHarness{}, and \layerTSK{} for \TaskSpecificHarness{}---by where the main contribution enters the runtime. Inclusion, level, and whether a paper calls itself an agent are three independent judgments: inclusion is domain relevance, not agent identity, so benchmarks and non-agent modules are counted when they are in scope. The following inclusion criteria and classification rules guide the organization of the reviewed literature. The purpose of the level assignment is not to reduce a system to one label; it is to expose what the paper is mainly teaching the field to build. We additionally record, as pure metadata, whether a paper explicitly claims an agent, agentic, or multi-agent system (marked \selfclaim{} when it does \emph{not}); this metadata never gates inclusion or level. By contribution type we distinguish only \typeSM{} works, which deliver a runnable system or reusable method, from \typeBench{} works, whose primary deliverable is an evaluation benchmark or testbed. Pure temporal foundation models and adjacent data-science agents are discussed elsewhere, but are not counted in this agent-harness statistic.
+Temporal optimization uses regimes, temporal experience, shifting distributions, and revision outcomes to update prompts, tools, memories, or policies. A reusable mechanism must preserve its temporal contract when the downstream task changes.
 
-In the incrementally screened snapshot through 2026-08-30, the ledger contains 139 works. By contribution type, 128 are \typeSM{} works and 11 are \typeBench{} works. The primary contribution distribution is: \layerGH{} 6/139 = 4.3\%, \layerGTS{} 9/139 = 6.5\%, and \layerTSK{} 124/139 = 89.2\%. The self-claim metadata cuts across this: 10 of the 139 works do not call themselves agents, and all ten fall in the \layerTSK{} layer, where they account for 15.9\% of the layer; the current \layerGH{} and \layerGTS{} primary sets are entirely self-claimed. This concentration is a property of the reviewed snapshot, not an inclusion gate: non-self-claimed methods remain counted and are assigned by runtime locus. These proportions describe this enumerated list and are not estimates of all eligible works by the cutoff. Within the snapshot, substantially more works have task-specific than cross-task temporal support as their primary locus; that distribution does not by itself establish maturity or causal underdevelopment. Figure~\ref{fig:contribution-trend} shows the cumulative composition for the 137 ledger entries with an identifiable public month (two repository-only records lack a datable posting); we read it as an August 2026 snapshot rather than a trend, since 53.9\% of the dated works fall in the most recent six months. The historical v2.3 ledger remains a frozen 54-work coding artifact, so its 47/54 reproducibility probe below is retained as a historical result rather than recomputed over the expanded corpus.
+\subsection{Coordination and Scaling}
 
-\subsection{How works were selected and compared}
+Multi-agent temporal coordination shares aligned series, event windows, provenance, and evidence identifiers across numeric, visual, textual, planning, and review roles. Without a common temporal state, coordination can produce internally consistent but temporally misaligned conclusions.
 
-\textbf{Screening.} We separate corpus membership from taxonomy assignment. The literature selection covers work available by August 30, 2026. Relevant search concepts combine time-series tasks, including forecasting and anomaly detection, with LLM agents, tool use, reasoning, and workflow design.
-After de-duplication, a work is in scope when temporal data are its primary object and an LLM runtime interacts with those data beyond calling a plain predictive model, or when the work proposes an evaluation protocol for time-series agent behavior. Time-R1 \citep{timer12025}, CALM \citep{calm2025}, and TimeOmni-1 \citep{timeomni2026} are positive non-self-claim boundary examples because each contributes an in-scope temporal runtime or reasoning-policy method. Chronos, TimesFM, and TimeOmni-VL are negative controls because they are models without an agent runtime \citep{ansari2024chronos,das2024timesfm,timeomnivl2026}. Mint-Agent is also excluded from the ledger: it is a finance-native research agent, but its public paper does not make a time-series object or time-series runtime contract load-bearing \citep{mintagent2026}. Data Interpreter and TimeSeriesGym remain excluded as generic data-science or ML-engineering agent settings; text-serialization-only studies are excluded for the same runtime-scope reason. The cutoff is determined by the first public version, and a stable official software artifact is accepted when the work itself is released as software. Companion reports are merged only under an explicit system-family work-unit rule with all locators retained. The corpus was assembled incrementally and contains 139 works with public bibliographic or official software sources. The reported distributions describe this reviewed collection.
+\subsection{Cross-dimensional temporal requirements}
 
-Screening, locus, and self-claim are independent judgments. A paper can therefore enter the corpus without calling itself an agent, and an uncertain locus assignment is held as \emph{pending} rather than used to reverse the inclusion decision. No work in the current ledger remains pending.
-
-\textbf{Classification.} The primary-locus decision uses the same structural rule for systems, methods, and benchmarks:
+The seven dimensions jointly enforce six recurring requirements:
 
 \begin{itemize}
-  \item Assign \layerGH{} when the main mechanism introduces no temporal-specific assumption, or when a benchmark measures domain-agnostic agent planning, tools, or control.
-  \item Assign \layerGTS{} when the mechanism is tied to a temporal substrate but can support different task families without redesigning its core runtime, or when a benchmark measures cross-task temporal contracts or temporal-agent robustness.
-  \item Assign \layerTSK{} when the core state, actions, reward, tool semantics, or verifier is structurally tied to a fixed task-family output contract, or when a benchmark measures one temporal task family.
+  \item \textbf{Temporal causality}: future observations, labels, events, or revisions do not enter an earlier state, action, retrieval, or evaluation.
+  \item \textbf{Numerical fidelity}: values, scales, units, timestamps, and precision survive representation and tool boundaries.
+  \item \textbf{Time-indexed state integrity}: alignment, missingness, channels, provenance, and data vintage remain available and auditable.
+  \item \textbf{Temporal operation semantics}: slicing, resampling, aggregation, forecasting, localization, and metric operations have explicit interval and horizon semantics.
+  \item \textbf{Temporal grounding}: external context is bound to the relevant interval, lag, horizon, availability time, provenance, and causal assumptions.
+  \item \textbf{Output auditability}: analytical outputs expose a task-appropriate checker, metric, evidence trace, or review protocol, with uncertainty validation when probabilistic semantics apply.
 \end{itemize}
 
-For a system or method, the operative boundary between \layerGTS{} and \layerTSK{} is structural. A dynamically instantiated query contract is not, by itself, sufficient for \layerTSK{}; changing task family must require redesign of a core runtime element. Demonstration on multiple task families raises confidence but does not itself change the locus.
+These requirements are the cross-task design checklist; the next section instantiates them under four task contracts.
+\section{Task-Specific Time-Series Harness}
+\label{sec:task-specific-harness}
 
-Mechanism descriptions retain all applicable layers. The existing primary-locus counts summarize the dominant emphasis recorded in the original work-level classification; they do not impose an exclusive category on a paper or measure the prevalence of every mechanism. The detailed profiles below show the mechanisms at each layer.
+Task-specific Harness modules instantiate the General Time-Series Harness under a concrete output contract. We use four task families and apply the same seven-module lens within each one: interface, memory, tools, control and verification, planning, optimization, and coordination.
 
-\textbf{Model-based coding reproducibility probe.} After freezing the v2.3 corpus and the clarified task-family-contract rule, a fresh model coder that had not participated in rubric design, corpus adjudication, or prior reviews received only the final rubric and a blinded 54-work packet. It agreed with the canonical labels on 47/54 works (87.0\%); chance correction under the observed class marginals gives Cohen's $\kappa=0.656$. Per-class F1 is 0.667 for \layerGH{}, 0.737 for \layerGTS{}, and 0.916 for \layerTSK{}, exposing that the two smaller boundary classes remain less reproducible than the task-specific majority. Seven disagreements remain. We report this as a model-based reproducibility probe rather than human inter-rater reliability, and we do not use these fresh disagreements to revise either the rubric or canonical labels; doing so would turn the same cases into a post-hoc agreement estimate. The full confusion matrix and case-level disagreements are archived with the frozen blind output.
+\subsection{Forecasting and Prediction}
 
-\subsection{Scope and limitations}
+Forecasting agents manage horizons, chronological splits, model selection, probabilistic outputs, revision, and deployment constraints. Forecasting workflows combine temporal tools and memory with task-bound backtesting, forecast reconciliation, and revision rules \citep{timeseriesscientist2025,timecap2025,timecopilot2026,lastmile2026,hydroagent2026,castflow2026}.
 
-The 139-work collection was assembled incrementally, so its percentages describe the reviewed literature rather than field-wide prevalence. The classifications and component mapping involve author judgment. Model-based checks on an earlier 54-work subset and the 84-cell mapping achieved agreement of 47/54 ($\kappa=0.656$) and 59/84 ($\kappa=0.506$), respectively; these checks did not cover the 23 subsequent additions or involve independent human reviewers. The remaining disagreements concern the boundaries between contribution layers and between direct enforcement and supporting roles. Broader literature coverage and independent expert assessment would strengthen these comparisons. The evaluation tests proposed in Section~6.2 also require empirical validation across tasks.
+\subsection{Data Augmentation and Synthesis}
 
-\begin{figure}[t!]
+Augmentation and synthesis agents generate, select, or validate temporal data and representations. Their task contract specifies the target distribution, conditioning context, fidelity checks, and downstream utility; the task-specific module is the generator--validator loop rather than generic generation alone \citep{liu2025synthetic,bridge2025,merit2025,scenariodiff2026}.
+
+\subsection{Anomaly Detection and Diagnosis}
+
+Anomaly agents localize events, propose or verify rules, retrieve incident evidence, diagnose causes, and support remediation. The task-specific contract includes windows, thresholds, root-cause labels, alert policies, and deployment gates \citep{argos2025,anomamind2026,chatad2026,sagead2026,ji2025lemad,wang2026large}.
+
+\subsection{Decision Support}
+
+Decision-support agents connect forecasts or diagnoses to actions under costs, constraints, uncertainty, and review requirements. Trading, traffic control, energy, climate, and health systems illustrate how a predictive output becomes a recommendation, policy, escalation, or operational record \citep{fincon2024,tradingagents2024,collmllight2026,climateagent2025,smartenergyagent2026}.
+
+The complete corpus is multi-label: a work may contribute to several Harness dimensions and several task families. The maintained ledger records the LLM-side contribution, the General Harness modules, the genuinely time-series-specific modules, and the task-specific modules separately. The contribution timeline below counts these fields independently so that a paper can contribute to more than one line.
+
+\begin{figure}[htbp]
 \centering
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}[font=\sffamily]
-  \tikzset{
-    trendline/.style={line width=1.2pt,line cap=round,line join=round},
-    totaline/.style={line width=1.35pt,line cap=round,line join=round,color=black!72},
-    point/.style={circle,fill=white,inner sep=1.05pt,line width=0.75pt}
-  }
-
-  \begin{scope}[x=0.40cm,y=0.075cm]
-    \fill[black!2,rounded corners=5pt] (-2.7,-13.5) rectangle (31.0,81.5);
-    \node[anchor=west,font=\bfseries\small,text=black!80] at (0.3,78.6) {Cumulative contribution ledger};
-    \foreach \y/\label in {0/0,20/20,40/40,60/60} {
-      \draw[black!10] (0,\y) -- (24.4,\y);
-      \node[anchor=east,font=\scriptsize,text=black!65] at (-0.5,\y) {\label};
-    }
-    \draw[->,black!55,line width=0.45pt] (0,0) -- (25.2,0);
-    \draw[->,black!55,line width=0.45pt] (0,0) -- (0,77.8);
-    \node[anchor=south,font=\scriptsize,text=black!65,rotate=90] at (-2.1,38) {Cumulative works};
-    \foreach \x/\label in {0/Aug'24,5/Jan'25,12/Aug'25,17/Jan'26,24/Aug'26} {
-      \draw[black!35] (\x,0) -- (\x,-0.65);
-      \node[anchor=north,font=\scriptsize,text=black!65] at (\x,-1.25) {\label};
-    }
-
-    \path[fill=surveyBlue!22]
-      plot coordinates {(0,0) (2,0) (5,0) (6,0) (7,0) (8,1) (10,1) (11,1) (12,1) (13,1) (14,1) (15,1) (17,2) (18,2) (19,3) (20,3) (21,4) (22,4) (23,4) (24,5)}
-      -- (24,0) -- (0,0) -- cycle;
-    \path[fill=surveyGold!28]
-      plot coordinates {(0,1) (2,2) (5,2) (6,2) (7,2) (8,3) (10,3) (11,3) (12,3) (13,3) (14,4) (15,4) (17,5) (18,7) (19,8) (20,8) (21,11) (22,12) (23,12) (24,14)}
-      -- (24,5) -- (23,4) -- (22,4) -- (21,4) -- (20,3) -- (19,3) -- (18,2) -- (17,2) -- (15,1) -- (14,1) -- (13,1) -- (12,1) -- (11,1) -- (10,1) -- (8,1) -- (7,0) -- (6,0) -- (5,0) -- (2,0) -- (0,0) -- cycle;
-    \path[fill=surveyGreen!24]
-      plot coordinates {(0,1) (2,3) (5,4) (6,5) (7,7) (8,8) (10,10) (11,11) (12,16) (13,17) (14,21) (15,24) (17,28) (18,35) (19,37) (20,41) (21,49) (22,54) (23,60) (24,76)}
-      -- (24,14) -- (23,12) -- (22,12) -- (21,11) -- (20,8) -- (19,8) -- (18,7) -- (17,5) -- (15,4) -- (14,4) -- (13,3) -- (12,3) -- (11,3) -- (10,3) -- (8,3) -- (7,2) -- (6,2) -- (5,2) -- (2,2) -- (0,1) -- cycle;
-
-    \draw[trendline,color=surveyBlue] plot coordinates {(0,0) (2,0) (5,0) (6,0) (7,0) (8,1) (10,1) (11,1) (12,1) (13,1) (14,1) (15,1) (17,2) (18,2) (19,3) (20,3) (21,4) (22,4) (23,4) (24,5)};
-    \draw[trendline,color=surveyGold] plot coordinates {(0,1) (2,2) (5,2) (6,2) (7,2) (8,3) (10,3) (11,3) (12,3) (13,3) (14,4) (15,4) (17,5) (18,7) (19,8) (20,8) (21,11) (22,12) (23,12) (24,14)};
-    \draw[totaline] plot coordinates {(0,1) (2,3) (5,4) (6,5) (7,7) (8,8) (10,10) (11,11) (12,16) (13,17) (14,21) (15,24) (17,28) (18,35) (19,37) (20,41) (21,49) (22,54) (23,60) (24,76)};
-    \foreach \x/\y in {0/1,2/3,5/4,6/5,7/7,8/8,10/10,11/11,12/16,13/17,14/21,15/24,17/28,18/35,19/37,20/41,21/49,22/54,23/60,24/76} {
-      \node[point,draw=black!65] at (\x,\y) {};
-    }
-
-    \node[anchor=west,font=\scriptsize,text=surveyGreen!70!black] at (24.55,46.0) {\layerTSK{} 62 (81.6\%)};
-    \node[anchor=west,font=\scriptsize,text=surveyGold!70!black] at (24.55,10.2) {\layerGTS{} 9 (11.8\%)};
-    \node[anchor=west,font=\scriptsize,text=surveyBlue!80!black] at (24.55,2.4) {\layerGH{} 5 (6.6\%)};
-    \node[anchor=west,font=\scriptsize,text=black!72] at (24.55,72.2) {137 dated works};
-
-    \node[anchor=west,font=\scriptsize,text=black!72] at (0,-10.5)
-      {\textcolor{surveyGreen}{\rule{0.9em}{0.9em}} \layerTSK{} Task-specific \quad
-       \textcolor{surveyGold}{\rule{0.9em}{0.9em}} \layerGTS{} General TS \quad
-       \textcolor{surveyBlue}{\rule{0.9em}{0.9em}} \layerGH{} General Harness \quad
-       \textcolor{black!72}{\rule{0.9em}{0.15em}} cumulative total};
-  \end{scope}
-\end{tikzpicture}
-}
-\caption{Cumulative primary contribution levels among Time Series Agent systems, reusable methods, and benchmarks, for the 137 ledger entries whose public posting month is identifiable (two repository-only records lack a datable public posting). The stacked area shows cumulative absolute counts; the colored composition at the right edge is the August 2026 snapshot of the dated subset. We read this as a snapshot rather than a trend: because the dated works are front-loaded in the current snapshot fall in the most recent six months, the series is too front-loaded to support a claim about temporal evolution. As a snapshot, task-specific modules dominate the dated subset in both absolute count and share.}
+\includegraphics[width=\linewidth]{artifacts/contribution_timeline.png}
+\caption{Cumulative publication counts for the reviewed Time-Series Agent corpus. The LLM-side line records works with an explicit model-side temporal contribution; the three Harness lines use the primary contribution locus. A work may also carry secondary Harness labels in the ledger.}
 \label{fig:contribution-trend}
 \end{figure}
+\section{Infrastructure and Benchmarks for Time-Series Agents}
+\label{sec:evaluation}
 
-\begingroup\small
-\setlength{\tabcolsep}{5pt}
-The complete work-level ledger is maintained as machine-readable CSV/JSON and is moved to Appendix~\ref{app:full-ledger} for readability. The main text uses representative profiles and aggregate counts; every included work remains auditable through the appendix and repository ledger.
+A Time-Series Agent requires evaluation at three levels: General Harness process, time-series contract, and task outcome. Existing resources cover fragments of this contract; the benchmark gap is the absence of a widely adopted cross-task suite that evaluates them together.
 
-\endgroup
+\subsection{Evaluation contract}
 
-\subsection{General agent mechanisms}
-
-The general mechanisms recur across the reviewed systems in several forms. Tool use and acting expose statistical models, code, visualizers, and validators; planning and workflow modules coordinate data preparation, model selection, revision, and reporting; memory and reflection retain cases, traces, and experience; control and verification check tool results and intermediate artifacts; and multi-agent designs distribute analysis, review, and synthesis. TRACE, FactorMAD, and SLEP illustrate this general layer while also instantiating it in forecasting, financial analysis, and anomaly diagnosis, respectively \citep{chen2025trace,duan2025factormad,wang2026large}. These patterns are represented by the seven General Harness dimensions in Section~3 and coded at finer resolution in the appendix ledger.
-
-
-\subsection{Shared time-series mechanisms}
-
-The same distinction appears in the work-level evidence. Some systems make chronology, numerical values, temporal state, temporal operations, contextual alignment, or output checking explicit in their runtime. We treat these as shared temporal capabilities when their core representation and interfaces can survive a change of task; the six obligations in Section~3 provide the common vocabulary, while the appendix records the supporting papers and evidence.
-
-
-\subsection{Task-specific mechanisms}
-
-The following summary organizes task-facing module designs and instantiations by task family; it is an illustrative cross-section rather than an exhaustive replay of the 139-work ledger. A row may have a \layerGH{} or \layerGTS{} primary locus in the ledger while still exposing a task-specific instantiation; inclusion here does not relabel its primary contribution. Forecasting, anomaly, classification, QA, and other task families differ in actions, validators, memories, and artifacts. We also include task-facing reasoning, supervision, adaptation, and evidence-acquisition methods that do not call themselves agents (marked \selfclaim{} in the ledger), because they define reusable modules that Time Series Agents can incorporate even when the original work does not claim to be an agent system.
-
-The task-facing literature is best shown as a compact map rather than five repeated work tables. The complete work-level profiles remain in Appendix~\ref{app:full-ledger}.
-
-\begin{table}[htbp]
-\centering\small
-\begin{tabularx}{\textwidth}{@{}lX X@{}}
-\toprule
-\textbf{Task family} & \textbf{Typical task-specific capabilities} & \textbf{Representative examples}\\
-\midrule
-Forecasting and revision & Horizon contracts, backtesting, model selection, contextual conditioning, forecast revision, and deployment audit. & TimeSeriesScientist, TimeCAP, TimeCopilot, Cast-R1, Last-Mile.\\
-Anomaly detection and diagnosis & Window localization, rule generation, root-cause evidence, multimodal diagnosis, and deployment gates. & Argos, AnomaMind, ChatAD, Time-RA, SAGE-AD.\\
-Classification and recognition & Channel-aware evidence, class exemplars, confidence aggregation, and knowledge-bank refinement. & FETA, ZARA, MarsTSC, TESSA, TimeMaster.\\
-Question answering and temporal reasoning & Tool-grounded evidence acquisition, segment selection, numerical reasoning, debate, and process supervision. & TS-Agent, TimeART, ARTIST, VeriTime, COUNTS, STReasoner.\\
-Benchmarks, streaming, and decision support & Task generation, validation, cross-turn state, streaming adaptation, forecast revision, and decision records. & AION, TFRBench, TimeSage-MT, CALM, TimeClaw-Harness.\\
-\bottomrule
-\end{tabularx}
-\caption{Task families show how shared agent capabilities are instantiated. Examples are representative; the complete 139-work profiles are in Appendix~\ref{app:full-ledger}.}
-\label{tab:task-summary}
-\end{table}
-
-Imputation is retained as a reserved task family, but the maintained ledger contains no dedicated imputation-agent system. In the reviewed snapshot, imputation appears as a temporal operation or tool-library capability rather than as the primary task-specific module.
-
-\section{How to Evaluate Time-Series Agents}\label{sec:evaluation}
-
-
+Evaluation should report tool-call validity, trace faithfulness, memory and artifact provenance, temporal availability rules, numerical fidelity, temporal operations, evidence grounding, task metrics, cost, failures, and revision behavior. A forecast score or QA score is one task result, not a complete Agent evaluation.
 
 \begin{figure}[htbp]
 \centering
@@ -595,139 +477,9 @@ Imputation is retained as a reserved task family, but the maintained ledger cont
 \label{fig:evaluation-stack}
 \end{figure}
 
+\subsection{Existing benchmark landscape}
 
-
-Evaluation in this survey follows the same contribution-locus axis used throughout the paper: \GeneralHarness{} (\layerGH{}), \GeneralTSHarness{} (\layerGTS{}), and \TaskSpecificHarness{} (\layerTSK{}). The reason is structural. If a Time Series Agent is scored only by output accuracy---the forecast error, the classification score, the detection F1---then only one of the three layers has actually been measured, and it is not the layer where most agentic contribution is claimed. An agent can produce an accurate number through an unfaithful tool call, a leaked future window, or an unverifiable evidence chain, and an output-only metric will not notice. We therefore organize evaluation as \layerGH{} process metrics, \layerGTS{} cross-task temporal contracts, and \layerTSK{} per-task instantiations, mirroring the ledger of Section~5.
-
-The relation between the layers is the one already established for design: \layerGTS{} provides candidate cross-task design-obligation and contract templates, each with an explicit applicability condition, failure predicate, and candidate validation route, while \layerTSK{} instantiates the applicable templates for forecasting, anomaly detection, classification, or QA. This is a two-level relation, not three parallel bins of metrics.
-
-One category sits deliberately outside this three-layer scheme. Standard model-capability suites---conventional forecasting, classification, and anomaly-detection benchmarks \citep{jiang2024empowering,zhang2024llmts}---measure a temporal \emph{component}, not an agent. In the contribution-locus picture they sit \emph{below} the axis: they are necessary-but-insufficient inputs that an agent calls, compares, and verifies, not a layer of agent evaluation. Counting them as agent metrics would re-collapse the component-versus-agent distinction that Section~4.1 is built to preserve. We therefore treat them as substrate and do not list them among the three agent-evaluation layers.
-
-\subsection{General-Harness evaluation: is it behaving like an agent?}
-
-This layer asks whether the system behaves as a competent agent at all, independent of temporal correctness. The relevant metrics are domain-agnostic agent-process measures: tool-call validity, parameter correctness, plan and trace faithfulness \citep{tsag2026}, multi-turn coherence, latency, cost, regression under component evolution, and human-review burden. These are the dimensions exercised by general agent-process and analytical-skill benchmarks and by the process side of temporal ones \citep{timesagemt2026,timeseriesgym2025,tsskill2026}.
-
-A high \layerGH{} score is useful but not sufficient. It provides evidence about valid tool calls, coherent multi-turn traces, cost, and review burden, but says nothing by itself about whether the temporal reasoning underneath is causally sound. A system can pass every \layerGH{} check and still leak future information or misread a unit. \layerGH{} evaluation assesses domain-agnostic agent-process competence rather than acting as a categorical gate; the temporal checks are in Section~6.2.
-
-\subsection{General Time-Series Harness evaluation: conditional cross-task contract templates}
-
-Among the works and benchmarks reviewed here, cross-task temporal contracts are the least standardized evaluation layer. We treat each design obligation as a candidate cross-task contract template whose applicability, validator, and failure criterion must be declared. Each obligation should be assigned one of three applicability statuses: \emph{applicable}, \emph{not applicable} because its precondition is absent, or \emph{not currently evaluable} because the obligation applies but the available artifact exposes no valid test. The latter two statuses are not passes.
-
-\paragraph{Measurement-status convention.} Relevance to an obligation does not make a cited metric a validated cross-task instrument. We distinguish five evidence statuses: \emph{ED}, an established direct instrument for the stated narrow construct on a declared population; \emph{EA}, an established adjacent or task-specific measure; \emph{FE}, evidence that a failure mode exists without an instrument for the obligation; \emph{AP}, an author-proposed reusable falsification fixture not yet validated across systems; and \emph{OM}, an open measurement problem lacking a shared denominator, threshold, aggregation rule, reference population, or validation record. Status attaches to the exact construct measured, not to an obligation as a whole. Passing an AP fixture means only that the tested implementation was not falsified under that fixture.
-
-Within the reviewed evidence set, none of the six obligations has one ED instrument covering its full cross-task scope. Existing work supplies adjacent or task-specific measures for several slices. ED status is clearest only for the narrower conditional uncertainty-validation sub-contract, where proper scoring rules and calibration or reliability diagnostics apply to declared probabilistic constructs and reference populations. All minimal fixtures in Table~\ref{tab:gts-obligation-protocol} are AP tests. Table~\ref{tab:gts-measurement-status} reports the status boundary explicitly.
-
-\begingroup
-\scriptsize
-\setlength{\tabcolsep}{2.6pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{longtable}{L{\fulltextcol{0.20}} L{\fulltextcol{0.11}} L{\fulltextcol{0.34}} L{\fulltextcol{0.35}}}
-\caption{Measurement status by obligation or sub-contract. ED=established direct instrument for the named narrow construct; EA=established adjacent/task-specific measure; FE=failure-mode evidence; AP=author-proposed reusable fixture; OM=open measurement problem.}
-\label{tab:gts-measurement-status}\\
-\toprule
-\textbf{Obligation or sub-contract} & \textbf{Status} & \textbf{Existing evidence scope} & \textbf{Remaining cross-task gap}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Obligation or sub-contract} & \textbf{Status} & \textbf{Existing evidence scope} & \textbf{Remaining cross-task gap}\\
-\midrule
-\endhead
-Temporal causality & EA/AP/OM & Finance-specific outcome-recall, anonymization, and contamination diagnostics; author future-canary/dependency fixture. & Agent-level dependency definition, denominator, aggregation, and validation across tasks.\\
-Numerical fidelity & FE/AP/OM & Tokenizer sensitivity in serialized forecasting and arithmetic; author field-wise round-trip fixture. & Validated fixture generator, per-field tolerances, aggregation, and cross-runtime application.\\
-Time-indexed state integrity & EA/AP/OM & Data-quality dimension identification/comparison; author persistence, merge, and revised-vintage fixture. & Shared state schema, thresholds, aggregation, and multi-runtime validation.\\
-Temporal operation semantics & EA/AP/OM & Query parsing, tool selection, ML-engineering, and executable infrastructure; author replay fixture. & A shared temporal-operator suite covering boundary, frequency, alignment, time zone, axis, and missingness.\\
-Temporal grounding of context & EA/AP/OM & Task-specific context value, event use, cross-modal alignment, evidence retrieval, and distractor measures. & One construct and estimator covering relevance, availability time, provenance, and causal status.\\
-Core output auditability & EA/AP/OM & Task-specific checkers, validation interfaces, reference code, evidence traces, and audit ledgers. & Cross-system validation of route completeness and reviewer reliability where human judgment is used.\\
-Conditional uncertainty validation & ED/EA & Proper scoring rules and calibration/reliability diagnostics for declared probabilistic constructs; task-specific agent applications. & Population choice, sample size, exchangeability and distribution shift, and integration with core auditability.\\
-\bottomrule
-\end{longtable}
-\endgroup
-
-Table~\ref{tab:gts-obligation-protocol} summarizes proposed tests for the six temporal requirements.
-
-\begingroup
-\small
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{longtable}{L{\fulltextcol{0.17}} L{\fulltextcol{0.24}} L{\fulltextcol{0.28}} L{\fulltextcol{0.31}}}
-\caption{Applicability, violation predicates, and minimal author-proposed falsification fixtures for the six temporal design obligations. These fixtures are not validated cross-task instruments. A failed fixture falsifies the tested implementation; passing one fixture does not prove universal satisfaction.}
-\label{tab:gts-obligation-protocol}\\
-\toprule
-\textbf{Design obligation} & \textbf{Applies when} & \textbf{Primary violation predicate} & \textbf{Minimal falsification fixture}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Design obligation} & \textbf{Applies when} & \textbf{Primary violation predicate} & \textbf{Minimal falsification fixture}\\
-\midrule
-\endhead
-Temporal causality & A prospective or as-of-time cutoff is declared. & A pre-cutoff state, action, retrieval, decision, or evaluation depends on post-cutoff information. & Add a unique future canary; delete, permute, or poison the future block and audit pre-cutoff dependencies.\\
-Numerical fidelity & Values, units, scales, timestamps, or precision affect declared semantics. & A representation, tool, or artifact silently changes a relevant field beyond tolerance. & Round-trip an adversarial micro-series through ingest, state, tool, artifact, and reload; compare every relevant field.\\
-Time-indexed state integrity & Temporal objects persist, merge, revise, or are queried across runtime steps. & Frequency, alignment, missingness, channels, units, provenance, or data vintage is lost or misstated. & Save--load--merge a multi-frequency, revised-vintage fixture and query the state as known at a specified time.\\
-Temporal operation semantics & The runtime executes a time-sensitive transformation or metric. & A valid-looking call applies the wrong interval, horizon, time zone, aggregation, axis, or missing-data rule. & Replay declared time-sensitive operations on a hand-checkable series and compare with an executable specification.\\
-Temporal grounding of context & External events, documents, tables, images, or other context are consumed. & Context is bound to the wrong interval, lag, horizon, availability time, provenance, or causal status. & Offer a valid event, a time-shifted content match, and a semantic distractor; require interval and evidence identifiers.\\
-Output auditability with conditional uncertainty validation & An analytical output is reported; uncertainty validation additionally requires probabilistic semantics and a reference population. & The output cannot be validated or traced through its declared route; for deterministic or executable artifacts, independent recomputation fails; when probabilistic validation applies, the declared reliability, calibration, or proper-scoring-rule criterion fails on the stated population. & Re-run the declared checker, evidence audit, or frozen human-review protocol and compare its decision and evidence links; require exact reconstruction only for deterministic artifacts, and test probabilistic validity separately when applicable.\\
-\bottomrule
-\end{longtable}
-\endgroup
-
-The literature supports the following narrower status assignments.
-
-\begin{itemize}
-  \item \keyterm{(a) Temporal causality.} The cited work provides EA diagnostics rather than an agent-level cross-task leakage instrument. In LLM-based economic forecasting, Lookahead Propensity (LAP) is $P(\mathrm{up})+P(\mathrm{down})$ from a date-only outcome-recall query; contamination is diagnosed through the forecast--LAP interaction, not by interpreting LAP as the fraction of agent decisions using future information \citep{gao2025lookahead}. Original-versus-anonymized financial-news backtests \citep{glasserman2023lookahead} and membership-inference/cutoff-disagreement filtering \citep{memguardalpha2026} are likewise task-specific contamination diagnostics. We therefore classify future-canary perturbation plus trace/dependency auditing as AP, while its agent-level dependency definition, denominator, and aggregation remain OM.
-  \item \keyterm{(b) Numerical fidelity.} The cited papers are FE, not fidelity instruments. Gruver et al. report that GPT-4 can underperform GPT-3 in their serialized forecasting setup partly because of number tokenization \citep{gruver2023llmtime}; number-tokenization direction also changes arithmetic accuracy \citep{tokenizationcounts2024}. Neither study tests whether a runtime preserves values, units, scale, timestamps, or precision end to end. Field-wise comparison and round-trip error under predeclared tolerances are therefore AP, with fixture generation, aggregation, and cross-system validation still OM.
-  \item \keyterm{(c) Time-indexed state integrity.} TSQBench evaluates data-quality dimension identification and evidence-grounded quality comparison \citep{tsqbench2026}; this is EA and does not test save/load/merge semantics, provenance, or revision vintage across agent steps. The revised-vintage state fixture is AP. Among the cited instruments, we did not identify one joint audit of persistence, merge semantics, provenance, and as-of revision integrity, so that combined route remains OM.
-  \item \keyterm{(d) Temporal operation semantics.} TSAG evaluates financial-query parsing, tool selection, parameter extraction, faithfulness, and hallucination using stubbed outputs \citep{tsag2026}; TimeSeriesGym evaluates ML-engineering agents \citep{timeseriesgym2025}; and TimeClaw provides executable temporal infrastructure \citep{timeclaw2026harness}. TSAG and TimeSeriesGym provide EA measures, while TimeClaw provides executable infrastructure that enables stronger checking. Replaying interval, horizon, frequency, alignment, time-zone, axis, and missing-data behavior against an executable oracle is AP; the cited benchmarks do not supply a shared cross-task suite for that combined construct.
-  \item \keyterm{(e) Temporal grounding of context.} Existing benchmarks cover complementary EA slices: CiK tests whether essential text improves forecasts \citep{contextiskey2025}; TemporalBench tests contextual and event-conditioned prediction \citep{temporalbench2026}; MMTS-Bench tests cross-modal semantic alignment \citep{mmtsbench2026}; and Dr-CiK directly measures supporting-evidence retrieval and distractor citation within forecasting \citep{drcik2026}. These measures do not form one estimator of relevance, availability-time validity, provenance, and causal status. The time-shift/distractor fixture is AP and the unified construct remains OM.
-  \item \keyterm{(f) Output auditability with conditional uncertainty validation.} Core auditability has EA task-specific checkers and AP rerun/evidence-review fixtures, but no universal scalar is implied. Conditional uncertainty validation has a narrower ED status: interval-score decompositions assess conditional calibration of interval forecasts \citep{intervalscore2025}, while confidence elicitation can be evaluated with calibration and failure-prediction metrics \citep{llmconfidence2023}. A structured HFMD forecasting agent reports rolling-origin CRPS and empirical interval coverage as an EA task-specific application \citep{epidemicagent2026}. These uncertainty instruments do not validate the broader evidence chain.
-\end{itemize}
-
-The scope of these six design obligations ends at output verification. Converting a verified analytical output into an accountable downstream action is the next lifecycle stage, not a seventh obligation of the same set; we therefore leave decision quality open and return to it in Section~\ref{sec:open-problems}.
-
-\subsection{Task-specific evaluation: per-task instantiation of applicable obligations}
-
-The \layerTSK{} layer does not add a parallel evaluation axis. It instantiates each applicable \layerGTS{} obligation as a concrete task-level contract; different tasks may require different validators without implying a shared scalar metric:
-
-\begin{itemize}
-  \item \emph{Temporal causality} becomes horizon-respecting backtest splits in forecasting, label-window separation in anomaly detection, and context-truncation discipline in QA.
-  \item \emph{Output auditability} becomes task-specific checking and evidence validation; when probabilistic semantics are present, conditional uncertainty validation may use coverage or reliability diagnostics and proper scoring rules for probabilistic forecasts, classification confidence, or thresholded alerts.
-  \item \emph{Numerical fidelity} stays a representation-faithfulness check distinct from predictive quality. We propose a fixture-level operationalization based on field-wise comparison and representation round-trip error against source values under predeclared, field-specific tolerances; this is not yet a validated cross-task instrument. It instantiates as the precision-sensitive channels each task must preserve---history values, scale, and units fed into forecasting tools; timestamp and threshold precision in anomaly detection; observed values carried through mask-aware imputation operators. It is deliberately \emph{not} the task's predictive error (forecast error, localization error), because an accurate prediction can still be produced through a lossy or mis-scaled representation.
-\end{itemize}
-
-Two concerns are genuinely task-specific rather than instantiations of a cross-task contract: deployment and live evaluation. Live and deployment settings test temporal generalization, operational drift, reproducibility, and revision traces under business constraints \citep{lastmile2026}. They belong to \layerTSK{} because they are tied to a deployed task's operating conditions, not to a property that holds across tasks.
-
-\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.40}} L{\fulltextcol{0.38}}}
-\caption{Evaluation by contribution locus. Each temporal design obligation is assigned an applicability status and a task-appropriate validation route; evidence maturity follows Table~\ref{tab:gts-measurement-status}, and listed routes are not assumed to be equally established. The \layerTSK{} layer instantiates the applicable obligations, while \layerGH{} process evaluation and standard component benchmarks bracket the three-layer scheme.}
-\label{tab:evaluation-locus}\\
-\toprule
-\textbf{Temporal design obligation} & \textbf{\layerGTS{} candidate validation route} & \textbf{\layerTSK{} per-task instantiation}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Temporal design obligation} & \textbf{\layerGTS{} candidate validation route} & \textbf{\layerTSK{} per-task instantiation}\\
-\midrule
-\endhead
-Temporal causality & AP allowed-context dependency audit; EA task-specific contamination diagnostics & Horizon backtest / anomaly label-window split / QA truncation\\
-Numerical fidelity & AP field-wise round-trip fixture; FE tokenizer sensitivity & Per-task precision audit: values/scale/units/timestamps preserved through the pipeline (\emph{not} predictive error)\\
-Time-indexed state integrity & AP state-integrity fixture; EA partial data-quality measures & Task-specific state and metadata checks\\
-Temporal operation semantics & AP executable-oracle replay; EA adjacent tool/process measures & Per-task operator validation\\
-Temporal grounding of context & AP unified fixture; EA task-specific context/evidence measures & Per-task retrieval and evidence checks\\
-Output auditability & Core auditability EA/AP/OM; conditional uncertainty ED/EA for narrow probabilistic constructs & Task checker, evidence or human protocol; conditional coverage/reliability diagnostics and proper scoring rules\\
-\emph{(\layerGH{}, above)} & Agent-process competence, not temporal & Tool validity, trace faithfulness, cost, review burden\\
-\emph{(component, below axis)} & Not an agent metric & Standard forecasting/classification/AD suites \citep{jiang2024empowering,zhang2024llmts}\\
-\bottomrule
-\end{longtable}
-
-Two observations from Section~5 line up here, and the alignment is worth stating carefully. In the corrected ledger snapshot, the \layerGTS{} layer is both the least standardized to evaluate (Section~6.2) and the sparser of the two \emph{time-series-specific} layers in the ledger's \emph{primary}-contribution count (Section~5, \layerGTS{} 9/139 against \layerTSK{} 124/139; the \layerGH{} layer, at 6/139, is domain-independent general-agent infrastructure and therefore falls outside this time-series-specific comparison). This 89.2\% task-specific share is a distributional description of the reviewed corpus, not evidence about evaluation maturity or causal proof that cross-task infrastructure is underdeveloped. The word \emph{sparse} needs a qualification: it is partly an artifact of the single-primary-locus counting rule, since Table~\ref{tab:agent-ledger} shows that almost every system touches \layerGTS{} as a secondary contribution, and the reviewed literature often reports task-specific proxies or instantiations of the obligations rather than shared cross-task instruments. The honest statement is therefore not that the cross-task layer is unbuilt or unmeasured, but that it has not been raised to a first-class, cross-task \emph{contract}: it is contributed to and measured task by task, not as a layer in its own right under a shared applicability-and-failure protocol. These remain two independent observations---one about evaluation practice, one about contribution distribution---and the ledger statistic does not \emph{prove} anything about evaluation maturity. We offer the shared-root-cause reading---few first-class \layerGTS{} contributions and little standardized cross-task evaluation both following from the same failure to treat the temporal layer as a first-class object---as a conjecture to be tested, not as a conclusion the counts establish.
-
-\section{Benchmarks and Open-Source Resources}
-
-Once an agent has been assembled from an LLM, a General Harness, and a Time-Series Harness Module, evaluation must test both the runtime and the temporal work it performs. A single task score cannot determine whether an agent selected valid tools, respected the information boundary, preserved numerical semantics, grounded context, or produced a reproducible artifact. We therefore separate evaluation into two linked chapters: Section~\ref{sec:evaluation} defines the evaluation dimensions and evidence maturity; this section inventories benchmark families and open-source infrastructure that can instantiate those dimensions.
-
-\subsection{Benchmark landscape}
-
-Existing benchmarks cover different parts of the agent contract. Forecasting and prediction suites measure point or probabilistic accuracy under chronological splits; anomaly and diagnosis suites measure detection, localization, root-cause attribution, and evidence quality; contextual and multimodal suites test whether text, images, events, and numerical signals are aligned; and time-series question-answering suites test grounded analytical responses. Agent-oriented benchmarks add tool selection, code execution, trajectory quality, validation, cost, and revision behavior. These families should be reported separately because a strong task score does not establish process validity, and a valid process does not guarantee useful task output.
-
-For each benchmark, our ledger records the task contract, temporal split or availability rule, required tools and artifacts, process-level signals, task-level metrics, and whether the benchmark is an established evaluation or an adjacent proxy. The same paper may therefore appear in more than one benchmark family when it evaluates distinct contracts.
+Forecasting suites measure horizon-respecting accuracy and probabilistic calibration. Anomaly and diagnosis suites measure detection, localization, root-cause attribution, and evidence. Augmentation suites measure fidelity and downstream utility. Decision-support studies measure policy, recommendation, or operational outcomes. TSQA and multimodal QA provide useful local evidence for grounded temporal answers, but they cover only one part of the Agent contract.
 
 \begin{table}[htbp]
 \centering\small
@@ -742,53 +494,46 @@ Time-series QA and reasoning & Answer correctness, evidence grounding, numerical
 Agent-process evaluation & Tool selection, trace faithfulness, code execution, validation, cost, review burden, and reproducibility. & Task utility unless paired with a temporal task benchmark.\\
 \bottomrule
 \end{tabularx}
-\caption{Benchmark families should be combined by contract rather than collapsed into one score.}
+\caption{Benchmark families cover complementary parts of the Time-Series Agent contract.}
 \label{tab:benchmark-families}
 \end{table}
 
-\subsection{Open-source projects and reusable evaluation assets}
+\subsection{Role of QA within a Time-Series Agent benchmark}
 
-Open-source systems make the evaluation contract executable. TimeClaw provides temporal tools, trajectories, memory, and capability evolution; AION provides task files, workspaces, validation interfaces, and layered review; TimeSeriesGym evaluates machine-learning engineering workflows; and TSQA, MMTS-Bench, Time-MQA, TSRBench, and related resources provide task-level suites for reasoning and contextual analysis. ModernTSF is an additional repository-level infrastructure resource: its README describes an agent-ready, reproducible forecasting substrate with model and dataset catalogs, callable contracts, evidence, budgets, and recoverable execution.\footnote{Diaugeia, \emph{ModernTSF repository}, \url{https://github.com/Diaugeia/ModernTSF}.} We cite it as software infrastructure rather than as a paper. These projects are complementary: a benchmark dataset supplies cases and labels, while a Harness repository supplies tools, state schemas, traces, and validators.
+QA resources evaluate temporal answers, evidence grounding, and selected numerical reasoning. They provide the language-facing part of evaluation; a complete Agent benchmark adds chronological validity, numerical fidelity, forecasting-horizon behavior, anomaly localization, augmentation quality, downstream decision utility, tool-call correctness, memory provenance, and validation traces.
 
-A reproducible evaluation release should therefore include the benchmark data and splits, the agent and tool versions, the temporal availability policy, all intermediate artifacts, the trace and evidence schema, the validator implementation, and the cost and failure logs. Without these artifacts, a reported score cannot distinguish model capability from retrieval, tool, memory, or evaluator behavior.
+\subsection{Infrastructure and the missing unified benchmark}
 
+TimeClaw, AION, TimeSeriesGym, and ModernTSF provide complementary infrastructure. ModernTSF contributes an agent-ready and reproducible forecasting substrate with model and dataset catalogs, callable interfaces, evidence, budgets, artifacts, and recoverable execution. We use it as an infrastructure case, not as evidence that the benchmark gap has been closed. The field still lacks a broadly adopted benchmark that combines a time-indexed availability policy, executable temporal tools, trace and evidence validation, and task contracts across forecasting, augmentation, anomaly diagnosis, and decision support.
+
+A reusable benchmark stack should therefore include a time-indexed workspace, explicit availability rules, executable temporal tools, trace and evidence schemas, validators, cases from all four task families, and cost, failure, and revision logs. These requirements connect the infrastructure chapter to the open problems below.
 \section{Open Problems and Case Studies}
 
-\subsection{Reusable infrastructure}
+\subsection{Reusable temporal infrastructure}
 
-The field needs reusable infrastructure rather than isolated demonstrations. A practical repository stack should contain:
+Time-Series Agents need shared workspaces, temporal tool contracts, evidence schemas, validators, and reproducible execution. ModernTSF, TimeClaw, AION, and related projects show complementary pieces of this stack.
 
-A practical repository should contain six complementary pieces: a time-indexed workspace and validation interface; task-specific modules for forecasting, anomaly diagnosis, QA, and deployment revision; a callable library of statistical, forecasting, imputation, visualization, retrieval, and TSFM tools; benchmark tasks with trace and evidence scoring; an agent-as-engineer pipeline for producing temporal artifacts; and a component ledger that keeps claims auditable. This list is more readable than a second layer table because the items are requirements rather than competing alternatives.
+\subsection{Open problems}
 
+\noindent\textbf{Temporal and numerical faithfulness.} Agents need typed temporal operations, unit-aware representations, chronology guards, and end-to-end fidelity checks.
 
-Current infrastructure-oriented systems point to three practical requirements: agents should be able to produce deployable temporal artifacts, operate over native time-series workspaces, and evaluate realistic tasks through explicit validation interfaces and protocols \citep{timeclaw2026harness,aion2026}.
+\noindent\textbf{Context retrieval and memory without leakage.} Retrieved events and episodic memories need availability-time provenance, expiry, regime awareness, and replayable audits.
 
-\subsection{Open problems}\label{sec:open-problems}
+\noindent\textbf{Interface standardization.} Shared schemas for temporal workspaces, tools, traces, and validators would make systems composable and comparable.
 
-\keyterm{Interface standardization.} Current systems use different tool schemas, workspaces, trace formats, and validation contracts. A Model Context Protocol-style interface for temporal tools and workspaces could make Time Series Agents comparable and composable.
+\noindent\textbf{Self-evolving components.} Tool, policy, memory, and workflow updates require regression checks under temporal shift.
 
-\keyterm{Numerical and temporal faithfulness.} LLMs can misread scales, ignore units, hallucinate trends, or reason over future information. Typed temporal tools, unit annotations, chronological guards, and evidence-grounded generation are required.
+\noindent\textbf{Decision-centric evaluation.} Future benchmarks should connect predictive or diagnostic evidence to action quality, cost, uncertainty, and accountability.
 
-\keyterm{Context retrieval under distractors.} Dr-CiK shows that retrieving future-relevant context is difficult when irrelevant documents are available. Temporal grounding of retrieved context and distractor-aware retrieval should become first-class benchmark dimensions.
+\subsection{Case studies}
 
-\keyterm{Memory without leakage.} Episodic memory can improve transfer but may contaminate evaluation, encode obsolete regimes, or retrieve superficially similar but temporally irrelevant cases. Temporal memory needs provenance, expiry, family filters, and replayable audits.
+\noindent\textbf{ChatTS.} ChatTS represents the LLM-side contribution: synthetic instruction data and time-series dialogue align a language model with temporal inputs and reasoning \citep{chatts2025}. Its lessons belong to Section~3, while its temporal interfaces can also be instantiated in later Harness layers.
 
-\keyterm{Self-evolving components without regression.} Recent systems suggest that tools, prompts, action-selection modules, skills, and memories can evolve \citep{timeclaw2026explore,timeclaw2026harness,aion2026,castr12026,kairosagent2026}. The open challenge is to verify improvement without overfitting to benchmarks or violating temporal constraints.
-
-\keyterm{Decision-centric evaluation.} The scope of the six temporal design obligations ends at output verification; decision-making is the next lifecycle stage and remains deliberately open rather than being relabeled as a seventh obligation. Many applications require inventory decisions, trading policies, grid control, diagnosis escalation, clinical triage, or maintenance scheduling. Time Series Agent benchmarks should therefore evaluate downstream action quality, counterfactual consequences, and accountability, not only predictive error.
-
-\subsection{Case study: LLM-side contributions in the ChatTS line}
-
-The ChatTS line illustrates why the LLM component must remain explicit in the taxonomy. ChatTS does not merely add a forecasting tool around a frozen language model; it contributes synthetic instruction data, time-series dialogue, and reasoning supervision that align the language model with temporal inputs and analytical operations. Its contribution is therefore recorded in the LLM-component field, while the resulting temporal interface and dialogue contract may also receive GTS or TSK labels. This is a simultaneous contribution, not a forced choice between ``model'' and ``Harness''.
-
-The case also gives a practical review rule. When a paper changes the language model's temporal perception, alignment, or reasoning capability, the reviewer should quote the training or alignment evidence separately from the runtime evidence. When it changes planning, tools, memory, state, or verification around an unchanged model, the contribution belongs primarily to the Harness. When both change, both records should be retained and the primary locus should be used only for aggregate counting.
+\noindent\textbf{ModernTSF.} ModernTSF represents the infrastructure contribution: callable model and dataset interfaces, evidence, budgets, artifacts, and recoverable execution provide a foundation for reproducible Agent evaluation.
 
 \section{Conclusion}
 
-Within the scope of this survey, we analyze LLM-based Time Series Agent systems as an LLM coupled with a \GeneralHarness{} and a \TSHarnessModule{}. The \GeneralHarness{} denotes the domain-agnostic interface, mechanism, and operation substrate. The temporal module specializes that substrate through time-indexed state, temporal operations, context grounding, and validation, and then instantiates these mechanisms under task contracts such as forecasting, anomaly detection, classification, QA, augmentation, synthesis, and decision support. The cross-task mechanisms constitute the \GeneralTSHarness{}; mechanisms whose state, actions, rewards, or verifiers depend on one of these task contracts constitute the \TaskSpecificHarness{}.
-
-This framing absorbs previous model-centric work rather than replacing it. Classical models, deep forecasters, TSFMs, LLM-based time-series models, multimodal temporal models, and statistical procedures can become callable components inside a temporal runtime. An emerging line of work complements standalone predictive models with executable, verifiable, stateful, and adaptive workflows. Our taxonomy connects each work's main contribution to its runtime layer and relates agent components to temporal design requirements and evaluation methods. Using this locus vocabulary, future work can state whether its main contribution improves the \GeneralHarness{}, the \GeneralTSHarness{}, or a \TaskSpecificHarness{} for a concrete time-series task.
-
+A Time-Series Agent is built by combining an LLM, a General Harness, time-series-specific Harness modules, and supporting components. The survey separates the model-side contribution from the runtime contribution, organizes the General Harness through seven shared dimensions, extracts genuinely temporal mechanisms into the General Time-Series Harness, and instantiates them under forecasting, augmentation, anomaly diagnosis, and decision support. Evaluation then follows the same construction: process, temporal contract, and task outcome. The remaining research challenge is to make these layers interoperable and to evaluate them with a unified, reproducible benchmark.
 \appendix
 \section{Complete Work-Level Contribution Ledger}
 \label{app:full-ledger}
@@ -829,7 +574,7 @@ The fine-grained component vocabulary used by the machine-readable ledger is rep
 \end{longtable}
 \endgroup
 
-The complete work-level profiles are provided here for auditability. The main text uses aggregate patterns and representative examples so that the conceptual argument remains readable. Repository-only resources are identified with footnotes rather than paper citations. The LLM-TSFD entry is linked to its author repository in a footnote.\footnote{Zhang et al., \emph{LLM-TSFD author repository}, \url{https://github.com/zq300/LLM-TSFD}.}
+The complete work-level profiles are provided here for auditability. The main text uses aggregate patterns and representative examples so that the conceptual argument remains readable. Repository-only resources are identified with footnotes rather than paper citations.
 
 \begingroup
 \scriptsize
@@ -917,7 +662,7 @@ EvoTS-Agent \citep{evotsagent2026} Aug'26; \typeSMshort{}\newline Financial chan
 Agentic Active Learning for Variable Stars \citep{agenticactivelearning2026} Aug'26; \typeSMshort{}\newline Astronomical anomaly discovery & \textbf{GH:} Iterative candidate review, relevance propagation, and multi-agent consensus.\newline\textbf{GTS:} Phase-folded light-curve images and embedding-space evidence.\newline\textbf{TSK:} Variable-star anomaly discovery and false-positive filtering.\\\midrule
 MetaCaster \citep{metacaster2026} Aug'26; \typeSMshort{}\newline Forecaster construction & \textbf{GH:} Agent-as-engineer data generation, training, selection, and meta-harness optimization.\newline\textbf{GTS:} Few-shot temporal context and generated-data traces.\newline\textbf{TSK:} Lightweight forecaster generation, training, and selection.\\\midrule
 TraceBench \citep{tracebench2026} Aug'26; \typeBenchshort{}\newline Root-cause attribution & \textbf{GH:} Agent exploration, code submission, and trajectory evaluation.\newline\textbf{GTS:} Controlled dynamical-system time-series observations and domain context.\newline\textbf{TSK:} Altered-parameter root-cause labels and per-sample attribution.\\\midrule
-MoiraiAgent --; \typeSMshort{}\newline Forecasting & \textbf{GH:} Copilot-style tool orchestration.\newline\textbf{GTS:} TSFM-as-tool forecast artifacts.\newline\textbf{TSK:} TSFM-centered forecasting assistant.\\\midrule
+MoiraiAgent\RepoMoirai --; \typeSMshort{}\newline Forecasting & \textbf{GH:} Copilot-style tool orchestration.\newline\textbf{GTS:} TSFM-as-tool forecast artifacts.\newline\textbf{TSK:} TSFM-centered forecasting assistant.\\\midrule
 Hierarchical AI-Meteorologist \citep{hierarchicalmeteorologist2025} Nov'25; \typeSMshort{}\newline Weather reporting & \textbf{GH:} Hierarchical reasoning and keyword validation.\newline\textbf{GTS:} Multi-scale meteorological context.\newline\textbf{TSK:} Explainable weather report generation.\\\midrule
 TimeSeriesGym \citep{timeseriesgym2025} May'25; \typeBenchshort{}\newline ML engineering benchmark & \textbf{GH:} Agent capability and artifact evaluation.\newline\textbf{GTS:} Time-series data, repository, and model tasks.\newline\textbf{TSK:} Engineering challenge and benchmark scoring.\\\midrule
 TS-Skill \citep{tsskill2026} May'26; \typeBenchshort{}\newline TSQA skill benchmark & \textbf{GH:} Skill-guided generation and verification.\newline\textbf{GTS:} Scale, location, and cross-interval evidence.\newline\textbf{TSK:} Analytical skill evaluation for TSQA.\\\midrule
@@ -949,7 +694,7 @@ LLM4TS \citep{chang2024llm4ts} Aug'23; \typeSMshort{}\newline Data-efficient for
 LEMAD \citep{ji2025lemad} Jul'25; \typeSMshort{}\newline Power-grid service anomaly detection & \textbf{GH:} Hierarchical multi-agent coordination and LLM-mediated semantic reasoning.\newline\textbf{GTS:} Multimodal log--metric fusion and distributed monitoring over temporal service signals.\newline\textbf{TSK:} Real-time power-grid anomaly detection and root-cause diagnosis.\\\midrule
 ElliottAgents \citep{wawer2025integrating} Jun'25; \typeSMshort{}\newline Financial forecasting & \textbf{GH:} Multi-agent planning, retrieval, and reinforcement-based adaptation.\newline\textbf{GTS:} Temporal market-data analysis and dynamic context management.\newline\textbf{TSK:} Elliott-Wave stock forecasting and investment decision support.\\\midrule
 LLMTraveler \citep{wang2025agentic} Nov'25; \typeSMshort{}\newline Day-to-day route choice & \textbf{GH:} LLM-based agent decision making with experience memory.\newline\textbf{GTS:} Dynamic travel-time observations and adaptive route-choice state.\newline\textbf{TSK:} Congestion-game route selection and travel-policy decision support.\\\midrule
-LLM-TSFD Mar'25; \typeSMshort{}\newline Industrial fault diagnosis & \textbf{GH:} LLM-mediated code execution and multi-turn interaction.\newline\textbf{GTS:} Temporal signal cleaning, labeling, and cross-sheet state comparison.\newline\textbf{TSK:} Human-in-the-loop industrial time-series fault diagnosis.\\\midrule
+LLM-TSFD\RepoLLMTSFD Mar'25; \typeSMshort{}\newline Industrial fault diagnosis & \textbf{GH:} LLM-mediated code execution and multi-turn interaction.\newline\textbf{GTS:} Temporal signal cleaning, labeling, and cross-sheet state comparison.\newline\textbf{TSK:} Human-in-the-loop industrial time-series fault diagnosis.\\\midrule
 GenAI Risk Analyst \citep{joshi2025using} Jan'25; \typeSMshort{}\newline Interest-rate risk modeling & \textbf{GH:} LLM query generation and validation interaction.\newline\textbf{GTS:} Financial-rate sequence modeling and scenario state comparison.\newline\textbf{TSK:} GAN/VAE scenario augmentation and Monte Carlo risk decision support.\\\midrule
 FinCon \citep{fincon2024} Jul'24; \typeSMshort{}\newline Financial decision making & \textbf{GH:} Manager--analyst coordination and reflective risk control.\newline\textbf{GTS:} Multimodal market state and memory.\newline\textbf{TSK:} Trading and portfolio decisions.\\\midrule
 FinAgent \citep{finagent2024} Feb'24; \typeSMshort{}\newline Financial trading & \textbf{GH:} Tool augmentation, reflection, and memory retrieval.\newline\textbf{GTS:} Multimodal market intelligence.\newline\textbf{TSK:} Trading actions and strategy integration.\\\midrule
@@ -981,9 +726,15 @@ GenAutoML \citep{genautoml2026} Jun'26; \typeSMshort{}\newline Architecture gene
 S2S-FDD \citep{s2sfdd2026} Mar'26; \typeSMshort{}\newline Fault diagnosis & \textbf{GH:} Multi-turn diagnosis and human feedback.\newline\textbf{GTS:} Signal-to-semantic summaries and dynamic signal queries.\newline\textbf{TSK:} Industrial fault explanation and repair diagnosis.\\\midrule
 MemCast \citep{memcast2026} Feb'26; \typeSMshort{}\newline Forecasting & \textbf{GH:} Experience-conditioned reasoning and confidence adaptation.\newline\textbf{GTS:} Hierarchical temporal memory and trajectory wisdom.\newline\textbf{TSK:} Memory-guided forecast refinement.\\\midrule
 MOSAIC \citep{mosaic2026} Jun'26; \typeSMshort{}\newline Model selection / forecasting & \textbf{GH:} Structured task profiling, blueprint composition, retrieval, and execution validation.\newline\textbf{GTS:} Temporal model-selection state and traceable evaluation.\newline\textbf{TSK:} Financial time-series workflow construction.\\\midrule
+TRACE \citep{chen2025trace} Feb'25; \typeSMshort{}\newline Distributed-energy forecasting & \textbf{GH:} Multi-agent consistency and collaborative thought refinement.\newline\textbf{GTS:} Forecasting-oriented reasoning and DER sequence alignment.\newline\textbf{TSK:} Data-scarce distributed-energy-resource forecasting.\\\midrule
+FactorMAD \citep{duan2025factormad} Oct'25; \typeSMshort{}\newline Financial factor mining & \textbf{GH:} Structured debate, critique, and iterative refinement.\newline\textbf{GTS:} Financial time-series state and factor evaluation.\newline\textbf{TSK:} Interpretable stock alpha-factor mining and trading evaluation.\\\midrule
+Large-model-based smart agent \citep{wang2026large} Feb'26; \typeSMshort{}\newline Power-system anomaly detection & \textbf{GH:} Agent development workflow and language-mediated interpretation.\newline\textbf{GTS:} Time-series anomaly reasoning and diagnostic tool workflow.\newline\textbf{TSK:} False-data-injection anomaly detection in power systems.\\\midrule
 \end{longtable}
 
 \endgroup
+
+\noindent\textsuperscript{a} Salesforce AI Research, \emph{MoiraiAgent} implementation: \href{https://github.com/SalesforceAIResearch/uni2ts/tree/main/project/moirai-agent}{GitHub repository}.\\
+\textsuperscript{b} Zhang et al., \emph{LLM-TSFD} author repository: \href{https://github.com/zq300/LLM-TSFD}{GitHub repository}.
 
 \bibliographystyle{plainnat}
 \bibliography{TS_AGENT_HARNESS_SURVEY}

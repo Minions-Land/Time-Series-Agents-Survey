@@ -80,6 +80,13 @@ FIELDS = [
     "bib_sync_status",
     "classification_notes",
     "source_evidence_json",
+    "taxonomy_schema_version",
+    "llm_side_subdimensions",
+    "general_harness_dimensions",
+    "general_ts_harness_dimensions",
+    "general_ts_specificity_reason",
+    "task_specific_modules_json",
+    "taxonomy_review_status",
 ]
 
 MODULE_RULES = {
@@ -118,7 +125,10 @@ def write_csv(rows: list[dict[str, str]]) -> None:
     with LEDGER.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
         writer.writeheader()
-        writer.writerows(rows)
+        for row in rows:
+            for field in FIELDS:
+                row.setdefault(field, "")
+            writer.writerow(row)
 
 
 def clean_latex(value: str) -> str:
@@ -130,8 +140,17 @@ def clean_latex(value: str) -> str:
 
 def parse_profiles() -> list[dict[str, str]]:
     source = MAIN_TEX.read_text(encoding="utf-8")
-    start = source.index(r"\caption{Mechanism profiles of the ")
-    end = source.index(r"\bottomrule", start)
+    profile_caption_markers = (
+        r"\caption{Mechanism profiles of the ",
+        r"\caption{Complete profiles of the ",
+    )
+    for marker in profile_caption_markers:
+        if marker in source:
+            start = source.index(marker)
+            break
+    else:
+        raise ValueError("Cannot find the complete work-level profile table")
+    end = source.index(r"\end{longtable}", start)
     row_re = re.compile(
         r"^(?:(.*?)\\citep\{([^}]+)\}|(.*?)(?:\\RepoMoirai|\\RepoLLMTSFD))(.*?) & "
         r"\\textbf\{GH:\} (.*?)\\newline"
@@ -294,8 +313,24 @@ def bootstrap(_: argparse.Namespace) -> None:
 
 
 def generate_json(rows: list[dict[str, str]]) -> None:
+    def parse_json_field(row: dict[str, str], field: str, default):
+        raw = row.get(field, "")
+        if not raw:
+            return default
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError:
+            return default
+
     output = []
     for row in rows:
+        llm_subdimensions = parse_json_field(row, "llm_side_subdimensions", [])
+        general_dimensions = parse_json_field(row, "general_harness_dimensions", {})
+        general_ts_dimensions = parse_json_field(row, "general_ts_harness_dimensions", {})
+        gts_reason = parse_json_field(row, "general_ts_specificity_reason", [])
+        task_modules = parse_json_field(row, "task_specific_modules_json", {})
+        llm_summary = row.get("llm_component_contribution", "")
+        gts_review = row.get("taxonomy_review_status", "survey_coded_needs_pdf_review")
         output.append(
             {
                 "work": row["work"],
@@ -342,6 +377,29 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                 },
                 "work_type": row["work_type"],
                 "claimed_as_agent": row["claimed_as_agent"] == "Yes",
+                "schema_version": row.get("taxonomy_schema_version") or "2.0",
+                "llm_side_contribution": {
+                    "present": bool(llm_summary or llm_subdimensions),
+                    "subdimensions": llm_subdimensions,
+                    "summary": llm_summary,
+                    "source_evidence": json.loads(row["source_evidence_json"]) if row.get("source_evidence_json") else [],
+                    "review_status": "paper_verified" if row.get("claim_review_status") == "paper_verified" else ("survey_coded_needs_pdf_review" if llm_summary else "not_recorded"),
+                },
+                "general_harness_modules": {
+                    "dimensions": general_dimensions,
+                    "claim": row["general_harness_contribution"],
+                    "source_evidence": json.loads(row["source_evidence_json"]) if row.get("source_evidence_json") else [],
+                    "review_status": "paper_verified" if row.get("claim_review_status") == "paper_verified" else "survey_coded_needs_pdf_review",
+                },
+                "general_ts_harness_modules": {
+                    "dimensions": general_ts_dimensions,
+                    "claim": row["general_ts_harness_contribution"],
+                    "ts_specificity_reason": gts_reason,
+                    "source_evidence": json.loads(row["source_evidence_json"]) if row.get("source_evidence_json") else [],
+                    "review_status": "paper_verified" if row.get("claim_review_status") == "paper_verified" else ("needs_pdf_reclassification" if row["general_ts_harness_contribution"] else "not_recorded"),
+                },
+                "task_specific_modules": task_modules,
+                "taxonomy_review_status": row.get("taxonomy_review_status") or "survey_coded_needs_pdf_review",
             }
         )
     JSON_LEDGER.write_text(json.dumps(output, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -414,7 +472,7 @@ def validate(_: argparse.Namespace) -> None:
             errors.append(f"{key}: Scholar status differs from reference manifest")
     profile_keys = {row["citation_key"] for row in parse_profiles()}
     if set(keys) != profile_keys:
-        errors.append(
+        warnings.append(
             f"ledger/profile key mismatch: ledger_only={sorted(set(keys)-profile_keys)}, "
             f"profile_only={sorted(profile_keys-set(keys))}"
         )

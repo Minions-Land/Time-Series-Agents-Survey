@@ -1,8 +1,9 @@
 # Paper classification ledger
 
 `paper_classification_ledger.csv` is the maintained work-level source for the
-survey taxonomy. `paper_classification_ledger.json` is its generated structured
-mirror. Each row represents one reviewed work and keeps four kinds of data
+survey taxonomy. `paper_classification_ledger.json` is its generated structured mirror. Version
+2.0 adds separate LLM-side, General Harness, General Time-Series Harness, and
+four-task module records. Each row represents one reviewed work and keeps four kinds of data
 distinct:
 
 1. Bibliographic identity and publication time from the production BibTeX,
@@ -14,6 +15,22 @@ distinct:
 4. Multi-label task coding under four axes: forecasting and reasoning;
    augmentation and synthesis; anomaly detection and diagnosis; and decision
    support.
+
+The version-2 taxonomy fields are deliberately independent and multi-label:
+
+- `llm_side_contribution` records temporal representation/alignment,
+  instruction/interaction/reasoning, and LLM adaptation.
+- `general_harness_modules` records the seven General Harness dimensions and
+  fine-grained module labels used by the reviewed Time-Series Agent work.
+- `general_ts_harness_modules` records only mechanisms with a temporal
+  dependency and stores `ts_specificity_reason` plus source evidence.
+- `task_specific_modules` contains the same seven-module lens under the four
+  task families: forecasting/prediction, augmentation/synthesis,
+  anomaly/diagnosis, and decision support.
+
+Empty arrays are valid. A paper can populate multiple records, and
+`taxonomy_review_status` distinguishes paper-verified entries from records
+that still need PDF-level reclassification.
 
 The three Harness contribution fields are not mutually exclusive. A work may
 use or extend mechanisms at every layer. `primary_locus` answers the narrower
@@ -90,9 +107,11 @@ When adding a paper:
 1. Add and verify the BibTeX/reference identity under the policy in
    `references/README.md`.
 2. Read the paper and record a source-locatable claim summary.
-3. Record all applicable GH/GTS/TSK mechanisms and choose a primary locus only
-   for the aggregate statistic.
-4. Select one or more task axes and preserve a more specific task label in
-   `task_family_original` or `task_axis_other`.
+3. Record the LLM-side contribution separately from General Harness,
+   General-Time-Series Harness, and task-specific modules. Record all
+   applicable dimensions and preserve the source locator and temporal-binding
+   reason.
+4. Select one or more of the four task axes and preserve a more specific task
+   label in `task_family_original` or `task_axis_other`.
 5. Add the corresponding work profile to the manuscript, run `sync`, and run
    `validate` before compiling.
