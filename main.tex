@@ -579,181 +579,36 @@ The complete work-level ledger is maintained as machine-readable CSV/JSON and is
 
 \subsection{General agent mechanisms}
 
-Table~\ref{tab:general-harness-contrib} isolates the contributions that are primarily about making an LLM operate as an agent, independent of the temporal domain. These components are important, but they should not be mistaken for time-series-domain novelty by themselves. This table therefore serves as a control layer: it identifies the agentic mechanisms that a temporal system may inherit before asking what is genuinely time-series-specific.
+The general mechanisms recur across the reviewed systems in several forms. Tool use and acting expose statistical models, code, visualizers, and validators; planning and workflow modules coordinate data preparation, model selection, revision, and reporting; memory and reflection retain cases, traces, and experience; control and verification check tool results and intermediate artifacts; and multi-agent designs distribute analysis, review, and synthesis. These patterns are represented by the 14-component vocabulary in Section~3 and coded for every work in the appendix ledger.
 
-\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.39}} L{\fulltextcol{0.39}}}
-\caption{General Harness components and representative contributions in Time Series Agent work.}
-\label{tab:general-harness-contrib}\\
-\toprule
-\textbf{General Harness component} & \textbf{Representative works} & \textbf{Contribution pattern}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{General Harness component} & \textbf{Representative works} & \textbf{Contribution pattern}\\
-\midrule
-\endhead
-\ToolUse{} / \Acting{} & TS-Agent \citep{tsagent2025}, TimeART \citep{timeart2026}, TSAG \citep{tsag2026}, MoiraiAgent, AgriWorld \citep{agriworld2026} & Tool-call interfaces, structured action schemas, executable observations, code execution, and tool-result feedback.\\
-\Planning{} / workflow & TimeSeriesScientist \citep{timeseriesscientist2025}, Nexus \citep{nexus2026}, TimeCopilot \citep{timecopilot2026}, Last-Mile \citep{lastmile2026}, AlphaCast \citep{alphacast2025} & Multi-stage decomposition, role specialization, user-guided orchestration, revision workflows, and report generation.\\
-\Memory{} / reflection & FLAIRR-TS \citep{flairr2025}, Last-Mile \citep{lastmile2026}, TimeClaw-EEL \citep{timeclaw2026explore}, TimeClaw-Harness \citep{timeclaw2026harness}, AION \citep{aion2026}, MarsTSC \citep{marstsc2026} & Retrieved cases, post-mortem memories, distilled experience, task/rule/skill memories, and evolving knowledge banks.\\
-\Control{} / verification & TSAG \citep{tsag2026}, TS-Debate \citep{tsdebate2026}, Argos \citep{argos2025}, TimeSage-MT \citep{timesagemt2026}, TFRBench \citep{tfrbench2026} & Faithfulness checks, debate calibration, validation gates, reference-code scoring, and verified reasoning-trace construction.\\
-\HarnessOptimization{} & Cast-R1 \citep{castr12026}, TimeClaw-EEL \citep{timeclaw2026explore}, KairosAgent \citep{kairosagent2026}, ChatAD \citep{chatad2026} & Policy learning, trajectory comparison, metric-supervised distillation, meta-harness optimization, and instruction evolution.\\
-\MultiAgentScaling{} / \StateArtifacts{} & Agentic RAG for TSA \citep{agenticrag2024}, TS-Debate \citep{tsdebate2026}, MAS4TS \citep{mas4ts2026}, WeatherTGD \citep{weathertgd2026}, SAGE-AD \citep{sagead2026}, TimeSeriesScientist \citep{timeseriesscientist2025} & Multi-agent routing, debate, role pipelines, shared artifacts, reviewer protocols, and collective verification.\\
-TRACE \citep{chen2025trace} Feb'25; \typeSMshort{}\newline Forecasting & \textbf{GH:} Multi-agent consistency and collaborative refinement.\newline\textbf{GTS:} CoT alignment with distributed energy-resource sequences.\newline\textbf{TSK:} Data-scarce DER forecasting.\\\midrule
-SLEP \citep{wang2026large} Jan'26; \typeSMshort{}\newline Anomaly detection & \textbf{GH:} Agent development and language-mediated interpretation.\newline\textbf{GTS:} Temporal anomaly evidence and diagnostic state.\newline\textbf{TSK:} Power-system anomaly detection and false-data-injection analysis.\\\midrule
-FactorMAD \citep{duan2025factormad} Nov'25; \typeSMshort{}\newline Financial decision support & \textbf{GH:} Structured multi-agent debate and critique.\newline\textbf{GTS:} Financial temporal factor evaluation.\newline\textbf{TSK:} Interpretable stock alpha-factor mining.\\\midrule
-\bottomrule
-\end{longtable}
 
 \subsection{Shared time-series mechanisms}
 
-Table~\ref{tab:general-ts-harness-contrib} organizes representative work by the same six design obligations used in Sections~2.2, 3, and 6. The examples are deliberately drawn from multiple research groups: the table illustrates how reported mechanisms contribute pieces of a shared temporal substrate without treating any single family as the canonical implementation. It maps reported design mechanisms to obligations; inclusion does not imply that a system has passed the falsification fixtures in Section~6.2.
+The same distinction appears in the work-level evidence. Some systems make chronology, numerical values, temporal state, temporal operations, contextual alignment, or output checking explicit in their runtime. We treat these as shared temporal capabilities when their core representation and interfaces can survive a change of task; the six obligations in Section~3 provide the common vocabulary, while the appendix records the supporting papers and evidence.
 
-%L{\fulltextcol{0.21}} L{\fulltextcol{0.40}} L{\fulltextcol{0.39}}}
-
-\begin{longtable}{L{\fulltextcol{0.21}} L{\fulltextcol{0.35}} L{\fulltextcol{0.44}}}
-\caption{Representative contributions to the six \GeneralTSHarness{} design obligations.}
-\label{tab:general-ts-harness-contrib}\\
-\toprule
-\textbf{GTS design obligation} & \textbf{Representative works} & \textbf{Reusable temporal design}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{GTS design obligation} & \textbf{Representative works} & \textbf{Reusable temporal design}\\
-\midrule
-\endhead
-Temporal causality & AION \citep{aion2026}, TimeSage-MT \citep{timesagemt2026}, Last-Mile \citep{lastmile2026}, Dr-CiK \citep{drcik2026} & Chronological boundaries, allowed-context rules, distractor filtering, validation interfaces, and audit traces make leakage constraints explicit.\\
-Numerical fidelity & TS-Agent \citep{tsagent2025}, TimeART \citep{timeart2026}, TimeClaw-Harness \citep{timeclaw2026harness}, TS-Reasoner \citep{tsreasoner2026} & Native series observations and executable numerical tools are designed to preserve values, scales, units, and precision beyond text-only serialization.\\
-Time-indexed state integrity & TS-Agent \citep{tsagent2025}, AION \citep{aion2026}, TimeSage-MT \citep{timesagemt2026}, SAGE-Sleep \citep{sagesleep2026}, CALM \citep{calm2025} & Series, timestamps, covariates, sensor layers, stream state, artifacts, and validation state are represented as explicit runtime objects.\\
-Temporal operation semantics & TimeART \citep{timeart2026}, TS-Reasoner \citep{tsreasoner2026}, AgriWorld \citep{agriworld2026}, TSAG \citep{tsag2026} & The reported designs expose load, slice, align, retrieve, visualize, simulate, query, and evaluate through typed temporal action schemas.\\
-Temporal grounding of context & TimeCAP \citep{timecap2025}, Nexus \citep{nexus2026}, Dr-CiK \citep{drcik2026}, TimeFore \citep{timefore2026} & The reported designs provide mechanisms intended to bind external events, documents, SQL results, multimodal evidence, and domain knowledge to intervals, horizons, and relevance assumptions.\\
-Output auditability & AION \citep{aion2026}, TimeSage-MT \citep{timesagemt2026}, TimeSeriesExamAgent \citep{timeseriesexamagent2026}, TFRBench \citep{tfrbench2026}, Last-Mile \citep{lastmile2026} & Task files, reference code, checked reasoning traces, explicit metrics, revision constraints, and audit ledgers provide mechanisms intended to make outputs reproducibly testable; conditional uncertainty validation is additionally relevant only when outputs carry probabilistic semantics.\\
-\bottomrule
-\end{longtable}
 
 \subsection{Task-specific mechanisms}
 
-The following tables organize selected task-facing module designs and instantiations by task family; they are illustrative cross-sections rather than an exhaustive replay of the 139-work ledger. A row may have a \layerGH{} or \layerGTS{} primary locus in the ledger while still exposing a task-specific instantiation; inclusion here does not relabel its primary contribution. Forecasting, anomaly, classification, QA, and other task families differ in actions, validators, memories, and artifacts. We also include task-facing reasoning, supervision, adaptation, and evidence-acquisition methods that do not call themselves agents (marked \selfclaim{} in the ledger), because they define reusable modules that Time Series Agents can incorporate even when the original work does not claim to be an agent system.
+The following summary organizes task-facing module designs and instantiations by task family; it is an illustrative cross-section rather than an exhaustive replay of the 139-work ledger. A row may have a \layerGH{} or \layerGTS{} primary locus in the ledger while still exposing a task-specific instantiation; inclusion here does not relabel its primary contribution. Forecasting, anomaly, classification, QA, and other task families differ in actions, validators, memories, and artifacts. We also include task-facing reasoning, supervision, adaptation, and evidence-acquisition methods that do not call themselves agents (marked \selfclaim{} in the ledger), because they define reusable modules that Time Series Agents can incorporate even when the original work does not claim to be an agent system.
 
-\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.18}} L{\fulltextcol{0.40}} L{\fulltextcol{0.20}}}
-\caption{Selected forecasting and forecast-deployment task-facing module designs and instantiations. Rows are concrete works; each design states the module that the system adds on top of a general agent runtime and a cross-task temporal substrate.}
-\label{tab:forecasting-task-harness}\\
-\toprule
-\textbf{Work} & \textbf{Task setting} & \textbf{Task-specific module design} & \textbf{Module locus}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Work} & \textbf{Task setting} & \textbf{Task-specific module design} & \textbf{Module locus}\\
-\midrule
-\endhead
-TimeSeriesScientist \citep{timeseriesscientist2025} & End-to-end forecasting & Curator--Planner--Forecaster--Reporter workflow for diagnostics, preprocessing, model planning, validation, ensembling, and reports. & Lifecycle automation\\
-DCATS \citep{yeh2025empowering} & Data-centric forecasting & Metadata-aware data-cleaning actions optimized against downstream forecasting error across candidate forecasters. & Data curation\\
-FLAIRR-TS \citep{flairr2025} & Prompted forecasting & Forecaster and refiner agents use retrieved analogs and past outputs to adapt prompts at test time. & Retrieval/\allowbreak refinement\\
-TimeCAP \citep{timecap2025} & Event-aware prediction & Contextualize--augment--predict workflow aligns external event windows with forecast targets. & Event conditioning\\
-TimeXL \citep{timexl2025} & Multimodal prediction & Predict/explain loop grounds forecasts in multimodal temporal evidence and explanation constraints. & Multimodal forecasting\\
-Nexus \citep{nexus2026} & Context-aware forecasting & Macro/micro reasoning stages separate stable temporal structure from volatile context before synthesizing a forecast. & Decomposed reasoning\\
-Dr-CiK \citep{drcik2026} & Forecasting with distractors & Retrieve--filter--distill module identifies future-relevant context while suppressing irrelevant documents. & Context retrieval\\
-AlphaCast \citep{alphacast2025} & Interactive forecasting & Human-wisdom/LLM co-reasoning module combines feature sets, knowledge base, case library, context pool, and reflective evaluation. & Interactive reasoning\\
-MoiraiAgent & TSFM-assisted forecasting & Copilot-style assistant exposes a TSFM as a callable forecasting component and organizes forecast artifacts. & TSFM-as-tool\\
-TimeCopilot \citep{timecopilot2026} & Forecasting assistant & User-facing interactive workspace supports forecast analysis, revision, and session-level task context. & User interaction\\
-Last-Mile \citep{lastmile2026} & Business-ready forecast revision & Forecast-revision module retrieves weakly structured context and applies constrained edits with audit ledgers. & Deployment revision\\
-Cast-R1 \citep{castr12026} & Forecasting policy & Sequential decision policy chooses tool-augmented forecasting actions under metric rewards. & Policy learning\\
-KairosAgent \citep{kairosagent2026} & Semantic forecasting & Multi-turn refinement combines TSFM outputs, semantic reasoning, and turn-level credit assignment. & Semantic refinement\\
-TimeClaw-EEL \citep{timeclaw2026explore} & Agent learning for forecasting & Explore--compare--distill--reinject loop converts successful temporal trajectories into reusable experience. & Experience learning\\
-Time-R1 \citep{timer12025} & Reasoning-trained forecasting & Fine-grained multi-objective reward and RL schedule train slow-thinking forecast reasoning. & Reasoning policy\\
-TimeMaster \citep{timemaster2025} & Visualized TS forecasting and classification & Structured reasoning/\allowbreak classification/\allowbreak extension output with reward-driven multimodal reasoning training. & Rewarded reasoning\\
-TFRBench \citep{tfrbench2026} & Forecast reasoning evaluation & Multi-agent verification loop synthesizes numerically grounded reasoning traces for cross-channel, trend, and event reasoning. & Reasoning benchmark\\
-\bottomrule
-\end{longtable}
+The task-facing literature is best shown as a compact map rather than five repeated work tables. The complete work-level profiles remain in Appendix~\ref{app:full-ledger}.
 
-\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.18}} L{\fulltextcol{0.40}} L{\fulltextcol{0.20}}}
-\caption{Selected question answering, temporal reasoning, and domain-oriented task-facing module designs and instantiations.}
-\label{tab:qa-reasoning-task-harness}\\
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}lX X@{}}
 \toprule
-\textbf{Work} & \textbf{Task setting} & \textbf{Task-specific module design} & \textbf{Module locus}\\
+\textbf{Task family} & \textbf{Typical task-specific capabilities} & \textbf{Representative examples}\\
 \midrule
-\endfirsthead
-\toprule
-\textbf{Work} & \textbf{Task setting} & \textbf{Task-specific module design} & \textbf{Module locus}\\
-\midrule
-\endhead
-TS-Agent \citep{tsagent2025} & Raw-series reasoning / QA & Iterative insight-gathering module delegates statistical and structural extraction to tools before final answer synthesis. & Tool-grounded QA\\
-TimeART \citep{timeart2026} & TSQA / reasoning & TimeToolBench-style tool augmentation supplies analytical traces and reflective training signals. & Tool-augmented TSQA\\
-TSAG \citep{tsag2026} & Financial temporal QA & Query-planning and parameter-extraction module maps natural language to finance-specific temporal operations with faithfulness checks. & Finance QA\\
-TimeFore \citep{timefore2026} & Forecast-based tabular QA & Retriever--Forecaster--Analyzer roles combine SQL retrieval, external forecast models, and final reasoning. & Forecast QA\\
-ARTIST \citep{artist2026} & Temporal QA / reasoning & Controller selects informative temporal segments and the reasoner answers from actively acquired evidence. & Segment selection\\
-VeriTime \citep{veritime2026} & Multi-task TS reasoning & Process-verifiable CoT synthesis, difficulty scheduling, and RL training create reusable reasoning traces. & Process supervision\\
-COUNTS \citep{counts2025} & Numerical TS reasoning & Discrete TS tokens plus verifiable-reward RL elicit chain-of-thought reasoning across temporal tasks. & CoT training\\
-STReasoner \citep{streasoner2026} & Spatio-temporal reasoning & Spatially grounded rewards and ST-Bench tasks target etiological, entity, correlation, and in-context forecasting reasoning. & Spatio-temporal reasoning\\
-TS-Debate \citep{tsdebate2026} & Multimodal TS reasoning & Numeric, visual, and textual agents debate over shared evidence before final decision. & Collaborative reasoning\\
-MAS4TS \citep{mas4ts2026} & Visual TS reasoning & Analyzer--Reasoner--Executor roles coordinate visual and statistical evidence. & Visual reasoning\\
-TimeClaw-Harness \citep{timeclaw2026harness} & Contextualized reasoning & Executable temporal tools, episodic multimodal memory, and evolved routines support open-ended temporal reasoning. & General TS reasoning\\
-AgriWorld \citep{agriworld2026} & Agricultural QA / counterfactuals & Code-executing agent queries geospatial and remote-sensing time series, crop simulators, and task predictors through execute-observe-refine. & Domain tools\\
-SAGE-Sleep \citep{sagesleep2026} & Sleep-care monitoring / QA & Sensor-grounded query layer supports user-initiated QA and system-initiated monitoring against personal baselines. & Health monitoring\\
-AI-Meteorologist \citep{aimeteorologist2025,hierarchicalmeteorologist2025} & Weather interpretation & Multi-variable weather-analysis module produces scientifically grounded narratives and validates temporal coherence with keywords. & Scientific reporting\\
-WeatherTGD \citep{weathertgd2026} & Weather captioning & Statistical, physical, and meteorological agents provide consensus-aware textual gradients for caption refinement. & Caption refinement\\
+Forecasting and revision & Horizon contracts, backtesting, model selection, contextual conditioning, forecast revision, and deployment audit. & TimeSeriesScientist, TimeCAP, TimeCopilot, Cast-R1, Last-Mile.\\
+Anomaly detection and diagnosis & Window localization, rule generation, root-cause evidence, multimodal diagnosis, and deployment gates. & Argos, AnomaMind, ChatAD, Time-RA, SAGE-AD.\\
+Classification and recognition & Channel-aware evidence, class exemplars, confidence aggregation, and knowledge-bank refinement. & FETA, ZARA, MarsTSC, TESSA, TimeMaster.\\
+Question answering and temporal reasoning & Tool-grounded evidence acquisition, segment selection, numerical reasoning, debate, and process supervision. & TS-Agent, TimeART, ARTIST, VeriTime, COUNTS, STReasoner.\\
+Benchmarks, streaming, and decision support & Task generation, validation, cross-turn state, streaming adaptation, forecast revision, and decision records. & AION, TFRBench, TimeSage-MT, CALM, TimeClaw-Harness.\\
 \bottomrule
-\end{longtable}
-
-\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.18}} L{\fulltextcol{0.40}} L{\fulltextcol{0.20}}}
-\caption{Selected classification, activity-recognition, and annotation task-facing module designs and instantiations.}
-\label{tab:classification-task-harness}\\
-\toprule
-\textbf{Work} & \textbf{Task setting} & \textbf{Task-specific module design} & \textbf{Module locus}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Work} & \textbf{Task setting} & \textbf{Task-specific module design} & \textbf{Module locus}\\
-\midrule
-\endhead
-FETA \citep{feta2025} & Training-free classification & Channel-wise agents reason with class exemplars and aggregate confidence without task-specific training. & Exemplar reasoning\\
-ZARA \citep{zara2025} & Motion/activity recognition & Retrieval-augmented motion-cue module represents sensor windows and filters candidate activity labels. & Motion priors\\
-MarsTSC \citep{marstsc2026} & Few-shot multimodal classification & Generator--Reflector--Modifier roles maintain a self-evolving knowledge bank and update it cautiously at test time. & Knowledge-bank refinement\\
-TESSA \citep{tessa2024} & Cross-domain annotation & General annotation agent and domain-specific annotation agent combine time-series-wise and text-wise features. & Annotation generation\\
-TimeMaster \citep{timemaster2025} & Multimodal classification & Structured output and composite rewards align visual TS reasoning, class decisions, and domain-specific insights. & Rewarded classification\\
-\bottomrule
-\end{longtable}
-
-\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.18}} L{\fulltextcol{0.40}} L{\fulltextcol{0.20}}}
-\caption{Selected anomaly-detection, diagnosis, and root-cause task-facing module designs and instantiations.}
-\label{tab:anomaly-task-harness}\\
-\toprule
-\textbf{Work} & \textbf{Task setting} & \textbf{Task-specific module design} & \textbf{Module locus}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Work} & \textbf{Task setting} & \textbf{Task-specific module design} & \textbf{Module locus}\\
-\midrule
-\endhead
-Argos \citep{argos2025} & Production anomaly detection & Rule proposal, validation, repair, deployment gates, monitoring context, and rule history. & Rule generation\\
-AnomaMind \citep{anomamind2026} & Anomaly diagnosis & Coarse-to-fine diagnostic loop prepares features, localizes windows, reflects on errors, and reuses diagnosis patterns. & Diagnosis workflow\\
-ChatAD \citep{chatad2026} & AD reasoning / dialogue & Multi-agent TS evolution creates AD reasoning data, multi-turn dialogue behavior, and LLADBench evaluation. & Dialogue evolution\\
-Time-RA \citep{timera2025} & Anomaly diagnosis & RATs40K integrates raw series, textual context, plots, and structured reasoning annotations for generative anomaly diagnosis. & Multimodal diagnosis\\
-SAGE-AD \citep{sagead2026} & Expert-like anomaly detection & Point, structural, seasonal, and pattern analyzers generate evidence; a detector and supervisor produce records and reports. & Specialized analyzers\\
-DAST \citep{dast2026} & O-RAN anomaly detection & VLM--LLM--VLM pipeline converts KPI streams to visual evidence, scores domain text, and verifies suspects on heatmaps. & Cross-interface localization\\
-Tree-of-Evidence \citep{treeofevidence2026} & Clinical/fault evidence search & Beam search over evidence bottlenecks selects compact time-window and text evidence that reproduces predictions. & Evidence acquisition\\
-\bottomrule
-\end{longtable}
-
-\begin{longtable}{L{\fulltextcol{0.22}} L{\fulltextcol{0.18}} L{\fulltextcol{0.40}} L{\fulltextcol{0.20}}}
-\caption{Selected benchmark-generation, evaluation, streaming, and deployment task-facing module designs and instantiations.}
-\label{tab:benchmark-streaming-task-harness}\\
-\toprule
-\textbf{Work} & \textbf{Task setting} & \textbf{Task-specific module design} & \textbf{Module locus}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Work} & \textbf{Task setting} & \textbf{Task-specific module design} & \textbf{Module locus}\\
-\midrule
-\endhead
-TimeSage-MT \citep{timesagemt2026} & Multi-turn agent benchmark & Dialogue turns, cross-turn temporal state, analytical skill library, and reference-code scoring expose failures in memory and decision tasks. & Process benchmark\\
-TimeSeries\allowbreak Exam\allowbreak Agent \citep{timeseriesexamagent2026} & Benchmark generation & Dataset-aware templates, question generation, verification, refinement, and question-bank memory. & Scalable task generation\\
-AION \citep{aion2026} & Practical harness / tasks & Task files, workspaces, artifacts, evaluators, and validation protocols define realistic TS-agent task interfaces. & Practical evaluation\\
-TFRBench \citep{tfrbench2026} & Forecast reasoning benchmark & Reasoning traces are generated and checked through an iterative multi-agent verification loop. & Reasoning evaluation\\
-CALM \citep{calm2025} & Streaming adaptation & Non-stationary stream state, LLM-as-judge feedback, continuous adaptation, and regression checks. & Stream monitoring\\
-Last-Mile \citep{lastmile2026} & Forecast deployment & Revision actions are constrained by safety contracts and recorded in a forecast audit ledger. & Deployment audit\\
-TimeClaw-Harness \citep{timeclaw2026harness} & Contextualized TS tasks & CiK, TSRBench, and TSAIA protocols evaluate context use, open-ended reasoning, tool traces, and memory. & Contextualized evaluation\\
-\bottomrule
-\end{longtable}
+\end{tabularx}
+\caption{Task families show how shared agent capabilities are instantiated. Examples are representative; the complete 139-work profiles are in Appendix~\ref{app:full-ledger}.}
+\label{tab:task-summary}
+\end{table}
 
 Imputation is retained as a reserved task family, but the maintained ledger contains no dedicated imputation-agent system. In the reviewed snapshot, imputation appears as a temporal operation or tool-library capability rather than as the primary task-specific module.
 
@@ -938,24 +793,8 @@ A reproducible evaluation release should therefore include the benchmark data an
 
 The field needs reusable infrastructure rather than isolated demonstrations. A practical repository stack should contain:
 
-\begin{longtable}{L{\fulltextcol{0.24}} L{\fulltextcol{0.40}} L{\fulltextcol{0.36}}}
-\caption{Suggested repository stack for Time Series Agent research.}\\
-\toprule
-\textbf{Layer} & \textbf{Content} & \textbf{Purpose}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Layer} & \textbf{Content} & \textbf{Purpose}\\
-\midrule
-\endhead
-TS-Agent-Core & Time-indexed workspace, data adapters, chronological split contracts, context binding, tool schemas, trace schema, validation interface. & Standardize the \GeneralTSHarness{} across tasks and agents.\\
-Task-specific modules & Forecast lifecycle, anomaly diagnosis, classification evidence, TSQA schemas, imputation operators, benchmark generation, and deployment revision templates. & Make task-specific Harness design explicit and reusable.\\
-TS-Tool-Library & Statistical, spectral, anomaly, forecasting, imputation, visualization, retrieval, TSFM, and LM-based TS model wrappers. & Make existing models callable agent components.\\
-TS-AgentBench & Multi-turn tasks, tool-trace scoring, evidence faithfulness, context retrieval, revision traces, cost, leakage, task-specific metrics, and governance metrics. & Evaluate both process quality and task-specific utility.\\
-Agent-as-Engineer pipeline & Synthetic data generation, lightweight forecaster training, forecaster selection, and meta-harness optimization. & Convert agentic reasoning into deployable temporal artifacts.\\
-Component ledger & Work-level labels for \GeneralHarness{}, \GeneralTSHarness{}, and \TaskSpecificHarness{} contributions. & Keep claims and future updates auditable.\\
-\bottomrule
-\end{longtable}
+A practical repository should contain six complementary pieces: a time-indexed workspace and validation interface; task-specific modules for forecasting, anomaly diagnosis, QA, and deployment revision; a callable library of statistical, forecasting, imputation, visualization, retrieval, and TSFM tools; benchmark tasks with trace and evidence scoring; an agent-as-engineer pipeline for producing temporal artifacts; and a component ledger that keeps claims auditable. This list is more readable than a second layer table because the items are requirements rather than competing alternatives.
+
 
 Current infrastructure-oriented systems point to three practical requirements: agents should be able to produce deployable temporal artifacts, operate over native time-series workspaces, and evaluate realistic tasks through explicit validation interfaces and protocols \citep{timeclaw2026harness,aion2026}.
 
