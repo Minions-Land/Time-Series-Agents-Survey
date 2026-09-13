@@ -170,8 +170,10 @@ LLM agents provide a natural system abstraction for this broader workflow. In th
   bottom=10pt
 ]
 \[
-\resizebox{\linewidth}{!}{$\textbf{LLM-based agent} \approx \text{LLM}+\text{Harness},\qquad
-\textbf{Time-Series Agent} \approx \text{LLM}+\text{General Harness}+\text{Time-Series Harness Module}$.}
+\begin{aligned}
+\textbf{LLM-based Agent} &\approx \text{LLM}+\text{Harness},\\
+\textbf{Time-Series Agent} &\approx \text{LLM}+\text{General Harness}+\text{Time-Series Harness Module}.
+\end{aligned}
 \]
 \end{tcolorbox}
 
@@ -199,12 +201,12 @@ Task-Specific Harness & Which mechanisms are tied to a concrete task contract, s
 \label{tab:harness-hierarchy}
 \end{table}
 
-The maintained ledger uses the module as its unit of analysis. A single paper can contribute a temporal representation, a memory mechanism, a verifier, and a task workflow at the same time; each contribution is recorded under the applicable module and dimension. Aggregate plots therefore count module-level contributions, allowing one work to appear in several categories.
+The maintained ledger uses the module as its unit of analysis. A single paper can contribute a temporal representation, a memory mechanism, a verifier, and a task workflow at the same time; each contribution is recorded under the applicable module and dimension. General Harness and General Time-Series Harness are therefore deliberately non-exclusive: the same capability family may appear once at the runtime layer and again with a temporal binding. For example, memory is General Harness when it stores reusable experience, but it is General Time-Series Harness when the stored state is indexed by availability time, data vintage, missingness, or revision. Aggregate plots count these module annotations separately, allowing one work to appear in several categories.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{artifacts/contribution_timeline.png}
-\caption{Cumulative module-level contributions in the reviewed Time-Series Agent corpus. The curves count independently recorded LLM-side, General Harness, General Time-Series Harness, and Task-Specific Harness modules; a paper can contribute to multiple curves.}
+\caption{Cumulative module-level contributions in the reviewed Time-Series Agent corpus. Each curve counts independently recorded module annotations, so one work may contribute to several curves. The logarithmic vertical axis keeps early contributions visible. GH and GTS overlap when the same capability is recorded at both the general runtime layer and its temporal specialization; the hollow markers keep the GH curve visible in that case.}
 \label{fig:contribution-trend}
 \end{figure}
 
@@ -234,7 +236,8 @@ From Prompts to Agents \citep{promptstoagents2026} & \yes & \yes & \no & \no & \
 Chang et al. \citep{changsurvey2026} & \yes & \yes & \no & \no & \no & \yes & \no\\
 LLM Agents for Time-Series \citep{chen2026tsagentsurvey} & \yes & \yes & \no & \no & \yes & \yes & \no\\
 LLM-based Agents for Forecasting \citep{xu2026forecastagentsurvey} & \yes & \yes & \no & \no & \no & \yes & \no\\
-This survey (\textbf{Ours}) & \yes & \yes & \yes & \yes & \yes & \yes & \yes\\
+\midrule
+\textbf{Ours} & \yes & \yes & \yes & \yes & \yes & \yes & \yes\\
 \bottomrule
 \end{longtable}
 \endgroup
@@ -284,9 +287,18 @@ These methods connect numerical sequences, time structure, and language represen
 
 A second line teaches the model to discuss and reason over temporal evidence. ChatTS constructs synthetic time-series instruction data and time-series dialogue for understanding and reasoning \citep{chatts2025}. Its direct extension, Towards Time-Series Reasoning, combines a trainable temporal encoder with supervised reasoning traces for cross-domain perception and analysis \citep{chow2024tsreasoning}. These works make natural-language temporal interaction a learned model capability rather than only a prompt format.
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.88\linewidth]{artifacts/paper_figures/chatts_overview.png}
+\caption{ChatTS's synthetic-data and model-training pipeline, reproduced from Fig.~3 of \citet{chatts2025}. The figure distinguishes an LLM-side contribution (temporal alignment and instruction data) from a Harness-side tool or workflow contribution.}
+\label{fig:chatts-overview}
+\end{figure}
+
 \subsection{LLM adaptation and the model-side boundary}
 
 LLM-side adaptation includes continued training, parameter-efficient adaptation, temporal adapters, and task-specific supervision. Foundational studies such as LLMTime establish what serialized numerical inputs can and cannot provide to a language model \citep{gruver2023llmtime,tan2024useful,merrill2024struggle}. We record the model-side change separately from Harness changes: a paper may contribute to this section and also introduce temporal tools, memory, or task contracts.
+
+The model-side boundary matters because a stronger temporal encoder does not automatically create an Agent. ChatTS changes the learned alignment and reasoning capability; a tool-using system can then call that capability from a General Harness; and a task-specific verifier determines whether the resulting forecast, diagnosis, or recommendation satisfies its output contract. Keeping these contributions separate prevents model adaptation from being confused with runtime orchestration, while allowing a paper to receive multiple module labels when it genuinely changes multiple layers.
 \section{General Harness}
 \label{sec:general-harness}
 
@@ -349,10 +361,26 @@ Optimization and evolution improve prompts, tools, policies, memories, or trajec
 \subsection{Coordination and Scaling}
 
 Coordination and scaling divide work among specialized roles, share state, and combine review or debate. Coordination may be cooperative, competitive, or hierarchical; the shared state and handoff protocol determine whether the final result is consistent and auditable. Multi-agent time-series systems use numeric, visual, textual, analyst, reviewer, and executor roles to construct a joint result \citep{tsdebate2026,mas4ts2026,aimeteorologist2025,fincon2024}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.94\linewidth]{artifacts/paper_figures/tsagent_trace.png}
+\caption{A tool-using reasoning trace from TS-Agent (Fig.~3 in \citet{tsagent2025}). It illustrates the General Harness loop of observation, tool execution, evidence logging, critic feedback, and final verification; the temporal tools are the domain-specific part.}
+\label{fig:tsagent-trace}
+\end{figure}
 \section{General Time-Series Harness}
 \label{sec:general-ts-harness}
 
 The General Time-Series Harness is the time-series specialization of the seven General Harness dimensions. We include a mechanism here only when its core representation, operation, or validator depends on temporal order, index, frequency, window, horizon, regime, availability time, or leakage control. This criterion follows the temporal contracts emphasized in recent time-series-agent surveys and reasoning taxonomies \citep{chen2026tsagentsurvey,changsurvey2026}. A generic chat loop, Python call, or reflection step remains General Harness.
+
+The distinction is easiest to see at the contract boundary. General Harness specifies how an Agent stores state, invokes tools, coordinates roles, and verifies outputs. General Time-Series Harness specifies what a valid temporal state or operation means: which observations were available, how a window is aligned, which frequency and units apply, and how a revision is represented. TIMECLAW and AION make this boundary explicit through time-series-native execution, temporal grounding, and reliability mechanisms \citep{timeclaw2026harness,aion2026}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.90\linewidth]{artifacts/paper_figures/aion_principles.png}
+\caption{AION's three coupled time-series harness principles, reproduced from Fig.~2 of \citet{aion2026}. Temporal grounding, knowledge-grounded reasoning, and reliability mechanisms show why GTS is a temporal contract layered on top of a general runtime.}
+\label{fig:aion-principles}
+\end{figure}
 
 \subsection{Interface and Interaction}
 
@@ -409,9 +437,23 @@ Forecasting agents manage horizons, chronological splits, model selection, proba
 
 Augmentation and synthesis agents generate, select, or validate temporal data and representations. Their interface declares the conditioning window, channels, sampling frequency, and intended use; memory records source series, transformations, and provenance; and tools implement perturbation, simulation, retrieval, or generative modeling. Control and verification compare generated trajectories with the target distribution, temporal dependence, missingness pattern, and downstream task utility. Planning determines which views or scenarios to generate, whereas optimization adapts the generator or selection policy from validation feedback. Their task contract therefore specifies the target distribution, conditioning context, fidelity checks, and downstream utility; the task-specific module is the generator--validator loop rather than generic generation alone \citep{liu2025synthetic,bridge2025,merit2025,scenariodiff2026}.
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.94\linewidth]{artifacts/paper_figures/merit_augmentation.png}
+\caption{MERIT's retrieval--augmentation--review loop, reproduced from Fig.~2 of \citet{merit2025}. The generator is coupled to a task-specific review agent, making fidelity and downstream utility part of the augmentation contract.}
+\label{fig:merit-augmentation}
+\end{figure}
+
 \subsection{Anomaly Detection and Diagnosis}
 
 Anomaly agents localize events, propose or verify rules, retrieve incident evidence, diagnose causes, and support remediation. Their interface fixes the monitoring window, channels, sampling rate, and alert horizon; memory links an event to historical baselines, prior incidents, and maintenance records; and tools support scoring, localization, root-cause analysis, and simulation. Control and verification must distinguish a novel observation from a delayed label, check false-alarm budgets, and require evidence for a diagnosis before remediation is recommended. Planning coordinates detection, evidence retrieval, diagnosis, and escalation, while multi-agent systems may separate numeric scoring, semantic interpretation, and review. The task-specific contract includes windows, thresholds, root-cause labels, alert policies, and deployment gates \citep{argos2025,anomamind2026,chatad2026,sagead2026,ji2025lemad,wang2026large}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.96\linewidth]{artifacts/paper_figures/anomamind_workflow.png}
+\caption{AnomaMind's coarse-to-fine anomaly-diagnosis workflow, reproduced from Fig.~1 of \citet{anomamind2026}. The example separates evidence acquisition, detection, diagnosis, and iterative refinement, which are distinct TSK modules under the anomaly contract.}
+\label{fig:anomamind-workflow}
+\end{figure}
 
 \subsection{Decision Support}
 
@@ -426,6 +468,10 @@ A Time-Series Agent requires evaluation at three levels: General Harness process
 \subsection{Evaluation contract}
 
 Evaluation should report tool-call validity, trace faithfulness, memory and artifact provenance, temporal availability rules, numerical fidelity, temporal operations, evidence grounding, task metrics, cost, failures, and revision behavior. A forecast score or QA score is one task result, not a complete Agent evaluation.
+
+The unit of evaluation should be an episode rather than a single answer. An episode records the task specification, as-of boundary, visible context, tool calls, intermediate artifacts, validator decisions, revision steps, final output, and resource use. This record makes it possible to separate a poor model prediction from a tool-selection error, a leakage error, an invalid temporal operation, or a failure to revise after feedback.
+
+The same protocol should support controlled perturbations: hide or reveal contextual evidence, shift the forecast origin, inject missingness, change the frequency, or replace a tool with a failing implementation. These interventions expose whether a system relies on the intended temporal evidence and whether its General Harness can recover from operational failures.
 
 \begin{figure}[htbp]
 \centering
@@ -446,21 +492,32 @@ Evaluation should report tool-call validity, trace faithfulness, memory and arti
 Forecasting suites measure horizon-respecting accuracy and probabilistic calibration. Anomaly and diagnosis suites measure detection, localization, root-cause attribution, and evidence. Augmentation suites measure fidelity and downstream utility. Decision-support studies measure policy, recommendation, or operational outcomes. TSQA and multimodal QA provide useful local evidence for grounded temporal answers, but they cover only one part of the Agent contract.
 
 \begin{table}[htbp]
-\centering\small
-\begin{tabularx}{\textwidth}{@{}lXX@{}}
+\centering\scriptsize
+\setlength{\tabcolsep}{1.5pt}
+\begin{tabularx}{\textwidth}{@{}L{0.17\textwidth}L{0.25\textwidth}L{0.24\textwidth}L{0.28\textwidth}@{}}
 \toprule
-\textbf{Benchmark family} & \textbf{What it evaluates} & \textbf{What it cannot establish alone}\\
+\textbf{Resource} & \textbf{Coverage and protocol} & \textbf{Agent signal} & \textbf{Scope boundary}\\
 \midrule
-Forecasting and prediction & Horizon-respecting accuracy, probabilistic calibration, revision utility, and deployment robustness. & General tool validity, memory provenance, or cross-task Harness reuse.\\
-Anomaly detection and diagnosis & Detection, localization, root-cause attribution, explanation, and mitigation evidence. & Whether the agent preserves temporal state or avoids leakage outside the tested protocol.\\
-Contextual and multimodal analysis & Alignment of signals with events, text, images, and domain context; distractor resistance. & General decision quality or faithful execution of arbitrary temporal tools.\\
-Time-series QA and reasoning & Answer correctness, evidence grounding, numerical reasoning, and multi-step analysis. & Forecast deployment behavior and downstream operational consequences.\\
-Agent-process evaluation & Tool selection, trace faithfulness, code execution, validation, cost, review burden, and reproducibility. & Task utility unless paired with a temporal task benchmark.\\
+TemporalBench \citep{temporalbench2026} & Four information settings spanning historical interpretation, context-free forecasting, contextual reasoning, and event-conditioned prediction. & Tests whether performance changes when temporal context is controlled. & Executable actions and decision utility are outside its protocol.\\
+TFRBench \citep{tfrbench2026} & Ten datasets across five domains with search--reasoning--verifier--forecasting--summary traces. & Separates forecast score from reasoning-trace quality using MASE and a reasoning judge. & Trace scoring depends on evaluator quality.\\
+TraceBench \citep{tracebench2026} & Controlled root-cause attribution with noise, domain context, labeled examples, and direct versus programmatic submission. & Measures intervention-aware trajectories and attribution behavior. & Its protocol centers on controlled diagnostic environments.\\
+TSAQA / MMTS-Bench \citep{tsaqa2026,mmtsbench2026} & Large temporal QA and multimodal QA collections with numerical, grounding, matching, and cross-modal tasks. & Measures language-facing temporal reasoning and evidence alignment. & Tool validity, long-horizon forecasting, and downstream action quality are outside its scope.\\
+TimeSeriesGym \citep{timeseriesgym2025} & ML-engineering challenges across domains, tasks, code, models, and submission artifacts. & Grades executable artifacts and combines quantitative and LLM-based evaluation. & Temporal availability and provenance are outside its protocol.\\
+TSQBench \citep{tsqbench2026} & Data-quality diagnosis with multiple analytical tools, real-world datasets, and dimension-wise comparison. & Tests whether an Agent can inspect and adjudicate temporal data quality. & Its task contract centers on data quality.\\
 \bottomrule
 \end{tabularx}
-\caption{Benchmark families cover complementary parts of the Time-Series Agent contract.}
+\caption{Representative benchmark resources and the part of the Time-Series Agent contract that each can establish.}
 \label{tab:benchmark-families}
 \end{table}
+
+These resources are complementary rather than interchangeable. TemporalBench and TFRBench emphasize contextual forecasting and reasoning traces; TraceBench controls diagnosis and interventions; TSAQA and MMTS-Bench measure temporal question answering and multimodal grounding; TimeSeriesGym evaluates executable ML-engineering artifacts; and TSQBench focuses on data-quality decisions. Together they cover important slices of the agent contract, but no single resource combines temporal availability, executable tools, evidence provenance, trace validation, and all four task families.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\linewidth]{artifacts/paper_figures/timeseriesgym_benchmark.png}
+\caption{TimeSeriesGym's benchmark design, reproduced from Fig.~1 of \citet{timeseriesgym2025}. It illustrates the infrastructure layer: heterogeneous challenges, executable submissions, quantitative and qualitative graders, and multimodal outputs.}
+\label{fig:timeseriesgym}
+\end{figure}
 
 \subsection{Role of QA within a Time-Series Agent benchmark}
 
@@ -468,10 +525,10 @@ QA resources evaluate temporal answers, evidence grounding, and selected numeric
 
 \subsection{Infrastructure and the missing unified benchmark}
 
-TimeClaw, AION, TimeSeriesGym, and ModernTSF provide complementary infrastructure. ModernTSF contributes an agent-ready and reproducible forecasting substrate with model and dataset catalogs, callable interfaces, evidence, budgets, artifacts, and recoverable execution. We use it as an infrastructure case, not as evidence that the benchmark gap has been closed. The field still lacks a broadly adopted benchmark that combines a time-indexed availability policy, executable temporal tools, trace and evidence validation, and task contracts across forecasting, augmentation, anomaly diagnosis, and decision support.
+TimeClaw, AION, TimeSeriesGym, and ModernTSF provide complementary infrastructure. ModernTSF contributes an agent-ready and reproducible forecasting substrate with model and dataset catalogs, callable interfaces, evidence, budgets, artifacts, and recoverable execution \footnote{ModernTSF repository: \url{https://github.com/Diaugeia/ModernTSF}.}. We use it as an infrastructure case, not as evidence that the benchmark gap has been closed. The field still lacks a single public suite that combines a time-indexed availability policy, executable temporal tools, trace and evidence validation, and task contracts across forecasting, augmentation, anomaly diagnosis, and decision support.
 
 A reusable benchmark stack should therefore include a time-indexed workspace, explicit availability rules, executable temporal tools, trace and evidence schemas, validators, cases from all four task families, and cost, failure, and revision logs. These requirements connect the infrastructure chapter to the open problems below.
-\section{Open Problems and Case Studies}
+\section{Open Problems and Focused System Analyses}
 
 \subsection{Reusable temporal infrastructure}
 
@@ -479,21 +536,30 @@ Time-Series Agents need shared workspaces, temporal tool contracts, evidence sch
 
 \subsection{Open problems}
 
-\noindent\textbf{Temporal and numerical faithfulness.} Agents need typed temporal operations, unit-aware representations, chronology guards, and end-to-end fidelity checks.
+\noindent\textbf{Temporal and numerical faithfulness.} Agents need typed temporal operations, unit-aware representations, chronology guards, and end-to-end fidelity checks. A correct textual explanation can still be wrong if a tool uses the wrong frequency, rounds a value, or retrieves information after the forecast origin. Future systems should therefore validate numerical and temporal invariants at every interface, not only score the final answer.
 
-\noindent\textbf{Context retrieval and memory without leakage.} Retrieved events and episodic memories need availability-time provenance, expiry, regime awareness, and replayable audits.
+\noindent\textbf{Context retrieval and memory without leakage.} Retrieved events and episodic memories need availability-time provenance, expiry, regime awareness, and replayable audits. This problem links GTS memory to evaluation: an Agent should be able to reconstruct exactly which event, revision, or prior trajectory was visible when a decision was made.
 
-\noindent\textbf{Interface standardization.} Shared schemas for temporal workspaces, tools, traces, and validators would make systems composable and comparable.
+\noindent\textbf{Interface standardization.} Shared schemas for temporal workspaces, tools, traces, and validators would make systems composable and comparable. Without a common contract, two Agents may report the same metric while using different as-of policies, window semantics, or failure handling.
 
-\noindent\textbf{Self-evolving components.} Tool, policy, memory, and workflow updates require regression checks under temporal shift.
+\noindent\textbf{Self-evolving components.} Tool, policy, memory, and workflow updates require regression checks under temporal shift. Capability evolution should preserve previous generations when a new component fails held-out temporal checks, and should record the evidence that justified promotion.
 
-\noindent\textbf{Decision-centric evaluation.} Future benchmarks should connect predictive or diagnostic evidence to action quality, cost, uncertainty, and accountability.
+\noindent\textbf{Decision-centric evaluation.} Future benchmarks should connect predictive or diagnostic evidence to action quality, cost, uncertainty, and accountability. Prediction is valuable because it informs action; an Agent benchmark should therefore measure whether a forecast or diagnosis changes a decision appropriately under explicit constraints, rather than treating prediction accuracy as the endpoint.
 
-\subsection{Case studies}
+\subsection{Focused system analyses}
 
-\noindent\textbf{ChatTS.} ChatTS represents the LLM-side contribution: synthetic instruction data and time-series dialogue align a language model with temporal inputs and reasoning \citep{chatts2025}. Its lessons belong to Section~3, while its temporal interfaces can also be instantiated in later Harness layers.
+\noindent\textbf{ChatTS: changing the LLM side.} ChatTS starts from a limitation of ordinary language models: time-series values and temporal attributes are not natively available as a multimodal input. Its attribute selector, synthetic time-series/text generator, evolution-instruct stage, and multimodal model align numerical series with language supervision \citep{chatts2025}. In our ledger this is an LLM-side contribution with a General Time-Series Harness binding: the learned alignment is reusable across temporal questions, while the dialogue and reasoning tasks provide task-specific instantiations. The central evidence is not simply a higher answer score; it is the change in what the LLM can represent and explain, together with the synthetic-data assumptions shown in Fig.~\ref{fig:chatts-overview}.
 
-\noindent\textbf{ModernTSF.} ModernTSF represents the infrastructure contribution: callable model and dataset interfaces, evidence, budgets, artifacts, and recoverable execution provide a foundation for reproducible Agent evaluation.
+\noindent\textbf{TimeClaw: making temporal semantics executable.} TimeClaw turns the GTS boundary into a runtime: numerical execution remains server-side, temporal tools evolve through an evaluated toolbox, and solution trajectories remain auditable and reusable \citep{timeclaw2026harness}. Its contribution is therefore broader than a forecasting model: it binds tool calls, temporal state, memory, and capability evolution to one execution contract.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\linewidth]{artifacts/paper_figures/timeclaw_runtime.png}
+\caption{TIMECLAW's time-series-native runtime, reproduced from Fig.~2 of \citet{timeclaw2026harness}. The figure connects server-side numerical execution, an evolving toolbox, auditable trajectories, and multimodal memory.}
+\label{fig:timeclaw-runtime}
+\end{figure}
+
+\noindent\textbf{ModernTSF: infrastructure and reproducibility.} ModernTSF represents the infrastructure contribution: callable model and dataset interfaces, evidence, budgets, artifacts, and recoverable execution provide a foundation for reproducible Agent evaluation \footnote{ModernTSF repository: \url{https://github.com/Diaugeia/ModernTSF}.}. Its role in this survey is to show what must be made executable and inspectable before a benchmark can compare Agents: data and model identity, tool inputs and outputs, budgets, intermediate artifacts, and recoverable failures. It is complementary to the benchmark resources in Table~\ref{tab:benchmark-families}; it does not by itself supply a unified cross-task evaluation protocol.
 
 \section{Conclusion}
 

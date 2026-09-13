@@ -80,15 +80,30 @@ def main() -> None:
     }
     plt.rcParams.update({"font.size": 10, "axes.titlesize": 11, "axes.labelsize": 10})
     fig, ax = plt.subplots(figsize=(8.4, 4.6))
-    # Draw the solid curves first and the dashed General-Harness curve last.
-    # This keeps both labels visible even where the ledger records the same
-    # reusable module at the GH and GTS layers.
+    # Keep all four layers in one plot. GH and GTS can legitimately share the
+    # same cumulative value when one module has both labels; hollow GH markers
+    # keep that independently counted curve visible in print.
     ax.plot(dates, cumulative["General Time-Series Harness"], lw=2.5, label="General Time-Series Harness", color=colors["General Time-Series Harness"], zorder=2)
     ax.plot(dates, cumulative["Task-Specific Harness"], lw=2.5, label="Task-Specific Harness", color=colors["Task-Specific Harness"], zorder=3)
     ax.plot(dates, cumulative["LLM-side"], lw=2.5, label="LLM-side", color=colors["LLM-side"], zorder=4)
-    ax.plot(dates, cumulative["General Harness"], lw=2.5, ls="--", dashes=(5, 2), label="General Harness", color=colors["General Harness"], zorder=5)
-    ax.set_ylabel("Cumulative module annotations")
+    ax.plot(
+        dates,
+        cumulative["General Harness"],
+        lw=1.8,
+        ls="--",
+        dashes=(5, 2),
+        marker="o",
+        markevery=max(1, len(dates) // 10),
+        ms=4.5,
+        mfc="white",
+        mec=colors["General Harness"],
+        label="General Harness",
+        color=colors["General Harness"],
+        zorder=5,
+    )
     ax.set_title("Module-level contributions across the reviewed corpus")
+    ax.set_yscale("log")
+    ax.set_ylabel("Cumulative module annotations (log scale)")
     ax.legend(frameon=False, ncol=2, loc="upper left", fontsize=8.5)
     ax.grid(axis="y", alpha=0.25)
     ax.spines[["top", "right"]].set_visible(False)
