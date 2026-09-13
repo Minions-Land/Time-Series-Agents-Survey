@@ -49,10 +49,18 @@ remain task/reasoning-oriented sources rather than Harness ontologies.
 
 ## Screening decisions
 
-- **Promote as a core Harness reference after Scholar verification:** Meng et
-  al. (2026).
-- **Use as supporting component evidence after PDF verification:** Lumer et
-  al. (2026), Zhu et al. (2026), Gong (2026), and Zhang et al. (2026).
+- **Eligible for the core Harness reference queue:** Meng et al. (2026). A
+  Google Scholar result, Cite page, and raw BibTeX receipt were obtained; the
+  paper PDF is also stored in the local candidate snapshot. The receipt is at
+  `references/reports/scholar_receipts/meng2026agentharness.bib`. It is still
+  kept out of the production bibliography until the manuscript actually cites
+  it.
+- **Not admitted yet:** Lumer et al. (2026), Zhu et al. (2026), Gong (2026),
+  and Zhang et al. (2026). Lumer, Zhang, and Zhu produced exact Scholar search
+  results, but the Cite endpoint returned a block before a BibTeX receipt could
+  be saved. Gong produced no exact Scholar result in the same pass. Their PDFs
+  were not all available from an unblocked official source. They therefore
+  remain screening evidence only.
 - **Use for the time-series task/LLM-role branch, not Harness definitions:** Yu
   et al. (2026), Li et al. (2026), and the already reviewed Chen et al. and
   Chang et al. surveys.
