@@ -79,28 +79,23 @@ def main() -> None:
         "LLM-side": "#7851a9",
     }
     plt.rcParams.update({"font.size": 10, "axes.titlesize": 11, "axes.labelsize": 10})
-    fig, (ax_top, ax_bottom) = plt.subplots(
-        2, 1, figsize=(8.4, 5.6), sharex=True, gridspec_kw={"height_ratios": [2.2, 1]}
-    )
-    ax_top.plot(dates, cumulative["General Harness"], lw=2.4, ls="--", label="General Harness", color=colors["General Harness"])
-    ax_top.plot(dates, cumulative["General Time-Series Harness"], lw=2.4, label="General Time-Series Harness", color=colors["General Time-Series Harness"])
-    ax_top.plot(dates, cumulative["Task-Specific Harness"], lw=2.4, label="Task-Specific Harness", color=colors["Task-Specific Harness"])
-    ax_top.set_ylabel("Cumulative module annotations")
-    ax_top.set_title("Harness-layer module contributions")
-    ax_top.legend(frameon=False, ncol=3, loc="upper left", fontsize=8.5)
-    ax_top.grid(axis="y", alpha=0.25)
-    ax_top.spines[["top", "right"]].set_visible(False)
-
-    ax_bottom.plot(dates, cumulative["LLM-side"], lw=2.4, color=colors["LLM-side"], label="LLM-side")
-    ax_bottom.set_ylabel("LLM modules")
-    ax_bottom.set_title("LLM-side temporal contributions")
-    ax_bottom.legend(frameon=False, loc="upper left", fontsize=8.5)
-    ax_bottom.grid(axis="y", alpha=0.25)
-    ax_bottom.spines[["top", "right"]].set_visible(False)
-    ax_bottom.xaxis.set_major_locator(mdates.MonthLocator(interval=4))
-    ax_bottom.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
+    fig, ax = plt.subplots(figsize=(8.4, 4.6))
+    # Draw the solid curves first and the dashed General-Harness curve last.
+    # This keeps both labels visible even where the ledger records the same
+    # reusable module at the GH and GTS layers.
+    ax.plot(dates, cumulative["General Time-Series Harness"], lw=2.5, label="General Time-Series Harness", color=colors["General Time-Series Harness"], zorder=2)
+    ax.plot(dates, cumulative["Task-Specific Harness"], lw=2.5, label="Task-Specific Harness", color=colors["Task-Specific Harness"], zorder=3)
+    ax.plot(dates, cumulative["LLM-side"], lw=2.5, label="LLM-side", color=colors["LLM-side"], zorder=4)
+    ax.plot(dates, cumulative["General Harness"], lw=2.5, ls="--", dashes=(5, 2), label="General Harness", color=colors["General Harness"], zorder=5)
+    ax.set_ylabel("Cumulative module annotations")
+    ax.set_title("Module-level contributions across the reviewed corpus")
+    ax.legend(frameon=False, ncol=2, loc="upper left", fontsize=8.5)
+    ax.grid(axis="y", alpha=0.25)
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=4))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
     fig.autofmt_xdate(rotation=0, ha="center")
-    fig.tight_layout(h_pad=1.1)
+    fig.tight_layout()
     fig.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
     plt.close(fig)
 

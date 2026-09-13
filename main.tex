@@ -109,6 +109,8 @@
 \newcommand{\typeBench}{\textsf{Benchmark}}
 \newcommand{\typeSMshort}{\textsf{S--M}}
 \newcommand{\typeBenchshort}{\textsf{Bench}}
+\newcommand{\yes}{\textcolor{surveyGreen}{\ensuremath{\checkmark}}}
+\newcommand{\no}{\textcolor{surveyGold}{\ensuremath{\times}}}
 \newcommand{\selfclaim}{\textsuperscript{\dag}}
 \newcommand{\RepoMoirai}{\textsuperscript{a}}
 \newcommand{\RepoLLMTSFD}{\textsuperscript{b}}
@@ -168,11 +170,8 @@ LLM agents provide a natural system abstraction for this broader workflow. In th
   bottom=10pt
 ]
 \[
-\begin{aligned}
-\textbf{LLM-based agent system} &\approx \text{LLM}+\text{Harness},\\
-\textbf{Time-Series Agent} &\approx \text{LLM}+\text{General Harness}\\
-&\quad +\text{Time-Series Harness Module}.
-\end{aligned}
+\resizebox{\linewidth}{!}{$\textbf{LLM-based agent} \approx \text{LLM}+\text{Harness},\qquad
+\textbf{Time-Series Agent} \approx \text{LLM}+\text{General Harness}+\text{Time-Series Harness Module}$.}
 \]
 \end{tcolorbox}
 
@@ -219,30 +218,29 @@ Several system and position papers further motivate this runtime perspective. AT
 
 \begingroup
 \scriptsize
-\setlength{\tabcolsep}{2.5pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{longtable}{L{\fulltextcol{0.16}} L{\fulltextcol{0.19}} L{\fulltextcol{0.24}} L{\fulltextcol{0.20}} L{\fulltextcol{0.21}}}
-\caption{Comparison with related surveys and representative runtime frameworks.}
-\label{tab:direct-prior-comparison}\\
+\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{longtable}{L{\fulltextcol{0.22}} C{\fulltextcol{0.10}} C{\fulltextcol{0.09}} C{\fulltextcol{0.11}} C{\fulltextcol{0.12}} C{\fulltextcol{0.11}} C{\fulltextcol{0.12}} C{\fulltextcol{0.13}}}
+\caption{Coverage comparison with related surveys. A checkmark denotes an explicit organizing element; a cross denotes that the element is not the survey's organizing unit. ``Ours'' refers to this survey.}\label{tab:direct-prior-comparison}\\
 \toprule
-\textbf{Work} & \textbf{Scope / unit} & \textbf{Main organizing lens} & \textbf{Protocol / artifact} & \textbf{Relation to this survey}\\
+\textbf{Work} & \textbf{Agent runtime} & \textbf{LLM side} & \textbf{7 GH dims.} & \textbf{GTS/TSK} & \textbf{4 task families} & \textbf{Benchmarks} & \textbf{Module ledger}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Work} & \textbf{Scope / unit} & \textbf{Main organizing lens} & \textbf{Protocol / artifact} & \textbf{Relation to this survey}\\
+\textbf{Work} & \textbf{Agent runtime} & \textbf{LLM side} & \textbf{7 GH dims.} & \textbf{GTS/TSK} & \textbf{4 task families} & \textbf{Benchmarks} & \textbf{Module ledger}\\
 \midrule
 \endhead
-From Prompts to Agents \citep{promptstoagents2026} & LLM-driven TS papers and methods & Passive prompting versus agentic systems; planning, reasoning, memory, tools, refinement & Survey and maintained resource repository & Maps paradigms and visible components rather than assigning a primary runtime contribution locus.\\
-Chang et al. \citep{changsurvey2026} & More than 100 TS-reasoning papers & One topology and one primary objective per paper, plus non-exclusive attribute tags & Explicit taxonomy and label definitions, work-level assignments, and repository & Closest primary-label precedent; codes execution topology and intent rather than contribution locus.\\
-LLM Agents for Time-Series \citep{chen2026tsagentsurvey} & Time-series agent literature & Agent architectures, task settings, evaluation, and research challenges & Survey of the emerging time-series-agent field & Broad field map; not a work-level primary-contribution-locus protocol.\\
-LLM-based Agents for Forecasting and Prediction \citep{xu2026forecastagentsurvey} & Forecasting and prediction agents & Methods, training, evaluation, and applications & Forecasting/prediction-focused survey & Narrows on forecasting and prediction agents rather than the cross-task runtime-locus question.\\
-ATSF \citep{atsf2026} & Forecasting process / position paper & Perception, planning, action, reflection, memory; workflow/RL/hybrid paradigms & Position and project resource, not a survey corpus & Articulates a forecasting-side agentic process framing; it is not designed as a cross-task literature-coding study.\\
-AION \citep{aion2026} & Realistic TS task and practical Harness & Task file, workspace, validation interface; Harness groups and review principles & Executable Harness, artifacts, traces, validation, case study & Builds one practical Harness; it is not designed to classify primary contributions across papers.\\
-TimeClaw \citep{timeclaw2026harness} & Contextualized TS task, trajectory, and memory & Executable temporal tools, capability evolution, episodic multimodal memory & Reference implementation, trajectories, memory banks, multi-benchmark evaluation & Implements a cross-task native runtime; it is not designed as a literature locus protocol.\\
-This survey & Enumerated cross-task work snapshot & Primary contribution locus (GH/GTS/TSK) plus secondary descriptions; seven-dimension/6-obligation crosswalk & Screening criteria, rubric, versioned ledger, evidence matrix, model sensitivity probes & Operationalizes and applies a literature-level attribution protocol rather than proposing the Harness concept itself.\\
+From Prompts to Agents \citep{promptstoagents2026} & \yes & \yes & \no & \no & \no & \no & \no\\
+Chang et al. \citep{changsurvey2026} & \yes & \yes & \no & \no & \no & \yes & \no\\
+LLM Agents for Time-Series \citep{chen2026tsagentsurvey} & \yes & \yes & \no & \no & \yes & \yes & \no\\
+LLM-based Agents for Forecasting \citep{xu2026forecastagentsurvey} & \yes & \yes & \no & \no & \no & \yes & \no\\
+This survey (\textbf{Ours}) & \yes & \yes & \yes & \yes & \yes & \yes & \yes\\
 \bottomrule
 \end{longtable}
 \endgroup
+
+\noindent\textit{Reading the table.} Existing surveys provide complementary views: agent mechanisms, reasoning topologies, task maps, or forecasting lifecycles. Our comparison adds an explicit runtime decomposition, a seven-dimension General Harness layer, a General-versus-Task-Specific Time-Series Harness distinction, a multi-label task view, and a module-level evidence ledger.
+
 
 The recent survey by Xu et al. organizes LLM-based forecasting and prediction agents around standalone LLMs, tool- and retrieval-augmented systems, and hybrid systems, while connecting methods to training, evaluation, applications, and risks \citep{xu2026forecastagentsurvey}. We include it as a direct competitor survey because it provides a forecasting-centered systems map and a careful account of contamination, leakage, calibration, cost, and deployment feedback. Its organizing unit is the forecasting/prediction system and its lifecycle; our organizing unit is the contribution locus of the underlying Harness. Thus its three system types are compatible with, but orthogonal to, our GH/GTS/TSK labels: a tool-augmented forecasting system may contribute to GH, GTS, TSK, or several of them depending on which mechanism the paper actually changes.
 
@@ -269,25 +267,7 @@ This survey makes four contributions.
 
 \section{What Is a Time-Series Agent?}
 
-A Time-Series Agent is a system in which an LLM operates through a reusable runtime and time-series-specific modules:
-
-\begin{tcolorbox}[
-  colback=surveyWarn,
-  colframe=surveyWarn,
-  boxrule=0pt,
-  arc=7pt,
-  left=12pt,
-  right=12pt,
-  top=10pt,
-  bottom=10pt
-]
-\[
-\begin{aligned}
-\textbf{Time-Series Agent}={}&\textbf{LLM}+\textbf{General Harness}\\
-&+\textbf{Time-Series Harness Module}.
-\end{aligned}
-\]
-\end{tcolorbox}
+A Time-Series Agent is a system in which an LLM operates through a reusable runtime and time-series-specific modules.
 
 The LLM supplies language understanding and reasoning. The General Harness supplies interaction, memory, tools, execution, control, planning, optimization, and coordination. The Time-Series Harness Module preserves temporal state, operations, context, and validation; statistical models, time-series foundation models, databases, simulators, retrieval systems, and evaluators operate as callable components within it.
 
@@ -344,63 +324,63 @@ The seven dimensions organize the evidence below. Each subsection first states t
 
 \subsection{Interface and Interaction}
 
-Inference interfaces expose the model's input state and intermediate reasoning; action interfaces turn a decision into a tool call or executable operation; environment modeling represents observations, artifacts, and feedback; user interaction supports natural-language requests and review; and the state--action loop connects successive steps. TS-Agent, TimeART, and TSAG instantiate these mechanisms with temporal analysis requests and executable analytical tools \citep{tsagent2025,timeart2026,tsag2026}.
+Inference interfaces expose the model's input state and intermediate reasoning; action interfaces turn a decision into a tool call or executable operation; environment modeling represents observations, artifacts, and feedback; user interaction supports natural-language requests and review; and the state--action loop connects successive steps. These interfaces define the boundary between a model response and an executable Agent action: they specify what state is visible, which actions are legal, and what result is returned for the next step. TS-Agent provides executable analysis actions; TimeART binds temporal analysis to a tool-using workflow; and TSAG couples temporal questions with structured analytical operations \citep{tsagent2025,timeart2026,tsag2026}. Together they show how a general interface becomes the entry point for a time-series-specific contract.
 
 \subsection{Memory and Context}
 
-Memory and context mechanisms preserve information across turns, retrieve prior cases, and expose relevant evidence. Time-series systems use event histories, prior trajectories, temporal fingerprints, and reusable analytical procedures in this layer \citep{agenticrag2024,timecap2025,timeclaw2026harness,forecastcompass2026}.
+Memory and context mechanisms preserve information across turns, retrieve prior cases, and expose relevant evidence. They can be working memory for the current trace, long-term memory for reusable experience, or shared state that coordinates several agents. Time-series systems use event histories, prior trajectories, temporal fingerprints, and reusable analytical procedures in this layer \citep{agenticrag2024,timecap2025,timeclaw2026harness,forecastcompass2026}.
 
 \subsection{Tools and Execution}
 
-Tools and execution expand the action space through code, statistical models, TSFMs, visualizers, retrievers, simulators, and validators. Forecasting and anomaly systems place these components behind callable interfaces so the LLM can select, execute, compare, and report them \citep{timeseriesscientist2025,timecopilot2026,argos2025,anomamind2026}.
+Tools and execution expand the action space through code, statistical models, TSFMs, visualizers, retrievers, simulators, and validators. A tool registry describes the inputs, outputs, permissions, and failure behavior of each capability; an execution environment then runs the call and returns an artifact or error that the Agent can inspect. Forecasting and anomaly systems place these components behind callable interfaces so the LLM can select, execute, compare, and report them \citep{timeseriesscientist2025,timecopilot2026,argos2025,anomamind2026}.
 
 \subsection{Control, Verification, and Feedback}
 
-Control and verification route feedback, enforce constraints, manage retries, and check intermediate or final artifacts. Representative systems use reflection, critic review, validation gates, and faithfulness checks to revise a trajectory or reject an invalid result \citep{flairr2025,tsag2026,veritime2026,tracebench2026}.
+Control and verification route feedback, enforce constraints, manage retries, and check intermediate or final artifacts. The controller determines when a trace may continue, when a tool must be retried, and when an output must be rejected or escalated. Representative systems use reflection, critic review, validation gates, and faithfulness checks to revise a trajectory or reject an invalid result \citep{flairr2025,tsag2026,veritime2026,tracebench2026}.
 
 \subsection{Planning and Workflow}
 
-Planning and workflow mechanisms decompose a request into data preparation, analysis, model selection, validation, reporting, and revision. Time-series agents use these mechanisms to connect tools and artifacts into a reproducible analysis procedure \citep{timeseriesscientist2025,timecap2025,climateagent2025,aion2026}.
+Planning and workflow mechanisms decompose a request into data preparation, analysis, model selection, validation, reporting, and revision. They make intermediate states explicit, choose a tool sequence, record stopping conditions, and preserve the artifacts required to reproduce the result. Time-series agents use these mechanisms to connect tools and artifacts into a reproducible analysis procedure \citep{timeseriesscientist2025,timecap2025,climateagent2025,aion2026}.
 
 \subsection{Optimization and Evolution}
 
-Optimization and evolution improve prompts, tools, policies, memories, or trajectories using feedback. TimeClaw, MetaCaster, CastFSR, and related systems treat experience, validation outcomes, or execution traces as material for capability improvement \citep{timeclaw2026explore,metacaster2026,castfsr2026,crafter2026}.
+Optimization and evolution improve prompts, tools, policies, memories, or trajectories using feedback. The update can be offline prompt or policy search, trajectory-level reflection, or a self-evolving Harness that promotes a new component after validation. TimeClaw, MetaCaster, CastFSR, and related systems treat experience, validation outcomes, or execution traces as material for capability improvement \citep{timeclaw2026explore,metacaster2026,castfsr2026,crafter2026}.
 
 \subsection{Coordination and Scaling}
 
-Coordination and scaling divide work among specialized roles, share state, and combine review or debate. Multi-agent time-series systems use numeric, visual, textual, analyst, reviewer, and executor roles to construct a joint result \citep{tsdebate2026,mas4ts2026,aimeteorologist2025,fincon2024}.
+Coordination and scaling divide work among specialized roles, share state, and combine review or debate. Coordination may be cooperative, competitive, or hierarchical; the shared state and handoff protocol determine whether the final result is consistent and auditable. Multi-agent time-series systems use numeric, visual, textual, analyst, reviewer, and executor roles to construct a joint result \citep{tsdebate2026,mas4ts2026,aimeteorologist2025,fincon2024}.
 \section{General Time-Series Harness}
 \label{sec:general-ts-harness}
 
-The General Time-Series Harness is the time-series specialization of the seven General Harness dimensions. We include a mechanism here only when its core representation, operation, or validator depends on temporal order, index, frequency, window, horizon, regime, availability time, or leakage control. A generic chat loop, Python call, or reflection step remains General Harness.
+The General Time-Series Harness is the time-series specialization of the seven General Harness dimensions. We include a mechanism here only when its core representation, operation, or validator depends on temporal order, index, frequency, window, horizon, regime, availability time, or leakage control. This criterion follows the temporal contracts emphasized in recent time-series-agent surveys and reasoning taxonomies \citep{chen2026tsagentsurvey,changsurvey2026}. A generic chat loop, Python call, or reflection step remains General Harness.
 
 \subsection{Interface and Interaction}
 
-Time-series interfaces expose as-of time, horizon, frequency, window, channel, and unit semantics. An action such as slice, align, aggregate, or forecast carries temporal arguments that determine what information is available and what output contract is produced.
+Time-series interfaces expose as-of time, horizon, frequency, window, channel, and unit semantics. An action such as slice, align, aggregate, or forecast carries temporal arguments that determine what information is available and what output contract is produced. Temporal analysis systems make these arguments explicit through executable requests and structured outputs \citep{tsagent2025,timeart2026,tsag2026}.
 
 \subsection{Memory and Context}
 
-Temporal memory preserves time-indexed state, missingness, provenance, data vintage, event history, and revision records. The state remains queryable as it was known at a declared time, which distinguishes it from an ordinary conversation buffer.
+Temporal memory preserves time-indexed state, missingness, provenance, data vintage, event history, and revision records. The state remains queryable as it was known at a declared time, which distinguishes it from an ordinary conversation buffer. Event histories, retrieved context, temporal fingerprints, and prior trajectories therefore become structured evidence that can be replayed and checked rather than an undifferentiated prompt. TimeClaw and ForecastCompass illustrate this direction through episodic experience and adaptive temporal memory, while financial systems use layered market memory to preserve point-in-time evidence \citep{timeclaw2026harness,forecastcompass2026,finmem2023,memcast2026}.
 
 \subsection{Tools and Execution}
 
-Time-series tools implement temporal slicing, resampling, aggregation, decomposition, backtesting, forecasting, anomaly localization, imputation, and context alignment. Their semantics must specify intervals, horizons, time zones, units, and missing-data behavior.
+Time-series tools implement temporal slicing, resampling, aggregation, decomposition, backtesting, forecasting, anomaly localization, imputation, and context alignment. Their semantics must specify intervals, horizons, time zones, units, and missing-data behavior. TimeSeriesScientist and TimeCopilot expose model and analysis selection as callable operations; related systems connect these operations to simulators, retrievers, or specialized temporal models \citep{timeseriesscientist2025,timecopilot2026,argos2025,anomamind2026}. The temporal tool boundary is consequently where numerical fidelity and chronological admissibility become executable checks.
 
 \subsection{Control, Verification, and Feedback}
 
-Temporal control checks chronological splits, allowed-context policies, leakage, units, frequency, drift, uncertainty, and evidence completeness. These checks operate on the temporal contract of the runtime, not only on the final task score.
+Temporal control checks chronological splits, allowed-context policies, leakage, units, frequency, drift, uncertainty, and evidence completeness. These checks operate on the temporal contract of the runtime, not only on the final task score. A validator can reject a future-leaking retrieval, an invalid window, an inconsistent unit conversion, or an unsupported probabilistic claim before the result reaches a user. AION, VeriTime, and TraceBench make this process-level view explicit through validation interfaces, temporal checks, and auditable traces \citep{aion2026,veritime2026,tracebench2026}.
 
 \subsection{Planning and Workflow}
 
-Temporal workflows schedule rolling-origin evaluation, horizon-aware model selection, context retrieval by availability time, forecast revision, incident escalation, and report generation. The planning state therefore carries temporal checkpoints and reproducible data boundaries.
+Temporal workflows schedule rolling-origin evaluation, horizon-aware model selection, context retrieval by availability time, forecast revision, incident escalation, and report generation. The planning state therefore carries temporal checkpoints and reproducible data boundaries. ATSF frames forecasting as an iterative perception--planning--action--reflection--memory process, while AION and ForecastCompass connect task files, adaptive memory, model selection, and validation into a repeatable workflow \citep{atsf2026,aion2026,forecastcompass2026}.
 
 \subsection{Optimization and Evolution}
 
-Temporal optimization uses regimes, temporal experience, shifting distributions, and revision outcomes to update prompts, tools, memories, or policies. A reusable mechanism must preserve its temporal contract when the downstream task changes.
+Temporal optimization uses regimes, temporal experience, shifting distributions, and revision outcomes to update prompts, tools, memories, or policies. A reusable mechanism must preserve its temporal contract when the downstream task changes. TimeClaw, MetaCaster, and CastFSR treat execution experience, validation outcomes, or traces as signals for improving temporal capabilities; the update itself must remain auditable under distribution shift \citep{timeclaw2026explore,metacaster2026,castfsr2026,crafter2026}.
 
 \subsection{Coordination and Scaling}
 
-Multi-agent temporal coordination shares aligned series, event windows, provenance, and evidence identifiers across numeric, visual, textual, planning, and review roles. Without a common temporal state, coordination can produce internally consistent but temporally misaligned conclusions.
+Multi-agent temporal coordination shares aligned series, event windows, provenance, and evidence identifiers across numeric, visual, textual, planning, and review roles. Without a common temporal state, coordination can produce internally consistent but temporally misaligned conclusions. FinCon, MAS4TS, and ClimateAgent illustrate complementary forms of role specialization, shared evidence, and review across financial, general time-series, and climate workflows \citep{fincon2024,mas4ts2026,climateagent2025}.
 
 \subsection{Cross-dimensional temporal requirements}
 
@@ -423,19 +403,19 @@ Task-specific Harness modules instantiate the General Time-Series Harness under 
 
 \subsection{Forecasting and Prediction}
 
-Forecasting agents manage horizons, chronological splits, model selection, probabilistic outputs, revision, and deployment constraints. Forecasting workflows combine temporal tools and memory with task-bound backtesting, forecast reconciliation, and revision rules \citep{timeseriesscientist2025,timecap2025,timecopilot2026,lastmile2026,hydroagent2026,castflow2026}.
+Forecasting agents manage horizons, chronological splits, model selection, probabilistic outputs, revision, and deployment constraints. The interface exposes the forecast origin, horizon, frequency, and target channels; memory preserves point-in-time covariates, prior forecasts, and revisions; and tools provide model fitting, backtesting, ensembling, and reconciliation. The task-specific control layer checks leakage, horizon alignment, calibration, and deployment thresholds, while planning and optimization choose a rolling-origin procedure and revise the workflow when evidence changes. Forecasting workflows combine temporal tools and memory with task-bound backtesting, forecast reconciliation, and revision rules \citep{timeseriesscientist2025,timecap2025,timecopilot2026,lastmile2026,hydroagent2026,castflow2026}.
 
 \subsection{Data Augmentation and Synthesis}
 
-Augmentation and synthesis agents generate, select, or validate temporal data and representations. Their task contract specifies the target distribution, conditioning context, fidelity checks, and downstream utility; the task-specific module is the generator--validator loop rather than generic generation alone \citep{liu2025synthetic,bridge2025,merit2025,scenariodiff2026}.
+Augmentation and synthesis agents generate, select, or validate temporal data and representations. Their interface declares the conditioning window, channels, sampling frequency, and intended use; memory records source series, transformations, and provenance; and tools implement perturbation, simulation, retrieval, or generative modeling. Control and verification compare generated trajectories with the target distribution, temporal dependence, missingness pattern, and downstream task utility. Planning determines which views or scenarios to generate, whereas optimization adapts the generator or selection policy from validation feedback. Their task contract therefore specifies the target distribution, conditioning context, fidelity checks, and downstream utility; the task-specific module is the generator--validator loop rather than generic generation alone \citep{liu2025synthetic,bridge2025,merit2025,scenariodiff2026}.
 
 \subsection{Anomaly Detection and Diagnosis}
 
-Anomaly agents localize events, propose or verify rules, retrieve incident evidence, diagnose causes, and support remediation. The task-specific contract includes windows, thresholds, root-cause labels, alert policies, and deployment gates \citep{argos2025,anomamind2026,chatad2026,sagead2026,ji2025lemad,wang2026large}.
+Anomaly agents localize events, propose or verify rules, retrieve incident evidence, diagnose causes, and support remediation. Their interface fixes the monitoring window, channels, sampling rate, and alert horizon; memory links an event to historical baselines, prior incidents, and maintenance records; and tools support scoring, localization, root-cause analysis, and simulation. Control and verification must distinguish a novel observation from a delayed label, check false-alarm budgets, and require evidence for a diagnosis before remediation is recommended. Planning coordinates detection, evidence retrieval, diagnosis, and escalation, while multi-agent systems may separate numeric scoring, semantic interpretation, and review. The task-specific contract includes windows, thresholds, root-cause labels, alert policies, and deployment gates \citep{argos2025,anomamind2026,chatad2026,sagead2026,ji2025lemad,wang2026large}.
 
 \subsection{Decision Support}
 
-Decision-support agents connect forecasts or diagnoses to actions under costs, constraints, uncertainty, and review requirements. Trading, traffic control, energy, climate, and health systems illustrate how a predictive output becomes a recommendation, policy, escalation, or operational record \citep{fincon2024,tradingagents2024,collmllight2026,climateagent2025,smartenergyagent2026}.
+Decision-support agents connect forecasts or diagnoses to actions under costs, constraints, uncertainty, and review requirements. The interface represents the current state, available actions, timing, and authority; memory retains forecasts, observations, policies, and prior outcomes; and tools expose simulators, optimizers, external data, and human-review channels. Planning maps predictive or diagnostic evidence to a sequence of actions, while control checks risk limits, counterfactual consequences, and escalation rules. Coordination becomes important when specialists debate a recommendation or when a decision must be audited by a human operator. Trading, traffic control, energy, climate, and health systems illustrate how a predictive output becomes a recommendation, policy, escalation, or operational record \citep{fincon2024,tradingagents2024,collmllight2026,climateagent2025,smartenergyagent2026}.
 
 The complete corpus is multi-label: a work may contribute to several Harness dimensions and several task families. The maintained ledger records the LLM-side contribution, the General Harness modules, the genuinely time-series-specific modules, and the task-specific modules separately.
 \section{Infrastructure and Benchmarks for Time-Series Agents}
