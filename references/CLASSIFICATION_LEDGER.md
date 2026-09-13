@@ -27,15 +27,18 @@ The version-2 taxonomy fields are deliberately independent and multi-label:
 - `task_specific_modules` contains the same seven-module lens under the four
   task families: forecasting/prediction, augmentation/synthesis,
   anomaly/diagnosis, and decision support.
+- `module_level_contributions` makes the aggregation unit explicit: every
+  non-empty fine-grained module annotation is one contribution unit, so one
+  paper can contribute multiple units across layers and task families.
 
 Empty arrays are valid. A paper can populate multiple records, and
 `taxonomy_review_status` distinguishes paper-verified entries from records
 that still need PDF-level reclassification.
 
 The three Harness contribution fields are not mutually exclusive. A work may
-use or extend mechanisms at every layer. `primary_locus` answers the narrower
-question used by the paper's aggregate statistics: where does the paper's main
-runtime contribution enter? The GTS/TSK boundary follows the counterfactual in
+use or extend mechanisms at every layer. `primary_locus` is retained as a
+descriptive field for the paper-level record; module-level plots and counts use
+the explicit fine-grained annotations instead. The GTS/TSK boundary follows the counterfactual in
 the manuscript. If the temporal state, action space, tool semantics, reward, or
 verifier can survive a change of task family without redesign, the mechanism is
 GTS; if one of those core elements is tied to a fixed task output contract, it

@@ -86,6 +86,7 @@ FIELDS = [
     "general_ts_harness_dimensions",
     "general_ts_specificity_reason",
     "task_specific_modules_json",
+    "module_level_contributions_json",
     "taxonomy_review_status",
 ]
 
@@ -129,6 +130,26 @@ def write_csv(rows: list[dict[str, str]]) -> None:
             for field in FIELDS:
                 row.setdefault(field, "")
             writer.writerow(row)
+
+
+def parse_json_value(raw: str, default):
+    if not raw:
+        return default
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        return default
+
+
+def module_contribution_record(row: dict[str, str]) -> dict:
+    """Return the explicit module-level unit used by aggregate plots."""
+    return {
+        "unit": "non-empty fine-grained module annotation",
+        "llm_side": parse_json_value(row.get("llm_side_subdimensions", ""), []),
+        "general_harness": parse_json_value(row.get("general_harness_dimensions", ""), {}),
+        "general_ts_harness": parse_json_value(row.get("general_ts_harness_dimensions", ""), {}),
+        "task_specific": parse_json_value(row.get("task_specific_modules_json", ""), {}),
+    }
 
 
 def clean_latex(value: str) -> str:
@@ -329,6 +350,9 @@ def generate_json(rows: list[dict[str, str]]) -> None:
         general_ts_dimensions = parse_json_field(row, "general_ts_harness_dimensions", {})
         gts_reason = parse_json_field(row, "general_ts_specificity_reason", [])
         task_modules = parse_json_field(row, "task_specific_modules_json", {})
+        module_contributions = parse_json_field(
+            row, "module_level_contributions_json", module_contribution_record(row)
+        )
         llm_summary = row.get("llm_component_contribution", "")
         gts_review = row.get("taxonomy_review_status", "survey_coded_needs_pdf_review")
         output.append(
@@ -377,7 +401,7 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                 },
                 "work_type": row["work_type"],
                 "claimed_as_agent": row["claimed_as_agent"] == "Yes",
-                "schema_version": row.get("taxonomy_schema_version") or "2.0",
+                "schema_version": row.get("taxonomy_schema_version") or "2.1",
                 "llm_side_contribution": {
                     "present": bool(llm_summary or llm_subdimensions),
                     "subdimensions": llm_subdimensions,
@@ -399,6 +423,7 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                     "review_status": "paper_verified" if row.get("claim_review_status") == "paper_verified" else ("needs_pdf_reclassification" if row["general_ts_harness_contribution"] else "not_recorded"),
                 },
                 "task_specific_modules": task_modules,
+                "module_level_contributions": module_contributions,
                 "taxonomy_review_status": row.get("taxonomy_review_status") or "survey_coded_needs_pdf_review",
             }
         )
@@ -431,6 +456,10 @@ def sync(_: argparse.Namespace) -> None:
             row["public_month"] = official_date[:7]
             row["publication_date_precision"] = "day"
         row["bib_sync_status"] = "matched" if entry and ref else "review"
+        row["module_level_contributions_json"] = json.dumps(
+            module_contribution_record(row), ensure_ascii=False, sort_keys=True
+        )
+        row["taxonomy_schema_version"] = "2.1"
     write_csv(rows)
     generate_json(rows)
     print(f"synchronized Bib and manifest metadata for {len(rows)} records")
