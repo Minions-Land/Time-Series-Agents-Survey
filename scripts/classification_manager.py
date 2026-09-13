@@ -141,14 +141,135 @@ def parse_json_value(raw: str, default):
         return default
 
 
+DIMENSION_NAMES = (
+    "Interface and Interaction",
+    "Memory and Context",
+    "Tools and Execution",
+    "Control, Verification, and Feedback",
+    "Planning and Workflow",
+    "Optimization and Evolution",
+    "Coordination and Scaling",
+)
+
+
+def empty_dimensions() -> dict[str, list[str]]:
+    return {name: [] for name in DIMENSION_NAMES}
+
+
+def _add_dimension(out: dict[str, list[str]], name: str, labels: list[str]) -> None:
+    for label in labels:
+        if label not in out[name]:
+            out[name].append(label)
+
+
+def derive_general_dimensions(row: dict[str, str]) -> dict[str, list[str]]:
+    """Map explicit harness module names to the seven comparison dimensions."""
+    out = empty_dimensions()
+    modules = [part.strip().lower() for part in row.get("harness_modules", "").split(";") if part.strip()]
+    for module in modules:
+        if "memory" in module or "context" in module:
+            _add_dimension(out, "Memory and Context", ["memory_or_context"])
+        if "tool" in module or "execution" in module:
+            _add_dimension(out, "Tools and Execution", ["tool_or_execution"])
+        if "control" in module or "verification" in module or "evaluation" in module:
+            _add_dimension(out, "Control, Verification, and Feedback", ["control_or_verification"])
+        if "planning" in module or "workflow" in module or "lifecycle" in module:
+            _add_dimension(out, "Planning and Workflow", ["planning_or_workflow"])
+        if "optimization" in module or "evolution" in module or "adapt" in module:
+            _add_dimension(out, "Optimization and Evolution", ["optimization_or_evolution"])
+        if "coordination" in module or "scaling" in module or "multi-agent" in module:
+            _add_dimension(out, "Coordination and Scaling", ["coordination_or_scaling"])
+        if any(token in module for token in ("interface", "interaction", "reasoning", "acting", "environment")):
+            _add_dimension(out, "Interface and Interaction", ["interface_or_interaction"])
+    return out
+
+
+def derive_temporal_dimensions(row: dict[str, str]) -> dict[str, list[str]]:
+    """Derive temporal dimensions from the recorded temporal-contract reason.
+
+    These are coding aids, not paper-level findings.  The JSON records the
+    basis and keeps the status pending until a PDF or source implementation is
+    checked.
+    """
+    out = empty_dimensions()
+    reasons = " ".join(parse_json_value(row.get("general_ts_specificity_reason", ""), [])).lower()
+    text = " ".join(
+        row.get(field, "")
+        for field in ("general_ts_harness_contribution", "paper_claim_summary", "task_family_original")
+    ).lower()
+    joined = f"{reasons} {text}"
+    if any(k in joined for k in ("window", "horizon", "frequency", "operation", "signal state", "time-series")):
+        _add_dimension(out, "Interface and Interaction", ["temporal_interface"])
+        _add_dimension(out, "Tools and Execution", ["temporal_operations"])
+    if any(k in joined for k in ("memory", "context", "retrieval", "evidence", "market state", "provenance")):
+        _add_dimension(out, "Memory and Context", ["time_indexed_context"])
+    if any(k in joined for k in ("leakage", "contract", "validation", "diagnos", "anomaly")):
+        _add_dimension(out, "Control, Verification, and Feedback", ["temporal_contract_check"])
+    if any(k in joined for k in ("forecast", "workflow", "operation")):
+        _add_dimension(out, "Planning and Workflow", ["temporal_workflow"])
+    if any(k in joined for k in ("regime", "distribution shift", "adapt")):
+        _add_dimension(out, "Optimization and Evolution", ["shift_or_regime_adaptation"])
+    if any(k in joined for k in ("multi-agent", "coordination", "role")):
+        _add_dimension(out, "Coordination and Scaling", ["temporal_coordination"])
+    return out
+
+
+def derive_task_dimensions(row: dict[str, str], temporal: dict[str, list[str]]) -> dict:
+    """Create task-contract labels without copying the GH/GTS dictionaries."""
+    tasks = parse_json_value(row.get("task_specific_modules_json", ""), {})
+    output = {}
+    for task_name, item in tasks.items():
+        if not isinstance(item, dict) or not item.get("present"):
+            output[task_name] = item
+            continue
+        dims = empty_dimensions()
+        for name, labels in temporal.items():
+            dims[name].extend(labels)
+        if task_name == "forecasting_prediction":
+            _add_dimension(dims, "Control, Verification, and Feedback", ["horizon_and_backtest_contract"])
+            _add_dimension(dims, "Planning and Workflow", ["forecast_revision_workflow"])
+        elif task_name == "augmentation_synthesis":
+            _add_dimension(dims, "Tools and Execution", ["generator_and_transform_tools"])
+            _add_dimension(dims, "Control, Verification, and Feedback", ["fidelity_and_utility_check"])
+        elif task_name == "anomaly_detection_diagnosis":
+            _add_dimension(dims, "Control, Verification, and Feedback", ["alert_and_diagnosis_contract"])
+            _add_dimension(dims, "Planning and Workflow", ["detection_to_diagnosis_workflow"])
+        elif task_name == "decision_support":
+            _add_dimension(dims, "Control, Verification, and Feedback", ["risk_and_constraint_check"])
+            _add_dimension(dims, "Planning and Workflow", ["action_policy_workflow"])
+            _add_dimension(dims, "Coordination and Scaling", ["human_or_specialist_review"])
+        item = dict(item)
+        item["dimensions"] = dims
+        item["dimension_coding_basis"] = "derived_from_task_contract_and_temporal_reason"
+        item["dimension_review_status"] = "survey_coded_needs_pdf_review"
+        output[task_name] = item
+    return output
+
+
 def module_contribution_record(row: dict[str, str]) -> dict:
-    """Return the explicit module-level unit used by aggregate plots."""
+    """Return module-level annotations with separate GH, GTS, and TSK coding."""
+    gh_raw = parse_json_value(row.get("general_harness_dimensions", ""), {})
+    gts_raw = parse_json_value(row.get("general_ts_harness_dimensions", ""), {})
+    task_raw = parse_json_value(row.get("task_specific_modules_json", ""), {})
+    gh = derive_general_dimensions(row)
+    gts = derive_temporal_dimensions(row)
     return {
         "unit": "non-empty fine-grained module annotation",
         "llm_side": parse_json_value(row.get("llm_side_subdimensions", ""), []),
-        "general_harness": parse_json_value(row.get("general_harness_dimensions", ""), {}),
-        "general_ts_harness": parse_json_value(row.get("general_ts_harness_dimensions", ""), {}),
-        "task_specific": parse_json_value(row.get("task_specific_modules_json", ""), {}),
+        "general_harness": gh,
+        "general_ts_harness": gts,
+        "task_specific": derive_task_dimensions(row, gts),
+        "source_dimensions": {
+            "general_harness": gh_raw,
+            "general_ts_harness": gts_raw,
+            "task_specific": task_raw,
+        },
+        "coding_basis": {
+            "general_harness": "derived_from_explicit_harness_modules",
+            "general_ts_harness": "derived_from_temporal_specificity_reason_and_claim",
+            "task_specific": "derived_from_task_contract_and_temporal_reason",
+        },
+        "review_status": "survey_coded_needs_pdf_review",
     }
 
 
@@ -346,10 +467,10 @@ def generate_json(rows: list[dict[str, str]]) -> None:
     output = []
     for row in rows:
         llm_subdimensions = parse_json_field(row, "llm_side_subdimensions", [])
-        general_dimensions = parse_json_field(row, "general_harness_dimensions", {})
-        general_ts_dimensions = parse_json_field(row, "general_ts_harness_dimensions", {})
+        general_dimensions = derive_general_dimensions(row)
+        general_ts_dimensions = derive_temporal_dimensions(row)
         gts_reason = parse_json_field(row, "general_ts_specificity_reason", [])
-        task_modules = parse_json_field(row, "task_specific_modules_json", {})
+        task_modules = derive_task_dimensions(row, general_ts_dimensions)
         module_contributions = parse_json_field(
             row, "module_level_contributions_json", module_contribution_record(row)
         )
@@ -411,12 +532,16 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                 },
                 "general_harness_modules": {
                     "dimensions": general_dimensions,
+                    "source_dimensions": parse_json_field(row, "general_harness_dimensions", {}),
+                    "dimension_coding_basis": "derived_from_explicit_harness_modules",
                     "claim": row["general_harness_contribution"],
                     "source_evidence": json.loads(row["source_evidence_json"]) if row.get("source_evidence_json") else [],
                     "review_status": "paper_verified" if row.get("claim_review_status") == "paper_verified" else "survey_coded_needs_pdf_review",
                 },
                 "general_ts_harness_modules": {
                     "dimensions": general_ts_dimensions,
+                    "source_dimensions": parse_json_field(row, "general_ts_harness_dimensions", {}),
+                    "dimension_coding_basis": "derived_from_temporal_specificity_reason_and_claim",
                     "claim": row["general_ts_harness_contribution"],
                     "ts_specificity_reason": gts_reason,
                     "source_evidence": json.loads(row["source_evidence_json"]) if row.get("source_evidence_json") else [],
