@@ -141,7 +141,7 @@
   bottom=12pt
 ]
 \textbf{Abstract.}
-Time-series analysis increasingly combines predictive models with LLM systems that retrieve temporal context, call analytical tools, check intermediate results, and support later decisions. This survey explains how such systems are built from an LLM, general agent mechanisms, and capabilities designed for temporal data. We distinguish mechanisms that can be reused across time-series tasks from mechanisms tied to a particular task, while treating forecasting, anomaly detection, augmentation, question answering, and decision support as ways in which those capabilities are used. We review 139 in-scope works, connect their claims to the part of the system they change, and organize evaluation from agent execution and temporal consistency to task performance and decision support. The synthesis highlights the need for reusable temporal infrastructure, reliable tool and memory use, transparent evidence, and feedback-aware systems.
+Time-series analysis increasingly combines predictive models with LLM systems that retrieve temporal context, call analytical tools, check intermediate results, and support later decisions. This survey explains how such systems are built from an LLM, general agent mechanisms, and capabilities designed for temporal data. We organize mechanisms by their reuse across time-series tasks and by the task contracts that bind them to forecasting, anomaly detection, augmentation, question answering, and decision support. We review 139 in-scope works, connect their claims to the system components they change, and organize evaluation from agent execution and temporal consistency to task performance and decision support. The synthesis highlights the need for reusable temporal infrastructure, reliable tool and memory use, transparent evidence, and feedback-aware systems.
 \end{tcolorbox}
 
 \textbf{Keywords}: time series agents, LLM agents, temporal reasoning, time series foundation models, contextualized time series, tool use, memory, benchmark, harness.
@@ -182,7 +182,7 @@ The LLM supplies language understanding, planning, and judgment; the general run
 
 A mechanism belongs to GH when it remains useful beyond time-series applications and has no temporal assumptions. Within the Time-Series Harness Module, GTS denotes mechanisms reusable across temporal task settings, whereas TSK denotes mechanisms whose state, actions, rewards, or verification follow one task contract. Prior task taxonomies define these downstream contracts.
 
-These judgments apply to mechanisms rather than entire papers. One system can combine general memory and reflection, cross-task temporal tools, and a forecasting-specific validation loop. Financial and traffic forecasting share the forecasting task contract, so domain changes alone do not alter the Harness layer.
+These judgments apply to mechanisms rather than entire papers. One system can combine general memory and reflection, cross-task temporal tools, and a forecasting-specific validation loop. The Harness layer follows the forecasting contract across financial and traffic domains.
 
 The resulting hierarchy is the organizing structure of this survey. Time-Series Agent is the outer concept; its LLM side is independent of the nested Harness side, where General Harness contains the General Time-Series Harness Module and the latter contains Task-Specific Harness Modules.
 
@@ -422,7 +422,7 @@ Tools and execution expand the action space through code, statistical models, TS
 
 \subsection{Control, Verification, and Feedback}
 
-Control and verification route feedback, enforce constraints, manage retries, and check intermediate or final artifacts. The controller determines when a trace may continue, when a tool must be retried, and when an output must be rejected or escalated. FLAIRR-TS \citep{flairr2025} uses iterative refinement around a forecaster, while TSAG \citep{tsag2026} adds checks to the analytical interaction loop. VeriTime \citep{veritime2026} makes temporal validity an explicit verification target, and TraceBench \citep{tracebench2026} evaluates the submitted trajectory rather than only the final label. These examples show a reusable critic-and-gate mechanism with task-specific validity conditions.
+Control and verification route feedback, enforce constraints, manage retries, and check intermediate or final artifacts. The controller determines when a trace may continue, when a tool must be retried, and when an output must be rejected or escalated. FLAIRR-TS \citep{flairr2025} uses iterative refinement around a forecaster, while TSAG \citep{tsag2026} adds checks to the analytical interaction loop. VeriTime \citep{veritime2026} makes temporal validity an explicit verification target, and TraceBench \citep{tracebench2026} evaluates the submitted trajectory alongside the final label. These examples show a reusable critic-and-gate mechanism with task-specific validity conditions.
 
 \subsection{Planning and Workflow}
 
@@ -501,7 +501,7 @@ These requirements form the cross-task design checklist; the next section instan
 \section{Task-Specific Time-Series Harness}
 \label{sec:task-specific-harness}
 
-Task-specific Harness modules instantiate the General Time-Series Harness under a concrete output contract. We use four task families and apply the same seven-module lens within each one: interface, memory, tools, control and verification, planning, optimization, and coordination.
+Task-specific Harness modules instantiate the General Time-Series Harness under a concrete output contract. Four task families organize this section, each analyzed through interface, memory, tools, control and verification, planning, optimization, and coordination.
 
 \subsection{Forecasting and Prediction}
 
