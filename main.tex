@@ -310,34 +310,8 @@ This survey makes four contributions.
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[font=\sffamily,>=stealth]
-  \tikzset{
-    box/.style={rounded corners=5pt, draw=#1!70!black, fill=#1!12, line width=.9pt, align=center},
-    small/.style={rounded corners=3pt, draw=#1!65!black, fill=#1!8, align=center, inner sep=4pt}
-  }
-  \node[box=surveyBlue, minimum width=.23\textwidth, minimum height=42mm] (llm)
-    {\textbf{LLM side}\\[2pt]representation\\alignment\\temporal reasoning};
-  \node[box=surveyBlue, minimum width=.68\textwidth, minimum height=58mm, right=7mm of llm] (gh)
-    {};
-  \node[anchor=north, font=\bfseries\sffamily\large, surveyBlue!80!black] at (gh.north) {General Harness};
-  \node[small=surveyBlue, minimum width=.18\textwidth, minimum height=12mm, below=8mm of gh.north west, anchor=north west] (gh1)
-    {interface\\and interaction};
-  \node[small=surveyBlue, minimum width=.18\textwidth, minimum height=12mm, right=3mm of gh1] (gh2)
-    {memory\\and context};
-  \node[small=surveyBlue, minimum width=.18\textwidth, minimum height=12mm, right=3mm of gh2] (gh3)
-    {tools, control,\\planning, coordination};
-  \node[box=surveyGold, minimum width=.60\textwidth, minimum height=31mm, below=7mm of gh.south, anchor=north] (gts)
-    {\textbf{General Time-Series Harness Module}\\
-    temporal state, operations, grounding, validation\\
-    \scriptsize seven General-Harness dimensions with temporal contracts};
-  \node[box=surveyGreen, minimum width=.50\textwidth, minimum height=20mm, below=5mm of gts.south, anchor=north] (tsk)
-    {\textbf{Task-Specific Harness Modules}\\
-    forecasting \quad augmentation \quad anomaly diagnosis \quad decision support};
-  \draw[->, surveyBlue!80!black, line width=1pt] (gh.south) -- (gts.north);
-  \draw[->, surveyGold!80!black, line width=1pt] (gts.south) -- (tsk.north);
-  \node[font=\bfseries\sffamily\large, surveyBlue!80!black, above=2mm of gh.north] {Time-Series Agent};
-\end{tikzpicture}
-\caption{Overview of the survey's four contribution dimensions. The LLM side is independent; the Harness side is nested from General Harness to General Time-Series Harness Module to Task-Specific Harness Modules. Each component is counted only at its deepest applicable Harness layer.}
+\includegraphics[width=\linewidth]{artifacts/Overview.png}
+\caption{Overview of the survey's four contribution dimensions. A Time-Series Agent combines an LLM-side contribution with a nested Harness stack: General Harness, General Time-Series Harness, and Task-Specific Harness. The paper card records contributions at the module level, so one work may contribute modules at several locations while each module is assigned to its deepest applicable Harness layer.}
 \label{fig:overview}
 \end{figure}
 
