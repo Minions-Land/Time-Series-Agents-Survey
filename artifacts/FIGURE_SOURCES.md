@@ -12,4 +12,4 @@ The visual grammar is intentionally shared across the decks: Times New Roman, re
 
 ## RSI reference reconstruction deck
 
-`RSI_Reference_Figures_Editable_TNR.pptx` contains the 11 user-provided RSI reference screenshots as native component reconstructions. Slide order follows the attached files: module timeline, organization map, landscape, open-problem panels, coverage table, four perspectives, recursive loop, update/evidence table, synthesis, research routes, and the dark text-panel style. The original screenshot filenames are stored in the speaker notes of each slide.
+`RSI_Reference_Figures_PixelFaithful_Components.pptx` contains the 11 user-provided RSI reference screenshots as pixel-faithful component slides. Slide order follows the attached files: module timeline, organization map, landscape, open-problem panels, coverage table, four perspectives, recursive loop, update/evidence table, synthesis, research routes, and the dark text-panel style. The original screenshot filenames are stored in the speaker notes of each slide.
