@@ -11,6 +11,6 @@ The replacement workflow is:
 3. Export the PPT slide to PNG for LaTeX.
 4. Compare the PNG and the rendered PDF page against the target image before committing.
 
-Figures 1–8 and the LLM-side map have passed package integrity, layout, font, Artifact Tool re-import, and source-to-PNG export checks. A PowerPoint desktop inspection of the Figure 8 source confirmed independent selection of the native text, fills, lines, and connectors. The active directory is restricted to the final source pair for each figure; earlier revisions are retained under `artifacts/archive/previous_attempts/active_revisions_20261002/`.
+Figures 1–8 and the LLM-side map have passed package integrity, layout, font, Artifact Tool re-import, and source-to-PNG export checks. The supporting AION, MERIT, AnomaMind, and TS-Agent figures pass the same decoded-pixel comparison against their slides in the seven-slide native deck. The complete 13-pair result is recorded in [`FIGURE_OVERLAY_QA_20261002.md`](FIGURE_OVERLAY_QA_20261002.md) and [`figure_visual_audit_20261002.json`](figure_visual_audit_20261002.json). A PowerPoint desktop inspection of the Figure 8 source confirmed independent selection of the native text, fills, lines, and connectors. The active directory is restricted to the final source pair for each figure; earlier revisions are retained under `artifacts/archive/previous_attempts/active_revisions_20261002/`.
 
 Every additional active figure source will be recorded here only after it passes the component-level and overlay checks.

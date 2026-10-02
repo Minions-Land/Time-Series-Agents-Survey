@@ -27,6 +27,7 @@ The survey will use one visual system across the main text and appendix. Each la
 - The PNG used by LaTeX is exported from the same PPT source.
 - The figure has a short caption that states what the figure establishes and cites the source when the visual grammar or an adapted mechanism comes from prior work.
 - The figure is checked at paper size for text fit, line crossings, and caption placement.
+- The decoded PNG export matches the active LaTeX PNG exactly, with the result recorded in `artifacts/FIGURE_OVERLAY_QA_20261002.md`.
 
 ## Current checkpoint
 
@@ -47,4 +48,4 @@ The old PNGs remain available as legacy references. They are not overwritten unt
 7. Evaluation and benchmark map (completed).
 8. Open-problem and case-study map (completed).
 9. LLM-side editable mechanism map (completed).
-10. Full-paper visual audit, compile, render, and synchronized push.
+10. Full-paper visual audit, compile, render, and synchronized push (completed; the 13-pair overlay audit is recorded in `artifacts/FIGURE_OVERLAY_QA_20261002.md`).
