@@ -21,7 +21,7 @@ The survey will use one visual system across the main text and appendix. Each la
 ## Acceptance criteria for every figure
 
 - The source is a native `.pptx` with independent text, fills, lines, arrows, and table/chart objects.
-- The composition remains groupable and ungroupable in PowerPoint without flattening.
+- The composition remains independently editable in PowerPoint without flattening; group/ungroup is verified as a separate desktop interaction.
 - Times New Roman is used consistently unless a cited source requires another font.
 - Colors encode the four contribution layers consistently: LLM, General Harness, General Time-Series Harness, and Task-Specific Harness.
 - The PNG used by LaTeX is exported from the same PPT source.
@@ -32,7 +32,7 @@ The survey will use one visual system across the main text and appendix. Each la
 
 The active directory now contains one source pair per figure used by `main.tex`. Figure 2 uses `artifacts/active/Figure2_organization_native_v2.pptx`; the LLM-side map uses `artifacts/active/Figure_LLM_side_native_v3.pptx`; Figures 1 and 3--8 use the corresponding final native sources. Superseded revisions remain in `artifacts/archive/previous_attempts/active_revisions_20261002/` so that a later comparison does not accidentally replace an active source.
 
-The visual language has been checked in the 46-page PDF: Times New Roman is consistent, the four semantic layers retain stable colors, the figures remain legible at paper size, and the references begin on a clear page after the conclusion. A PowerPoint desktop check of Figure 8 confirmed that the composition consists of individually selectable native objects; the generated PNG and the LaTeX figure use the same source composition.
+The visual language has been checked in the 46-page PDF: Times New Roman is consistent, the four semantic layers retain stable colors, the figures remain legible at paper size, and the references begin on a clear page after the conclusion. A PowerPoint desktop check of Figure 8 confirmed that the composition consists of individually selectable native objects; the generated PNG and the LaTeX figure use the same source composition. The direct Group command was not confirmed in the current desktop test copy and remains a separate follow-up check.
 
 The old PNGs remain available as legacy references. They are not overwritten until their replacements pass the same workflow.
 
