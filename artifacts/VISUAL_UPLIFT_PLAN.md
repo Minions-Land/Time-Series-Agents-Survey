@@ -8,14 +8,15 @@ The survey will use one visual system across the main text and appendix. Each la
 
 | Section | Figure purpose | Current source | Next action |
 |---|---|---|---|
-| Introduction | Module-level publication and contribution timeline | `artifacts/contribution_timeline.png` | Rebuild as a native editable chart/diagram with the module-level counting rule |
-| What Is a Time-Series Agent | Construction hierarchy and Paper Card unit | `artifacts/Overview.png` plus the Paper Card text box | Consolidate into one native composition |
-| LLM-Side Contributions | Temporal representation, alignment, instruction, and reasoning | `artifacts/paper_figures/redrawn/chatts_overview.png` | Replace the screenshot-style asset with a clean editable mechanism map |
-| General Harness | Seven reusable runtime dimensions | Text and Table 3 | Build a seven-dimension radial or linear map with the same palette |
-| General Time-Series Harness | Temporal objects, operations, evidence, and contracts | `artifacts/rsi_figures/gts_landscape.png` | Build a temporal-contract landscape with explicit reusable mechanisms |
-| Task-Specific Harness | Four task families under the same seven-module lens | `artifacts/rsi_figures/research_routes.png` | Build a four-branch task map and retain task-specific labels |
-| Infrastructure and Benchmarks | Traces, tools, evaluators, and benchmark coverage | `artifacts/paper_figures/redrawn/timeseriesgym_benchmark.png`, `timeclaw_runtime.png` | Build one evaluation-contract figure and one benchmark coverage table |
-| Open Problems and Case Studies | Evidence-backed gaps and representative systems | Existing open-problem material | Build a six-panel route map only after claims and citations are checked |
+| Introduction | Module-level publication and contribution timeline | `artifacts/active/Figure1_module_timeline_native.pptx` | Active native source; replace legacy `contribution_timeline.png` |
+| What Is a Time-Series Agent | Construction hierarchy and Paper Card unit | `artifacts/active/Figure3_construction_native.pptx` | Active native source; replace legacy `Overview.png` |
+| LLM-Side Contributions | Temporal representation, alignment, instruction, and reasoning | `artifacts/active/Figure_LLM_side_native_v3.pptx` | Active native source and PNG; replaces the screenshot-style asset |
+| General Harness | Seven reusable runtime dimensions | `artifacts/active/Figure4_general_harness_native_v2.pptx` | Active native source; seven dimensions surround the reusable runtime |
+| General Time-Series Harness | Temporal objects, operations, evidence, and contracts | `artifacts/active/Figure5_general_ts_harness_native.pptx` | Active native source; separate reusable temporal semantics from task contracts |
+| Task-Specific Harness | Four task families under the same seven-module lens | `artifacts/active/Figure6_task_specific_native_v2.pptx` | Active native source and PNG; shared seven-module lens with four task contracts |
+| Infrastructure and Benchmarks | Traces, tools, evaluators, and benchmark coverage | `artifacts/active/Figure7_infrastructure_native.pptx` | Active native source and PNG; evaluation layers, episode record, and resources |
+| Open Problems and Case Studies | Evidence-backed gaps and representative systems | `artifacts/active/Figure8_open_problems_native.pptx` | Active native source and PNG; ledger gaps, system cases, and Paper Card fields |
+| Supporting mechanism examples | AION, MERIT, AnomaMind, and TS-Agent schematics | `artifacts/active/Figure_supporting_workflows_native.pptx` | Seven-slide native source; the main text uses the corresponding exported PNGs |
 
 ## Acceptance criteria for every figure
 
@@ -36,12 +37,12 @@ The old PNGs remain available as legacy references. They are not overwritten unt
 ## Order of work
 
 1. Figure 2 organization map (completed checkpoint).
-2. Overview / construction hierarchy and Paper Card.
-3. Module-level contribution timeline.
-4. General Harness seven-dimension map.
-5. General Time-Series Harness temporal-contract map.
-6. Task-Specific Harness four-family map.
-7. Evaluation and benchmark map.
-8. Open-problem and case-study map.
-9. Full-paper visual audit, compile, render, and synchronized push.
-
+2. Overview / construction hierarchy and Paper Card (completed checkpoint).
+3. Module-level contribution timeline (completed checkpoint).
+4. General Harness seven-dimension map (completed checkpoint).
+5. General Time-Series Harness temporal-contract map (completed checkpoint).
+6. Task-Specific Harness four-family map (completed).
+7. Evaluation and benchmark map (completed).
+8. Open-problem and case-study map (completed).
+9. LLM-side editable mechanism map (completed).
+10. Full-paper visual audit, compile, render, and synchronized push.
