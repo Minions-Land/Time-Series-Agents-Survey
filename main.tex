@@ -308,6 +308,13 @@ This survey makes four contributions.
   \item We show how the paper-card ledger turns the survey into an extensible research map: the same records that support classification also expose missing temporal contracts, evaluation gaps, and future research directions.
 \end{enumerate}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{artifacts/rsi_figures/survey_organization.png}
+\caption{Organization of the survey. The sections follow the construction of a Time-Series Agent, from the LLM side and reusable runtime to temporal contracts, task modules, evaluation, and open problems. The paper-card fields provide the evidence record behind each section. The visual grammar is adapted from the organization map in Wu et al., \textit{Recursive Self-Improvement in AI: A Survey} (2026 preprint).}
+\label{fig:survey-organization}
+\end{figure}
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{artifacts/Overview.png}
@@ -321,6 +328,14 @@ This survey makes four contributions.
 A Time-Series Agent is a system in which an LLM operates through a reusable runtime and time-series-specific modules.
 
 The LLM supplies language understanding and reasoning. The General Harness supplies interaction, memory, tools, execution, control, planning, optimization, and coordination. The Time-Series Harness Module preserves temporal state, operations, context, and validation; statistical models, time-series foundation models, databases, simulators, retrieval systems, and evaluators operate as callable components within it.
+
+At an abstract level, the runtime can be written as
+\begin{equation}
+  a_t = \pi_\theta(s_t), \qquad
+  s_{t+1} = \mathcal{H}(s_t,a_t,o_{t+1}),
+  \label{eq:agent-loop}
+\end{equation}
+where $s_t$ is the visible state, $a_t$ is a tool or environment action, $o_{t+1}$ is the returned observation, and $\mathcal{H}$ is the Harness transition. Time-Series Harness Modules add temporal type information to each state, action, and observation.
 
 The rest of the survey follows these construction layers. Section~3 isolates changes to the LLM; Section~4 describes the General Harness; Section~5 identifies the parts that become genuinely time-series-specific; Section~6 instantiates them under four task families; and Section~7 evaluates the resulting systems and the infrastructure needed to benchmark them.
 \section{LLM-Side Contributions for Time-Series Agents}
@@ -423,11 +438,25 @@ The General Time-Series Harness specializes the seven General Harness dimensions
 
 The contract boundary makes the distinction explicit. General Harness specifies how an Agent stores state, invokes tools, coordinates roles, and verifies outputs. General Time-Series Harness specifies what a valid temporal state or operation means: which observations were available, how a window is aligned, which frequency and units apply, and how a revision is represented. TIMECLAW and AION make this boundary explicit through time-series-native execution, temporal grounding, and reliability mechanisms \citep{timeclaw2026harness,aion2026}.
 
+For a temporal state at decision time $\tau$, the admissible information can be represented as
+\begin{equation}
+  \mathcal{I}_{\tau} = \{(x_i,t_i,v_i): t_i \leq \tau,\; v_i \leq \tau\},
+  \label{eq:temporal-availability}
+\end{equation}
+where $t_i$ is the event time and $v_i$ is the time at which the value became available. This distinction gives the GTS layer an executable leakage and provenance contract.
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.90\linewidth]{artifacts/paper_figures/aion_principles.png}
 \caption{AION's three coupled time-series harness principles, reproduced from Fig.~2 of \citet{aion2026}. Temporal grounding, knowledge-grounded reasoning, and reliability mechanisms show why GTS is a temporal contract layered on top of a general runtime.}
 \label{fig:aion-principles}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.96\linewidth]{artifacts/rsi_figures/gts_landscape.png}
+\caption{The General Time-Series Harness landscape. Temporal objects, operations, and evidence are carried through reusable interface, memory, tool, control, and planning mechanisms before a task-specific output contract is applied. The visual grammar is adapted from the layered landscape figures in Wu et al., \textit{Recursive Self-Improvement in AI: A Survey} (2026 preprint).}
+\label{fig:gts-landscape}
 \end{figure}
 
 \subsection{Interface and Interaction}
@@ -477,6 +506,25 @@ These requirements form the cross-task design checklist; the next section instan
 
 Task-specific Harness modules instantiate the General Time-Series Harness under a concrete output contract. Four task families organize this section, each analyzed through interface, memory, tools, control and verification, planning, optimization, and coordination.
 
+The task contract determines the final object being optimized. For forecasting, a typical contract is
+\begin{equation}
+  \widehat{y}_{\tau+1:\tau+H}=f_\theta\!\left(y_{\leq\tau},x_{\leq\tau}\right),
+  \label{eq:forecast-contract}
+\end{equation}
+where $H$ is the declared horizon and the inputs are restricted by the availability set in Eq.~\ref{eq:temporal-availability}. For anomaly detection, the same temporal state supports a decision rule such as
+\begin{equation}
+  \widehat{z}_{\tau}=\mathbb{1}\!\left[\mathcal{S}(x_{\tau},\mathcal{I}_{\tau})>\gamma\right],
+  \label{eq:anomaly-contract}
+\end{equation}
+with score $\mathcal{S}$ and threshold $\gamma$ recorded as part of the task-specific module.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.98\linewidth]{artifacts/rsi_figures/research_routes.png}
+\caption{Research routes across the reviewed Time-Series Agent corpus. The routes connect LLM-side capability, reusable runtime mechanisms, temporal grounding, and four task-facing branches. Placement follows the maintained paper-card ledger and records module-level contributions rather than a paper-level ranking. The visual grammar is adapted from the research-route timeline in Wu et al., \textit{Recursive Self-Improvement in AI: A Survey} (2026 preprint).}
+\label{fig:research-routes}
+\end{figure}
+
 \subsection{Forecasting and Prediction}
 
 Forecasting agents manage horizons, chronological splits, model selection, probabilistic outputs, revision, and deployment constraints. The interface exposes the forecast origin, horizon, frequency, and target channels; memory preserves point-in-time covariates, prior forecasts, and revisions; and tools provide model fitting, backtesting, ensembling, and reconciliation. TimeSeriesScientist \citep{timeseriesscientist2025} constructs a role-based forecasting workflow, TimeCAP \citep{timecap2025} adds contextual augmentation, and TimeCopilot \citep{timecopilot2026} selects among forecasting models as callable tools. Last-Mile Forecasting \citep{lastmile2026} focuses on decision-ready revision, HydroAgent \citep{hydroagent2026} couples hydrological simulation with warnings, and CastFlow \citep{castflow2026} iteratively refines forecasts using multi-view evidence. The TSK contract is the horizon-specific output together with leakage-controlled validation and revision rules.
@@ -484,6 +532,13 @@ Forecasting agents manage horizons, chronological splits, model selection, proba
 \subsection{Data Augmentation and Synthesis}
 
 Augmentation and synthesis agents generate, select, or validate temporal data and representations. BRIDGE \citep{bridge2025} conditions temporal generation on language and evaluates the generated series; MERIT \citep{merit2025} combines similar-series retrieval, augmentation, and review; and SCENARIODIFF \citep{scenariodiff2026} generates forecast-relevant scenarios from multimodal anchors. The interface declares the conditioning window, channels, sampling frequency, and intended use; memory records source series, transformations, and provenance; and verification compares temporal dependence, missingness, distributional fidelity, and downstream utility. The TSK contract is the generator--validator loop with temporal fidelity and downstream utility checks.
+
+For a conditioning context $\mathcal{C}$, a synthesis module produces a candidate series and is accepted only when its temporal fidelity and downstream utility satisfy the declared checks:
+\begin{equation}
+  \widetilde{x}_{1:T}\sim p_{\phi}(x_{1:T}\mid\mathcal{C}), \qquad
+  \operatorname{Accept}(\widetilde{x})=\mathbb{1}\!\left[\mathcal{F}(\widetilde{x},x)\geq\delta_f\;\wedge\;\mathcal{U}(\widetilde{x})\geq\delta_u\right].
+  \label{eq:augmentation-contract}
+\end{equation}
 
 \begin{figure}[htbp]
 \centering
@@ -506,6 +561,13 @@ Anomaly agents localize events, propose or verify rules, retrieve incident evide
 \subsection{Decision Support}
 
 Decision-support agents connect forecasts or diagnoses to actions under costs, constraints, uncertainty, and review requirements. FinCon \citep{fincon2024} coordinates analyst evidence before portfolio decisions, TradingAgents \citep{tradingagents2024} turns market and news analysis into risk-aware trading actions, and CoLLMLight \citep{collmllight2026} uses simulation feedback for network-wide signal control. ClimateAgent \citep{climateagent2025} connects climate analysis to operational workflows, while Smart Energy Agent \citep{smartenergyagent2026} converts appliance-level anomalies into maintenance recommendations. The TSK interface represents the current state, available actions, timing, and authority; control checks risk limits and counterfactual consequences; and human review records whether the recommendation was accepted, revised, or escalated.
+
+Decision support extends prediction through an action utility:
+\begin{equation}
+  a_{\tau}^{\star}=\arg\max_{a\in\mathcal{A}}\mathbb{E}\!\left[U(a,Y_{\tau+1})\mid\mathcal{I}_{\tau}\right],
+  \label{eq:decision-contract}
+\end{equation}
+where the utility, action set, uncertainty, and review authority are part of the task contract. This makes the transition from forecasting to decision support explicit.
 
 The complete corpus is multi-label across components: a work may contribute to several Harness dimensions and task families, with each component assigned to its deepest applicable Harness layer. The maintained ledger records both the inclusive evidence fields and the exclusive plotting labels, alongside the independent LLM-side contribution.
 \section{Infrastructure and Benchmarks for Time-Series Agents}
