@@ -30,7 +30,9 @@ The survey will use one visual system across the main text and appendix. Each la
 
 ## Current checkpoint
 
-Figure 2 is the first active source. Its native PowerPoint source is `artifacts/active/Figure2_organization_native_v2.pptx`; the LaTeX PNG is `artifacts/active/Figure2_organization_native_v2.png`. The figure uses the RSI organization-map structure while replacing its content with the current nine-section survey plan and Paper Card evidence layer.
+The active directory now contains one source pair per figure used by `main.tex`. Figure 2 uses `artifacts/active/Figure2_organization_native_v2.pptx`; the LLM-side map uses `artifacts/active/Figure_LLM_side_native_v3.pptx`; Figures 1 and 3--8 use the corresponding final native sources. Superseded revisions remain in `artifacts/archive/previous_attempts/active_revisions_20261002/` so that a later comparison does not accidentally replace an active source.
+
+The visual language has been checked in the 46-page PDF: Times New Roman is consistent, the four semantic layers retain stable colors, the figures remain legible at paper size, and the references begin on a clear page after the conclusion. A PowerPoint desktop check of Figure 8 confirmed that the composition consists of individually selectable native objects; the generated PNG and the LaTeX figure use the same source composition.
 
 The old PNGs remain available as legacy references. They are not overwritten until their replacements pass the same workflow.
 

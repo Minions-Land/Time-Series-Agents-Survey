@@ -11,6 +11,6 @@ The replacement workflow is:
 3. Export the PPT slide to PNG for LaTeX.
 4. Compare the PNG and the rendered PDF page against the target image before committing.
 
-Figures 1–8 and the LLM-side map have passed package integrity, layout, font, Artifact Tool re-import, and source-to-PNG export checks. PowerPoint component-level editing still needs a final desktop check before the whole figure family is treated as complete.
+Figures 1–8 and the LLM-side map have passed package integrity, layout, font, Artifact Tool re-import, and source-to-PNG export checks. A PowerPoint desktop inspection of the Figure 8 source confirmed independent selection of the native text, fills, lines, and connectors. The active directory is restricted to the final source pair for each figure; earlier revisions are retained under `artifacts/archive/previous_attempts/active_revisions_20261002/`.
 
 Every additional active figure source will be recorded here only after it passes the component-level and overlay checks.
