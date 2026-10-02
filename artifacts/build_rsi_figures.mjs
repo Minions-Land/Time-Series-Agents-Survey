@@ -5,9 +5,9 @@ import { Presentation, PresentationFile } from '@oai/artifact-tool';
 const SKILL_DIR='/Users/mjm/.codex/plugins/cache/openai-primary-runtime/presentations/26.909.12148/skills/presentations';
 const workspaceDir='/Users/mjm/Papers/Qingsong/IJCAI2027-Time-Series-Agents-Survey';
 const buildDir=path.join(workspaceDir,'.ppt-build');
-const finalPath=path.join(workspaceDir,'artifacts','TimeSeriesAgent_Figures_RSI_v2.pptx');
+const finalPath=path.join(workspaceDir,'artifacts','TimeSeriesAgent_Figures_RSI_TNR.pptx');
 const {resolvePresentationFont, finalizePresentation}=await import(pathToFileURL(path.join(SKILL_DIR,'container_tools/artifact_tool_utils.mjs')).href);
-const family=resolvePresentationFont({fontFamily:'Arial'});
+const family=resolvePresentationFont({fontFamily:'Times New Roman'});
 const p=Presentation.create({slideSize:{width:1280,height:720}});
 const C={navy:'#24324A',ink:'#303A4B',muted:'#687386',line:'#3D4652',yellow:'#F4F0C9',green:'#DDEEDC',blue:'#D9EEF0',purple:'#E6E0F2',white:'#FFFFFF',gold:'#B77F2B',teal:'#438B86',violet:'#78639F',red:'#B86659'};
 function addText(slide,x,y,w,h,txt,size=18,color=C.ink,bold=false,italic=false,align='left'){
