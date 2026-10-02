@@ -1,15 +1,14 @@
-# Editable figure sources
+# Figure source status
 
-The survey embeds the PNG exports from these source decks. Each slide is built from native PowerPoint text boxes, shapes, and connectors; the objects can be selected, grouped, and ungrouped in PowerPoint.
+The current PNGs in `main.tex` are legacy exports. They remain in place until their replacements pass the visual audit.
 
-| Main-text figure family | Source deck | Slides | Embedded PNG directory |
-|---|---|---:|---|
-| Survey organization, General Time-Series Harness landscape, research routes | `TimeSeriesAgent_Figures_RSI_TNR.pptx` | 1--3 | `rsi_figures/` |
-| ChatTS, TS-Agent, AION, MERIT, AnomaMind, TIMECLAW, TimeSeriesGym | `TimeSeriesAgent_Redrawn_Workflows.pptx` | 1--7 | `paper_figures/redrawn/` |
+The previous PPT decks are archived in `artifacts/archive/previous_attempts/` and are not active sources. They were useful for testing layouts, but they do not satisfy the final component-level conversion requirement.
 
-The visual grammar is intentionally shared across the decks: Times New Roman, restrained pastel fills, dark outlines, and short mechanism labels. Captions in `main.tex` identify the source paper and state that the figure is adapted and redrawn.
+The replacement workflow is:
 
+1. Freeze the target visual composition from the approved reference image.
+2. Convert that composition into native PowerPoint text, shapes, tables, connectors, and icons with fixed coordinates.
+3. Export the PPT slide to PNG for LaTeX.
+4. Compare the PNG and the rendered PDF page against the target image before committing.
 
-## RSI reference reconstruction deck
-
-`RSI_Reference_Figures_PixelFaithful_Components.pptx` contains the 11 user-provided RSI reference screenshots as pixel-faithful component slides. Slide order follows the attached files: module timeline, organization map, landscape, open-problem panels, coverage table, four perspectives, recursive loop, update/evidence table, synthesis, research routes, and the dark text-panel style. The original screenshot filenames are stored in the speaker notes of each slide.
+Every active figure source will be recorded here only after it passes the component-level and overlay checks.
