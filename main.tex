@@ -444,33 +444,93 @@ The seven dimensions organize the evidence below. Each subsection first states t
 
 Inference interfaces expose the model's input state and intermediate reasoning; action interfaces turn a decision into a tool call or executable operation; environment modeling represents observations, artifacts, and feedback; user interaction supports natural-language requests and review; and the state--action loop connects successive steps. The interface is a protocol that declares the visible state, legal actions, return types, and failure signals consumed by the next step. TS-Agent \citep{tsagent2025} turns a natural-language question into explicit analytical operations and evidence logs. TimeART \citep{timeart2026} binds temporal analysis requests to structured tools, while TSAG \citep{tsag2026} exposes temporal questions, intermediate results, and final answers as separate states. In each case, the General Harness interface becomes the point where a time-series contract can later add horizons, windows, channels, and units.
 
+A general tool call carries the name, arguments, permissions, and resource budget needed to execute one step:
+\begin{equation}
+  \omega_k=(n_k,\operatorname{args}_k,\operatorname{perm}_k,b_k),\qquad
+  o_{k+1}=\operatorname{Exec}(\omega_k,s_k),\qquad
+  s_{k+1}=\mathcal{H}(s_k,\omega_k,o_{k+1}).
+  \label{eq:gh-interface}
+\end{equation}
+TS-Agent, TimeART, and TSAG instantiate this boundary with analytical operations, structured intermediate states, and returned evidence.
 
 \subsection{Memory and Context}
 
 Memory and context mechanisms preserve information across turns, retrieve prior cases, and expose relevant evidence. Working memory holds the current trace and tool outputs; long-term memory stores reusable cases or procedures; and shared state lets several agents inspect the same artifacts. Agentic RAG for time-series analysis \citep{agenticrag2024} retrieves task-relevant examples and prompt knowledge, whereas TimeCAP \citep{timecap2025} uses contextual augmentation to connect retrieved evidence to a forecasting workflow. TIMECLAW \citep{timeclaw2026harness} stores auditable trajectories and multimodal experience, and ForecastCompass \citep{forecastcompass2026} uses adaptive memory to revise forecasting context. These mechanisms are General Harness contributions because the storage and retrieval loop is reusable; their temporal indexing and point-in-time rules are analyzed in Section~5.
 
+At step $k$, the memory interface retrieves evidence for the current query, merges it with the working state, and writes the resulting trace back for later reuse:
+\begin{equation}
+  m_k=R_{\psi}(\mathcal{M}_k,q_k), \qquad
+  s_k^{+}=s_k\oplus m_k,\qquad
+  \mathcal{M}_{k+1}=\operatorname{Write}(\mathcal{M}_k,\rho_k).
+  \label{eq:gh-memory}
+\end{equation}
+Here $R_{\psi}$ covers retrieval and context selection, while $\operatorname{Write}$ covers episodic storage and experience promotion used by TIMECLAW and ForecastCompass.
 
 \subsection{Tools and Execution}
 
 Tools and execution expand the action space through code, statistical models, TSFMs, visualizers, retrievers, simulators, and validators. A useful tool specification contains an input schema, output schema, permission boundary, resource budget, and failure behavior. TimeSeriesScientist \citep{timeseriesscientist2025} delegates data inspection, model selection, and reporting to executable roles; TimeCopilot \citep{timecopilot2026} exposes forecasting models as selectable tools; and Argos \citep{argos2025} connects monitoring tools to rule proposal and review. AnomaMind \citep{anomamind2026} illustrates the same interface for anomaly localization and diagnosis. The General Harness contribution is the registry and execution loop; temporal semantics such as resampling, horizon alignment, and leakage checks belong to GTS.
 
+Let $\mathcal{T}$ denote the registered tools. The execution interface selects a legal tool call and returns a typed observation:
+\begin{equation}
+  \omega_k=\pi_{\theta}(s_k,\mathcal{T}),\qquad
+  o_{k+1}=\operatorname{Exec}_{n_k}(\operatorname{args}_k),\qquad
+  s_{k+1}=\operatorname{Update}(s_k,\omega_k,o_{k+1}).
+  \label{eq:gh-tools}
+\end{equation}
+The registry supplies the name, argument schema, permission boundary, output type, and resource budget for each callable component.
+
 \subsection{Control, Verification, and Feedback}
 
 Control and verification route feedback, enforce constraints, manage retries, and check intermediate or final artifacts. The controller determines when a trace may continue, when a tool must be retried, and when an output must be rejected or escalated. FLAIRR-TS \citep{flairr2025} uses iterative refinement around a forecaster, while TSAG \citep{tsag2026} adds checks to the analytical interaction loop. VeriTime \citep{veritime2026} makes temporal validity an explicit verification target, and TraceBench \citep{tracebench2026} evaluates the submitted trajectory alongside the final label. These examples show a reusable critic-and-gate mechanism with task-specific validity conditions.
 
+For a trajectory $\rho_{1:k}$ and result $r_k$, the controller opens the next step only when the process and output checks pass:
+\begin{equation}
+  g_k=\mathbb{1}\!\left[\mathcal{V}_{\mathrm{proc}}(\rho_{1:k})=1\;\wedge\;\mathcal{V}_{\mathrm{out}}(r_k)=1\right],
+  \qquad
+  \operatorname{Next}_k=\begin{cases}
+    \operatorname{stop}(r_k), & g_k=1,\\
+    \operatorname{retry/escalate}(\rho_{1:k}), & g_k=0.
+  \end{cases}
+  \label{eq:gh-control}
+\end{equation}
+The same gate supports iterative refinement in FLAIRR-TS, interaction checks in TSAG, and trajectory-level assessment in TraceBench.
 
 \subsection{Planning and Workflow}
 
 Planning and workflow mechanisms decompose a request into data preparation, analysis, model selection, validation, reporting, and revision. They make intermediate states explicit, choose a tool sequence, record stopping conditions, and preserve the artifacts required to reproduce the result. TimeSeriesScientist \citep{timeseriesscientist2025} assigns complementary roles to curation, planning, forecasting, and reporting. TimeCAP \citep{timecap2025} connects context retrieval, augmentation, and prediction, while ClimateAgent \citep{climateagent2025} coordinates data, code, visualization, and report generation. AION \citep{aion2026} represents the workflow through task files, workspaces, artifacts, and validation interfaces, making the plan inspectable and explicit.
 
+For a request $q$, planning chooses a valid sequence of operations from the available workflow space:
+\begin{equation}
+  \rho^{\star}=\arg\max_{\rho\in\mathcal{R}(q)}
+  \left[\operatorname{Utility}(\rho)-\lambda\operatorname{Cost}(\rho)\right]
+  \qquad \text{s.t.}\qquad \operatorname{Valid}(\rho)=1.
+  \label{eq:gh-planning}
+\end{equation}
+The workflow records the selected operations, intermediate artifacts, stopping condition, and validation points.
 
 \subsection{Optimization and Evolution}
 
 Optimization and evolution improve prompts, tools, policies, memories, or trajectories using feedback. The update can be offline prompt or policy search, trajectory-level reflection, or a self-evolving Harness that promotes a new component after validation. TIMECLAW's explore--compare--distill loop \citep{timeclaw2026explore} turns successful trajectories into reusable capabilities. MetaCaster \citep{metacaster2026} treats the Agent as an engineer that generates and selects forecasters; CastFSR \citep{castfsr2026} revises context and forecasts through fast--slow reflection; and CRAFTER \citep{crafter2026} proposes temporal features and accepts them only after validation. The optimization mechanism is general; distribution shift and temporal promotion criteria are handled by GTS.
 
+The evolution loop updates a Harness component from evaluated trajectories:
+\begin{equation}
+  \theta_{j+1}=\operatorname{Update}\!\left(\theta_j,\mathcal{D}_j\right),\qquad
+  \mathcal{D}_j=\left\{(\rho_i,\operatorname{Score}(\rho_i))\right\}_{i=1}^{j}.
+  \label{eq:gh-evolution}
+\end{equation}
+TIMECLAW promotes successful trajectories, MetaCaster searches over generated forecasters, and CastFSR updates context and forecasts through reflection.
+
 \subsection{Coordination and Scaling}
 
 Coordination and scaling divide work among specialized roles, share state, and combine review or debate. Coordination may be cooperative, competitive, or hierarchical; the shared state and handoff protocol determine whether the final result is consistent and auditable. TS-Debate \citep{tsdebate2026} uses debate among specialized analysts, MAS4TS \citep{mas4ts2026} separates temporal analysis roles, and the AI-Meteorologist \citep{aimeteorologist2025} combines domain experts with a coordinating agent. FinCon \citep{fincon2024} assigns financial roles to analysts and a manager who aggregates evidence before a decision. These systems show why coordination is a Harness dimension; the temporal alignment of shared evidence is a separate GTS obligation.
+
+With role states $s_k^{(1)},\ldots,s_k^{(J)}$, coordination aggregates role outputs before the next shared action:
+\begin{equation}
+  m_k^{\mathrm{shared}}=\operatorname{Aggregate}\!\left(\{m_k^{(j)}\}_{j=1}^{J}\right),\qquad
+  a_k=\pi_{\theta}\left(s_k^{(1:J)},m_k^{\mathrm{shared}}\right).
+  \label{eq:gh-coordination}
+\end{equation}
+The shared message and handoff protocol are the runtime objects used by debate, delegation, and manager--analyst systems.
 
 \begin{figure}[htbp]
 \centering
