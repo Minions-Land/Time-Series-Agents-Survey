@@ -337,6 +337,51 @@ At an abstract level, the runtime can be written as
 \end{equation}
 where $s_t$ is the visible state, $a_t$ is a tool or environment action, $o_{t+1}$ is the returned observation, and $\mathcal{H}$ is the Harness transition. Time-Series Harness Modules add temporal type information to each state, action, and observation.
 
+To keep the method descriptions comparable, we use the following notation throughout the survey. The equations below are normalized system contracts: they expose the object being changed by a work and the condition that its module must satisfy, while the surrounding text identifies the cited implementation.
+
+\begin{table}[htbp]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\linewidth}{@{}p{0.18\linewidth}p{0.31\linewidth}p{0.18\linewidth}X@{}}
+\toprule
+\textbf{Symbol} & \textbf{Meaning} & \textbf{Layer} & \textbf{Use in the survey}\\
+\midrule
+$x_{1:T}$ & Multivariate time series with $T$ observations, channels, units, and timestamps. & LLM / GTS & Input to representation, temporal operations, and task modules.\\
+$t,\tau,H$ & Event time, decision or forecast-origin time, and forecast horizon. & GTS / TSK & Define chronological availability and task output intervals.\\
+$\mathcal{I}_{\tau}$ & Information admissible at time $\tau$, including availability and provenance. & GTS & Governs retrieval, memory, validation, and leakage control.\\
+$s_k,a_k,o_{k+1}$ & Agent state, action or tool call, and returned observation at step $k$. & GH & Describe the reusable state--action loop.\\
+$\omega_k$ & Typed tool call: name, arguments, permissions, budget, and failure contract. & GH / GTS & Makes execution and temporal arguments inspectable.\\
+$\mathcal{M}_{\tau}$ & Memory available at $\tau$ with time index, vintage, provenance, and revision status. & GH / GTS & Defines point-in-time retrieval and experience reuse.\\
+$\mathcal{V}$ & Validator or verifier that returns a pass, fail, finding, or escalation decision. & GH / GTS / TSK & Checks process, temporal, and task-specific obligations.\\
+$\mathcal{C}_{\mathrm{task}}$ & Output contract for forecasting, augmentation, anomaly diagnosis, or decision support. & TSK & Specifies the object, metric, constraint, and review authority.\\
+$(\widehat{y},\widehat{z},\widetilde{x},a^{\star})$ & Forecast, anomaly decision, generated series, and selected action. & TSK & The four representative task outputs used in Section~6.\\
+\bottomrule
+\end{tabularx}
+\caption{Unified notation for the module-level method descriptions. GH denotes General Harness, GTS denotes General Time-Series Harness, and TSK denotes Task-Specific Harness.}
+\label{tab:unified-notation}
+\end{table}
+
+\begin{table}[htbp]
+\centering\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\linewidth}{@{}p{0.19\linewidth}p{0.35\linewidth}p{0.27\linewidth}X@{}}
+\toprule
+\textbf{Formal object} & \textbf{Normalized expression} & \textbf{Core innovation exposed} & \textbf{Representative works}\\
+\midrule
+LLM--series interface & $h_x=E_{\phi}(x_{1:T}),\;\widetilde{h}_x=P_{\phi}(h_x),\;p_{\theta}(r\mid x,q)=\operatorname{LLM}_{\theta}([\widetilde{h}_x;q])$ & Temporal values become an input to language reasoning. & Time-LLM \citep{jin2024timellm}; LLM4TS \citep{chang2024llm4ts}; ChatTS \citep{chatts2025}\\
+General Harness loop & $a_k=\pi_{\theta}(s_k),\;s_{k+1}=\mathcal{H}(s_k,a_k,o_{k+1})$ & State, action, observation, and runtime transition are explicit. & TS-Agent \citep{tsagent2025}; TimeART \citep{timeart2026}; AION \citep{aion2026}\\
+Temporal availability & $\mathcal{I}_{\tau}=\{(x_i,t_i,v_i):t_i\leq\tau,\;v_i\leq\tau\}$ & Retrieval and memory obey event-time and availability-time constraints. & TIMECLAW \citep{timeclaw2026harness}; VeriTime \citep{veritime2026}; TemporalBench \citep{temporalbench2026}\\
+Temporal action & $\omega_k^{\mathrm{TS}}=(\operatorname{op}_k,[t_k^{-},t_k^{+}],f_k,c_k,u_k,\tau_k)$ & A temporal operation carries interval, frequency, channel, unit, and reference time. & TS-Agent \citep{tsagent2025}; TimeART \citep{timeart2026}; TSAG \citep{tsag2026}\\
+Task contract & $\widehat{y},\;\widetilde{x},\;\widehat{z},\;a^{\star}$ with task-specific validity predicates & Forecasting, augmentation, anomaly diagnosis, and decision support produce different typed outputs. & TimeCopilot \citep{timecopilot2026}; MERIT \citep{merit2025}; AnomaMind \citep{anomamind2026}; FinCon \citep{fincon2024}\\
+Episode evaluation & $e=(\mathcal{C}_{\mathrm{task}},\tau,\mathcal{I}_{\tau},\omega_{1:K},\mathcal{V}_{1:K},r,\operatorname{Cost}(e))$ & Evaluation records process, temporal contract, task outcome, and resources together. & TFRBench \citep{tfrbench2026}; TraceBench \citep{tracebench2026}; TimeSeriesGym \citep{timeseriesgym2025}\\
+\bottomrule
+\end{tabularx}
+\caption{Unified formal map used to compare the reviewed methods. The expressions are normalized abstractions of the contribution objects; the cited works provide the corresponding implementations or evaluation protocols.}
+\label{tab:formal-map}
+\end{table}
+
 The rest of the survey follows these construction layers. Section~3 isolates changes to the LLM; Section~4 describes the General Harness; Section~5 identifies the parts that become genuinely time-series-specific; Section~6 instantiates them under four task families; and Section~7 evaluates the resulting systems and the infrastructure needed to benchmark them.
 \section{LLM-Side Contributions for Time-Series Agents}
 
@@ -346,9 +391,26 @@ The LLM is one of the three principal construction layers in a Time-Series Agent
 
 These methods connect numerical sequences, time structure, and language representations. Time-LLM reprograms a frozen language model with text prototypes and a prompt prefix, while LLM4TS aligns a pretrained language model with time-series inputs for data-efficient forecasting \citep{jin2024timellm,chang2024llm4ts}. Multimodal systems extend the interface to visual or textual temporal context \citep{timevlm2025,timeomnivl2026}. Their contribution is the model-side representation and alignment that makes temporal signals available to language-model reasoning.
 
+We write this model-side interface as
+\begin{equation}
+  h_x = E_{\phi}(x_{1:T}), \qquad
+  \widetilde{h}_x = P_{\phi}(h_x), \qquad
+  p_{\theta}(r\mid x,q) = \operatorname{LLM}_{\theta}([\widetilde{h}_x;q]),
+  \label{eq:llm-temporal-alignment}
+\end{equation}
+where $E_{\phi}$ encodes the temporal signal, $P_{\phi}$ maps it into the language-model interface, and $q$ is a natural-language request. The equation captures the contribution locus of reprogramming and alignment methods; it does not assume a particular encoder or tokenization scheme.
+
 \subsection{Temporal instruction, interaction, and reasoning}
 
 A second line teaches the model to discuss and reason over temporal evidence. ChatTS constructs synthetic time-series instruction data and time-series dialogue for understanding and reasoning \citep{chatts2025}. Its direct extension, Towards Time-Series Reasoning, combines a trainable temporal encoder with supervised reasoning traces for cross-domain perception and analysis \citep{chow2024tsreasoning}. These works make natural-language temporal interaction a learned model capability.
+
+For an instruction record $(x,q,r)$, the learned dialogue or reasoning capability can be represented by
+\begin{equation}
+  \mathcal{D}_{\mathrm{TS}}=\{(x^{(i)},q^{(i)},r^{(i)})\}_{i=1}^{N}, \qquad
+  \mathcal{L}_{\mathrm{instr}}(\theta)=-\sum_{i=1}^{N}\log p_{\theta}\!\left(r^{(i)}\mid x^{(i)},q^{(i)}\right).
+  \label{eq:llm-temporal-instruction}
+\end{equation}
+The distinction is useful for the ledger: the learned encoder or instruction objective is an LLM-side contribution, whereas the tool, memory, and validation loop that consumes the resulting representation is recorded under the relevant Harness layer.
 
 \begin{figure}[htbp]
 \centering
@@ -408,9 +470,25 @@ The seven dimensions organize the evidence below. Each subsection first states t
 
 Inference interfaces expose the model's input state and intermediate reasoning; action interfaces turn a decision into a tool call or executable operation; environment modeling represents observations, artifacts, and feedback; user interaction supports natural-language requests and review; and the state--action loop connects successive steps. The interface is a protocol that declares the visible state, legal actions, return types, and failure signals consumed by the next step. TS-Agent \citep{tsagent2025} turns a natural-language question into explicit analytical operations and evidence logs. TimeART \citep{timeart2026} binds temporal analysis requests to structured tools, while TSAG \citep{tsag2026} exposes temporal questions, intermediate results, and final answers as separate states. In each case, the General Harness interface becomes the point where a time-series contract can later add horizons, windows, channels, and units.
 
+The shared interface can therefore be written as a typed tool boundary:
+\begin{equation}
+  \omega_k=(n_k,\,\mathrm{args}_k,\,\mathrm{perm}_k,\,b_k), \qquad
+  o_{k+1}=\operatorname{Exec}(\omega_k,s_k), \qquad
+  s_{k+1}=\mathcal{H}(s_k,\omega_k,o_{k+1}),
+  \label{eq:gh-interface}
+\end{equation}
+where $n_k$ is a tool name, $\mathrm{args}_k$ are validated arguments, $\mathrm{perm}_k$ is the permission boundary, and $b_k$ is the resource budget. Temporal arguments are added to this schema in Section~5.
+
 \subsection{Memory and Context}
 
 Memory and context mechanisms preserve information across turns, retrieve prior cases, and expose relevant evidence. Working memory holds the current trace and tool outputs; long-term memory stores reusable cases or procedures; and shared state lets several agents inspect the same artifacts. Agentic RAG for time-series analysis \citep{agenticrag2024} retrieves task-relevant examples and prompt knowledge, whereas TimeCAP \citep{timecap2025} uses contextual augmentation to connect retrieved evidence to a forecasting workflow. TIMECLAW \citep{timeclaw2026harness} stores auditable trajectories and multimodal experience, and ForecastCompass \citep{forecastcompass2026} uses adaptive memory to revise forecasting context. These mechanisms are General Harness contributions because the storage and retrieval loop is reusable; their temporal indexing and point-in-time rules are analyzed in Section~5.
+
+The reusable retrieval operation has the form
+\begin{equation}
+  m_k=R_{\psi}(\mathcal{M},q_k), \qquad s_k^{+}=s_k\oplus m_k,
+  \label{eq:gh-memory}
+\end{equation}
+where $R_{\psi}$ selects evidence for query $q_k$, and $\oplus$ merges it with the working state. GTS adds the admissibility condition $m_k\subseteq\mathcal{I}_{\tau_k}$.
 
 \subsection{Tools and Execution}
 
@@ -420,9 +498,23 @@ Tools and execution expand the action space through code, statistical models, TS
 
 Control and verification route feedback, enforce constraints, manage retries, and check intermediate or final artifacts. The controller determines when a trace may continue, when a tool must be retried, and when an output must be rejected or escalated. FLAIRR-TS \citep{flairr2025} uses iterative refinement around a forecaster, while TSAG \citep{tsag2026} adds checks to the analytical interaction loop. VeriTime \citep{veritime2026} makes temporal validity an explicit verification target, and TraceBench \citep{tracebench2026} evaluates the submitted trajectory alongside the final label. These examples show a reusable critic-and-gate mechanism with task-specific validity conditions.
 
+At the Harness level, a result is released only when its process and output checks pass:
+\begin{equation}
+  \operatorname{Accept}(r_k)=\mathbb{1}\!\left[\mathcal{C}_{\mathrm{process}}(\rho_{1:k})=1\;\wedge\;\mathcal{C}_{\mathrm{output}}(r_k)=1\right],
+  \label{eq:gh-verification}
+\end{equation}
+where $\rho_{1:k}$ is the observed trajectory. The temporal and task-specific predicates that instantiate these checks are defined later.
+
 \subsection{Planning and Workflow}
 
 Planning and workflow mechanisms decompose a request into data preparation, analysis, model selection, validation, reporting, and revision. They make intermediate states explicit, choose a tool sequence, record stopping conditions, and preserve the artifacts required to reproduce the result. TimeSeriesScientist \citep{timeseriesscientist2025} assigns complementary roles to curation, planning, forecasting, and reporting. TimeCAP \citep{timecap2025} connects context retrieval, augmentation, and prediction, while ClimateAgent \citep{climateagent2025} coordinates data, code, visualization, and report generation. AION \citep{aion2026} represents the workflow through task files, workspaces, artifacts, and validation interfaces, making the plan inspectable and explicit.
+
+For a candidate sequence of operations $\rho\in\mathcal{R}$, the general planning objective can be summarized as
+\begin{equation}
+  \rho^{\star}=\arg\max_{\rho\in\mathcal{R}}\;\mathbb{E}[\mathcal{R}_{\mathrm{task}}(\rho)]-\lambda\,\operatorname{Cost}(\rho),
+  \label{eq:gh-planning}
+\end{equation}
+where the task reward is supplied by the downstream contract and the Harness contributes the search, stopping, and resource accounting.
 
 \subsection{Optimization and Evolution}
 
@@ -470,9 +562,23 @@ where $t_i$ is the event time and $v_i$ is the time at which the value became av
 
 Time-series interfaces extend the general action schema with temporal arguments: as-of time, forecast origin, horizon, frequency, window, channel, unit, and revision. A slice action must state its interval; an aggregation must state its calendar and timezone; and a forecast must state the origin and horizon. TS-Agent \citep{tsagent2025} exposes executable temporal analysis requests, TimeART \citep{timeart2026} structures the request and result objects, and TSAG \citep{tsag2026} couples temporal questions to operations such as trend detection and correlation. These systems turn temporal meaning into an explicit interface contract.
 
+The temporal specialization of a tool call is therefore
+\begin{equation}
+  \omega_k^{\mathrm{TS}}=(\operatorname{op}_k,[t_k^{-},t_k^{+}],f_k,c_k,u_k,\tau_k),
+  \label{eq:gts-temporal-action}
+\end{equation}
+where the interval, frequency, channel set, units, and reference time are part of the action rather than unstated metadata.
+
 \subsection{Memory and Context}
 
 Temporal memory preserves time-indexed state, missingness, provenance, data vintage, event history, and revision records. The state remains queryable as it was known at a declared time, giving it semantics beyond an ordinary conversation buffer. TIMECLAW \citep{timeclaw2026harness} stores execution trajectories and multimodal experience; ForecastCompass \citep{forecastcompass2026} retrieves adaptive forecasting context; and FinMem \citep{finmem2023} organizes financial evidence into layered memories. MemCast \citep{memcast2026} uses hierarchical temporal experience to guide forecast refinement. Their common GTS contribution is the temporal key attached to memory: an event or trajectory is usable only when its availability, vintage, and revision status are known.
+
+For any temporal object $z$ retrieved or produced at $\tau$, the GTS validity predicate is
+\begin{equation}
+  \operatorname{Valid}_{\mathrm{TS}}(z;\tau)=\mathbb{1}\!\left[\operatorname{Avail}(z)\subseteq\mathcal{I}_{\tau}\;\wedge\;\operatorname{Align}(z)=1\;\wedge\;\operatorname{Unit}(z)=1\right].
+  \label{eq:gts-validity}
+\end{equation}
+This predicate is what turns temporal provenance, alignment, and unit semantics into an executable module boundary.
 
 \subsection{Tools and Execution}
 
@@ -587,6 +693,18 @@ A Time-Series Agent requires evaluation at three levels: General Harness process
 Evaluation should report tool-call validity, trace faithfulness, memory and artifact provenance, temporal availability rules, numerical fidelity, temporal operations, evidence grounding, task metrics, cost, failures, and revision behavior. A forecast or QA score is one task result within a complete Agent evaluation.
 
 The unit of evaluation is an episode. An episode records the task specification, as-of boundary, visible context, tool calls, intermediate artifacts, validator decisions, revision steps, final output, and resource use. This record attributes errors to prediction, tool selection, leakage, temporal operations, or revision after feedback.
+
+We represent an episode as
+\begin{equation}
+  e=\bigl(\mathcal{C}_{\mathrm{task}},\tau,\mathcal{I}_{\tau},\omega_{1:K},\mathcal{V}_{1:K},r,\operatorname{Cost}(e)\bigr),
+  \label{eq:episode-record}
+\end{equation}
+which keeps the task contract, information boundary, execution trace, verification decisions, final result, and resource use in one auditable record. A benchmark can then report a vector rather than a single task score:
+\begin{equation}
+  \mathcal{E}(e)=\bigl(E_{\mathrm{GH}},E_{\mathrm{GTS}},E_{\mathrm{TSK}},E_{\mathrm{resource}}\bigr),
+  \label{eq:evaluation-vector}
+\end{equation}
+where the four coordinates measure process validity, temporal-contract validity, task outcome, and cost or failure behavior. The vector follows the construction hierarchy and makes clear which layer a benchmark actually tests.
 
 The same protocol should support controlled perturbations: hide or reveal contextual evidence, shift the forecast origin, inject missingness, change the frequency, or replace a tool with a failing implementation. These interventions expose whether a system relies on the intended temporal evidence and whether its General Harness can recover from operational failures.
 
