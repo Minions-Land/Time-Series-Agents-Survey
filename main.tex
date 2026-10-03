@@ -384,7 +384,7 @@ The method first transforms the series into the language-model interface, applie
 
 A second line teaches the model to discuss and reason over temporal evidence. ChatTS constructs synthetic time-series instruction data and time-series dialogue for understanding and reasoning \citep{chatts2025}. Its direct extension, Towards Time-Series Reasoning, combines a trainable temporal encoder with supervised reasoning traces for cross-domain perception and analysis \citep{chow2024tsreasoning}. These works make natural-language temporal interaction a learned model capability.
 
-The paper-card records these learned data and reasoning capabilities under the LLM layer. Tools, memory, and validation loops introduced by the same work remain separate Harness entries, so a paper can contribute to several layers without forcing a single label.
+The paper card places learned data and reasoning under the LLM layer. Tool, memory, and validation contributions from the same work receive their own Harness entries, keeping multi-layer contributions visible.
 
 \begin{figure}[htbp]
 \centering
@@ -490,7 +490,7 @@ For a temporal state at decision time $\tau$, the admissible information can be 
   \mathcal{I}_{\tau} = \{(x_i,t_i,v_i): t_i \leq \tau,\; v_i \leq \tau\},
   \label{eq:temporal-availability}
 \end{equation}
-where $t_i$ is the event time and $v_i$ is the time at which the value became available. This distinction gives the GTS layer an executable leakage and provenance contract.
+where $t_i$ is the event time and $v_i$ is the time at which the value became available. This constraint defines the GTS availability and provenance contract.
 
 \begin{figure}[htbp]
 \centering
@@ -515,7 +515,7 @@ The temporal specialization of a tool call is therefore
   \omega_k^{\mathrm{TS}}=(\operatorname{op}_k,[t_k^{-},t_k^{+}],f_k,c_k,u_k,\tau_k),
   \label{eq:gts-temporal-action}
 \end{equation}
-where the interval, frequency, channel set, units, and reference time are part of the action rather than unstated metadata.
+where the interval, frequency, channel set, units, and reference time are explicit action fields.
 
 \subsection{Memory and Context}
 
@@ -610,7 +610,7 @@ Anomaly agents localize events, propose or verify rules, retrieve incident evide
   (s_k,a_k,o_{k+1})\;\longleftarrow\;B=\{K,N\}, \qquad s_{k+1}=\operatorname{Update}(s_k,a_k,o_{k+1}).
   \label{eq:anomamind-loop}
 \end{equation}
-This formulation is included with the method because it is the paper's central design choice: anomaly detection is treated as an evidence-seeking decision process rather than a single threshold call.
+This state--action--evidence loop is the paper's central design choice: anomaly detection proceeds through evidence-seeking decisions, tool responses, and state updates.
 
 \begin{figure}[htbp]
 \centering
@@ -647,7 +647,7 @@ We represent an episode as
   e=\bigl(\mathcal{C}_{\mathrm{task}},\tau,\mathcal{I}_{\tau},\omega_{1:K},\mathcal{V}_{1:K},r,\operatorname{Cost}(e)\bigr),
   \label{eq:episode-record}
 \end{equation}
-which keeps the task contract, information boundary, execution trace, verification decisions, final result, and resource use in one auditable record. A benchmark can then report a vector rather than a single task score:
+which keeps the task contract, information boundary, execution trace, verification decisions, final result, and resource use in one auditable record. A benchmark reports a vector of process validity, temporal-contract validity, task outcome, and resource behavior:
 \begin{equation}
   \mathcal{E}(e)=\bigl(E_{\mathrm{GH}},E_{\mathrm{GTS}},E_{\mathrm{TSK}},E_{\mathrm{resource}}\bigr),
   \label{eq:evaluation-vector}
