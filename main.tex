@@ -382,7 +382,13 @@ The method first transforms the series into the language-model interface, applie
 
 \subsection{Temporal instruction, interaction, and reasoning}
 
-A second line teaches the model to discuss and reason over temporal evidence. ChatTS constructs synthetic time-series instruction data and time-series dialogue for understanding and reasoning \citep{chatts2025}. Its direct extension, Towards Time-Series Reasoning, combines a trainable temporal encoder with supervised reasoning traces for cross-domain perception and analysis \citep{chow2024tsreasoning}. These works make natural-language temporal interaction a learned model capability. For instruction records $(x_i,q_i,r_i)$, the model-side training objective is
+A second line teaches the model to discuss and reason over temporal evidence. ChatTS constructs synthetic time-series instruction data and time-series dialogue for understanding and reasoning \citep{chatts2025}. Its direct extension, Towards Time-Series Reasoning, combines a trainable temporal encoder with supervised reasoning traces for cross-domain perception and analysis \citep{chow2024tsreasoning}. These works make natural-language temporal interaction a learned model capability. ChatTS also preserves numerical meaning during normalization by exposing the scale and offset in the text prompt. For a series value $x_t$, its value-preserved normalization can be written as
+\begin{equation}
+  x_t^{\mathrm{norm}}=\frac{x_t-x_{\min}}{x_{\max}-x_{\min}},\qquad
+  x_t=(x_{\max}-x_{\min})x_t^{\mathrm{norm}}+x_{\min},
+  \label{eq:chatts-value-preserved}
+\end{equation}
+so the LLM receives normalized patches together with the parameters required to recover the original numerical scale \citep{chatts2025}. For instruction records $(x_i,q_i,r_i)$, the model-side training objective is
 \begin{equation}
   \mathcal{L}_{\mathrm{dialog}}(\theta)=-\sum_{i=1}^{N}\log p_{\theta}(r_i\mid x_i,q_i).
   \label{eq:llm-dialogue-objective}
@@ -464,7 +470,13 @@ TS-Agent, TimeART, and TSAG instantiate this boundary with analytical operations
 
 \subsection{Memory and Context}
 
-Memory and context mechanisms preserve information across turns, retrieve prior cases, and expose relevant evidence. Working memory holds the current trace and tool outputs; long-term memory stores reusable cases or procedures; and shared state lets several agents inspect the same artifacts. Agentic RAG for time-series analysis \citep{agenticrag2024} retrieves task-relevant examples and prompt knowledge, whereas TimeCAP \citep{timecap2025} uses contextual augmentation to connect retrieved evidence to a forecasting workflow. TIMECLAW \citep{timeclaw2026harness} stores auditable trajectories and multimodal experience, and ForecastCompass \citep{forecastcompass2026} uses adaptive memory to revise forecasting context. These mechanisms are General Harness contributions because the storage and retrieval loop is reusable; their temporal indexing and point-in-time rules are analyzed in Section~5. At step $k$, the memory interface retrieves evidence for the current query, merges it with the working state, and writes the resulting trace back for later reuse:
+Memory and context mechanisms preserve information across turns, retrieve prior cases, and expose relevant evidence. Working memory holds the current trace and tool outputs; long-term memory stores reusable cases or procedures; and shared state lets several agents inspect the same artifacts. Agentic RAG for time-series analysis \citep{agenticrag2024} retrieves task-relevant examples and prompt knowledge, whereas TimeCAP \citep{timecap2025} uses contextual augmentation to connect retrieved evidence to a forecasting workflow. TIMECLAW \citep{timeclaw2026harness} stores auditable trajectories and multimodal experience, and ForecastCompass \citep{forecastcompass2026} uses adaptive memory to revise forecasting context. These mechanisms are General Harness contributions because the storage and retrieval loop is reusable; their temporal indexing and point-in-time rules are analyzed in Section~5. TimeCAP makes the dual-agent interface explicit: a contextualizer first maps the series to a textual summary and a predictor then conditions on that summary,
+\begin{equation}
+  s_x=A_C(x)=M_{\theta}\!\left(p_C(x)\right),\qquad
+  \widehat{y}_{\mathrm{LLM}}=A_P(s_x)=M_{\theta}\!\left(p_P(s_x)\right).
+  \label{eq:timecap-dual-agent}
+\end{equation}
+The equation is the method-level contribution: memory is not only a buffer, but a contextualizer--predictor handoff that changes the information supplied to the forecasting agent \citep{timecap2025}. At step $k$, the general memory interface retrieves evidence for the current query, merges it with the working state, and writes the resulting trace back for later reuse:
 \begin{equation}
   m_k=R_{\psi}(\mathcal{M}_k,q_k), \qquad
   s_k^{+}=s_k\oplus m_k,\qquad
@@ -475,7 +487,24 @@ Here $R_{\psi}$ covers retrieval and context selection, while $\operatorname{Wri
 
 \subsection{Tools and Execution}
 
-Tools and execution expand the action space through code, statistical models, TSFMs, visualizers, retrievers, simulators, and validators. A useful tool specification contains an input schema, output schema, permission boundary, resource budget, and failure behavior. TimeSeriesScientist \citep{timeseriesscientist2025} delegates data inspection, model selection, and reporting to executable roles; TimeCopilot \citep{timecopilot2026} exposes forecasting models as selectable tools; and Argos \citep{argos2025} connects monitoring tools to rule proposal and review. AnomaMind \citep{anomamind2026} illustrates the same interface for anomaly localization and diagnosis. The General Harness contribution is the registry and execution loop; temporal semantics such as resampling, horizon alignment, and leakage checks belong to GTS. Let $\mathcal{T}$ denote the registered tools. The execution interface selects a legal tool call and returns a typed observation:
+Tools and execution expand the action space through code, statistical models, TSFMs, visualizers, retrievers, simulators, and validators. A useful tool specification contains an input schema, output schema, permission boundary, resource budget, and failure behavior. TimeSeriesScientist \citep{timeseriesscientist2025} delegates data inspection, model selection, and reporting to executable roles; TimeCopilot \citep{timecopilot2026} exposes forecasting models as selectable tools; and Argos \citep{argos2025} connects monitoring tools to rule proposal and review. AnomaMind \citep{anomamind2026} illustrates the same interface for anomaly localization and diagnosis. The General Harness contribution is the registry and execution loop; temporal semantics such as resampling, horizon alignment, and leakage checks belong to GTS. TimeSeriesScientist's Curator is a concrete tool-using module: it emits statistics, missingness and outlier information, and a preprocessing policy, then applies that policy to the input series,
+\begin{equation}
+  Q=A_f(D)=(S,M,O,\pi),\qquad
+  \widetilde{D}=\phi_{\pi}(D),
+  \label{eq:tsci-curator}
+\end{equation}
+where $S=(\mu,\sigma,x_{\min},x_{\max},\tau_{\mathrm{trend}})$ and $\pi$ contains the selected missing-value and outlier operations \citep{timeseriesscientist2025}. The registry therefore exposes not only a generic ``run'' action but also a data-aware diagnostic tool.
+The Planner stage then evaluates the candidate model pool rather than committing to one forecaster in advance. For each candidate $m_i$ with configuration $\theta_i$, TSci selects
+\begin{equation}
+  \theta_i^{\star}=\arg\min_{\theta_i\in\mathcal{C}_i}
+  \operatorname{MAPE}_{\mathrm{val}}\!\left(m_i(\theta_i)\right),\qquad
+  \operatorname{MAPE}_{\mathrm{val}}(m_i(\theta_i))=
+  \frac{100\%}{|\widetilde{D}_{\mathrm{val}}|}
+  \sum_{t\in\widetilde{D}_{\mathrm{val}}}
+  \left|\frac{x_t-\widehat{x}^{(i,\theta_i)}_t}{x_t}\right|.
+  \label{eq:tsci-planner}
+\end{equation}
+The equation links tool execution to the forecasting contract: the LLM narrows the hypothesis space, while validation metrics select the configuration \citep{timeseriesscientist2025}. Let $\mathcal{T}$ denote the registered tools. The execution interface selects a legal tool call and returns a typed observation:
 \begin{equation}
   \omega_k=\pi_{\theta}(s_k,\mathcal{T}),\qquad
   o_{k+1}=\operatorname{Exec}_{n_k}(\operatorname{args}_k),\qquad
@@ -486,7 +515,18 @@ The registry supplies the name, argument schema, permission boundary, output typ
 
 \subsection{Control, Verification, and Feedback}
 
-Control and verification route feedback, enforce constraints, manage retries, and check intermediate or final artifacts. The controller determines when a trace may continue, when a tool must be retried, and when an output must be rejected or escalated. FLAIRR-TS \citep{flairr2025} uses iterative refinement around a forecaster, while TSAG \citep{tsag2026} adds checks to the analytical interaction loop. VeriTime \citep{veritime2026} makes temporal validity an explicit verification target, and TraceBench \citep{tracebench2026} evaluates the submitted trajectory alongside the final label. These examples show a reusable critic-and-gate mechanism with task-specific validity conditions. For a trajectory $\rho_{1:k}$ and result $r_k$, the controller opens the next step only when the process and output checks pass:
+Control and verification route feedback, enforce constraints, manage retries, and check intermediate or final artifacts. The controller determines when a trace may continue, when a tool must be retried, and when an output must be rejected or escalated. FLAIRR-TS \citep{flairr2025} uses iterative refinement around a forecaster, while TSAG \citep{tsag2026} adds checks to the analytical interaction loop. VeriTime \citep{veritime2026} makes temporal validity an explicit verification target, and TraceBench \citep{tracebench2026} evaluates the submitted trajectory alongside the final label. FLAIRR-TS gives this controller a concrete test-time loop: retrieve analogous segments, augment the prompt, forecast, measure MAE, and let a stateful refiner propose the next prompt,
+\begin{equation}
+\begin{aligned}
+  S_{\mathrm{retr}}^{(k)}&=\operatorname{RetrieveSegments}(X_{\mathrm{HistDB}},X_{\mathrm{Ctx}},M),\\
+  C_{\mathrm{aug}}^{(k)}&=\operatorname{AugmentContext}(X_{\mathrm{Ctx}},S_{\mathrm{retr}}^{(k)}),\\
+  \widehat{X}^{(k)}&=F_{\mathrm{LLM}}(P_{\mathrm{curr}}^{(k)},C_{\mathrm{aug}}^{(k)},H),\\
+  \operatorname{mae}^{(k)}&=\operatorname{MAE}(\widehat{X}^{(k)},X_{t:t+H}),\\
+  (P_{\mathrm{next}}^{(k)},d^{(k)})&=R_{\mathrm{LLM}}\!\left(\{(P^{(i)},\operatorname{mae}^{(i)})\}_{i<k},P_{\mathrm{curr}}^{(k)},\tau_{\mathrm{stop}}\right).
+\end{aligned}
+\label{eq:flairr-loop}
+\end{equation}
+The source algorithm returns the best prompt when the stopping signal is absent and terminates early when the improvement criterion is met \citep{flairr2025}. For a trajectory $\rho_{1:k}$ and result $r_k$, the generic controller opens the next step only when the process and output checks pass:
 \begin{equation}
   g_k=\mathbb{1}\!\left[\mathcal{V}_{\mathrm{proc}}(\rho_{1:k})=1\;\wedge\;\mathcal{V}_{\mathrm{out}}(r_k)=1\right],
   \qquad
@@ -511,7 +551,19 @@ The workflow records the selected operations, intermediate artifacts, stopping c
 
 \subsection{Optimization and Evolution}
 
-Optimization and evolution improve prompts, tools, policies, memories, or trajectories using feedback. The update can be offline prompt or policy search, trajectory-level reflection, or a self-evolving Harness that promotes a new component after validation. TIMECLAW's explore--compare--distill loop \citep{timeclaw2026explore} turns successful trajectories into reusable capabilities. MetaCaster \citep{metacaster2026} treats the Agent as an engineer that generates and selects forecasters; CastFSR \citep{castfsr2026} revises context and forecasts through fast--slow reflection; and CRAFTER \citep{crafter2026} proposes temporal features and accepts them only after validation. The optimization mechanism is general; distribution shift and temporal promotion criteria are handled by GTS. The evolution loop updates a Harness component from evaluated trajectories:
+Optimization and evolution improve prompts, tools, policies, memories, or trajectories using feedback. The update can be offline prompt or policy search, trajectory-level reflection, or a self-evolving Harness that promotes a new component after validation. TIMECLAW's explore--compare--distill loop \citep{timeclaw2026explore} turns successful trajectories into reusable capabilities. MetaCaster \citep{metacaster2026} treats the Agent as an engineer that generates and selects forecasters; CastFSR \citep{castfsr2026} revises context and forecasts through fast--slow reflection; and CRAFTER \citep{crafter2026} proposes temporal features and accepts them only after validation. MetaCaster writes the optimization target at the level of the downstream forecaster. Given a trainable Harness $\theta$, it minimizes the gap between authentic-data and generated-data forecasters,
+\begin{equation}
+  \theta^{\star}=\arg\min_{\theta}\;\mathbb{E}_{m,l}\,\delta\!\left(\omega(f_l^m),\omega(\bar f_l^m)\right),\qquad
+  \bar D^m=\operatorname{MGAgent}(D_{\mathrm{sup}}^m,C^m),
+  \label{eq:metacaster-objective}
+\end{equation}
+and uses the hinge-style comparison
+\begin{equation}
+  \delta\!\left(\omega(f_l^m),\omega(\bar f_l^m)\right)=
+  \max\!\left\{\frac{\omega(\bar f_l^m)-\omega(f_l^m)}{\omega(f_l^m)},0\right\}
+  \label{eq:metacaster-hinge}
+\end{equation}
+to penalize generated training data that produces a worse lightweight forecaster \citep{metacaster2026}. The generic evolution loop updates a Harness component from evaluated trajectories:
 \begin{equation}
   \theta_{j+1}=\operatorname{Update}\!\left(\theta_j,\mathcal{D}_j\right),\qquad
   \mathcal{D}_j=\left\{(\rho_i,\operatorname{Score}(\rho_i))\right\}_{i=1}^{j}.
@@ -612,7 +664,23 @@ Temporal workflows schedule rolling-origin evaluation, horizon-aware model selec
 
 \subsection{Optimization and Evolution}
 
-Temporal optimization uses regimes, temporal experience, shifting distributions, and revision outcomes to update prompts, tools, memories, or policies. TIMECLAW \citep{timeclaw2026explore} evolves capabilities from evaluated trajectories; MetaCaster \citep{metacaster2026} searches over generated forecasters; CastFSR \citep{castfsr2026} adapts retrieval and reflection to the current series; and CRAFTER \citep{crafter2026} validates proposed temporal features. The GTS condition is that promotion and rollback remain valid under temporal shift. A temporal component is promoted only when it passes held-out checks across the evaluated regimes:
+Temporal optimization uses regimes, temporal experience, shifting distributions, and revision outcomes to update prompts, tools, memories, or policies. TIMECLAW \citep{timeclaw2026explore} evolves capabilities from evaluated trajectories; MetaCaster \citep{metacaster2026} searches over generated forecasters; CastFSR \citep{castfsr2026} adapts retrieval and reflection to the current series; and CRAFTER \citep{crafter2026} validates proposed temporal features. CastFSR gives the temporal loop a precise state and action semantics. Its state combines the task, memory, current forecast prior, and retrieved context, and its policy chooses among fast, slow, reflective, and final actions:
+\begin{equation}
+  s_k=\Phi(I,M_k,\widehat{Y}^{\mathrm{prior}}_k,C_k),\qquad
+  a_k\sim\pi_{\theta}(\cdot\mid s_k),\quad a_k\in\mathcal{A}_{\mathrm{fast}}\cup\mathcal{A}_{\mathrm{slow}}\cup\mathcal{A}_{\mathrm{reflect}}\cup\mathcal{A}_{\mathrm{final}}.
+  \label{eq:castfsr-state-action}
+\end{equation}
+The same paper defines the temporal context and revision stages as
+\begin{equation}
+\begin{aligned}
+  C_k&=T_{\mathrm{ctx}}(D_{\mathrm{task}},D_{\mathrm{domain}},X_{1:L},H_{\mathrm{ctx}},\widehat{Y}^{\mathrm{prior}}_k,M_k;W_k),\\
+  \widehat{Y}^{\mathrm{cand}}_k&=G_{\theta}(\widehat{Y}^{\mathrm{prior}}_k,C_k,M_k),\\
+  E_k&=E_{\theta}(\widehat{Y}^{\mathrm{cand}}_k,\widehat{Y}^{\mathrm{prior}}_k,C_k,M_k),\qquad
+  \widehat{Y}_{1:H}=F_{\theta}(\widehat{Y}^{\mathrm{cand}}_k,E_k,M_k).
+\end{aligned}
+\label{eq:castfsr-revision}
+\end{equation}
+These equations make the GTS contribution concrete: the Agent revises a numerical prior with horizon-aligned context and releases it only after temporal, contextual, and domain checks \citep{castfsr2026}. The GTS condition is that promotion and rollback remain valid under temporal shift. A temporal component is promoted only when it passes held-out checks across the evaluated regimes:
 \begin{equation}
   \operatorname{Promote}(\phi)=\mathbb{1}\!\left[\min_{r\in\mathcal{R}_{\mathrm{heldout}}}\operatorname{Score}(\phi;r)\geq\delta\right].
   \label{eq:gts-promotion}
@@ -669,7 +737,15 @@ Forecasting agents manage horizons, chronological splits, model selection, proba
 
 \subsection{Data Augmentation and Synthesis}
 
-Augmentation and synthesis agents generate, select, or validate temporal data and representations. BRIDGE \citep{bridge2025} conditions temporal generation on language and evaluates the generated series; MERIT \citep{merit2025} combines similar-series retrieval, augmentation, and review; and SCENARIODIFF \citep{scenariodiff2026} generates forecast-relevant scenarios from multimodal anchors. The interface declares the conditioning window, channels, sampling frequency, and intended use; memory records source series, transformations, and provenance; and verification compares temporal dependence, missingness, distributional fidelity, and downstream utility. The TSK contract is the generator--validator loop with temporal fidelity and downstream utility checks.
+Augmentation and synthesis agents generate, select, or validate temporal data and representations. BRIDGE \citep{bridge2025} conditions temporal generation on language and evaluates the generated series; MERIT \citep{merit2025} combines similar-series retrieval, augmentation, and review; and SCENARIODIFF \citep{scenariodiff2026} generates forecast-relevant scenarios from multimodal anchors. SCENARIODIFF separates the agents that summarize historical evidence, generate a scenario description, and produce sparse anchor points, then conditions a diffusion forecaster on those signals. Its conditional denoising objective is
+\begin{equation}
+  \mathcal{L}(\theta)=\mathbb{E}_{x^{(0)},t,\epsilon}
+  \left\|x^{(0)}-x_{\theta}\!\left(x^{(t)},t,c\right)\right\|_2^2,
+  \qquad
+  x^{(t)}=\sqrt{\bar\alpha_t}x^{(0)}+\sqrt{1-\bar\alpha_t}\,\epsilon,
+  \label{eq:scenariodiff-denoising}
+\end{equation}
+where $c$ contains the historical summaries and scenario context \citep{scenariodiff2026}. The interface declares the conditioning window, channels, sampling frequency, and intended use; memory records source series, transformations, and provenance; and verification compares temporal dependence, missingness, distributional fidelity, and downstream utility. The TSK contract is the generator--validator loop with temporal fidelity and downstream utility checks.
 
 For a conditioning context $\mathcal{C}$, a synthesis module produces a candidate series and is accepted only when its temporal fidelity and downstream utility satisfy the declared checks:
 \begin{equation}
@@ -687,12 +763,19 @@ For a conditioning context $\mathcal{C}$, a synthesis module produces a candidat
 
 \subsection{Anomaly Detection and Diagnosis}
 
-Anomaly agents localize events, propose or verify rules, retrieve incident evidence, diagnose causes, and support remediation. AnomaMind \citep{anomamind2026} separates coarse evidence acquisition, adaptive evidence construction, detection, and iterative refinement. ChatAD \citep{chatad2026} uses language-guided anomaly reasoning, while SAGE-AD \citep{sagead2026} and LEMAD \citep{ji2025lemad} connect detection to diagnosis and service context. Large-model-based smart agents \citep{wang2026large} use temporal evidence to interpret power-system anomalies. The TSK contract fixes monitoring windows, thresholds, root-cause labels, false-alarm budgets, alert policies, and deployment gates. AnomaMind makes the sequential structure explicit: at step $k$, the agent maintains a state $s_k$, selects an action $a_k$, and receives numerical or knowledge evidence $o_{k+1}$ from its toolkit. Its toolkit is written as $B=\{K,N\}$, where $K$ denotes knowledge memory and $N$ numerical diagnostics \citep{anomamind2026}:
+Anomaly agents localize events, propose or verify rules, retrieve incident evidence, diagnose causes, and support remediation. AnomaMind \citep{anomamind2026} separates coarse evidence acquisition, adaptive evidence construction, detection, and iterative refinement. ChatAD \citep{chatad2026} uses language-guided anomaly reasoning, while SAGE-AD \citep{sagead2026} and LEMAD \citep{ji2025lemad} connect detection to diagnosis and service context. Large-model-based smart agents \citep{wang2026large} use temporal evidence to interpret power-system anomalies. The TSK contract fixes monitoring windows, thresholds, root-cause labels, false-alarm budgets, alert policies, and deployment gates. AnomaMind makes the sequential structure explicit: at step $k$, the agent maintains a state $s_k$, selects an action $a_k$, and receives numerical or knowledge evidence $o_k$ from its toolkit. Its toolkit is written as $B=\{K,N\}$, where $K$ denotes knowledge memory and $N$ numerical diagnostics. The paper's workflow update and detector are
 \begin{equation}
-  (s_k,a_k,o_{k+1})\;\longleftarrow\;B=\{K,N\}, \qquad s_{k+1}=\operatorname{Update}(s_k,a_k,o_{k+1}).
-  \label{eq:anomamind-loop}
+  s_{k+1}=E\!\left(s_k,a_k,o_k,\widehat{Y}^{(k)}\right),\qquad
+  \widehat{y}_j=D_{\theta}\!\left(s_j,Z_{1:k},C_{1:k}\right),\quad \widehat{y}_j\in\{0,1\},
+  \label{eq:anomamind-decision}
 \end{equation}
-This state--action--evidence loop is the paper's central design choice: anomaly detection proceeds through evidence-seeking decisions, tool responses, and state updates.
+and its rule-based feedback combines parse validity, interval F1, and a false-positive penalty,
+\begin{equation}
+  r_k=\lambda_p r_k^{\mathrm{parse}}+\lambda_f r_k^{F1}-\lambda_{fp}r_k^{FP},\qquad
+  \max_{\theta}\;\mathbb{E}_{\widehat{Y}^{(k)}\sim\pi_{\theta}(\cdot\mid s_k)}\left[\sum_{k=1}^{K}r_k\right].
+  \label{eq:anomamind-reward}
+\end{equation}
+This is the method-level distinction: the LLM gathers evidence and reflects, while the detection policy receives task-specific learning signals \citep{anomamind2026}. Anomaly detection therefore proceeds through evidence-seeking decisions, tool responses, and state updates rather than a single fixed score.
 
 \begin{figure}[htbp]
 \centering
@@ -703,7 +786,20 @@ This state--action--evidence loop is the paper's central design choice: anomaly 
 
 \subsection{Decision Support}
 
-Decision-support agents connect forecasts or diagnoses to actions under costs, constraints, uncertainty, and review requirements. FinCon \citep{fincon2024} coordinates analyst evidence before portfolio decisions, TradingAgents \citep{tradingagents2024} turns market and news analysis into risk-aware trading actions, and CoLLMLight \citep{collmllight2026} uses simulation feedback for network-wide signal control. ClimateAgent \citep{climateagent2025} connects climate analysis to operational workflows, while Smart Energy Agent \citep{smartenergyagent2026} converts appliance-level anomalies into maintenance recommendations. The TSK interface represents the current state, available actions, timing, and authority; control checks risk limits and counterfactual consequences; and human review records whether the recommendation was accepted, revised, or escalated.
+Decision-support agents connect forecasts or diagnoses to actions under costs, constraints, uncertainty, and review requirements. FinCon \citep{fincon2024} coordinates analyst evidence before portfolio decisions, TradingAgents \citep{tradingagents2024} turns market and news analysis into risk-aware trading actions, and CoLLMLight \citep{collmllight2026} uses simulation feedback for network-wide signal control. ClimateAgent \citep{climateagent2025} connects climate analysis to operational workflows, while Smart Energy Agent \citep{smartenergyagent2026} converts appliance-level anomalies into maintenance recommendations. FinCon states the decision objective directly as cumulative profit and loss under prompt-controlled analyst and manager policies,
+\begin{equation}
+  \max_{\theta}\;\mathbb{E}\!\left[\sum_{t\in\mathcal{T}}\alpha^t R_t^{\Pi_{\theta}}\right],
+  \qquad R_t^{\Pi_{\theta}}=R(O_t,B_t,A_t),
+  \label{eq:fincon-objective}
+\end{equation}
+and its portfolio manager solves a mean--variance allocation subject to the buy/sell/hold direction selected by the agents,
+\begin{equation}
+  \max_{w}\;\langle w,\mu\rangle-\langle w,\Sigma w\rangle,\qquad
+  w_n\in\begin{cases}[0,1],&\text{buy},\\\left[-1,0\right],&\text{sell},\\\{0\},&\text{hold},\end{cases}
+  \quad n=1,\ldots,N.
+  \label{eq:fincon-portfolio}
+\end{equation}
+These equations show how the multi-agent Harness turns temporal evidence into a task-specific action and risk contract \citep{fincon2024}. The TSK interface represents the current state, available actions, timing, and authority; control checks risk limits and counterfactual consequences; and human review records whether the recommendation was accepted, revised, or escalated.
 
 Decision support extends prediction through an action utility:
 \begin{equation}
@@ -716,7 +812,14 @@ The complete corpus is multi-label across components: a work may contribute to s
 \section{Infrastructure and Benchmarks for Time-Series Agents}
 \label{sec:evaluation}
 
-A Time-Series Agent requires evaluation at three levels: General Harness process, time-series contract, and task outcome. Existing resources cover fragments of this contract; the benchmark gap is the absence of a widely adopted cross-task suite that evaluates them together.
+A Time-Series Agent requires evaluation at three levels: General Harness process, time-series contract, and task outcome. Existing resources cover fragments of this contract; the benchmark gap is the absence of a widely adopted cross-task suite that evaluates them together. AION makes the missing task contract explicit by representing a next-generation time-series task as
+\begin{equation}
+  \mathcal{T}=(\phi,\mathcal{W},\mathcal{V}),\qquad
+  \phi=(\mathcal{T}_{\mathrm{access}},\Sigma,\mathcal{O},\mathcal{C},\mathcal{A}),\qquad
+  (g,s)=\mathcal{V}(o),
+  \label{eq:aion-task-contract}
+\end{equation}
+where the task file specifies access, prior knowledge, output form, constraints, and metrics, while the validation interface returns validity checks $g$ and scores $s$ for a candidate output $o$ \citep{aion2026}. This formalization is why a benchmark must expose the workspace and validation interface rather than only a dataset and one score.
 
 \subsection{Evaluation contract}
 
@@ -834,12 +937,20 @@ The paper-card ledger makes these open problems explicit. Each card separates th
 
 \noindent\textbf{ChatTS: changing the LLM side.} ChatTS equips a language model with temporal values and attributes through a multimodal input pipeline. Its attribute selector, synthetic time-series/text generator, evolution-instruct stage, and multimodal model align numerical series with language supervision \citep{chatts2025}. In our ledger this is an LLM-side contribution with a General Time-Series Harness binding: the learned alignment is reusable across temporal questions, while the dialogue and reasoning tasks provide task-specific instantiations. The central evidence is the change in what the LLM can represent and explain, together with the synthetic-data assumptions shown in Fig.~\ref{fig:chatts-overview}.
 
-\noindent\textbf{TimeClaw: making temporal semantics executable.} TimeClaw turns the GTS boundary into a runtime: numerical execution remains server-side, temporal tools evolve through an evaluated toolbox, and solution trajectories remain auditable and reusable \citep{timeclaw2026harness}. Its contribution is therefore broader than a forecasting model: it binds tool calls, temporal state, memory, and capability evolution to one execution contract. A TimeClaw trajectory can be recorded as
+\noindent\textbf{TimeClaw: making temporal semantics executable.} TimeClaw turns the GTS boundary into a runtime: numerical execution remains server-side, temporal tools evolve through an evaluated toolbox, and solution trajectories remain auditable and reusable \citep{timeclaw2026explore}. Its method is an explicit Explore--Compare--Distill--Reinject loop. For a task instance $x$, candidate executions are scored by task loss and the best valid trajectory is selected:
 \begin{equation}
-  \rho=\left\{(s_k,\omega_k,o_{k+1},\mathcal{V}_k)\right\}_{k=0}^{K},
-  \qquad \operatorname{Reuse}(\rho)=\mathbb{1}\left[\operatorname{Score}(\rho)\geq\delta\right].
-  \label{eq:timeclaw-trajectory}
+  q(\pi_k;x)=-L_{\tau}(\widehat{y}_k,y^{\star}),\qquad
+  \pi^{\star}(x)=\arg\max_{\pi_k\in\Pi_{\mathrm{valid}}(x)}q(\pi_k;x).
+  \label{eq:timeclaw-compare}
 \end{equation}
+The selected execution is summarized, cleaned to remove answer leakage and non-transferable control text, and distilled into an external experience state:
+\begin{equation}
+  n_x=\operatorname{Summarize}\!\left(x,\Pi(x),\{q(\pi_k;x)\}_{k=1}^{K},\pi^{\star}(x)\right),\quad
+  e_x=\operatorname{Clean}(n_x),\quad
+  A_s^{(m+1)}=\operatorname{Distill}\!\left(A_s^{(m)},e_x\right).
+  \label{eq:timeclaw-distill}
+\end{equation}
+These equations capture the paper's concrete contribution: execution quality, rather than completion alone, determines which temporal tool trajectory becomes reusable experience \citep{timeclaw2026explore}.
 
 \begin{figure}[htbp]
 \centering
