@@ -1,6 +1,6 @@
 # Figure overlay and native-source audit
 
-Date: 2026-10-03
+Date: 2026-10-06
 
 The audit compares each active PNG with the decoded pixel output produced by its native PowerPoint source. PNG metadata is ignored. It also checks that the active PNG is referenced by `main.tex` and counts native PowerPoint shape, connector, picture, and graphic-frame objects in the source package.
 

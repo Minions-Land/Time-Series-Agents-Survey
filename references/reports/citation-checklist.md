@@ -1,198 +1,157 @@
 # Citation checklist (one row per unique citation key)
 
-Total unique citation keys: 192
+Total unique citation keys: **151**
 
-| # | Key | Occurrences | Bib | Ledger | Scholar | Review |
-|---:|---|---:|---|---|---|---|
-| 1 | `zhang2024llmts` | 4 | yes | no | n/a | outside-ledger |
-| 2 | `jiang2024empowering` | 4 | yes | no | n/a | outside-ledger |
-| 3 | `promptstoagents2026` | 3 | yes | no | n/a | outside-ledger |
-| 4 | `chen2026tsagentsurvey` | 4 | yes | no | n/a | outside-ledger |
-| 5 | `xu2026forecastagentsurvey` | 2 | yes | no | n/a | outside-ledger |
-| 6 | `aion2026` | 12 | yes | yes | pending | survey_coded |
-| 7 | `timeclaw2026harness` | 13 | yes | yes | pending | survey_coded |
-| 8 | `li2026harnesssurvey` | 8 | yes | no | n/a | outside-ledger |
-| 9 | `ning2026codeharness` | 8 | yes | no | n/a | outside-ledger |
-| 10 | `lee2026metaharness` | 7 | yes | no | n/a | outside-ledger |
-| 11 | `lim2021deepts` | 1 | yes | no | n/a | outside-ledger |
-| 12 | `aminikhanghahi2017changepoint` | 1 | yes | no | n/a | outside-ledger |
-| 13 | `darban2024anomaly` | 1 | yes | no | n/a | outside-ledger |
-| 14 | `wen2023transformers` | 1 | yes | no | n/a | outside-ledger |
-| 15 | `liang2024foundation` | 1 | yes | no | n/a | outside-ledger |
-| 16 | `liu2025synthetic` | 1 | yes | no | n/a | outside-ledger |
-| 17 | `liu2025crossmodality` | 1 | yes | no | n/a | outside-ledger |
-| 18 | `jiang2025multimodal` | 1 | yes | no | n/a | outside-ledger |
-| 19 | `changsurvey2026` | 2 | yes | no | n/a | outside-ledger |
-| 20 | `atsf2026` | 3 | yes | no | n/a | outside-ledger |
-| 21 | `lin2026agenticharness` | 7 | yes | no | n/a | outside-ledger |
-| 22 | `zeng2023dlinear` | 1 | yes | no | n/a | outside-ledger |
-| 23 | `nie2023patchtst` | 1 | yes | no | n/a | outside-ledger |
-| 24 | `wu2023timesnet` | 1 | yes | no | n/a | outside-ledger |
-| 25 | `ansari2024chronos` | 2 | yes | no | n/a | outside-ledger |
-| 26 | `das2024timesfm` | 2 | yes | no | n/a | outside-ledger |
-| 27 | `rasul2023lagllama` | 1 | yes | no | n/a | outside-ledger |
-| 28 | `woo2024moirai` | 1 | yes | no | n/a | outside-ledger |
-| 29 | `goswami2024moment` | 1 | yes | no | n/a | outside-ledger |
-| 30 | `timegpt2023` | 1 | yes | no | n/a | outside-ledger |
-| 31 | `timer2024` | 1 | yes | no | n/a | outside-ledger |
-| 32 | `jin2024timellm` | 2 | yes | yes | pending | survey_coded |
-| 33 | `unitime2024` | 1 | yes | no | n/a | outside-ledger |
-| 34 | `test2024` | 1 | yes | no | n/a | outside-ledger |
-| 35 | `urbangpt2024` | 1 | yes | no | n/a | outside-ledger |
-| 36 | `chattime2025` | 1 | yes | no | n/a | outside-ledger |
-| 37 | `timevlm2025` | 1 | yes | no | n/a | outside-ledger |
-| 38 | `timeomnivl2026` | 2 | yes | no | n/a | outside-ledger |
-| 39 | `tan2024useful` | 1 | yes | no | n/a | outside-ledger |
-| 40 | `merrill2024struggle` | 1 | yes | no | n/a | outside-ledger |
-| 41 | `contextiskey2025` | 2 | yes | no | n/a | outside-ledger |
-| 42 | `timemqa2025` | 1 | yes | no | n/a | outside-ledger |
-| 43 | `mtbench2025` | 1 | yes | no | n/a | outside-ledger |
-| 44 | `mmtsbench2026` | 2 | yes | no | n/a | outside-ledger |
-| 45 | `tsaqa2026` | 2 | yes | no | n/a | outside-ledger |
-| 46 | `tsrbench2026` | 1 | yes | no | n/a | outside-ledger |
-| 47 | `hearts2026` | 1 | yes | no | n/a | outside-ledger |
-| 48 | `temporalbench2026` | 3 | yes | yes | pending | survey_coded |
-| 49 | `tsagent2025` | 6 | yes | yes | pending | survey_coded |
-| 50 | `timeart2026` | 7 | yes | yes | pending | survey_coded |
-| 51 | `tsag2026` | 8 | yes | yes | pending | survey_coded |
-| 52 | `agenticrag2024` | 3 | yes | yes | pending | survey_coded |
-| 53 | `feta2025` | 3 | yes | yes | pending | survey_coded |
-| 54 | `zara2025` | 4 | yes | yes | pending | survey_coded |
-| 55 | `tessa2024` | 3 | yes | yes | pending | survey_coded |
-| 56 | `marstsc2026` | 4 | yes | yes | pending | survey_coded |
-| 57 | `timeseriesscientist2025` | 6 | yes | yes | pending | survey_coded |
-| 58 | `timecap2025` | 4 | yes | yes | pending | survey_coded |
-| 59 | `timexl2025` | 3 | yes | yes | pending | survey_coded |
-| 60 | `flairr2025` | 4 | yes | yes | pending | survey_coded |
-| 61 | `nexus2026` | 6 | yes | yes | pending | survey_coded |
-| 62 | `timecopilot2026` | 4 | yes | yes | pending | survey_coded |
-| 63 | `lastmile2026` | 9 | yes | yes | pending | survey_coded |
-| 64 | `alphacast2025` | 4 | yes | yes | pending | survey_coded |
-| 65 | `finarena2025` | 2 | yes | yes | pending | survey_coded |
-| 66 | `argos2025` | 4 | yes | yes | pending | survey_coded |
-| 67 | `anomamind2026` | 3 | yes | yes | pending | survey_coded |
-| 68 | `chatad2026` | 4 | yes | yes | pending | survey_coded |
-| 69 | `timera2025` | 3 | yes | yes | pending | survey_coded |
-| 70 | `sagead2026` | 4 | yes | yes | pending | survey_coded |
-| 71 | `dast2026` | 3 | yes | yes | pending | survey_coded |
-| 72 | `sagesleep2026` | 4 | yes | yes | pending | survey_coded |
-| 73 | `tsdebate2026` | 5 | yes | yes | pending | survey_coded |
-| 74 | `mas4ts2026` | 4 | yes | yes | pending | survey_coded |
-| 75 | `weathertgd2026` | 4 | yes | yes | pending | survey_coded |
-| 76 | `aimeteorologist2025` | 3 | yes | yes | pending | survey_coded |
-| 77 | `hierarchicalmeteorologist2025` | 3 | yes | yes | pending | survey_coded |
-| 78 | `datainterpreter2025` | 1 | yes | no | n/a | outside-ledger |
-| 79 | `dsagent2024` | 1 | yes | no | n/a | outside-ledger |
-| 80 | `mlagentbench2024` | 2 | yes | no | n/a | outside-ledger |
-| 81 | `castr12026` | 5 | yes | yes | pending | survey_coded |
-| 82 | `timeclaw2026explore` | 6 | yes | yes | pending | survey_coded |
-| 83 | `kairosagent2026` | 5 | yes | yes | pending | survey_coded |
-| 84 | `metacaster2026` | 3 | yes | yes | pending | survey_coded |
-| 85 | `crafter2026` | 2 | yes | yes | pending | survey_coded |
-| 86 | `timer12025` | 4 | yes | yes | pending | survey_coded |
-| 87 | `timemaster2025` | 4 | yes | yes | pending | survey_coded |
-| 88 | `veritime2026` | 3 | yes | yes | pending | survey_coded |
-| 89 | `artist2026` | 3 | yes | yes | pending | survey_coded |
-| 90 | `counts2025` | 3 | yes | yes | pending | survey_coded |
-| 91 | `streasoner2026` | 3 | yes | yes | pending | survey_coded |
-| 92 | `timeomni2026` | 3 | yes | yes | pending | survey_coded |
-| 93 | `batterylake2026` | 2 | yes | yes | pending | survey_coded |
-| 94 | `topobrick2026` | 2 | yes | yes | pending | survey_coded |
-| 95 | `hydroagent2026` | 2 | yes | yes | pending | survey_coded |
-| 96 | `castfsr2026` | 2 | yes | yes | pending | survey_coded |
-| 97 | `reasoncast2026` | 2 | yes | yes | pending | survey_coded |
-| 98 | `timerlm2026` | 2 | yes | yes | pending | survey_coded |
-| 99 | `agentictwin2026` | 2 | yes | yes | verified | survey_coded |
-| 100 | `evotsagent2026` | 2 | yes | yes | pending | survey_coded |
-| 101 | `timesageev2026` | 2 | yes | yes | pending | survey_coded |
-| 102 | `tracebench2026` | 2 | yes | yes | pending | survey_coded |
-| 103 | `calm2025` | 4 | yes | yes | pending | survey_coded |
-| 104 | `mintagent2026` | 1 | yes | no | n/a | outside-ledger |
-| 105 | `tsreasoner2026` | 3 | yes | yes | pending | survey_coded |
-| 106 | `competitionagents2025` | 1 | yes | yes | pending | survey_coded |
-| 107 | `yeh2025empowering` | 2 | yes | yes | pending | survey_coded |
-| 108 | `epidemicagent2026` | 2 | yes | yes | pending | survey_coded |
-| 109 | `agriworld2026` | 4 | yes | yes | pending | survey_coded |
-| 110 | `tfrbench2026` | 5 | yes | yes | pending | survey_coded |
-| 111 | `treeofevidence2026` | 2 | yes | yes | pending | survey_coded |
-| 112 | `timeseriesexamagent2026` | 3 | yes | yes | pending | survey_coded |
-| 113 | `drcik2026` | 5 | yes | yes | pending | survey_coded |
-| 114 | `timesagemt2026` | 7 | yes | yes | pending | survey_coded |
-| 115 | `timefore2026` | 3 | yes | yes | pending | survey_coded |
-| 116 | `tsqbench2026` | 2 | yes | yes | pending | survey_coded |
-| 117 | `neuroagentic2026` | 1 | yes | yes | pending | survey_coded |
-| 118 | `finanalyst2026` | 1 | yes | yes | pending | survey_coded |
-| 119 | `plotstowords2026` | 1 | yes | yes | pending | survey_coded |
-| 120 | `oilwellagent2026` | 1 | yes | yes | pending | survey_coded |
-| 121 | `tracemas2026` | 1 | yes | yes | pending | survey_coded |
-| 122 | `quantimedai2026` | 1 | yes | yes | pending | survey_coded |
-| 123 | `aqua2026` | 1 | yes | yes | pending | survey_coded |
-| 124 | `tiem2026` | 1 | yes | yes | pending | survey_coded |
-| 125 | `scenariodiff2026` | 1 | yes | yes | pending | survey_coded |
-| 126 | `agenticactivelearning2026` | 1 | yes | yes | verified | survey_coded |
-| 127 | `timeseriesgym2025` | 3 | yes | yes | pending | survey_coded |
-| 128 | `tsskill2026` | 2 | yes | yes | pending | survey_coded |
-| 129 | `fromnewstoforecast2024` | 1 | yes | yes | pending | survey_coded |
-| 130 | `grammarwave2026` | 1 | yes | yes | pending | survey_coded |
-| 131 | `forecastcompass2026` | 1 | yes | yes | pending | survey_coded |
-| 132 | `siren2026` | 1 | yes | yes | pending | survey_coded |
-| 133 | `timeclaw2026` | 1 | yes | yes | pending | survey_coded |
-| 134 | `alphacast2026` | 1 | yes | yes | pending | survey_coded |
-| 135 | `newscompetition2025` | 1 | yes | yes | pending | survey_coded |
-| 136 | `dcats2025` | 1 | yes | yes | pending | survey_coded |
-| 137 | `timecopilot2025` | 1 | yes | yes | pending | survey_coded |
-| 138 | `tsagent2026` | 1 | yes | yes | pending | survey_coded |
-| 139 | `bridge2025` | 1 | yes | yes | pending | survey_coded |
-| 140 | `adagent2025` | 1 | yes | yes | pending | survey_coded |
-| 141 | `gridmind2025` | 1 | yes | yes | pending | survey_coded |
-| 142 | `agentfm2025` | 1 | yes | yes | pending | survey_coded |
-| 143 | `llmlight2025` | 1 | yes | yes | pending | survey_coded |
-| 144 | `collmllight2026` | 1 | yes | yes | pending | survey_coded |
-| 145 | `openti2024` | 1 | yes | yes | pending | survey_coded |
-| 146 | `chatts2025` | 1 | yes | yes | pending | paper_verified |
-| 147 | `chow2024tsreasoning` | 1 | yes | yes | pending | survey_coded |
-| 148 | `gruver2023llmtime` | 2 | yes | yes | pending | survey_coded |
-| 149 | `chang2024llm4ts` | 1 | yes | yes | pending | survey_coded |
-| 150 | `ji2025lemad` | 1 | yes | yes | pending | survey_coded |
-| 151 | `wawer2025integrating` | 1 | yes | yes | pending | survey_coded |
-| 152 | `wang2025agentic` | 1 | yes | yes | pending | survey_coded |
-| 153 | `joshi2025using` | 1 | yes | yes | pending | paper_verified |
-| 154 | `fincon2024` | 1 | yes | yes | pending | survey_coded |
-| 155 | `finagent2024` | 1 | yes | yes | pending | survey_coded |
-| 156 | `lastmileforecast2026` | 1 | yes | yes | pending | survey_coded |
-| 157 | `multimodaltsad2026` | 1 | yes | yes | verified | survey_coded |
-| 158 | `multimodaldebate2026` | 1 | yes | yes | pending | survey_coded |
-| 159 | `physiologicalagent2025` | 1 | yes | yes | pending | survey_coded |
-| 160 | `flairrts2025` | 1 | yes | yes | pending | survey_coded |
-| 161 | `structuredagenticworkflows2025` | 1 | yes | yes | pending | survey_coded |
-| 162 | `tradetonottrade2025` | 1 | yes | yes | pending | survey_coded |
-| 163 | `heraldlight2025` | 1 | yes | yes | pending | survey_coded |
-| 164 | `virtualtrafficpolice2026` | 1 | yes | yes | pending | survey_coded |
-| 165 | `gridagent2025` | 1 | yes | yes | pending | survey_coded |
-| 166 | `elliottagents2025` | 1 | yes | yes | pending | survey_coded |
-| 167 | `finmem2023` | 1 | yes | yes | pending | survey_coded |
-| 168 | `trafficr12025` | 1 | yes | yes | pending | survey_coded |
-| 169 | `curalight2026` | 1 | yes | yes | pending | survey_coded |
-| 170 | `tradingagents2024` | 1 | yes | yes | pending | survey_coded |
-| 171 | `atlas2025` | 1 | yes | yes | pending | survey_coded |
-| 172 | `finrldeepseek2025` | 1 | yes | yes | pending | survey_coded |
-| 173 | `merit2025` | 1 | yes | yes | pending | survey_coded |
-| 174 | `climateagent2025` | 1 | yes | yes | pending | survey_coded |
-| 175 | `hydroagentcalibration2026` | 1 | yes | yes | pending | survey_coded |
-| 176 | `pandaai2026` | 1 | yes | yes | pending | survey_coded |
-| 177 | `smartenergyagent2026` | 1 | yes | yes | pending | survey_coded |
-| 178 | `castflow2026` | 1 | yes | yes | verified | survey_coded |
-| 179 | `genautoml2026` | 1 | yes | yes | pending | survey_coded |
-| 180 | `s2sfdd2026` | 1 | yes | yes | pending | survey_coded |
-| 181 | `memcast2026` | 1 | yes | yes | pending | survey_coded |
-| 182 | `mosaic2026` | 1 | yes | yes | pending | survey_coded |
-| 183 | `chen2025trace` | 1 | yes | yes | verified | paper_verified |
-| 184 | `wang2026large` | 1 | yes | yes | verified | paper_verified |
-| 185 | `duan2025factormad` | 1 | yes | yes | verified | paper_verified |
-| 186 | `gao2025lookahead` | 1 | yes | no | n/a | outside-ledger |
-| 187 | `glasserman2023lookahead` | 1 | yes | no | n/a | outside-ledger |
-| 188 | `memguardalpha2026` | 1 | yes | no | n/a | outside-ledger |
-| 189 | `tokenizationcounts2024` | 1 | yes | no | n/a | outside-ledger |
-| 190 | `intervalscore2025` | 1 | yes | no | n/a | outside-ledger |
-| 191 | `llmconfidence2023` | 1 | yes | no | n/a | outside-ledger |
-| 192 | `impermanent2026` | 1 | yes | no | n/a | outside-ledger |
+| # | Key | Uses | Bib | Ledger | Identity | Scholar | PDF | Claim review |
+|---:|---|---:|---|---|---|---|---|---|
+| 1 | `adagent2025` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 2 | `agentfm2025` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 3 | `agenticactivelearning2026` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 4 | `agenticrag2024` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 5 | `agentictwin2026` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 6 | `agriworld2026` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 7 | `aimeteorologist2025` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 8 | `aion2026` | 9 | yes | yes | matched | pending | present | survey_coded |
+| 9 | `alphacast2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 10 | `aminikhanghahi2017changepoint` | 1 | yes | no | matched | pending | failed | outside-ledger |
+| 11 | `anomamind2026` | 6 | yes | yes | matched | pending | present | survey_coded |
+| 12 | `aqua2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 13 | `argos2025` | 3 | yes | yes | matched | pending | present | survey_coded |
+| 14 | `artist2026` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 15 | `atlas2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 16 | `atsf2026` | 2 | yes | no | matched | pending | present | outside-ledger |
+| 17 | `batterylake2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 18 | `bridge2025` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 19 | `calm2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 20 | `castflow2026` | 2 | yes | yes | matched | verified | present | survey_coded |
+| 21 | `castfsr2026` | 4 | yes | yes | matched | pending | present | survey_coded |
+| 22 | `castr12026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 23 | `chang2024llm4ts` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 24 | `changsurvey2026` | 7 | yes | no | matched | pending | present | outside-ledger |
+| 25 | `chatad2026` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 26 | `chatts2025` | 7 | yes | yes | matched | pending | present | paper_verified |
+| 27 | `chen2025trace` | 1 | yes | yes | review | pending | present | paper_verified |
+| 28 | `chen2026tsagentsurvey` | 8 | yes | no | matched | verified | present | outside-ledger |
+| 29 | `chow2024tsreasoning` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 30 | `climateagent2025` | 4 | yes | yes | matched | review | present | survey_coded |
+| 31 | `collmllight2026` | 2 | yes | yes | matched | verified | present | survey_coded |
+| 32 | `competitionagents2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 33 | `counts2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 34 | `crafter2026` | 3 | yes | yes | matched | pending | present | survey_coded |
+| 35 | `curalight2026` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 36 | `darban2024anomaly` | 1 | yes | no | matched | pending | present | outside-ledger |
+| 37 | `dast2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 38 | `drcik2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 39 | `duan2025factormad` | 1 | yes | yes | matched | pending | present | paper_verified |
+| 40 | `elliottagents2025` | 1 | yes | yes | matched | review | present | survey_coded |
+| 41 | `epidemicagent2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 42 | `evotsagent2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 43 | `feta2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 44 | `finagent2024` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 45 | `finanalyst2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 46 | `finarena2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 47 | `fincon2024` | 6 | yes | yes | matched | verified | present | survey_coded |
+| 48 | `finmem2023` | 2 | yes | yes | matched | review | present | survey_coded |
+| 49 | `finrldeepseek2025` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 50 | `flairr2025` | 3 | yes | yes | matched | pending | present | survey_coded |
+| 51 | `forecastcompass2026` | 4 | yes | yes | matched | pending | present | survey_coded |
+| 52 | `fromnewstoforecast2024` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 53 | `genautoml2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 54 | `grammarwave2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 55 | `gridagent2025` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 56 | `gridmind2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 57 | `gruver2023llmtime` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 58 | `heraldlight2025` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 59 | `hierarchicalmeteorologist2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 60 | `hydroagent2026` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 61 | `hydroagentcalibration2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 62 | `ji2025lemad` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 63 | `jiang2024empowering` | 2 | yes | no | matched | pending | present | outside-ledger |
+| 64 | `jiang2025multimodal` | 1 | yes | no | matched | pending | present | outside-ledger |
+| 65 | `jin2024timellm` | 3 | yes | yes | matched | pending | present | survey_coded |
+| 66 | `joshi2025using` | 1 | yes | yes | matched | pending | present | paper_verified |
+| 67 | `kairosagent2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 68 | `lastmile2026` | 2 | yes | yes | matched | verified | present | survey_coded |
+| 69 | `lee2026metaharness` | 5 | yes | no | matched | pending | present | outside-ledger |
+| 70 | `liang2024foundation` | 1 | yes | no | matched | pending | present | outside-ledger |
+| 71 | `lim2021deepts` | 1 | yes | no | matched | pending | present | outside-ledger |
+| 72 | `lin2026agenticharness` | 4 | yes | no | matched | pending | present | outside-ledger |
+| 73 | `liu2025crossmodality` | 1 | yes | no | matched | pending | present | outside-ledger |
+| 74 | `liu2025synthetic` | 1 | yes | no | matched | pending | present | outside-ledger |
+| 75 | `llmlight2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 76 | `marstsc2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 77 | `mas4ts2026` | 3 | yes | yes | matched | pending | present | survey_coded |
+| 78 | `memcast2026` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 79 | `merit2025` | 3 | yes | yes | matched | verified | present | survey_coded |
+| 80 | `merrill2024struggle` | 1 | yes | no | matched | pending | present | outside-ledger |
+| 81 | `metacaster2026` | 4 | yes | yes | matched | pending | present | survey_coded |
+| 82 | `mmtsbench2026` | 1 | yes | no | matched | pending | present | outside-ledger |
+| 83 | `mosaic2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 84 | `multimodaldebate2026` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 85 | `multimodaltsad2026` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 86 | `neuroagentic2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 87 | `nexus2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 88 | `ning2026codeharness` | 5 | yes | no | matched | pending | present | outside-ledger |
+| 89 | `oilwellagent2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 90 | `openti2024` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 91 | `pandaai2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 92 | `physiologicalagent2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 93 | `plotstowords2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 94 | `promptstoagents2026` | 3 | yes | no | matched | pending | pending | outside-ledger |
+| 95 | `quantimedai2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 96 | `reasoncast2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 97 | `s2sfdd2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 98 | `sagead2026` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 99 | `sagesleep2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 100 | `scenariodiff2026` | 3 | yes | yes | matched | pending | present | survey_coded |
+| 101 | `siren2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 102 | `smartenergyagent2026` | 2 | yes | yes | matched | verified | present | survey_coded |
+| 103 | `streasoner2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 104 | `structuredagenticworkflows2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 105 | `tan2024useful` | 1 | yes | no | matched | pending | present | outside-ledger |
+| 106 | `temporalbench2026` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 107 | `tessa2024` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 108 | `tfrbench2026` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 109 | `tiem2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 110 | `timeart2026` | 3 | yes | yes | matched | pending | present | survey_coded |
+| 111 | `timecap2025` | 5 | yes | yes | matched | pending | present | survey_coded |
+| 112 | `timeclaw2026explore` | 5 | yes | yes | matched | pending | present | survey_coded |
+| 113 | `timeclaw2026harness` | 7 | yes | yes | matched | pending | present | survey_coded |
+| 114 | `timecopilot2025` | 4 | yes | yes | matched | pending | present | survey_coded |
+| 115 | `timefore2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 116 | `timemaster2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 117 | `timeomni2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 118 | `timeomnivl2026` | 1 | yes | no | matched | pending | present | outside-ledger |
+| 119 | `timer12025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 120 | `timera2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 121 | `timerlm2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 122 | `timesageev2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 123 | `timesagemt2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 124 | `timeseriesexamagent2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 125 | `timeseriesgym2025` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 126 | `timeseriesscientist2025` | 8 | yes | yes | matched | pending | present | survey_coded |
+| 127 | `timevlm2025` | 1 | yes | no | matched | pending | present | outside-ledger |
+| 128 | `timexl2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 129 | `topobrick2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 130 | `tracebench2026` | 4 | yes | yes | matched | pending | present | survey_coded |
+| 131 | `tracemas2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 132 | `tradetonottrade2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 133 | `tradingagents2024` | 2 | yes | yes | matched | review | present | survey_coded |
+| 134 | `trafficr12025` | 1 | yes | yes | matched | review | present | survey_coded |
+| 135 | `treeofevidence2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 136 | `tsag2026` | 4 | yes | yes | matched | pending | present | survey_coded |
+| 137 | `tsagent2025` | 4 | yes | yes | matched | pending | present | survey_coded |
+| 138 | `tsaqa2026` | 1 | yes | no | matched | pending | present | outside-ledger |
+| 139 | `tsqbench2026` | 2 | yes | yes | matched | pending | present | survey_coded |
+| 140 | `tsreasoner2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 141 | `tsskill2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 142 | `veritime2026` | 3 | yes | yes | matched | pending | present | survey_coded |
+| 143 | `virtualtrafficpolice2026` | 1 | yes | yes | matched | verified | present | survey_coded |
+| 144 | `wang2025agentic` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 145 | `wang2026large` | 2 | yes | yes | matched | pending | present | paper_verified |
+| 146 | `wawer2025integrating` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 147 | `weathertgd2026` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 148 | `xu2026forecastagentsurvey` | 7 | yes | no | matched | pending | present | outside-ledger |
+| 149 | `yeh2025empowering` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 150 | `zara2025` | 1 | yes | yes | matched | pending | present | survey_coded |
+| 151 | `zhang2024llmts` | 2 | yes | no | matched | pending | present | outside-ledger |

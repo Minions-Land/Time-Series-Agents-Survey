@@ -671,6 +671,16 @@ def scholar_check(_: argparse.Namespace) -> None:
     if not MANIFEST.exists():
         inventory(argparse.Namespace())
     rows_by_key = read_manifest()
+    # A Scholar status is valid only when a raw Cite -> BibTeX receipt exists
+    # under the canonical production key.  Older manifests sometimes carried
+    # ``verified`` from a Crossref or manual check; clear that stale state
+    # before evaluating the receipts that are actually present.
+    receipt_keys = {path.stem for path in SCHOLAR_DIR.glob("*.bib")}
+    for key, row in rows_by_key.items():
+        if key not in receipt_keys:
+            row["scholar_status"] = "pending"
+            row["scholar_checked_at"] = ""
+            row["scholar_bib_path"] = ""
     checked = 0
     for path in sorted(SCHOLAR_DIR.glob("*.bib")):
         key = path.stem
