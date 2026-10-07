@@ -190,6 +190,7 @@ The survey maintains a module-level evidence ledger described in Appendix~\ref{a
 
 \begin{figure}[htbp]
 \centering
+\noindent\textbf{Why this figure matters.} The timeline gives a corpus-level view of when different contribution modules enter the field. Read each curve as a cumulative count of independently coded modules rather than as a count of papers; the separation between LLM-side, GH, GTS, and TSK curves shows where the field has accumulated capability, while the early slope and later acceleration show the order in which system concerns emerged. The underlying counts come from the module-level ledger described in Appendix~\ref{app:full-ledger}.
 \includegraphics[width=\linewidth]{artifacts/active/Figure1_module_timeline_native.png}
 \caption{Cumulative module-level contributions in the reviewed Time-Series Agent corpus. Each curve counts independently recorded module annotations, so one work may contribute to several curves. The logarithmic vertical axis keeps early contributions visible. GH and GTS overlap when the same capability is recorded at both the general runtime layer and its temporal specialization; the hollow markers keep the GH curve visible in that case.}
 \label{fig:contribution-trend}
@@ -207,6 +208,7 @@ Several system and position papers motivate this runtime perspective. ATSF frame
 \scriptsize
 \setlength{\tabcolsep}{3.5pt}
 \renewcommand{\arraystretch}{1.15}
+\noindent\textbf{How to read the comparison.} This table asks what each time-series-agent survey chooses as its organizing object and what that choice lets the survey answer. A checkmark means that the dimension is explicitly developed in the cited survey; blank cells indicate that the dimension is outside its stated scope. The pattern motivates our contribution-locus view: model capability, task organization, workflow, lifecycle, process evaluation, and deployment utility can be read together rather than as isolated vocabularies.
 \begin{longtable}{L{\fulltextcol{0.19}} C{\fulltextcol{0.09}} C{\fulltextcol{0.12}} C{\fulltextcol{0.12}} C{\fulltextcol{0.12}} C{\fulltextcol{0.12}} C{\fulltextcol{0.12}} C{\fulltextcol{0.12}}}
 \caption{Discriminative dimensions across time-series-agent surveys. Columns shared by all surveys are omitted; checkmarks indicate explicit coverage.}\label{tab:direct-prior-comparison}\\
 \toprule
@@ -248,6 +250,7 @@ This survey makes four contributions.
 
 \begin{figure}[htbp]
 \centering
+\noindent\textbf{How the paper is organized.} This map is a reading guide for the whole survey. Follow the arrows from the LLM side and reusable runtime to temporal contracts, task modules, evaluation, and open problems; the sequence mirrors the construction process of a Time-Series Agent. Its purpose is to show why the later sections are not a list of methods: each section answers the next design or evaluation question.
 \includegraphics[width=\linewidth]{artifacts/active/Figure2_organization_native_v2.png}
 \caption{Organization of the survey. The sections follow the construction of a Time-Series Agent, from the LLM side and reusable runtime to temporal contracts, task modules, evaluation, and open problems. The module-level ledger provides the evidence record behind each section. The visual grammar follows the organization-map style used by recent survey figures; the labels and hierarchy are specific to this survey.}
 \label{fig:survey-organization}
@@ -255,6 +258,7 @@ This survey makes four contributions.
 
 \begin{figure}[H]
 \centering
+\noindent\textbf{How to read the construction diagram.} The left branch is the independent LLM-side contribution; the nested right branch shows increasing temporal and task specificity. A mechanism moves downward only when its temporal state, operation, or validator becomes less reusable. This figure supplies the hierarchy used in the subsequent sections and in the exclusive module-level statistics.
 \includegraphics[width=\linewidth]{artifacts/active/Figure3_construction_native.png}
 \caption{Construction of a Time-Series Agent. The LLM side remains independent of the nested Harness stack: General Harness contains reusable runtime mechanisms, General Time-Series Harness contains temporal mechanisms that transfer across tasks, and Task-Specific Harness instantiates a task contract. The module-level ledger is the unit of evidence and records module-level contributions.}
 \label{fig:overview}
@@ -281,6 +285,7 @@ To keep the method descriptions comparable, we use the following notation throug
 \centering\small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.12}
+\noindent\textbf{Notation used by the method descriptions.} The table fixes the symbols that recur in equations across the survey so that each method can be compared at the same level: temporal data and information sets, actions and observations, Harness layers, and task contracts. It is a reference table rather than a taxonomy; readers can return to it when a later method introduces a new training objective or evaluation variable.
 \begin{tabularx}{\linewidth}{@{}p{0.18\linewidth}p{0.31\linewidth}p{0.18\linewidth}X@{}}
 \toprule
 \textbf{Symbol} & \textbf{Meaning} & \textbf{Layer} & \textbf{Use in the survey}\\
@@ -337,6 +342,7 @@ The module ledger places learned data and reasoning under the LLM layer. Tool, m
 
 \begin{figure}[htbp]
 \centering
+\noindent\textbf{What the LLM-side figure establishes.} The diagram follows the ChatTS pipeline from temporal attribute selection to synthetic supervision and model training. It makes the LLM-side contribution concrete: the model is changed before the Harness chooses tools or controls execution. The redesign is based on the temporal alignment and instruction-data pipeline reported by ChatTS~\citep{chatts2025}; read it left to right as a sequence of learned interfaces.
 \includegraphics[width=0.88\linewidth]{artifacts/active/Figure_LLM_side_native_v3.png}
 \caption{LLM-side temporal alignment and instruction data, adapted from the ChatTS training pipeline in Fig.~3 of \citet{chatts2025}. The editable map separates temporal attribute selection, synthetic supervision, instruction generation, and model training.}
 \label{fig:chatts-overview}
@@ -364,6 +370,7 @@ Table~\ref{tab:component-vocab} states the seven-dimension domain-agnostic runti
 \small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.12}
+\noindent\textbf{Purpose of the seven-dimension table.} This table is the shared comparison vocabulary for General Harness mechanisms. Each row answers one runtime question and names the operations included in that dimension; the rows can co-occur because one system can plan, call tools, preserve memory, and verify results in the same episode. The vocabulary is synthesized from the cited Harness and agent surveys~\citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness,changsurvey2026,chen2026tsagentsurvey,xu2026forecastagentsurvey}.
 \begin{longtable}{L{\fulltextcol{0.24}} L{\fulltextcol{0.30}} L{\fulltextcol{0.46}}}
 \caption{A coarse-grained taxonomy of General Harness capabilities, synthesized as the recurring functional intersection of the General Harness and agent-survey literature \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness,changsurvey2026,chen2026tsagentsurvey,xu2026forecastagentsurvey}. The seven dimensions form an author-normalized comparison layer and can co-occur within one system.}
 \label{tab:component-vocab}\\
@@ -388,6 +395,7 @@ Coordination and Scaling & How do multiple agents divide work, communicate, and 
 
 \begin{figure}[htbp]
 \centering
+\noindent\textbf{Reading the General Harness figure.} The center is the runtime interface around an LLM; the seven surrounding nodes are reusable mechanism families, not seven mutually exclusive agent types. The figure supports the chapter's main claim: a Time-Series Agent can reuse these runtime mechanisms while temporal semantics are added in the next layer. The dimensions follow Table~\ref{tab:component-vocab}.
 \includegraphics[width=0.96\linewidth]{artifacts/active/Figure4_general_harness_native_v2.png}
 \caption{The seven reusable dimensions of a General Harness. The center represents the runtime around an LLM; each surrounding node is a mechanism family that can recur across domains. A paper may contribute to several dimensions, while temporal semantics are coded separately in the General Time-Series Harness layer.}
 \label{fig:general-harness-seven-dimensions}
@@ -521,6 +529,7 @@ The shared message and handoff protocol are the runtime objects used by debate, 
 
 \begin{figure}[htbp]
 \centering
+\noindent\textbf{Why the trace is shown.} A system-level trace makes the abstract Harness dimensions observable. Read the sequence as observation, tool execution, evidence logging, critic feedback, and final verification; temporal tool calls are the points where the general loop acquires time-series semantics. The trace is adapted from TS-Agent~\citep{tsagent2025} and demonstrates why process evidence must accompany a final task score.
 \includegraphics[width=0.94\linewidth]{artifacts/active/Figure_support_tsagent.png}
 \caption{A tool-using reasoning trace from TS-Agent (Fig.~3 in \citet{tsagent2025}). It illustrates the General Harness loop of observation, tool execution, evidence logging, critic feedback, and final verification; the temporal tools are the domain-specific part.}
 \label{fig:tsagent-trace}
@@ -541,6 +550,7 @@ where $t_i$ is the event time and $v_i$ is the time at which the value became av
 
 \begin{figure}[htbp]
 \centering
+\noindent\textbf{What the AION example contributes.} This figure connects three temporal-runtime principles to the GTS layer: temporal grounding controls what information is available, knowledge-grounded reasoning ties outputs to evidence, and reliability mechanisms check the resulting artifact. Read the three principles as constraints on one workflow, not as independent modules. The design is adapted from AION~\citep{aion2026}.
 \includegraphics[width=0.90\linewidth]{artifacts/active/Figure_support_aion.png}
 \caption{AION's three coupled time-series harness principles, adapted and redrawn from Fig.~2 of \citet{aion2026}. Temporal grounding, knowledge-grounded reasoning, and reliability mechanisms show why GTS is a temporal contract layered on top of a general runtime.}
 \label{fig:aion-principles}
@@ -548,6 +558,7 @@ where $t_i$ is the event time and $v_i$ is the time at which the value became av
 
 \begin{figure}[htbp]
 \centering
+\noindent\textbf{How to use the GTS landscape.} The diagram answers the cross-task question: which temporal objects, operations, and evidence bindings survive when the downstream task changes? Follow the middle layer across forecasting, anomaly, augmentation, and decision support; anything that remains valid there is GTS, while a contract-bound branch belongs to TSK. This is the bridge between the seven General Harness dimensions and the four task sections.
 \includegraphics[width=0.96\linewidth]{artifacts/active/Figure5_general_ts_harness_native.png}
 \caption{The General Time-Series Harness. Temporal objects, operations, and evidence specialize reusable Harness dimensions before a task-specific output contract is applied. The cross-task criterion is the survival of the temporal contract when the downstream task changes.}
 \label{fig:gts-landscape}
@@ -660,6 +671,7 @@ where $H$ is the declared horizon and the inputs are restricted by the availabil
 
 \begin{figure}[htbp]
 \centering
+\noindent\textbf{Purpose of the task-family figure.} The four branches show how one shared Harness vocabulary becomes four different output contracts. Read each branch from temporal input to validation: forecasting emphasizes horizon and backtesting, augmentation emphasizes fidelity and utility, anomaly diagnosis emphasizes localization and evidence, and decision support emphasizes utility, risk, cost, and review authority. This figure explains why task categories are an instantiation layer rather than a competing top-level taxonomy.
 \includegraphics[width=0.98\linewidth]{artifacts/active/Figure6_task_specific_native_v2.png}
 \caption{The four task families and their task-specific Harness contracts. Each family instantiates the same seven-module lens under a different temporal output contract.}
 \label{fig:task-specific-harness}
@@ -694,6 +706,7 @@ For a conditioning context $\mathcal{C}$, a synthesis module produces a candidat
 
 \begin{figure}[htbp]
 \centering
+\noindent\textbf{Why the augmentation example matters.} The MERIT loop shows a concrete task-specific contract: generation is followed by retrieval, review, and downstream-utility checks. Read the loop as evidence that synthetic data are not validated by resemblance alone; fidelity and usefulness are jointly evaluated. The diagram is adapted from MERIT~\citep{merit2025}.
 \includegraphics[width=0.94\linewidth]{artifacts/active/Figure_support_merit.png}
 \caption{MERIT's retrieval--augmentation--review loop, adapted and redrawn from Fig.~2 of \citet{merit2025}. The generator is coupled to a task-specific review agent, making fidelity and downstream utility part of the augmentation contract.}
 \label{fig:merit-augmentation}
@@ -717,6 +730,7 @@ This is the method-level distinction: the LLM gathers evidence and reflects, whi
 
 \begin{figure}[htbp]
 \centering
+\noindent\textbf{Why the anomaly example matters.} AnomaMind makes the anomaly contract visible as a coarse-to-fine workflow: acquire evidence, detect a suspicious interval, diagnose a cause, and refine the conclusion. The figure maps each stage to a TSK module and shows why detection accuracy alone does not establish diagnostic quality. It is adapted from AnomaMind~\citep{anomamind2026}.
 \includegraphics[width=0.96\linewidth]{artifacts/active/Figure_support_anomamind.png}
 \caption{AnomaMind's coarse-to-fine anomaly-diagnosis workflow, adapted and redrawn from Fig.~1 of \citet{anomamind2026}. The example separates evidence acquisition, detection, diagnosis, and iterative refinement, which are distinct TSK modules under the anomaly contract.}
 \label{fig:anomamind-workflow}
@@ -781,6 +795,7 @@ The same protocol should support controlled perturbations: hide or reveal contex
 
 \begin{figure}[htbp]
 \centering
+\noindent\textbf{How to read the evaluation stack.} The stack aligns evaluation with the construction hierarchy: process validity at the runtime layer, temporal-contract validity at the GTS layer, task outcomes at the TSK layer, and reproducibility across the full episode. Its purpose is to prevent a single forecast or QA score from standing in for tool correctness, chronology, evidence quality, and revision behavior. The episode record is linked to the benchmark discussion that follows.
 \includegraphics[width=0.98\linewidth]{artifacts/active/Figure7_infrastructure_native.png}
 \caption{Infrastructure and benchmark coverage. The evaluation layers mirror the construction hierarchy, while the episode record preserves temporal availability, execution, evidence, revision, and reproducibility.}
 \label{fig:evaluation-stack}
@@ -793,6 +808,7 @@ Forecasting suites measure horizon-respecting accuracy and probabilistic calibra
 \begin{table}[htbp]
 \centering\scriptsize
 \setlength{\tabcolsep}{1.5pt}
+\noindent\textbf{What the benchmark table answers.} The table maps each resource to the part of the Agent contract that it can establish. Read across a row from resource to evidence type, then compare the rows: datasets and task metrics cover outcomes, while traces, tool interfaces, temporal splits, and recoverable artifacts cover the process around those outcomes. The pattern supports the conclusion that a unified Time-Series Agent benchmark must combine these layers.
 \begin{tabularx}{\textwidth}{@{}L{0.17\textwidth}L{0.25\textwidth}L{0.24\textwidth}L{0.28\textwidth}@{}}
 \toprule
 \textbf{Resource} & \textbf{Coverage and protocol} & \textbf{Agent signal} & \textbf{Coverage focus}\\
@@ -892,6 +908,7 @@ These equations capture the paper's concrete contribution: execution quality, ra
 
 \begin{figure}[htbp]
 \centering
+\noindent\textbf{How the open-problem map is derived.} Each node starts from a missing or weakly evidenced Paper Card field and is connected to the Harness layer where the gap appears. Read from left to right: model-side temporal understanding, runtime state and tools, task contracts, evaluation infrastructure, and deployment feedback. The map turns the evidence ledger into research questions rather than a free-standing list of future work.
 \includegraphics[width=0.98\linewidth]{artifacts/active/Figure8_open_problems_native.png}
 \caption{Open problems and focused system cases. The ledger links each gap to a Harness layer and records representative LLM-side, temporal-runtime, and infrastructure contributions.}
 \label{fig:open-problems-cases}
@@ -963,6 +980,7 @@ We construct each card in four passes: verify the work identity and publication 
 
 \begin{table}[htbp]
 \centering\small
+\noindent\textbf{Why this appendix table is retained.} The table is the compact decoding key for the Paper Card hierarchy. It tells the reader which question each layer answers before the full profiles are shown; the nesting also explains why aggregate plots assign a concrete module to its deepest applicable layer.
 \begin{tabularx}{\textwidth}{@{}lX@{}}
 \toprule
 \textbf{Level} & \textbf{Question answered by the level}\\
@@ -983,6 +1001,7 @@ The coding unit is a concrete module contribution. A paper may contribute to sev
 \small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.08}
+\noindent\textbf{How to inspect a Paper Card sample.} Each row is one work-level record, while the module and task fields can contain several entries. Read the claim together with the evidence status: this table illustrates the human-readable view, and the JSON ledger retains the page locators and quotations used to audit it.
 \begin{longtable}{L{\fulltextcol{0.18}} L{\fulltextcol{0.25}} L{\fulltextcol{0.14}} L{\fulltextcol{0.14}} L{\fulltextcol{0.14}} L{\fulltextcol{0.15}}}
 \caption{Human-readable view of representative module-level records from the JSON ledger. The complete profiles follow; source locators and quotations are retained in the machine-readable record.}\label{tab:ledger-sample}\\
 \toprule
@@ -1008,6 +1027,7 @@ The fine-grained component vocabulary used by the machine-readable ledger is rep
 \small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.08}
+\noindent\textbf{Why the fine-grained vocabulary is separate.} The main text uses seven readable dimensions; this appendix table exposes the 14 component labels used to code individual mechanisms. It is the bridge between a paper's concrete claim and the coarser comparison figures, so readers can reproduce how a module was assigned without expanding the main narrative.
 \begin{longtable}{L{\fulltextcol{0.16}} L{\fulltextcol{0.25}} L{\fulltextcol{0.59}}}
 \caption{Fine-grained 14-component \GeneralHarness{} vocabulary used for ledger-level coding. The vocabulary records the 14 components used for ledger-level coding; the main text presents them through the seven-dimension comparison layer.}
 \label{tab:fine-component-vocab}\\
@@ -1045,6 +1065,7 @@ The complete work-level profiles are provided here. The main text uses aggregate
 \scriptsize
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{1.02}
+\noindent\textbf{How to read the complete classification.} The final table is exhaustive at the reviewed-corpus level. A row identifies one work, its claim, inclusive GH/GTS/TSK evidence, task family, and review status; it is not a mutually exclusive paper ranking. To reproduce the timeline or a task count, filter the corresponding module fields in the machine-readable JSON and apply the deepest-layer rule described above.
 \begin{longtable}{@{}p{0.27\textwidth}p{0.68\textwidth}@{}}
 \caption{Profiles of the 138 reviewed works. Each profile records inclusive evidence across runtime layers; exclusive plotting uses the deepest applicable Harness layer. SM denotes a system or method and B an evaluation benchmark; $\dagger$ marks works whose authors do not use the Agent label.}\label{tab:agent-ledger}\\
 \toprule Work and task & Mechanisms across runtime layers\\\midrule
