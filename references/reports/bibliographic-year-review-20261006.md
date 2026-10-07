@@ -1,6 +1,6 @@
 # Bibliographic year review (2026-10-06)
 
-The production BibTeX contains **151** records. This report lists **12** records whose BibTeX year differs from the current official-source year field.
+The production BibTeX contains **161** records. This report lists **12** records whose BibTeX year differs from the current official-source year field.
 
 A year difference is not treated as a fabricated identity: it can reflect an arXiv posting followed by a venue publication, an online-first/issue year, or a later accepted version. These rows remain flagged until a matching Google Scholar BibTeX receipt or publisher record settles the citation convention.
 

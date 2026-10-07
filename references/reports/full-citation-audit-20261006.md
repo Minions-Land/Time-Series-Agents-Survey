@@ -4,20 +4,20 @@ This report is generated from the current `main.tex`, production BibTeX, referen
 
 ## Counts
 
-- Unique citation keys in `main.tex`: **151**; total citation occurrences: **296**.
-- Production BibTeX entries: **151**; missing cited keys: **0**; uncited production entries: **0**.
-- Classification cards: **130** (128 production-Bib cards and 2 repository-only records).
-- Contextual/component citations outside the paper-card ledger: **23**; these are background, survey, model, benchmark, or infrastructure sources rather than additional paper cards.
-- Claim review states: **{'paper_verified': 5, 'survey_coded': 125}**; cards with source-evidence JSON: **128/130**.
-- Identity status: **{'matched': 150, 'review': 1}**.
-- PDF status for cited works: **{'failed': 1, 'pending': 1, 'present': 149}**.
-- Scholar receipt status: **{'pending': 125, 'review': 5, 'verified': 21}**.
+- Unique citation keys in `main.tex`: **161**; total citation occurrences: **314**.
+- Production BibTeX entries: **161**; missing cited keys: **0**; uncited production entries: **0**.
+- Classification cards: **138** (136 production-Bib cards and 2 repository-only records).
+- Contextual/component citations outside the paper-card ledger: **25**; these are background, survey, model, benchmark, or infrastructure sources rather than additional paper cards.
+- Claim review states: **{'paper_verified': 13, 'survey_coded': 125}**; cards with source-evidence JSON: **136/138**.
+- Identity status: **{'matched': 160, 'review': 1}**.
+- PDF status for cited works: **{'failed': 1, 'pending': 3, 'present': 157}**.
+- Scholar receipt status: **{'pending': 135, 'review': 5, 'verified': 21}**.
 
 ## Issues requiring attention
 
 - Stable-identity review: chen2025trace
 - Scholar receipts with title/year/author mismatch: climateagent2025, elliottagents2025, finmem2023, tradingagents2024, trafficr12025
-- Cited works without a validated local PDF: 2; see `reference-audit.md` for the list.
+- Cited works without a validated local PDF: 4; see `reference-audit.md` for the list.
 - Cards whose claim evidence is not yet marked `paper_verified`: 125; these remain usable as survey-coded records but must not be described as full-text verified.
 
 ## Interpretation
