@@ -186,69 +186,7 @@ The labels describe mechanisms. A single system can combine general memory and r
 
 The resulting hierarchy is the organizing structure of this survey. Time-Series Agent is the outer concept; its LLM side is independent of the nested Harness side, where General Harness contains the General Time-Series Harness Module and the latter contains Task-Specific Harness Modules.
 
-Our central unit of evidence is a \emph{module-level paper card}. Each card links a work's verified identity and BibTeX record to its central claim, source quotation and locator, LLM-side contribution, Harness modules, task contract, evaluation evidence, and review status. This representation follows the three directions along which Time-Series Agents develop: stronger Agent capabilities, stronger temporal capabilities on the LLM side, and new time-series tasks. It provides a common place for existing and future work: a new paper adds a card, extends a module, or introduces a task-specific branch within the construction hierarchy. The result is a stable reference survey that grows with the field.
-
-\begin{tcolorbox}[
-  colback=surveyCard,
-  colframe=surveyBlue!55!black,
-  boxrule=0.8pt,
-  arc=5pt,
-  left=10pt,
-  right=10pt,
-  top=8pt,
-  bottom=8pt,
-  title=\textbf{The module-level paper card},
-  fonttitle=\sffamily\bfseries,
-  coltitle=surveyBlue!80!black
-]
-\small
-\begin{tabularx}{\linewidth}{@{}>{\sffamily\bfseries}p{0.22\linewidth}X@{}}
-Identity & Authors, year, DOI or landing page, BibTeX key, and source status.\\
-Claim & The paper's central claim and the concrete contribution it makes.\\
-Evidence & Page or section locator, quotation, figure or table, and verification status.\\
-Contribution & LLM-side capability plus General Harness, General Time-Series Harness, and Task-Specific Harness modules.\\
-Task contract & Forecasting, augmentation, anomaly diagnosis, decision support, or another explicitly supported task.\\
-Evaluation & Process validity, temporal-contract checks, task metrics, and deployment or decision evidence.
-\end{tabularx}
-\end{tcolorbox}
-
-The paper card is itself a contribution of this survey. It turns the literature review into an extensible, auditable research map: the same record supports citation management, module-level classification, comparison tables, cumulative plots, and the derivation of open problems.
-
-\noindent\textbf{From papers to cards.} We construct a card in four passes. First, we verify the work identity and publication record, including its BibTeX key and source location. Second, we extract the paper's own claim and attach a page- or section-level quotation. Third, we code the concrete mechanisms it changes. LLM-side capabilities are recorded independently. For Harness mechanisms, changing the downstream temporal task tests reusability: cross-task mechanisms are General Time-Series Harness, task-bound state, actions, rewards, or validators are Task-Specific Harness, and domain-independent mechanisms are General Harness. Finally, we record the task family and evaluation evidence. A card carries multiple module entries, while each concrete Harness component receives one deepest-layer label for aggregate statistics.
-
-\begin{tcolorbox}[
-  colback=surveyCard,
-  colframe=surveyBlue!40!black,
-  boxrule=0.6pt,
-  arc=4pt,
-  left=8pt,
-  right=8pt,
-  top=6pt,
-  bottom=6pt
-]
-\small
-\textbf{Current ledger snapshot.} The database contains \textbf{130} module-level paper cards: \textbf{119} systems or methods and \textbf{11} benchmarks; \textbf{120} records explicitly present themselves as agents. The task labels map to \textbf{74} forecasting/reasoning, \textbf{24} decision-support, \textbf{24} anomaly-diagnosis, and \textbf{18} augmentation/synthesis records (multi-label cards are counted in each applicable family). The module ledger contains \textbf{135} exclusive General-Harness annotations, \textbf{39} exclusive General-Time-Series-Harness annotations, and \textbf{673} task-specific module annotations across the four task families. \textbf{8} cards record an LLM-side contribution. Of the 130 cards, 128 have production BibTeX entries and two are repository-only resources; 21 Scholar receipts are verified and 5 require review because their year or author metadata differs from the production record.\
-\end{tcolorbox}
-
-\begin{table}[htbp]
-\centering\small
-\begin{tabularx}{\textwidth}{@{}lX@{}}
-\toprule
-\textbf{Level} & \textbf{Question answered by the level}\\
-\midrule
-General Harness & What runtime mechanisms turn an LLM into an agent, independently of time-series assumptions?\\
-Time-Series Harness Module & What temporal objects, operations, context bindings, and validation interfaces make the runtime suitable for time-series analysis?\\
-General Time-Series Harness & Which temporal mechanisms remain reusable when the downstream time-series task changes?\\
-Task-Specific Harness & Which mechanisms are tied to a concrete task contract, such as a forecasting horizon, anomaly definition, or decision constraint?\\
-\bottomrule
-\end{tabularx}
-\caption{The hierarchical construction used throughout the survey. The General and Task-Specific Time-Series Harness levels are nested within the Time-Series Harness Module; a paper may contribute mechanisms at more than one level.}
-\label{tab:harness-hierarchy}
-\end{table}
-
-The maintained ledger uses the module as its unit of analysis. A single paper can contribute a temporal representation, a memory mechanism, a verifier, and a task workflow at the same time; each contribution is recorded under the applicable module and dimension. Harness labels are exclusive by depth: a task-specific module is counted at TSK, a cross-task temporal module at GTS, and a reusable runtime module at GH. The deepest-layer rule assigns each component to one nested level in the aggregate plot. The LLM-side dimension remains independent and can co-occur with any Harness layer.
-
-This construction-and-ledger view provides a stable reference coordinate system for subsequent Time-Series Agent research. New model capabilities, temporal mechanisms, task modules, system compositions, and evaluation resources enter as module-level records within the same organizing hierarchy. Future papers refine layer contents within this construction space.
+The survey maintains a module-level evidence ledger described in Appendix~\ref{app:full-ledger}. The ledger records claims, source locators, contribution modules, task contracts, evaluation evidence, and review status; its fields support the comparison tables and module-level plots used throughout the paper.
 
 \begin{figure}[htbp]
 \centering
@@ -261,7 +199,7 @@ This construction-and-ledger view provides a stable reference coordinate system 
 
 Existing surveys cover important subsets of the landscape. Task-oriented surveys discuss forecasting, change-point detection, anomaly detection, and deep architectures from their respective methodological perspectives \citep{aminikhanghahi2017changepoint,lim2021deepts,darban2024anomaly}. Surveys on time-series foundation models, synthetic data, LLM integration, and multimodal temporal modeling summarize pretraining, adaptation, serialization, prompting, tokenization, cross-modal alignment, data generation, and evaluation \citep{liang2024foundation,liu2025synthetic,zhang2024llmts,jiang2024empowering,liu2025crossmodality,jiang2025multimodal}.
 
-Among the closest related surveys, From Prompts to Agents and Chang et al. provide useful accounts of agentic time-series systems. From Prompts to Agents separates representation, model adaptation, workflow autonomy, and analytical tasks; its workflow-autonomy axis further distinguishes predictor, augmenter, orchestrator, and multi-agent-collaboration levels, while the survey also discusses perception, planning, tool use, memory, and reflection \citep{promptstoagents2026}. Chang et al. describe reasoning topologies, objectives, and mechanism tags \citep{changsurvey2026}. Chen et al. organize the task-facing literature into forecasting and reasoning, augmentation and synthesis, anomaly detection and diagnosis, and decision support \citep{chen2026tsagentsurvey}. These surveys supply the component and task vocabularies from which our framework is built. Harness literature defines the Agent runtime; time-series task structure determines whether a temporal mechanism is cross-task or task-specific. Our contribution is the resulting hierarchical organization.
+Among the closest related surveys, \textit{From Prompts to Agents: A Comprehensive Survey of LLM-Driven Time Series Analysis} \citep{promptstoagents2026} separates representation, model adaptation, workflow autonomy, and analytical tasks; its workflow-autonomy axis further distinguishes predictor, augmenter, orchestrator, and multi-agent-collaboration levels, while the survey also discusses perception, planning, tool use, memory, and reflection. \textit{A Survey of Reasoning and Agentic Systems in Time Series with Large Language Models} \citep{changsurvey2026} describes reasoning topologies, objectives, and mechanism tags. \textit{LLM Agents for Time-Series: A Survey} \citep{chen2026tsagentsurvey} organizes the task-facing literature into forecasting and reasoning, augmentation and synthesis, anomaly detection and diagnosis, and decision support. These surveys supply the component and task vocabularies from which our framework is built. Harness literature defines the Agent runtime; time-series task structure determines whether a temporal mechanism is cross-task or task-specific. Our contribution is the resulting hierarchical organization.
 
 Several system and position papers motivate this runtime perspective. ATSF frames forecasting as an iterative perception--planning--action--reflection--memory process \citep{atsf2026}. AION formalizes time-series tasks through task files, workspaces, validation interfaces, artifacts, and layered review \citep{aion2026}. TimeClaw implements a time-series-native runtime with executable tools, episodic multimodal memory, auditable trajectories, and experience-driven capability evolution \citep{timeclaw2026harness}. We organize these systems by the runtime layer each work changes and connect reusable temporal mechanisms to task-specific workflows and temporal design requirements.
 
@@ -292,7 +230,7 @@ Several system and position papers motivate this runtime perspective. ATSF frame
 \noindent\textit{Reading the table.} The table retains the dimensions that separate the compared surveys. Our survey spans the full set by linking model-side contributions, task organization, reasoning and workflow, system lifecycle, multi-task coverage, agent-process evaluation, and deployment-oriented decision utility.
 
 
-The recent survey by Xu et al. organizes LLM-based forecasting and prediction agents around standalone LLMs, tool- and retrieval-augmented systems, and hybrid systems, while connecting methods to training, evaluation, applications, and risks \citep{xu2026forecastagentsurvey}. Its organizing unit is the forecasting/prediction system and its lifecycle; ours is the contribution locus of the underlying Harness. Its three system types map naturally to GH, GTS, and TSK components at different Harness depths, with each component assigned to its deepest applicable layer.
+\textit{LLM-Based Agents for Forecasting and Prediction: Methods, Training, Evaluation, and Applications} \citep{xu2026forecastagentsurvey} organizes LLM-based forecasting and prediction agents around standalone LLMs, tool- and retrieval-augmented systems, and hybrid systems, while connecting methods to training, evaluation, applications, and risks. Its organizing unit is the forecasting/prediction system and its lifecycle; ours is the contribution locus of the underlying Harness. Its three system types map naturally to GH, GTS, and TSK components at different Harness depths, with each component assigned to its deepest applicable layer.
 
 We re-read the broader literature through this additional contribution-locus question. Tools, memory, multimodality, decomposition, verification, and agent loops recur across the literature. We synthesize them into a seven-dimension \GeneralHarness{} comparison vocabulary from General Harness architecture, engineering, and agent-survey studies \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness,changsurvey2026,chen2026tsagentsurvey,xu2026forecastagentsurvey}. The dimensions form a common comparison layer; temporal obligations and the primary-locus rule provide the domain-specific coding and evaluation lens.
 
@@ -305,20 +243,20 @@ This survey makes four contributions.
   \item We separate general agent mechanisms, capabilities shared across time-series tasks, and mechanisms tied to one task, with multi-module contributions recorded at their respective levels.
   \item We review the literature with explicit inclusion and comparison rules, and release a module-level ledger that records each paper's claim, evidence locator, contribution layer, task contract, and review status in a machine-readable form.
   \item We connect system capabilities to evaluation, benchmarks, open-source resources, and open problems, including the transition from prediction to decision support.
-  \item We show how the paper-card ledger turns the survey into an extensible research map: the same records that support classification also expose missing temporal contracts, evaluation gaps, and future research directions.
+  \item We show how the module-level ledger turns the survey into an extensible research map: the same records that support classification also expose missing temporal contracts, evaluation gaps, and future research directions.
 \end{enumerate}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{artifacts/active/Figure2_organization_native_v2.png}
-\caption{Organization of the survey. The sections follow the construction of a Time-Series Agent, from the LLM side and reusable runtime to temporal contracts, task modules, evaluation, and open problems. The paper-card fields provide the evidence record behind each section. The layout follows the organization-map style of Wu et al., \textit{Recursive Self-Improvement in AI: A Survey} (2026 preprint), while the labels and hierarchy are specific to this survey.}
+\caption{Organization of the survey. The sections follow the construction of a Time-Series Agent, from the LLM side and reusable runtime to temporal contracts, task modules, evaluation, and open problems. The module-level ledger provides the evidence record behind each section. The visual grammar follows the organization-map style used by recent survey figures; the labels and hierarchy are specific to this survey.}
 \label{fig:survey-organization}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{artifacts/active/Figure3_construction_native.png}
-\caption{Construction of a Time-Series Agent. The LLM side remains independent of the nested Harness stack: General Harness contains reusable runtime mechanisms, General Time-Series Harness contains temporal mechanisms that transfer across tasks, and Task-Specific Harness instantiates a task contract. The Paper Card is the unit of evidence and records module-level contributions.}
+\caption{Construction of a Time-Series Agent. The LLM side remains independent of the nested Harness stack: General Harness contains reusable runtime mechanisms, General Time-Series Harness contains temporal mechanisms that transfer across tasks, and Task-Specific Harness instantiates a task contract. The module-level ledger is the unit of evidence and records module-level contributions.}
 \label{fig:overview}
 \end{figure}
 
@@ -395,7 +333,7 @@ so the LLM receives normalized patches together with the parameters required to 
 \end{equation}
 ChatTS instantiates this objective with synthetic temporal attributes, instruction data, and dialogue responses \citep{chatts2025}.
 
-The paper card places learned data and reasoning under the LLM layer. Tool, memory, and validation contributions from the same work receive their own Harness entries, keeping multi-layer contributions visible.
+The module ledger places learned data and reasoning under the LLM layer. Tool, memory, and validation contributions from the same work receive their own Harness entries, keeping multi-layer contributions visible.
 
 \begin{figure}[htbp]
 \centering
@@ -414,7 +352,7 @@ LLM-side adaptation includes continued training, parameter-efficient adaptation,
 \end{equation}
 We record model-side changes alongside any temporal tools, memory, or task contracts introduced by the same paper.
 
-A stronger temporal encoder supplies the learned alignment and reasoning capability; a General Harness makes it callable; and a task-specific verifier checks the resulting forecast, diagnosis, or recommendation against its output contract. The ledger records these changes as separate modules when a paper contributes to multiple layers.
+A stronger temporal encoder supplies the learned alignment and reasoning capability; a General Harness makes it callable; and a task-specific verifier checks the resulting forecast, diagnosis, or recommendation against its output contract. The module ledger records these changes as separate entries when a paper contributes to multiple layers.
 \section{General Harness}
 \label{sec:general-harness}
 
@@ -900,7 +838,7 @@ Time-Series Agents need shared workspaces, temporal tool contracts, evidence sch
 
 \subsection{Open problems}
 
-The paper-card ledger makes these open problems explicit. Each card separates the claim, module, task contract, and evidence, so gaps appear as missing or weakly supported regions in the research map. Across the reviewed cards, the clearest gaps occur at the interfaces between layers: model-side temporal understanding is rarely connected to auditable Harness state; reusable temporal modules are often evaluated through a single task; and task-specific systems seldom report decision feedback, revision behavior, or deployment cost. New papers can therefore be assessed by asking which card field or module they strengthen and which previously unsupported contract they make measurable.
+The module ledger makes these open problems explicit. Each card separates the claim, module, task contract, and evidence, so gaps appear as missing or weakly supported regions in the research map. Across the reviewed cards, the clearest gaps occur at the interfaces between layers: model-side temporal understanding is rarely connected to auditable Harness state; reusable temporal modules are often evaluated through a single task; and task-specific systems seldom report decision feedback, revision behavior, or deployment cost. New papers can therefore be assessed by asking which card field or module they strengthen and which previously unsupported contract they make measurable.
 
 \noindent\textbf{Temporal and numerical faithfulness.} Agents need typed temporal operations, unit-aware representations, chronology guards, and end-to-end fidelity checks. A textual explanation is reliable when tools preserve frequency, precision, and forecast-origin constraints. Future systems should validate numerical and temporal invariants at every interface alongside the final answer. For an operation $o$ applied at time $\tau$, the invariant is
 \begin{equation}
@@ -978,6 +916,66 @@ A Time-Series Agent is built by combining an LLM, a General Harness, and a Time-
 \section{Module-Level Contribution Ledger}
 \label{app:full-ledger}
 The machine-readable JSON ledger is a central research artifact of this survey. It records, for each work, the bibliographic identity, publication date, claim, source locator and quotation, LLM-side contribution, General Harness dimensions, General Time-Series Harness dimensions, Task-Specific Harness dimensions, task family, work type, and review status. The ledger is extensible: each new paper adds a supported module-level record to the construction hierarchy. The human-readable profiles below expose the same information in a form suitable for inspection.
+
+\subsection{Paper Card schema}
+\label{app:paper-card}
+A Paper Card is the evidence unit used to maintain the survey. It keeps bibliographic identity, the paper's own claim, source evidence, module contributions, task contract, evaluation evidence, and review status in one record. The card is multi-label: one work may contribute to the LLM side and to several Harness modules. Aggregate Harness plots apply the deepest-layer rule to each concrete module, while the inclusive evidence fields remain available for audit.
+
+\begin{tcolorbox}[
+  colback=surveyCard,
+  colframe=surveyBlue!55!black,
+  boxrule=0.8pt,
+  arc=5pt,
+  left=10pt,
+  right=10pt,
+  top=8pt,
+  bottom=8pt,
+  title=\textbf{Paper Card fields},
+  fonttitle=\sffamily\bfseries,
+  coltitle=surveyBlue!80!black
+]
+\small
+\begin{tabularx}{\linewidth}{@{}>{\sffamily\bfseries}p{0.22\linewidth}X@{}}
+Identity & Authors, year, landing page, BibTeX key, PDF, and source status.\\
+Claim & The central claim and concrete contribution stated by the work.\\
+Evidence & Page or section locator, quotation, figure or table, and verification status.\\
+Modules & LLM-side capability, General Harness, General Time-Series Harness, and Task-Specific Harness entries.\\
+Task contract & Forecasting, augmentation, anomaly diagnosis, decision support, or another supported task family.\\
+Evaluation & Process validity, temporal-contract checks, task metrics, and deployment or decision evidence.
+\end{tabularx}
+\end{tcolorbox}
+
+We construct each card in four passes: verify the work identity and publication record; extract the paper's claim with a page- or section-level quotation; code the concrete mechanisms it changes; and record task and evaluation evidence. A mechanism that transfers across temporal tasks is coded as General Time-Series Harness, a task-bound state, action, reward, or validator as Task-Specific Harness, and a domain-independent runtime mechanism as General Harness. The card can therefore support citation management, module tables, cumulative plots, and open-problem analysis without assigning a paper to a single mutually exclusive class.
+
+\begin{tcolorbox}[
+  colback=surveyCard,
+  colframe=surveyBlue!40!black,
+  boxrule=0.6pt,
+  arc=4pt,
+  left=8pt,
+  right=8pt,
+  top=6pt,
+  bottom=6pt
+]
+\small
+\textbf{Current ledger snapshot.} The database contains \textbf{138} Paper Cards, including \textbf{136} production-Bib cards and \textbf{2} repository-only resources. \textbf{13} cards are paper-verified and \textbf{125} are survey-coded. The task labels include \textbf{74} forecasting/prediction, \textbf{24} anomaly detection/diagnosis, \textbf{24} decision support, and \textbf{18} augmentation/synthesis cards; cards may carry multiple task labels. The current ledger records 12 LLM-side contributions.\
+\end{tcolorbox}
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Level} & \textbf{Question answered by the level}\\
+\midrule
+General Harness & What runtime mechanisms turn an LLM into an agent, independently of time-series assumptions?\\
+Time-Series Harness Module & What temporal objects, operations, context bindings, and validation interfaces make the runtime suitable for time-series analysis?\\
+General Time-Series Harness & Which temporal mechanisms remain reusable when the downstream time-series task changes?\\
+Task-Specific Harness & Which mechanisms are tied to a concrete task contract, such as a forecasting horizon, anomaly definition, or decision constraint?\\
+\bottomrule
+\end{tabularx}
+\caption{Hierarchical construction used for Paper Card coding. The General and Task-Specific Time-Series Harness levels are nested within the Time-Series Harness Module; one work may contribute modules at more than one level.}
+\label{tab:app-harness-hierarchy}
+\end{table}
 
 The coding unit is a concrete module contribution. A paper may contribute to several modules and may therefore appear in several dimensions. For Harness plotting, the exclusive layer is the deepest applicable one: a task-bound module is counted as Task-Specific, an otherwise reusable temporal module as General Time-Series, and only a domain-independent runtime module as General Harness. The inclusive descriptions are retained as source evidence, while every claim remains tied to a paper locator and an explicit review status.
 
