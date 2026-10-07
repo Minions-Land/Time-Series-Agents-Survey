@@ -212,11 +212,11 @@ Several system and position papers motivate this runtime perspective. ATSF frame
 \begin{longtable}{L{\fulltextcol{0.19}} C{\fulltextcol{0.09}} C{\fulltextcol{0.12}} C{\fulltextcol{0.12}} C{\fulltextcol{0.12}} C{\fulltextcol{0.12}} C{\fulltextcol{0.12}} C{\fulltextcol{0.12}}}
 \caption{Discriminative dimensions across time-series-agent surveys. Columns shared by all surveys are omitted; checkmarks indicate explicit coverage.}\label{tab:direct-prior-comparison}\\
 \toprule
-\textbf{Survey} & \textbf{Model / LLM} & \textbf{Task organization} & \textbf{Reasoning / workflow} & \textbf{System lifecycle} & \textbf{Multiple task families} & \textbf{Agent process evaluation} & \textbf{Deployment / decision}\\
+\textbf{Survey} & \textbf{Model} & \textbf{Tasks} & \textbf{Reasoning} & \textbf{Lifecycle} & \textbf{Coverage} & \textbf{Evaluation} & \textbf{Deployment}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Survey} & \textbf{Model / LLM} & \textbf{Task organization} & \textbf{Reasoning / workflow} & \textbf{System lifecycle} & \textbf{Multiple task families} & \textbf{Agent process evaluation} & \textbf{Deployment / decision}\\
+\textbf{Survey} & \textbf{Model} & \textbf{Tasks} & \textbf{Reasoning} & \textbf{Lifecycle} & \textbf{Coverage} & \textbf{Evaluation} & \textbf{Deployment}\\
 \midrule
 \endhead
 \textit{From Prompts to Agents: A Comprehensive Survey of LLM-Driven Time Series Analysis} \citep{promptstoagents2026} & \no & \yes & \yes & \no & \yes & \yes & \no\\
@@ -288,7 +288,7 @@ To keep the method descriptions comparable, we use the following notation throug
 \noindent\textbf{Notation used by the method descriptions.} The table fixes the symbols that recur in equations across the survey so that each method can be compared at the same level: temporal data and information sets, actions and observations, Harness layers, and task contracts. It is a reference table rather than a taxonomy; readers can return to it when a later method introduces a new training objective or evaluation variable.
 \begin{tabularx}{\linewidth}{@{}p{0.18\linewidth}p{0.31\linewidth}p{0.18\linewidth}X@{}}
 \toprule
-\textbf{Symbol} & \textbf{Meaning} & \textbf{Layer} & \textbf{Use in the survey}\\
+\textbf{Symbol} & \textbf{Meaning} & \textbf{Layer} & \textbf{Use}\\
 \midrule
 $x_{1:T}$ & Multivariate time series with $T$ observations, channels, units, and timestamps. & LLM / GTS & Input to representation, temporal operations, and task modules.\\
 $t,\tau,H$ & Event time, decision or forecast-origin time, and forecast horizon. & GTS / TSK & Define chronological availability and task output intervals.\\
@@ -375,11 +375,11 @@ Table~\ref{tab:component-vocab} states the seven-dimension domain-agnostic runti
 \caption{A coarse-grained taxonomy of General Harness capabilities, synthesized as the recurring functional intersection of the General Harness and agent-survey literature \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness,changsurvey2026,chen2026tsagentsurvey,xu2026forecastagentsurvey}. The seven dimensions form an author-normalized comparison layer and can co-occur within one system.}
 \label{tab:component-vocab}\\
 \toprule
-\textbf{Unified dimension} & \textbf{Core question} & \textbf{What it includes}\\
+\textbf{Dimension} & \textbf{Question} & \textbf{Elements}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Unified dimension} & \textbf{Core question} & \textbf{What it includes}\\
+\textbf{Dimension} & \textbf{Question} & \textbf{Elements}\\
 \midrule
 \endhead
 Interface and Interaction & How does the agent receive state and act on its environment? & Reasoning interfaces, action interfaces, environment modeling, user interaction, and state--action loops.\\
@@ -811,7 +811,7 @@ Forecasting suites measure horizon-respecting accuracy and probabilistic calibra
 \noindent\textbf{What the benchmark table answers.} The table maps each resource to the part of the Agent contract that it can establish. Read across a row from resource to evidence type, then compare the rows: datasets and task metrics cover outcomes, while traces, tool interfaces, temporal splits, and recoverable artifacts cover the process around those outcomes. The pattern supports the conclusion that a unified Time-Series Agent benchmark must combine these layers.
 \begin{tabularx}{\textwidth}{@{}L{0.17\textwidth}L{0.25\textwidth}L{0.24\textwidth}L{0.28\textwidth}@{}}
 \toprule
-\textbf{Resource} & \textbf{Coverage and protocol} & \textbf{Agent signal} & \textbf{Coverage focus}\\
+\textbf{Resource} & \textbf{Coverage} & \textbf{Signal} & \textbf{Focus}\\
 \midrule
 TemporalBench \citep{temporalbench2026} & Four information settings spanning historical interpretation, context-free forecasting, contextual reasoning, and event-conditioned prediction. & Tests whether performance changes when temporal context is controlled. & Its protocol focuses on forecasting context and prediction outcomes.\\
 TFRBench \citep{tfrbench2026} & Ten datasets across five domains with search--reasoning--verifier--forecasting--summary traces. & Separates forecast score from reasoning-trace quality using MASE and a reasoning judge. & Trace scoring depends on evaluator quality.\\
@@ -983,7 +983,7 @@ We construct each card in four passes: verify the work identity and publication 
 \noindent\textbf{Why this appendix table is retained.} The table is the compact decoding key for the Paper Card hierarchy. It tells the reader which question each layer answers before the full profiles are shown; the nesting also explains why aggregate plots assign a concrete module to its deepest applicable layer.
 \begin{tabularx}{\textwidth}{@{}lX@{}}
 \toprule
-\textbf{Level} & \textbf{Question answered by the level}\\
+\textbf{Level} & \textbf{Question}\\
 \midrule
 General Harness & What runtime mechanisms turn an LLM into an agent, independently of time-series assumptions?\\
 Time-Series Harness Module & What temporal objects, operations, context bindings, and validation interfaces make the runtime suitable for time-series analysis?\\
@@ -1005,11 +1005,11 @@ The coding unit is a concrete module contribution. A paper may contribute to sev
 \begin{longtable}{L{\fulltextcol{0.18}} L{\fulltextcol{0.25}} L{\fulltextcol{0.14}} L{\fulltextcol{0.14}} L{\fulltextcol{0.14}} L{\fulltextcol{0.15}}}
 \caption{Human-readable view of representative module-level records from the JSON ledger. The complete profiles follow; source locators and quotations are retained in the machine-readable record.}\label{tab:ledger-sample}\\
 \toprule
-\textbf{Work} & \textbf{Claim recorded} & \textbf{LLM side} & \textbf{Harness layer} & \textbf{Task family} & \textbf{Evidence status}\\
+\textbf{Work} & \textbf{Claim} & \textbf{LLM} & \textbf{Harness} & \textbf{Task} & \textbf{Evidence}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Work} & \textbf{Claim recorded} & \textbf{LLM side} & \textbf{Harness layer} & \textbf{Task family} & \textbf{Evidence status}\\
+\textbf{Work} & \textbf{Claim} & \textbf{LLM} & \textbf{Harness} & \textbf{Task} & \textbf{Evidence}\\
 \midrule
 \endhead
 ChatTS \citep{chatts2025} & Synthetic temporal instruction data and alignment for time-series understanding and reasoning. & Alignment; instruction tuning & LLM-side & Cross-task reasoning & PDF locator recorded\\
@@ -1032,11 +1032,11 @@ The fine-grained component vocabulary used by the machine-readable ledger is rep
 \caption{Fine-grained 14-component \GeneralHarness{} vocabulary used for ledger-level coding. The vocabulary records the 14 components used for ledger-level coding; the main text presents them through the seven-dimension comparison layer.}
 \label{tab:fine-component-vocab}\\
 \toprule
-\textbf{Group} & \textbf{Component} & \textbf{General-agent role}\\
+\textbf{Group} & \textbf{Component} & \textbf{Role}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Group} & \textbf{Component} & \textbf{General-agent role}\\
+\textbf{Group} & \textbf{Component} & \textbf{Role}\\
 \midrule
 \endhead
 \multirow[t]{5}{\fulltextcol{0.16}}{\MechanismGroup{}} & \Planning{} & Organizes long-horizon execution through decomposition, search, or workflow orchestration.\\
@@ -1068,9 +1068,9 @@ The complete work-level profiles are provided here. The main text uses aggregate
 \noindent\textbf{How to read the complete classification.} The final table is exhaustive at the reviewed-corpus level. A row identifies one work, its claim, inclusive GH/GTS/TSK evidence, task family, and review status; it is not a mutually exclusive paper ranking. To reproduce the timeline or a task count, filter the corresponding module fields in the machine-readable JSON and apply the deepest-layer rule described above.
 \begin{longtable}{@{}p{0.27\textwidth}p{0.68\textwidth}@{}}
 \caption{Profiles of the 138 reviewed works. Each profile records inclusive evidence across runtime layers; exclusive plotting uses the deepest applicable Harness layer. SM denotes a system or method and B an evaluation benchmark; $\dagger$ marks works whose authors do not use the Agent label.}\label{tab:agent-ledger}\\
-\toprule Work and task & Mechanisms across runtime layers\\\midrule
+\toprule Work & Mechanisms\\\midrule\\\midrule
 \endfirsthead
-\toprule Work and task & Mechanisms across runtime layers\\\midrule
+\toprule Work & Mechanisms\\\midrule\\\midrule
 \endhead
 Agentic RAG for TSA \citep{agenticrag2024} Aug'24; \typeSMshort{}\newline Cross-task TSA & \textbf{GH:} Hierarchical multi-agent routing and prompt-pool retrieval.\newline\textbf{GTS:} Task-specialized SLM agents over time-series requests.\newline\textbf{TSK:} Instruction-tuned task agents for multiple TS tasks.\\\midrule
 TS-Reasoner \citep{tsreasoner2026} Oct'24; \typeSMshort{}\newline Inference / analysis & \textbf{GH:} Domain-oriented inference loop.\newline\textbf{GTS:} Time-series inference tools and evidence state.\newline\textbf{TSK:} Analysis tasks over temporal data.\\\midrule
