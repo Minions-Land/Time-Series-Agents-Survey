@@ -150,15 +150,15 @@ Time-series analysis increasingly combines predictive models with LLM systems th
 
 \section{Introduction}
 
-Time series analysis has long been organized around task-specific predictors: forecasting, classification, anomaly detection, imputation, segmentation, and representation learning. This model-centric paradigm has produced a mature ecosystem spanning classical statistical methods, deep neural architectures, foundation models, and LLM-enhanced temporal models \citep{zhang2024llmts,jiang2024empowering}. These models become callable components inside a broader agent runtime. We analyze the system layer that turns a predictor into an executable, stateful workflow with specified data, context, evaluation, and revision.
+Time-series analysis is usually introduced through predictors for forecasting, classification, anomaly detection, imputation, or representation learning. Those predictors become components of a larger system when a practitioner must decide what information was available, choose tools, inspect evidence, revise an output, and hand the result to a downstream action. This survey therefore studies the construction of the system around the predictor.
 
-The task space is broader than forecasting. Time-series systems may be asked to forecast future values, classify sequence-level or window-level labels, detect anomalies and root causes, impute missing observations, answer questions about temporal evidence, retrieve event context, generate benchmarks, revise deployed forecasts, or support downstream decisions. These tasks share temporal constraints and require distinct runtime components. A forecasting agent needs horizon-aware validation, model selection, ensembling, and revision contracts; an anomaly agent needs window localization, rule generation, and incident evidence; a classification agent needs channel-aware evidence and class exemplars; a QA agent needs faithful tool calls and answer grounding. Task heterogeneity calls for a structured time-series harness.
+The central question is practical: given a time-series scenario and a task contract, how should one assemble an Agent and select a benchmark that tests the resulting system? The task contract specifies the output, temporal horizon, admissible information, constraints, metric, and authority to accept, revise, or escalate a result. Forecasting is often the first computational step rather than the endpoint: a forecast estimates a future state, while a decision combines that estimate with objectives, costs, uncertainty, and available actions. The same transition appears in anomaly diagnosis, data augmentation, event interpretation, and operational monitoring.
 
-Real temporal analysis extends beyond a single model output~\cite{promptstoagents2026,chen2026tsagentsurvey,xu2026forecastagentsurvey,aion2026,timeclaw2026harness}. A practitioner inspects data quality, verifies temporal granularity, identifies regime shifts, retrieves events, selects tools, compares models, validates chronological splits, explains evidence, revises forecasts under constraints, and turns predictions into operational decisions. This workflow requires a runtime that plans, acts, preserves temporal state, calls specialized tools, validates intermediate artifacts, and revises its behavior.
+The construction has three sources of variation. The LLM may gain a temporal representation, alignment, or reasoning capability. The Agent runtime may gain memory, tools, planning, verification, or coordination. The temporal layer may add availability time, frequency, horizon, units, missingness, regime, provenance, and task-specific output contracts. These changes are related but not interchangeable. A useful survey must show where a mechanism lives, what temporal obligation it adds, and whether that obligation transfers when the downstream task changes \citep{promptstoagents2026,changsurvey2026,chen2026tsagentsurvey}.
 
-A central reason to study forecasting and related predictive tasks is that their outputs provide evidence for subsequent decisions. A forecast estimates what may happen under a stated information set; a decision must additionally determine what to do given objectives, constraints, costs, uncertainty, risk tolerance, and available actions. The decision may be to order inventory, adjust a forecast, escalate a diagnosis, change a control policy, or defer action and acquire more evidence. A Time-Series Agent connects temporal evidence and prediction to validated action, revision, or accountable recommendation. Decision support extends prediction with state, tools, verification, and feedback; prediction remains a capability that an Agent can call, compare, and audit.
+We organize the literature as a construction recipe. First specify the scenario and task contract. Then select the General Harness mechanisms needed to execute the workflow. Add a Time-Series Harness Module when temporal state, operations, evidence, or validation need explicit semantics. Finally instantiate task-specific modules and select a benchmark that evaluates process, temporal validity, task outcome, and resource behavior. Existing surveys provide the component and task vocabularies; this survey connects them to those design decisions.
 
-LLM agents provide a natural system abstraction for this broader workflow. In the general agent literature, the runtime around an LLM provides external computation, action schemas, tools, memory, state, execution loops, validators, observability, and permission boundaries \citep{ning2026codeharness,lee2026metaharness}. We describe LLM-based agents through the following runtime abstraction:
+LLM agents provide a natural system abstraction for this workflow. In the general agent literature, the runtime around an LLM provides external computation, action schemas, tools, memory, state, execution loops, validators, observability, and permission boundaries \citep{ning2026codeharness,lee2026metaharness}. We describe LLM-based agents through the following runtime abstraction:
 
 \begin{tcolorbox}[
   colback=surveyWarn,
@@ -188,9 +188,10 @@ The resulting hierarchy is the organizing structure of this survey. Time-Series 
 
 The survey maintains a module-level evidence ledger described in Appendix~\ref{app:full-ledger}. The ledger records claims, source locators, contribution modules, task contracts, evaluation evidence, and review status; its fields support the comparison tables and module-level plots used throughout the paper.
 
+\noindent\textbf{Why this figure matters.} The timeline gives a corpus-level view of when different contribution modules enter the field. Read each curve as a cumulative count of independently coded modules rather than as a count of papers; the separation between LLM-side, GH, GTS, and TSK curves shows where the field has accumulated capability, while the early slope and later acceleration show the order in which system concerns emerged. The underlying counts come from the module-level ledger described in Appendix~\ref{app:full-ledger}.
+
 \begin{figure}[htbp]
 \centering
-\noindent\textbf{Why this figure matters.} The timeline gives a corpus-level view of when different contribution modules enter the field. Read each curve as a cumulative count of independently coded modules rather than as a count of papers; the separation between LLM-side, GH, GTS, and TSK curves shows where the field has accumulated capability, while the early slope and later acceleration show the order in which system concerns emerged. The underlying counts come from the module-level ledger described in Appendix~\ref{app:full-ledger}.
 \includegraphics[width=\linewidth]{artifacts/active/Figure1_module_timeline_native.png}
 \caption{Cumulative module-level contributions in the reviewed Time-Series Agent corpus. Each curve counts independently recorded module annotations, so one work may contribute to several curves. The logarithmic vertical axis keeps early contributions visible. GH and GTS overlap when the same capability is recorded at both the general runtime layer and its temporal specialization; the hollow markers keep the GH curve visible in that case.}
 \label{fig:contribution-trend}
@@ -238,27 +239,29 @@ We re-read the broader literature through this additional contribution-locus que
 
 \subsection{Contributions}
 
-This survey makes four contributions.
+This survey makes five contributions.
 
 \begin{enumerate}
-  \item We describe how a general LLM agent becomes a time-series agent by adding temporal data, operations, context, and validation.
-  \item We separate general agent mechanisms, capabilities shared across time-series tasks, and mechanisms tied to one task, with multi-module contributions recorded at their respective levels.
-  \item We review the literature with explicit inclusion and comparison rules, and release a module-level ledger that records each paper's claim, evidence locator, contribution layer, task contract, and review status in a machine-readable form.
-  \item We connect system capabilities to evaluation, benchmarks, open-source resources, and open problems, including the transition from prediction to decision support.
-  \item We show how the module-level ledger turns the survey into an extensible research map: the same records that support classification also expose missing temporal contracts, evaluation gaps, and future research directions.
+  \item We give a construction view of Time-Series Agents: a scenario becomes a task contract, the contract selects a General Harness, temporal obligations add a Time-Series Harness Module, and a task-specific module completes the system.
+  \item We separate LLM-side capabilities from the nested Harness layers, distinguishing reusable runtime mechanisms, cross-task temporal mechanisms, and mechanisms bound to one task contract.
+  \item We provide a module-level evidence ledger in the appendix. Each Paper Card records a work's claim, source locator, contribution modules, task contract, evaluation evidence, and review status so that future systems can be added without changing the organizing coordinates.
+  \item We define an evaluation path that follows the construction: General Harness process, temporal contract, task outcome, resource behavior, and decision utility. The benchmark chapter maps existing resources to these evaluation layers.
+  \item We derive open problems from missing interfaces and weakly evaluated contracts, including temporal faithfulness, provenance, self-evolution, reproducibility, and decision-centric evaluation.
 \end{enumerate}
+
+\noindent\textbf{How the paper is organized.} This map is a reading guide for the whole survey. Follow the arrows from the LLM side and reusable runtime to temporal contracts, task modules, evaluation, and open problems; the sequence mirrors the construction process of a Time-Series Agent. Its purpose is to show why the later sections are not a list of methods: each section answers the next design or evaluation question.
 
 \begin{figure}[htbp]
 \centering
-\noindent\textbf{How the paper is organized.} This map is a reading guide for the whole survey. Follow the arrows from the LLM side and reusable runtime to temporal contracts, task modules, evaluation, and open problems; the sequence mirrors the construction process of a Time-Series Agent. Its purpose is to show why the later sections are not a list of methods: each section answers the next design or evaluation question.
 \includegraphics[width=\linewidth]{artifacts/active/Figure2_organization_native_v2.png}
 \caption{Organization of the survey. The sections follow the construction of a Time-Series Agent, from the LLM side and reusable runtime to temporal contracts, task modules, evaluation, and open problems. The module-level ledger provides the evidence record behind each section. The visual grammar follows the organization-map style used by recent survey figures; the labels and hierarchy are specific to this survey.}
 \label{fig:survey-organization}
 \end{figure}
 
+\noindent\textbf{How to read the construction diagram.} The left branch is the independent LLM-side contribution; the nested right branch shows increasing temporal and task specificity. A mechanism moves downward only when its temporal state, operation, or validator becomes less reusable. This figure supplies the hierarchy used in the subsequent sections and in the exclusive module-level statistics.
+
 \begin{figure}[H]
 \centering
-\noindent\textbf{How to read the construction diagram.} The left branch is the independent LLM-side contribution; the nested right branch shows increasing temporal and task specificity. A mechanism moves downward only when its temporal state, operation, or validator becomes less reusable. This figure supplies the hierarchy used in the subsequent sections and in the exclusive module-level statistics.
 \includegraphics[width=\linewidth]{artifacts/active/Figure3_construction_native.png}
 \caption{Construction of a Time-Series Agent. The LLM side remains independent of the nested Harness stack: General Harness contains reusable runtime mechanisms, General Time-Series Harness contains temporal mechanisms that transfer across tasks, and Task-Specific Harness instantiates a task contract. The module-level ledger is the unit of evidence and records module-level contributions.}
 \label{fig:overview}
@@ -278,6 +281,18 @@ At an abstract level, the runtime can be written as
   \label{eq:agent-loop}
 \end{equation}
 where $s_t$ is the visible state, $a_t$ is a tool or environment action, $o_{t+1}$ is the returned observation, and $\mathcal{H}$ is the Harness transition. Time-Series Harness Modules add temporal type information to each state, action, and observation.
+
+The construction begins with the scenario, not with a model name. A scenario specifies the data stream, the information boundary, the operational objective, the allowed actions, and the evidence needed for review. Its task contract specifies the output object, temporal horizon, constraints, metric, and authority to accept, revise, or escalate the result. This contract determines which parts of the Harness must be temporal and which can remain general.
+
+\begin{enumerate}
+  \item \textbf{Specify the scenario.} State the data sources, event and availability times, channels, units, missingness policy, and the decision or analysis that follows the output.
+  \item \textbf{Write the task contract.} Define the output, horizon, admissible information, constraints, evaluation metric, and review authority.
+  \item \textbf{Select the runtime.} Choose General Harness mechanisms for interaction, memory, tools, execution, control, planning, optimization, and coordination.
+  \item \textbf{Add temporal semantics.} Introduce temporal state, operations, provenance, chronology guards, and validators wherever a generic runtime leaves the meaning ambiguous.
+  \item \textbf{Instantiate and evaluate.} Add task-specific modules, then evaluate process validity, temporal validity, task performance, resource use, failures, revision, and downstream decision utility.
+\end{enumerate}
+
+This sequence is the practical meaning of the survey's hierarchy. The same runtime can support financial forecasting, traffic prediction, industrial diagnosis, or demand planning; the temporal and task contracts determine which modules and benchmarks must change.
 
 To keep the method descriptions comparable, we use the following notation throughout the survey. The table records symbols that recur in the method descriptions and in the paper-card ledger.
 
@@ -340,9 +355,10 @@ ChatTS instantiates this objective with synthetic temporal attributes, instructi
 
 The module ledger places learned data and reasoning under the LLM layer. Tool, memory, and validation contributions from the same work receive their own Harness entries, keeping multi-layer contributions visible.
 
+\noindent\textbf{What the LLM-side figure establishes.} The diagram follows the ChatTS pipeline from temporal attribute selection to synthetic supervision and model training. It makes the LLM-side contribution concrete: the model is changed before the Harness chooses tools or controls execution. The redesign is based on the temporal alignment and instruction-data pipeline reported by ChatTS~\citep{chatts2025}; read it left to right as a sequence of learned interfaces.
+
 \begin{figure}[htbp]
 \centering
-\noindent\textbf{What the LLM-side figure establishes.} The diagram follows the ChatTS pipeline from temporal attribute selection to synthetic supervision and model training. It makes the LLM-side contribution concrete: the model is changed before the Harness chooses tools or controls execution. The redesign is based on the temporal alignment and instruction-data pipeline reported by ChatTS~\citep{chatts2025}; read it left to right as a sequence of learned interfaces.
 \includegraphics[width=0.88\linewidth]{artifacts/active/Figure_LLM_side_native_v3.png}
 \caption{LLM-side temporal alignment and instruction data, adapted from the ChatTS training pipeline in Fig.~3 of \citet{chatts2025}. The editable map separates temporal attribute selection, synthetic supervision, instruction generation, and model training.}
 \label{fig:chatts-overview}
@@ -359,6 +375,8 @@ LLM-side adaptation includes continued training, parameter-efficient adaptation,
 We record model-side changes alongside any temporal tools, memory, or task contracts introduced by the same paper.
 
 A stronger temporal encoder supplies the learned alignment and reasoning capability; a General Harness makes it callable; and a task-specific verifier checks the resulting forecast, diagnosis, or recommendation against its output contract. The module ledger records these changes as separate entries when a paper contributes to multiple layers.
+\noindent\textbf{Design takeaway.} At this stage, choose the runtime capabilities needed by the workflow while keeping their interfaces domain-independent. The next section asks which of those interfaces need temporal types, chronology, provenance, or validation.
+
 \section{General Harness}
 \label{sec:general-harness}
 
@@ -393,9 +411,10 @@ Coordination and Scaling & How do multiple agents divide work, communicate, and 
 \end{longtable}
 \endgroup
 
+\noindent\textbf{Reading the General Harness figure.} The center is the runtime interface around an LLM; the seven surrounding nodes are reusable mechanism families, not seven mutually exclusive agent types. The figure supports the chapter's main claim: a Time-Series Agent can reuse these runtime mechanisms while temporal semantics are added in the next layer. The dimensions follow Table~\ref{tab:component-vocab}.
+
 \begin{figure}[htbp]
 \centering
-\noindent\textbf{Reading the General Harness figure.} The center is the runtime interface around an LLM; the seven surrounding nodes are reusable mechanism families, not seven mutually exclusive agent types. The figure supports the chapter's main claim: a Time-Series Agent can reuse these runtime mechanisms while temporal semantics are added in the next layer. The dimensions follow Table~\ref{tab:component-vocab}.
 \includegraphics[width=0.96\linewidth]{artifacts/active/Figure4_general_harness_native_v2.png}
 \caption{The seven reusable dimensions of a General Harness. The center represents the runtime around an LLM; each surrounding node is a mechanism family that can recur across domains. A paper may contribute to several dimensions, while temporal semantics are coded separately in the General Time-Series Harness layer.}
 \label{fig:general-harness-seven-dimensions}
@@ -527,13 +546,16 @@ Coordination and scaling divide work among specialized roles, share state, and c
 \end{equation}
 The shared message and handoff protocol are the runtime objects used by debate, delegation, and manager--analyst systems.
 
+\noindent\textbf{Why the trace is shown.} A system-level trace makes the abstract Harness dimensions observable. Read the sequence as observation, tool execution, evidence logging, critic feedback, and final verification; temporal tool calls are the points where the general loop acquires time-series semantics. The trace is adapted from TS-Agent~\citep{tsagent2025} and demonstrates why process evidence must accompany a final task score.
+
 \begin{figure}[htbp]
 \centering
-\noindent\textbf{Why the trace is shown.} A system-level trace makes the abstract Harness dimensions observable. Read the sequence as observation, tool execution, evidence logging, critic feedback, and final verification; temporal tool calls are the points where the general loop acquires time-series semantics. The trace is adapted from TS-Agent~\citep{tsagent2025} and demonstrates why process evidence must accompany a final task score.
 \includegraphics[width=0.94\linewidth]{artifacts/active/Figure_support_tsagent.png}
 \caption{A tool-using reasoning trace from TS-Agent (Fig.~3 in \citet{tsagent2025}). It illustrates the General Harness loop of observation, tool execution, evidence logging, critic feedback, and final verification; the temporal tools are the domain-specific part.}
 \label{fig:tsagent-trace}
 \end{figure}
+\noindent\textbf{Design takeaway.} A temporal mechanism belongs in the General Time-Series Harness when it remains valid after the downstream task changes. The next section applies the same temporal interfaces to concrete output contracts.
+
 \section{General Time-Series Harness}
 \label{sec:general-ts-harness}
 
@@ -548,17 +570,19 @@ For a temporal state at decision time $\tau$, the admissible information can be 
 \end{equation}
 where $t_i$ is the event time and $v_i$ is the time at which the value became available. This constraint defines the GTS availability and provenance contract.
 
+\noindent\textbf{What the AION example contributes.} This figure connects three temporal-runtime principles to the GTS layer: temporal grounding controls what information is available, knowledge-grounded reasoning ties outputs to evidence, and reliability mechanisms check the resulting artifact. Read the three principles as constraints on one workflow, not as independent modules. The design is adapted from AION~\citep{aion2026}.
+
 \begin{figure}[htbp]
 \centering
-\noindent\textbf{What the AION example contributes.} This figure connects three temporal-runtime principles to the GTS layer: temporal grounding controls what information is available, knowledge-grounded reasoning ties outputs to evidence, and reliability mechanisms check the resulting artifact. Read the three principles as constraints on one workflow, not as independent modules. The design is adapted from AION~\citep{aion2026}.
 \includegraphics[width=0.90\linewidth]{artifacts/active/Figure_support_aion.png}
 \caption{AION's three coupled time-series harness principles, adapted and redrawn from Fig.~2 of \citet{aion2026}. Temporal grounding, knowledge-grounded reasoning, and reliability mechanisms show why GTS is a temporal contract layered on top of a general runtime.}
 \label{fig:aion-principles}
 \end{figure}
 
+\noindent\textbf{How to use the GTS landscape.} The diagram answers the cross-task question: which temporal objects, operations, and evidence bindings survive when the downstream task changes? Follow the middle layer across forecasting, anomaly, augmentation, and decision support; anything that remains valid there is GTS, while a contract-bound branch belongs to TSK. This is the bridge between the seven General Harness dimensions and the four task sections.
+
 \begin{figure}[htbp]
 \centering
-\noindent\textbf{How to use the GTS landscape.} The diagram answers the cross-task question: which temporal objects, operations, and evidence bindings survive when the downstream task changes? Follow the middle layer across forecasting, anomaly, augmentation, and decision support; anything that remains valid there is GTS, while a contract-bound branch belongs to TSK. This is the bridge between the seven General Harness dimensions and the four task sections.
 \includegraphics[width=0.96\linewidth]{artifacts/active/Figure5_general_ts_harness_native.png}
 \caption{The General Time-Series Harness. Temporal objects, operations, and evidence specialize reusable Harness dimensions before a task-specific output contract is applied. The cross-task criterion is the survival of the temporal contract when the downstream task changes.}
 \label{fig:gts-landscape}
@@ -657,6 +681,8 @@ The seven dimensions jointly enforce six recurring requirements:
 \end{itemize}
 
 These requirements form the cross-task design checklist; the next section instantiates them under four task contracts.
+\noindent\textbf{Design takeaway.} Task-specific modules complete the output contract. Their design should state what the Agent must produce, what evidence is required, how the result is verified, and which actions or revisions are permitted.
+
 \section{Task-Specific Time-Series Harness}
 \label{sec:task-specific-harness}
 
@@ -669,9 +695,10 @@ The task contract determines the final object being optimized. For forecasting, 
 \end{equation}
 where $H$ is the declared horizon and the inputs are restricted by the availability set in Eq.~\ref{eq:temporal-availability}.
 
+\noindent\textbf{Purpose of the task-family figure.} The four branches show how one shared Harness vocabulary becomes four different output contracts. Read each branch from temporal input to validation: forecasting emphasizes horizon and backtesting, augmentation emphasizes fidelity and utility, anomaly diagnosis emphasizes localization and evidence, and decision support emphasizes utility, risk, cost, and review authority. This figure explains why task categories are an instantiation layer rather than a competing top-level taxonomy.
+
 \begin{figure}[htbp]
 \centering
-\noindent\textbf{Purpose of the task-family figure.} The four branches show how one shared Harness vocabulary becomes four different output contracts. Read each branch from temporal input to validation: forecasting emphasizes horizon and backtesting, augmentation emphasizes fidelity and utility, anomaly diagnosis emphasizes localization and evidence, and decision support emphasizes utility, risk, cost, and review authority. This figure explains why task categories are an instantiation layer rather than a competing top-level taxonomy.
 \includegraphics[width=0.98\linewidth]{artifacts/active/Figure6_task_specific_native_v2.png}
 \caption{The four task families and their task-specific Harness contracts. Each family instantiates the same seven-module lens under a different temporal output contract.}
 \label{fig:task-specific-harness}
@@ -704,9 +731,10 @@ For a conditioning context $\mathcal{C}$, a synthesis module produces a candidat
   \label{eq:augmentation-contract}
 \end{equation}
 
+\noindent\textbf{Why the augmentation example matters.} The MERIT loop shows a concrete task-specific contract: generation is followed by retrieval, review, and downstream-utility checks. Read the loop as evidence that synthetic data are not validated by resemblance alone; fidelity and usefulness are jointly evaluated. The diagram is adapted from MERIT~\citep{merit2025}.
+
 \begin{figure}[htbp]
 \centering
-\noindent\textbf{Why the augmentation example matters.} The MERIT loop shows a concrete task-specific contract: generation is followed by retrieval, review, and downstream-utility checks. Read the loop as evidence that synthetic data are not validated by resemblance alone; fidelity and usefulness are jointly evaluated. The diagram is adapted from MERIT~\citep{merit2025}.
 \includegraphics[width=0.94\linewidth]{artifacts/active/Figure_support_merit.png}
 \caption{MERIT's retrieval--augmentation--review loop, adapted and redrawn from Fig.~2 of \citet{merit2025}. The generator is coupled to a task-specific review agent, making fidelity and downstream utility part of the augmentation contract.}
 \label{fig:merit-augmentation}
@@ -728,9 +756,10 @@ and its rule-based feedback combines parse validity, interval F1, and a false-po
 \end{equation}
 This is the method-level distinction: the LLM gathers evidence and reflects, while the detection policy receives task-specific learning signals \citep{anomamind2026}. Anomaly detection therefore proceeds through evidence-seeking decisions, tool responses, and state updates rather than a single fixed score.
 
+\noindent\textbf{Why the anomaly example matters.} AnomaMind makes the anomaly contract visible as a coarse-to-fine workflow: acquire evidence, detect a suspicious interval, diagnose a cause, and refine the conclusion. The figure maps each stage to a TSK module and shows why detection accuracy alone does not establish diagnostic quality. It is adapted from AnomaMind~\citep{anomamind2026}.
+
 \begin{figure}[htbp]
 \centering
-\noindent\textbf{Why the anomaly example matters.} AnomaMind makes the anomaly contract visible as a coarse-to-fine workflow: acquire evidence, detect a suspicious interval, diagnose a cause, and refine the conclusion. The figure maps each stage to a TSK module and shows why detection accuracy alone does not establish diagnostic quality. It is adapted from AnomaMind~\citep{anomamind2026}.
 \includegraphics[width=0.96\linewidth]{artifacts/active/Figure_support_anomamind.png}
 \caption{AnomaMind's coarse-to-fine anomaly-diagnosis workflow, adapted and redrawn from Fig.~1 of \citet{anomamind2026}. The example separates evidence acquisition, detection, diagnosis, and iterative refinement, which are distinct TSK modules under the anomaly contract.}
 \label{fig:anomamind-workflow}
@@ -761,6 +790,8 @@ Decision support extends prediction through an action utility:
 where the utility, action set, uncertainty, and review authority are part of the task contract. This makes the transition from forecasting to decision support explicit.
 
 The complete corpus is multi-label across components: a work may contribute to several Harness dimensions and task families, with each component assigned to its deepest applicable Harness layer. The maintained ledger records both the inclusive evidence fields and the exclusive plotting labels, alongside the independent LLM-side contribution.
+\noindent\textbf{Design takeaway.} A completed Agent is only useful when its runtime, temporal contract, task outcome, and resource behavior can be evaluated together. The benchmark section turns the construction hierarchy into an evaluation protocol.
+
 \section{Infrastructure and Benchmarks for Time-Series Agents}
 \label{sec:evaluation}
 
@@ -793,9 +824,10 @@ where the four coordinates measure process validity, temporal-contract validity,
 
 The same protocol should support controlled perturbations: hide or reveal contextual evidence, shift the forecast origin, inject missingness, change the frequency, or replace a tool with a failing implementation. These interventions expose whether a system relies on the intended temporal evidence and whether its General Harness can recover from operational failures.
 
+\noindent\textbf{How to read the evaluation stack.} The stack aligns evaluation with the construction hierarchy: process validity at the runtime layer, temporal-contract validity at the GTS layer, task outcomes at the TSK layer, and reproducibility across the full episode. Its purpose is to prevent a single forecast or QA score from standing in for tool correctness, chronology, evidence quality, and revision behavior. The episode record is linked to the benchmark discussion that follows.
+
 \begin{figure}[htbp]
 \centering
-\noindent\textbf{How to read the evaluation stack.} The stack aligns evaluation with the construction hierarchy: process validity at the runtime layer, temporal-contract validity at the GTS layer, task outcomes at the TSK layer, and reproducibility across the full episode. Its purpose is to prevent a single forecast or QA score from standing in for tool correctness, chronology, evidence quality, and revision behavior. The episode record is linked to the benchmark discussion that follows.
 \includegraphics[width=0.98\linewidth]{artifacts/active/Figure7_infrastructure_native.png}
 \caption{Infrastructure and benchmark coverage. The evaluation layers mirror the construction hierarchy, while the episode record preserves temporal availability, execution, evidence, revision, and reproducibility.}
 \label{fig:evaluation-stack}
@@ -841,6 +873,20 @@ QA resources evaluate temporal answers, evidence grounding, and selected numeric
 FutureSim adds a replayable world-event environment in which an Agent can be evaluated under changing information and adaptive interaction, complementing dataset-fixed forecasting benchmarks \citep{futuresim2026}. WorldReasoner focuses on whether a forecasting Agent respects the information available at prediction time and whether its reasoning is valid, making temporal leakage and trace quality explicit benchmark targets \citep{worldreasoner2026}. TimeClaw, AION, TimeSeriesGym, and ModernTSF provide complementary infrastructure. ModernTSF contributes an agent-ready and reproducible forecasting substrate with model and dataset catalogs, callable interfaces, evidence, budgets, artifacts, and recoverable execution \footnote{ModernTSF repository: \url{https://github.com/Diaugeia/ModernTSF}.}. It provides an infrastructure case for the benchmark stack. A unified public suite would combine a time-indexed availability policy, executable temporal tools, trace and evidence validation, and task contracts across forecasting, augmentation, anomaly diagnosis, and decision support.
 
 A reusable benchmark stack should therefore include a time-indexed workspace, explicit availability rules, executable temporal tools, trace and evidence schemas, validators, cases from all four task families, and cost, failure, and revision logs. These requirements connect the infrastructure chapter to the open problems below.
+
+\subsection{Selecting a benchmark for a new scenario}
+
+A benchmark should be selected by matching its coverage to the task contract, rather than by choosing the dataset with the most convenient score. For a new scenario, first require an availability policy and temporal split; then require the tools, evidence, and validators needed by the workflow; finally require task metrics and a decision or review signal when the output will guide action. A resource can be strong on one layer and silent on another, so a benchmark suite may combine several resources while preserving one episode record and one evaluation vector.
+
+\begin{equation}
+  b^{\star} = \underset{b\in\mathcal{B}}{\operatorname{argmax}}\; \sum_{\ell} w_{\ell} C_{\ell b},
+  \qquad \sum_{\ell}w_{\ell}=1,
+  \label{eq:benchmark-selection}
+\end{equation}
+
+Here $C_{\ell b}$ is the coverage indicator used above and $w_{\ell}$ is the importance of evaluation layer $\ell$ for the scenario. Forecasting deployments assign more weight to horizon and calibration; diagnosis assigns more weight to localization and evidence; decision support assigns more weight to utility, cost, and review authority. This turns benchmark selection into an explicit design decision that can be audited and revised.
+\noindent\textbf{Design takeaway.} The open problems below are the unresolved interfaces in the construction and evaluation path. Each one identifies a missing contract that a future Agent or benchmark should make explicit.
+
 \section{Open Problems and Focused System Analyses}
 
 \subsection{Reusable temporal infrastructure}
@@ -906,9 +952,10 @@ The selected execution is summarized, cleaned to remove answer leakage and non-t
 \end{equation}
 These equations capture the paper's concrete contribution: execution quality, rather than completion alone, determines which temporal tool trajectory becomes reusable experience \citep{timeclaw2026explore}.
 
+\noindent\textbf{How the open-problem map is derived.} Each node starts from a missing or weakly evidenced Paper Card field and is connected to the Harness layer where the gap appears. Read from left to right: model-side temporal understanding, runtime state and tools, task contracts, evaluation infrastructure, and deployment feedback. The map turns the evidence ledger into research questions rather than a free-standing list of future work.
+
 \begin{figure}[htbp]
 \centering
-\noindent\textbf{How the open-problem map is derived.} Each node starts from a missing or weakly evidenced Paper Card field and is connected to the Harness layer where the gap appears. Read from left to right: model-side temporal understanding, runtime state and tools, task contracts, evaluation infrastructure, and deployment feedback. The map turns the evidence ledger into research questions rather than a free-standing list of future work.
 \includegraphics[width=0.98\linewidth]{artifacts/active/Figure8_open_problems_native.png}
 \caption{Open problems and focused system cases. The ledger links each gap to a Harness layer and records representative LLM-side, temporal-runtime, and infrastructure contributions.}
 \label{fig:open-problems-cases}
@@ -922,7 +969,9 @@ These equations capture the paper's concrete contribution: execution quality, ra
 
 \section{Conclusion}
 
-A Time-Series Agent is built by combining an LLM, a General Harness, and a Time-Series Harness Module. The survey separates the model-side contribution from the runtime contribution, organizes the General Harness through seven shared dimensions, extracts genuinely temporal mechanisms into the General Time-Series Harness, and instantiates them under forecasting, augmentation, anomaly diagnosis, and decision support. Evaluation then follows the same construction: process, temporal contract, and task outcome. The remaining research challenge is to make these layers interoperable and to evaluate them with a unified, reproducible benchmark.
+A Time-Series Agent is built by combining an LLM, a General Harness, and a Time-Series Harness Module. The practical path is to begin with a scenario and task contract, select the runtime mechanisms that make the workflow executable, add temporal semantics where chronology and provenance matter, and specialize the final output contract for the task at hand. The four task families show how the same construction can support forecasting, augmentation, anomaly diagnosis, and decision support.
+
+The evaluation path follows the same structure. A useful benchmark records the information boundary, execution trace, temporal checks, task outcome, resource behavior, and, when the result guides action, the decision utility and review outcome. This construction view gives practitioners a way to design a new Time-Series Agent and gives researchers a common coordinate system for adding new capabilities, tasks, and benchmarks.
 % Keep the references between the main conclusion and the audit appendix.
 \clearpage
 \bibliographystyle{plainnat}
