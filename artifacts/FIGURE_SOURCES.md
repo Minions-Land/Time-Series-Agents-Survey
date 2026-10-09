@@ -1,8 +1,8 @@
 # Figure source status
 
-The main-text section figures use active native sources. Figure 2 uses `artifacts/active/Figure2_organization_native_v2.pptx`; the LLM-side figure uses `artifacts/active/Figure_LLM_side_native_v3.pptx`; Figures 1, 3, 4, 5, 6, 7, and 8 use their corresponding active PPT sources under `artifacts/active/`; and the supporting AION, MERIT, AnomaMind, and TS-Agent figures use slides in `artifacts/active/Figure_supporting_workflows_native.pptx`. Each active source has a PNG exported from the same presentation.
+The main-text section figures use active native sources. Figures 2, 3, and 6 now use direct single-page PDF exports from the grouped RSI-derived deck `artifacts/active/TimeSeriesAgent_Figures_RSI_template_working_copy_grouped.pptx`; the page mapping is recorded in `artifacts/active/RSI_PPT_PAPER_MAPPING.md`. The LLM-side figure uses `artifacts/active/Figure_LLM_side_native_v3.pptx`; Figures 1, 4, 5, 7, and 8 use their corresponding active grouped PPT sources under `artifacts/active/`; and the supporting AION, MERIT, AnomaMind, and TS-Agent figures use slides in `artifacts/active/Figure_supporting_workflows_native.pptx`. Each active source has a PDF export used by LaTeX and an editable PowerPoint source.
 
-The previous PPT decks are archived in `artifacts/archive/previous_attempts/` and are not active sources. They were useful for testing layouts, but they do not satisfy the final component-level conversion requirement.
+The previous 16:9 native redraws for Figures 2, 3, and 6 remain in `artifacts/active/` as historical alternatives; they are no longer the active LaTeX sources. The RSI-derived deck is retained as the canonical editable source for the three mapped figures and preserves native groups for later group/ungroup editing.
 
 The replacement workflow is:
 
