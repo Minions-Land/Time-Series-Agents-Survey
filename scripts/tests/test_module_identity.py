@@ -18,4 +18,16 @@ class IdentityTests(unittest.TestCase):
  def test_duplicate_module_rejected(self):
   x={'id':'x','layer':'LLM','scope_reason':'training','evidence':[{'locator':'p1'}]}
   with self.assertRaises(ValueError):m.reviewed_module_record({'citation_key':'paper','reviewed_modules_json':json.dumps([x,x])})
+ def test_other_task_is_same_coordinate(self):
+  x={'id':'classifier','layer':'TSK','dimensions':['Tools and Execution'],'tasks':[], 'other_tasks':['classification'],'scope_reason':'Class output','evidence':[{'locator':'p4','quote':'source'}]}
+  r=m.reviewed_module_record({'reviewed_modules_json':json.dumps([x])})
+  self.assertEqual(list(r['task_specific']),['classification'])
+  self.assertEqual(len(r['modules']),1)
+ def test_exclusion_is_not_verified_module(self):
+  r=m.reviewed_module_record({'reviewed_modules_json':'[]','taxonomy_review_status':'out_of_scope'})
+  self.assertEqual(r['review_status'],'out_of_scope');self.assertEqual(r['modules'],[])
+ def test_repository_is_not_paper_verification(self):
+  x={'id':'repo','layer':'GH','dimensions':['Tools and Execution'],'scope_reason':'executor','evidence':[{'locator':'README','quote':'source'}]}
+  r=m.reviewed_module_record({'reviewed_modules_json':json.dumps([x]),'taxonomy_review_status':'repository_verified'})
+  self.assertEqual(r['review_status'],'repository_verified')
 if __name__=='__main__':unittest.main()

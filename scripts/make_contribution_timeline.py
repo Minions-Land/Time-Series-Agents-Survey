@@ -34,25 +34,26 @@ def count_module_labels(value: dict) -> int:
 
 def contribution_counts(record: dict) -> dict[str, int]:
     module = record.get("module_level_contributions", {})
-    if "modules" in module:
+    if "modules" in module and module.get("review_status") in {"paper_verified", "repository_verified"}:
         counts = Counter(m["layer"] for m in module["modules"])
         return {"LLM-side": counts["LLM"], "General Harness": counts["GH"],
                 "General Time-Series Harness": counts["GTS"], "Task-Specific Harness": counts["TSK"]}
-    llm = module.get("llm_side", [])
-    task = module.get("task_specific", {})
-    return {
-        "LLM-side": len(llm) if isinstance(llm, list) else 0,
-        "General Harness": count_module_labels(module.get("general_harness", {})),
-        "General Time-Series Harness": count_module_labels(module.get("general_ts_harness", {})),
-        "Task-Specific Harness": len({label for item in task.values() if isinstance(item, dict) for labels in item.get("dimensions", {}).values() for label in labels}),
-    }
+    return {name: 0 for name in ("LLM-side", "General Harness", "General Time-Series Harness", "Task-Specific Harness")}
 
 
 def main() -> None:
     records = json.loads(LEDGER.read_text(encoding="utf-8"))
     monthly: dict[str, Counter] = {}
+    dated_records, undated = [], []
     for record in records:
+        counts = contribution_counts(record)
+        if not sum(counts.values()):
+            continue
         month = record.get("publication", {}).get("public_month")
+        if not month:
+            first = record.get("publication", {}).get("first_public_date") or ""
+            if len(first) == 4 and first.isdigit():
+                month = first
         if month and len(month) == 4 and month.isdigit():
             # Year-only records are plotted at January and remain marked as
             # year precision in the ledger; this keeps them visible without
@@ -62,8 +63,10 @@ def main() -> None:
             year = record.get("publication", {}).get("first_public_date")
             month = f"{year}-01" if year and len(year) == 4 and year.isdigit() else None
         if not month:
+            undated.append(record["citation"]["key"])
             continue
-        monthly.setdefault(month, Counter()).update(contribution_counts(record))
+        dated_records.append(record["citation"]["key"])
+        monthly.setdefault(month, Counter()).update(counts)
 
     months = sorted(monthly)
     running = Counter()
@@ -90,7 +93,12 @@ def main() -> None:
         "Task-Specific Harness": "#2f7d5c",
         "LLM-side": "#7851a9",
     }
-    plt.rcParams.update({"font.size": 10, "axes.titlesize": 11, "axes.labelsize": 10})
+    (ROOT/'artifacts/module_contribution_timeline_coverage.json').write_text(json.dumps({
+        'dated_records': len(dated_records), 'undated_records': undated,
+        'plotted_modules': dict(running), 'counting_unit': 'unique reviewed module ID',
+        'year_only_placement': 'January; date precision retained in ledger'
+    }, indent=2)+'\n')
+    plt.rcParams.update({"font.family":"serif", "font.serif":["Times New Roman", "DejaVu Serif"], "font.size": 10, "axes.titlesize": 11, "axes.labelsize": 10})
     fig, ax = plt.subplots(figsize=(8.4, 4.6))
     # Keep all four module-level series in one plot. Curves can share a
     # cumulative value because different module sets may have the same size;

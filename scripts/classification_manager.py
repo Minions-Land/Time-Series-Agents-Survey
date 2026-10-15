@@ -95,6 +95,7 @@ FIELDS = [
     "module_level_contributions_json",
     "taxonomy_review_status",
     "reviewed_modules_json",
+    "review_audit_json",
 ]
 
 MODULE_RULES = {
@@ -297,18 +298,19 @@ def reviewed_module_record(row: dict[str, str]) -> dict | None:
             for d in dims:
                 target[d].append(mid)
         else:
-            if not m.get("tasks"):
+            memberships = list(dict.fromkeys(m.get("tasks", []) + m.get("other_tasks", [])))
+            if not memberships:
                 raise ValueError(f"{mid}: task-specific module without task")
-            for task in m["tasks"]:
+            for task in memberships:
                 item = tasks.setdefault(task, {"present": True, "dimensions": empty_dimensions(),
-                                               "source_evidence": [], "dimension_review_status": "paper_verified"})
+                                               "source_evidence": [], "dimension_review_status": row.get("taxonomy_review_status") or "paper_verified"})
                 for d in dims:
                     item["dimensions"][d].append(mid)
                 item["source_evidence"].extend(m["evidence"])
     return {"unit": "unique source-grounded module id", "modules": modules,
             "llm_side": llm, "general_harness": gh, "general_ts_harness": gts,
             "task_specific": tasks, "coding_basis": "primary_source_module_review",
-            "review_status": "paper_verified"}
+            "review_status": row.get("taxonomy_review_status") or "paper_verified"}
 
 
 def module_contribution_record(row: dict[str, str]) -> dict:
@@ -372,18 +374,18 @@ def parse_profiles() -> list[dict[str, str]]:
     end = source.index(r"\end{longtable}", start)
     row_re = re.compile(
         r"^(?:(.*?)\\citep\{([^}]+)\}|(.*?)(?:\\RepoMoirai|\\RepoLLMTSFD))(.*?) & "
-        r"\\textbf\{GH:\} (.*?)\\newline"
-        r"\\textbf\{GTS:\} (.*?)\\newline"
-        r"\\textbf\{TSK:\} (.*?)\\\\\\midrule$"
+        r"(.*?)\\\\\\midrule$"
     )
     profiles = []
     for line in source[start:end].splitlines():
-        if (r"\citep{" not in line and r"\RepoMoirai" not in line and r"\RepoLLMTSFD" not in line) or r"\textbf{GH:}" not in line:
+        if (r"\citep{" not in line and r"\RepoMoirai" not in line and r"\RepoLLMTSFD" not in line) or " & " not in line:
             continue
         match = row_re.match(line)
         if not match:
             raise ValueError(f"Cannot parse mechanism-profile row: {line[:160]}")
-        work, key, alt_work, metadata, gh, gts, tsk = match.groups()
+        work, key, alt_work, metadata, mechanisms = match.groups()
+        layers = dict(re.findall(r"\\textbf\{(GH|GTS|TSK|LLM):\} (.*?)(?=\\newline\\textbf|$)", mechanisms))
+        gh, gts, tsk = (layers.get(k, "") for k in ("GH", "GTS", "TSK"))
         if key is None:
             work = alt_work
             key = "moiraiagent2026" if r"\RepoMoirai" in line else "zhang2025llm"
@@ -607,14 +609,16 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                     "other": row["task_axis_other"] or None,
                 },
                 "work_type": row["work_type"],
+                "inclusion": row.get("included_as", ""),
+                "review_audit": parse_json_field(row, "review_audit_json", {}),
                 "claimed_as_agent": row["claimed_as_agent"] == "Yes",
                 "schema_version": row.get("taxonomy_schema_version") or "2.1",
                 "llm_side_contribution": {
                     "present": bool(llm_summary or llm_subdimensions),
                     "subdimensions": llm_subdimensions,
                     "summary": llm_summary,
-                    "source_evidence": json.loads(row["source_evidence_json"]) if row.get("source_evidence_json") else [],
-                    "review_status": "paper_verified" if row.get("claim_review_status") == "paper_verified" else ("survey_coded_needs_pdf_review" if llm_summary else "not_recorded"),
+                    "source_evidence": [e for m in reviewed["modules"] if m["layer"] == "LLM" for e in m["evidence"]] if reviewed is not None else parse_json_field(row, "source_evidence_json", []),
+                    "review_status": reviewed["review_status"] if reviewed is not None else ("survey_coded_needs_pdf_review" if llm_summary else "not_recorded"),
                 },
                 "general_harness_modules": {
                     "dimensions": exclusive_gh,
@@ -622,8 +626,8 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                     "source_dimensions": parse_json_field(row, "general_harness_dimensions", {}),
                     "dimension_coding_basis": "primary_source_module_review" if reviewed is not None else "derived_from_explicit_harness_modules",
                     "claim": row["general_harness_contribution"],
-                    "source_evidence": json.loads(row["source_evidence_json"]) if row.get("source_evidence_json") else [],
-                    "review_status": "paper_verified" if reviewed is not None else "survey_coded_needs_pdf_review",
+                    "source_evidence": [e for m in reviewed["modules"] if m["layer"] == "GH" for e in m["evidence"]] if reviewed is not None else parse_json_field(row, "source_evidence_json", []),
+                    "review_status": reviewed["review_status"] if reviewed is not None else "survey_coded_needs_pdf_review",
                 },
                 "general_ts_harness_modules": {
                     "dimensions": exclusive_gts,
@@ -632,8 +636,8 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                     "dimension_coding_basis": "primary_source_module_review" if reviewed is not None else "derived_from_temporal_specificity_reason_and_claim",
                     "claim": row["general_ts_harness_contribution"],
                     "ts_specificity_reason": gts_reason,
-                    "source_evidence": json.loads(row["source_evidence_json"]) if row.get("source_evidence_json") else [],
-                    "review_status": "paper_verified" if reviewed is not None else ("needs_pdf_reclassification" if row["general_ts_harness_contribution"] else "not_recorded"),
+                    "source_evidence": [e for m in reviewed["modules"] if m["layer"] == "GTS" for e in m["evidence"]] if reviewed is not None else parse_json_field(row, "source_evidence_json", []),
+                    "review_status": reviewed["review_status"] if reviewed is not None else ("needs_pdf_reclassification" if row["general_ts_harness_contribution"] else "not_recorded"),
                 },
                 "task_specific_modules": task_modules,
                 "module_level_contributions": module_contributions,
@@ -672,7 +676,7 @@ def sync(_: argparse.Namespace) -> None:
         row["module_level_contributions_json"] = json.dumps(
             module_contribution_record(row), ensure_ascii=False, sort_keys=True
         )
-        row["taxonomy_schema_version"] = "2.2"
+        row["taxonomy_schema_version"] = "2.3"
     write_csv(rows)
     generate_json(rows)
     print(f"synchronized Bib and manifest metadata for {len(rows)} records")
@@ -702,29 +706,30 @@ def validate(_: argparse.Namespace) -> None:
             errors.append(f"{key}: missing from production BibTeX")
         if key not in manifest and not repo_only:
             errors.append(f"{key}: missing from reference manifest")
-        if row["primary_locus"] not in {"GH", "GTS", "TSK"}:
+        if row["primary_locus"] not in {"LLM", "GH", "GTS", "TSK", "NONE"}:
             errors.append(f"{key}: invalid primary_locus={row['primary_locus']}")
         if not row["paper_claim_summary"]:
             errors.append(f"{key}: missing paper_claim_summary")
         if not row["primary_contribution"]:
             errors.append(f"{key}: missing primary_contribution")
         modules = {part.strip() for part in row["harness_modules"].split(";") if part.strip()}
-        unknown = modules - catalog_names
+        unknown = modules - (set(DIMENSION_NAMES) if row.get("reviewed_modules_json") else catalog_names)
         if unknown:
             errors.append(f"{key}: unknown Harness modules: {sorted(unknown)}")
-        if not modules:
+        if not modules and not row.get("reviewed_modules_json"):
             warnings.append(f"{key}: no Harness module assigned")
-        if not any(row[f"task_axis_{name}"] == "Yes" for name in TASK_AXES) and not row["task_axis_other"]:
+        if row.get("taxonomy_review_status") != "out_of_scope" and not any(row[f"task_axis_{name}"] == "Yes" for name in TASK_AXES) and not row["task_axis_other"]:
             warnings.append(f"{key}: no task axis assigned")
         ref = manifest.get(key, {})
         if ref and row["scholar_status"] != ref.get("scholar_status", ""):
             errors.append(f"{key}: Scholar status differs from reference manifest")
     profile_keys = {row["citation_key"] for row in parse_profiles()}
     profile_keys -= REPOSITORY_ONLY_KEYS
-    if set(keys) - REPOSITORY_ONLY_KEYS != profile_keys:
+    retained_keys = {r['citation_key'] for r in rows if r.get('taxonomy_review_status') not in {'out_of_scope', 'blocked'}}
+    if retained_keys - REPOSITORY_ONLY_KEYS != profile_keys:
         warnings.append(
-            f"ledger/profile key mismatch: ledger_only={sorted((set(keys)-REPOSITORY_ONLY_KEYS)-profile_keys)}, "
-            f"profile_only={sorted(profile_keys-(set(keys)-REPOSITORY_ONLY_KEYS))}"
+            f"ledger/profile key mismatch: ledger_only={sorted((retained_keys-REPOSITORY_ONLY_KEYS)-profile_keys)}, "
+            f"profile_only={sorted(profile_keys-(retained_keys-REPOSITORY_ONLY_KEYS))}"
         )
     locus = Counter(row["primary_locus"] for row in rows)
     generate_json(rows)

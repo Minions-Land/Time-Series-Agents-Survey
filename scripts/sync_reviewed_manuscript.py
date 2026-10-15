@@ -1,32 +1,41 @@
-"""Update the appendix's reviewed profiles and database snapshot from the ledger."""
+"""Render the appendix profiles and snapshot from adjudicated module records."""
 import json,re
 from collections import Counter
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 records=json.loads((ROOT/'paper_classification_ledger.json').read_text());p=ROOT/'main.tex';s=p.read_text()
 def escape(v):
- return v.replace('&',r'\&').replace('%',r'\%').replace('_',r'\_')
-for r in records:
- mods=r['module_level_contributions'].get('modules')
- if mods is None:continue
- key=r['citation']['key']
- lines=s.splitlines()
- for i,line in enumerate(lines):
-  if '\\citep{'+key+'}' in line and '& \\textbf{GH:}' in line:
-   first=line.split('& \\textbf{GH:}')[0]
-   parts=[]
-   for layer in ['GH','GTS','TSK','LLM']:
-    names=[escape(m['name']) for m in mods if m['layer']==layer]
-    if layer=='LLM' and not names:continue
-    parts.append('\\textbf{'+layer+':} '+('; '.join(names)+'.' if names else '--'))
-   lines[i]=first+'& '+r'\newline'.join(parts)+r'\\\midrule'
- s='\n'.join(lines)+'\n'
-claims=Counter(r['claim']['review_status'] for r in records);tasks=Counter(t for r in records for t in r['tasks']['axes'])
-reviewed=[r for r in records if 'modules' in r['module_level_contributions']]
-modules=sum(len(r['module_level_contributions']['modules']) for r in reviewed)
-snapshot=(r'\textbf{Current ledger snapshot.} The database contains \textbf{'+str(len(records))+r'} Paper Cards, including 136 production-Bib records and 2 repository-only resources. '
- +str(claims['paper_verified'])+' records have paper-verified claim summaries. Module-level review currently covers '+str(len(reviewed))+' works and '+str(modules)+' individually located modules; the remaining records retain candidate classifications. '
- +'Task memberships comprise '+str(tasks['forecasting_reasoning'])+' forecasting/prediction, '+str(tasks['augmentation_synthesis'])+' augmentation/synthesis, '+str(tasks['anomaly_detection_diagnosis'])+' anomaly/diagnosis, and '+str(tasks['decision_support'])+' decision-support records. '+str(sum(r['llm_side_contribution']['present'] for r in records))+' records carry LLM-side annotations. A record may have several task memberships.')
+ return v.replace('&',r'\&').replace('%',r'\%').replace('_',r'\_').replace('–','--').replace('—','---')
+bykey={r['citation']['key']:r for r in records}
+lines=s.splitlines();new=[]
+for line in lines:
+ if '& \\textbf{' not in line:
+  new.append(line);continue
+ match=re.search(r'\\citep\{([^}]+)\}',line)
+ key=match.group(1) if match else ('moiraiagent2026' if '\\RepoMoirai' in line else 'zhang2025llm' if '\\RepoLLMTSFD' in line else None)
+ if key not in bykey:new.append(line);continue
+ r=bykey[key];view=r['module_level_contributions'];mods=view.get('modules')
+ if mods is None:raise ValueError('Unreviewed profile '+key)
+ if view['review_status'] in ['out_of_scope','blocked']:continue
+ first=line.split('& \\textbf{')[0]
+ # Replace old inferred task label with the current contract description.
+ first=first.split(r'\newline')[0]+r'\newline '+escape(r['tasks']['source_label'])+' '
+ parts=[]
+ for layer in ['GH','GTS','TSK','LLM']:
+  names=[escape(m['name']) for m in mods if m['layer']==layer]
+  if not names:continue
+  parts.append('\\textbf{'+layer+':} '+'; '.join(names)+'.')
+ new.append(first+'& '+r'\newline'.join(parts)+r'\\\midrule')
+s='\n'.join(new)+'\n'
+status=Counter(r['module_level_contributions']['review_status'] for r in records)
+active=[r for r in records if r['module_level_contributions']['review_status'] in ['paper_verified','repository_verified']]
+tasks=Counter(t for r in active for t in r['tasks']['axes'])
+mods=[m for r in active for m in r['module_level_contributions']['modules']];layers=Counter(m['layer'] for m in mods)
+snapshot=(r'\textbf{Current ledger snapshot.} The database contains \textbf{'+str(len(records))+r'} examined records: '
+ +str(status['paper_verified'])+' paper-supported works, '+str(status['repository_verified'])+' repository-supported resources, and '+str(status['out_of_scope'])+' background records excluded from contribution counts. '
+ +'The '+str(len(active))+' retained records contain '+str(len(mods))+' source-located modules: '+str(layers['LLM'])+' LLM-side, '+str(layers['GH'])+' General Harness, '+str(layers['GTS'])+' General Time-Series Harness, and '+str(layers['TSK'])+' Task-Specific Harness modules. '
+ +'Task memberships comprise '+str(tasks['forecasting_reasoning'])+' forecasting/prediction, '+str(tasks['augmentation_synthesis'])+' augmentation/synthesis, '+str(tasks['anomaly_detection_diagnosis'])+' anomaly/diagnosis, and '+str(tasks['decision_support'])+' decision-support records; additional task values include classification, imputation, annotation, and question answering. Each module has one layer and may have several mechanism and task labels.')
 s=re.sub(r'\\textbf\{Current ledger snapshot\.\}[^\n]*',lambda _:snapshot,s)
+s=re.sub(r'Profiles of the \d+ reviewed works\.', 'Profiles of the '+str(len(active))+' retained works.',s)
 p.write_text(s)
-print('Snapshot synchronized:',len(records),'cards;',len(reviewed),'module-reviewed works;',modules,'modules')
+print('Snapshot:',len(records),'examined;',len(active),'retained;',len(mods),'modules;',dict(layers))

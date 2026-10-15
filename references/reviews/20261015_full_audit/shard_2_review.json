@@ -1,0 +1,3031 @@
+[
+  {
+    "citation_key": "tsreasoner2026",
+    "title_checked": "TS-Reasoner: Domain-Oriented Time Series Inference Agents for Reasoning and Automated Analysis",
+    "status": "paper_verified",
+    "claim_summary": "An LLM decomposes analytical instructions into executable time-series operators and revises failed plans.",
+    "modules": [
+      {
+        "id": "tsreasoner2026:execution-feedback",
+        "name": "Execution-error plan revision",
+        "layer": "GH",
+        "dimensions": [
+          "Control, Verification, and Feedback",
+          "Planning and Workflow"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Retrying a failed executable plan using the error message is independent of forecasting/anomaly semantics.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning Once the task decomposer",
+            "quote": "Once the task decomposer generates a structured execution plan R = [f1, f2, ..., fn] that specifies the sequence and order of operators, the program executor interprets and executes each step accordingly. If an execution error is encountered, a feedback loop is initiated: the task decomposer is re-invoked to produce a revised end-to-end execution plan",
+            "source_path": "references/pdfs/tsreasoner2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "tsreasoner2026:temporal-toolkit",
+        "name": "Unified time-series operator suite",
+        "layer": "GTS",
+        "dimensions": [
+          "Tools and Execution"
+        ],
+        "tasks": [
+          "forecasting_prediction",
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [
+          "imputation",
+          "temporal_causal_analysis"
+        ],
+        "scope_reason": "Model and numerical time-series operators support heterogeneous temporal analyses.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning TS-Reasoner relies on a suite",
+            "quote": "TS-Reasoner relies on a suite of modular operators that wrap existing statistical tools, machine learning and deep learning models, and numerical utilities. We adopt state-of-the-art or widely used components and expose them through a unified interface. Each operator is given an informa- tive name (e.g., ForecastOP, AnomalDetOP, calibrateThreshOP) and follows a consistent calling structure, enabling",
+            "source_path": "references/pdfs/tsreasoner2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "tsreasoner2026:forecast-holdout",
+        "name": "Within-instance forecast selection",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "The last 10% pseudo-holdout supplies forecast-quality feedback, binding this module to prediction.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning Feedback is obtained",
+            "quote": "Feedback is obtained via within-instance, temporally valid self-evaluation, where the last 10% of each time series is used as a pseudo-holdout for intermediate feedback, while final evaluation is conducted exclusively on the unseen future horizon. The program executor maintains a buffer memory of previously explored solution paths to prevent redundant evaluations. If the task decomposer",
+            "source_path": "references/pdfs/tsreasoner2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis",
+      "forecasting_prediction"
+    ],
+    "other_tasks": [
+      "imputation",
+      "temporal_causal_analysis"
+    ],
+    "evaluation_summary": "TimeSeriesExam plus constraint-aware forecasting, threshold-calibrated anomaly detection and Granger-style causal-analysis instances.",
+    "corrections": [
+      "Do not infer LLM training from in-context decomposition.",
+      "The citation key year differs from current TMLR 03/2026 PDF; preserve first-public date separately."
+    ],
+    "pages_inspected": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      7
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "timecap2025",
+    "title_checked": "TimeCAP: Learning to Contextualize, Augment, and Predict Time Series Events with Large Language Model Agents",
+    "status": "paper_verified",
+    "claim_summary": "Frozen contextualizer/predictor LLMs cooperate with a trained multimodal encoder and retrieved examples for event prediction.",
+    "modules": [
+      {
+        "id": "timecap2025:event-context-retrieval",
+        "name": "Multimodal event-example retrieval and prediction fusion",
+        "layer": "TSK",
+        "dimensions": [
+          "Memory and Context",
+          "Tools and Execution"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Retrieval and fusion are trained and evaluated for future-event class labels.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning In-Context Example Sampling.",
+            "quote": "In-Context Example Sampling. Once the multi-modal en- coder is trained, it aids AP in making more informed predic- tions by sampling relevant text summaries from the training set as valuable demonstrations (i.e., prompt augmentation). Given the embedding z of the multi-modal input (x, sx), we retrieve k summaries from the training set whose embed- dings",
+            "source_path": "references/pdfs/timecap2025.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Seven weather, finance and healthcare event-classification datasets; F1/AUROC, 6:2:2 split, five runs.",
+    "corrections": [
+      "Input/prompt augmentation is not generated time-series synthesis.",
+      "The main LLM is frozen; encoder training alone does not establish LLM-side contribution."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "competitionagents2025",
+    "title_checked": "Can Competition Enhance the Proficiency of Agents Powered by Large Language Models in the Realm of News-driven Time Series Forecasting?",
+    "status": "paper_verified",
+    "claim_summary": "Forecasting agents compete over news-selection rules, reject harmful rule updates and aggregate surviving predictions.",
+    "modules": [
+      {
+        "id": "competitionagents2025:competitive-news-selection",
+        "name": "Competitive news-rule evolution",
+        "layer": "TSK",
+        "dimensions": [
+          "Optimization and Evolution",
+          "Coordination and Scaling"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Survival and reflection use forecast error and news-selection policies.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning In Figure 1",
+            "quote": "In Figure 1, assume I agents need to participate in E rounds of competitions. In round e, the basic process of the task includes four stages. (1) News Filtering stage: Each agent i uses its logic L(e) i to select a news set N(e) i = {N(e) i,1 , N(e) i,2 , ..., N(e) i,S",
+            "source_path": "references/pdfs/competitionagents2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "competitionagents2025:llm-forecast-training",
+        "name": "Agent-specific forecast LLM fine-tuning",
+        "layer": "LLM",
+        "dimensions": [],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Each agent fine-tunes its forecasting LLM on selected news and temporal targets.",
+        "role": "model_training",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning Time Series Forecasting stage:",
+            "quote": "Time Series Forecasting stage: Each agent i fine-tunes their own LLM model LLM(e) S,i to predict the value eyi s,t+1 at time t + 1 of each Xs based on the analysis of the selected news N(e) i,s . The use of LLM(e) S,i for training and testing are mainly based on the research proposed",
+            "source_path": "references/pdfs/competitionagents2025.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Traffic, exchange, Bitcoin and electricity news-driven forecasts; 8:1:1 train/validation/test split.",
+    "corrections": [
+      "Competition framework is task-bound here; do not additionally count the same competitive module as GH."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "timera2025",
+    "title_checked": "Time-RA: Towards Time Series Reasoning for Anomaly Diagnosis with LLM Feedback",
+    "status": "paper_verified",
+    "claim_summary": "TIME-RA supplies multimodal anomaly reasoning supervision and fine-tunes language/vision-language models to detect, categorize and explain anomalies.",
+    "modules": [
+      {
+        "id": "timera2025:rats-sft",
+        "name": "RATS40K multimodal anomaly SFT",
+        "layer": "LLM",
+        "dimensions": [],
+        "tasks": [
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "The language model parameters are trained with time-series, description and image inputs.",
+        "role": "model_training",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning In TIME-RA task",
+            "quote": "In TIME-RA task, we address these limitations by fine-tuning LLMs with our unique RATS40K dataset. This approach empow- ers the LLMs with the ability to analyze time series anomalies more effectively and to generalize their understanding across diverse domains. Mathematically, given a (vision) language model π and after formatting an input x = {T, D,",
+            "source_path": "references/pdfs/timera2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "timera2025:anomaly-evaluation",
+        "name": "Detection, category and explanation evaluation",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Separate label, category and explanation evaluation explicitly targets anomaly reasoning.",
+        "role": "evaluation",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning Evaluation. To thoroughly",
+            "quote": "Evaluation. To thoroughly assess the perfor- mance of our fine-tuned models, we consider three types of evaluation separately: numerical binary label yl for determining whether a point is anoma- lous, numerical multi-class action a for identifying the type of anomaly, and textual reasoning r for explanation. For the first two quantitative evalua- tions, we treat",
+            "source_path": "references/pdfs/timera2025.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Binary/multiclass precision-recall-F1 and explanation metrics; expert checks of generated labels.",
+    "corrections": [
+      "Observation/Thought/Action labels describe annotation and model output; they are not evidence of a deployed tool-acting agent."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "calm2025",
+    "title_checked": "CALM: A Framework for Continuous, Adaptive, and LLM-Mediated Anomaly Detection in Time-Series Streams",
+    "status": "paper_verified",
+    "claim_summary": "CALM combines event-time streaming preparation with forecasting-based anomalies and LLM-guided TimesFM adaptation.",
+    "modules": [
+      {
+        "id": "calm2025:event-windowing",
+        "name": "Ordered event-time window construction",
+        "layer": "GTS",
+        "dimensions": [
+          "Memory and Context",
+          "Tools and Execution"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Timestamp ordering, watermarks and missing-time repair define a reusable temporal ingestion component.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.6; method passage beginning Handling Out-of-Order Data",
+            "quote": "Handling Out-of-Order Data A naive windowing approach would fail on out-of-order data, leading to incomplete or incorrect windows. We implement a custom stateful sliding-window function to handle this. As shown in Figure 2, incoming elements are first buffered in state (per key) instead of being immediately emitted. • Stateful Ordered Buffer: We use a persistent",
+            "source_path": "references/pdfs/calm2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "calm2025:stream-model-swap",
+        "name": "In-flight model-artifact swapping",
+        "layer": "GH",
+        "dimensions": [
+          "Tools and Execution"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Side-input artifact watching and weight reload do not require time-series task semantics.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.8; method passage beginning The pipeline monitors",
+            "quote": "The pipeline monitors a storage location (e.g., a local or remote bucket) for new model files. Whenever the fine-tuning stage produces a new model artifact and saves it to this location, the side input value is updated to the new model’s path. The inference component is designed to detect this update and then load the",
+            "source_path": "references/pdfs/calm2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "calm2025:drift-curation",
+        "name": "Semantic drift curation for anomaly adaptation",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback",
+          "Optimization and Evolution"
+        ],
+        "tasks": [
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "KEEP/REMOVE judgments curate anomalous windows for TimesFM fine-tuning.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.8; method passage beginning Once an outlier is detected",
+            "quote": "Once an outlier is detected by the forecasting model, it is not immediately used for fine-tuning. Instead, it is first passed to an LLM-based classifier (the ”LLM-as-a-Judge” component) for semantic analysis, as depicted in Figure 4. Figure 4: The LLM-as-a-Judge mechanism. A detected anomaly is enriched with surrounding data and statistical context. This is formatted",
+            "source_path": "references/pdfs/calm2025.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "33 TSB-UAD datasets selected for multiple anomaly groups and anomalies in final 20%.",
+    "corrections": [
+      "TimesFM fine-tuning is not LLM fine-tuning."
+    ],
+    "pages_inspected": [
+      1,
+      6,
+      7,
+      8,
+      10
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "counts2025",
+    "title_checked": "Eliciting Chain-of-Thought Reasoning for Time Series Analysis using Reinforcement Learning",
+    "status": "paper_verified",
+    "claim_summary": "COUNTS introduces discrete temporal/scale tokens and SFT plus reinforcement learning for chain-of-thought temporal analysis.",
+    "modules": [
+      {
+        "id": "counts2025:rvq-tokenization",
+        "name": "Residual-VQ temporal vocabulary",
+        "layer": "LLM",
+        "dimensions": [],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [
+          "temporal_question_answering",
+          "time_series_classification"
+        ],
+        "scope_reason": "New temporal tokens extend the LLM vocabulary and temporal representation.",
+        "role": "model_training",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning The primary modification",
+            "quote": "The primary modification to the LLM is the extension of its vocabulary to include the new tokens generated by the time series tokenizer, including both time series and scale tokens. This allows the LLM to seamlessly process and generate sequences containing both natural language and time series information. 3.2 Training Methodology The training of COUNTS",
+            "source_path": "references/pdfs/counts2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "counts2025:dapo-reasoning",
+        "name": "DAPO time-series reasoning training",
+        "layer": "LLM",
+        "dimensions": [],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [
+          "temporal_question_answering",
+          "time_series_classification"
+        ],
+        "scope_reason": "Policy-gradient training changes the LLM reasoning policy.",
+        "role": "model_training",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning Reinforcement Learning Phase",
+            "quote": "Reinforcement Learning Phase Building upon the foundation laid by the SFT phase, the RL phase aims to explicitly train the LLM to generate step-by-step reasoning (chain-of-thought) before arriving at a final answer for time series analysis problems. The model initialized from the SFT phase is further trained using the Decouple Clip and Dynamic sAmpling Policy",
+            "source_path": "references/pdfs/counts2025.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [
+      "temporal_question_answering",
+      "time_series_classification"
+    ],
+    "evaluation_summary": "ECG-QA and Context Is Key contextual forecasting; SFT versus RL and algorithm ablations.",
+    "corrections": [
+      "Do not classify chain-of-thought training as a runtime Harness planning module."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      7
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "alphacast2025",
+    "title_checked": "AlphaCast: A Human Wisdom-LLM Intelligence Co-Reasoning Framework for Interactive Time Series Forecasting",
+    "status": "paper_verified",
+    "claim_summary": "Training-free forecasting combines temporal features, domain priors, a model-linked case library and investigator/generator/reflector stages.",
+    "modules": [
+      {
+        "id": "alphacast2025:forecast-case-context",
+        "name": "Model-linked historical-case forecasting context",
+        "layer": "TSK",
+        "dimensions": [
+          "Memory and Context",
+          "Tools and Execution"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Cases store the best forecasting model and its outputs for each history.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning Case Library.",
+            "quote": "Case Library. To simulate the expert use of historical experiences, AlphaCast constructs a case library by associat- ing each training sample ⟨Xi, Yi⟩with its optimal candidate model Mi selected from the candidate pool M (detailed in Appendix B.2). To enable efficient retrieval and generation of case-based predictions, we perform K-means clustering (detailed in Appendix A.2)",
+            "source_path": "references/pdfs/alphacast2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "alphacast2025:forecast-reasoning",
+        "name": "Context-guided forecast adjustment",
+        "layer": "TSK",
+        "dimensions": [
+          "Planning and Workflow"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "The generator adjusts forecast shape and scale using retrieved forecasts and contextual covariates.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning Given the consolidated context",
+            "quote": "Given the consolidated context Icon, AlphaCast derives an intermediate prediction Yint through reasoning-driven gener- ation instead of single-pass regression. The model initializes with the case-based prediction Ycase as a reliable reference. To handle distribution shifts between neighbor Xnb and the current sequence Xen, AlphaCast uses the neighbor trajec- tory Ynb to adjust for scale and",
+            "source_path": "references/pdfs/alphacast2025.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Short- and long-horizon forecasting benchmarks including regional EPF; MAE/MSE.",
+    "corrections": [
+      "Human wisdom refers to curated priors/cases; do not imply online human interaction without further evidence."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "streasoner2026",
+    "title_checked": "STReasoner: Empowering LLMs for Spatio-Temporal Reasoning in Time Series via Spatial-Aware Reinforcement Learning",
+    "status": "paper_verified",
+    "claim_summary": "Network-SDE multi-agent synthesis produces aligned graph/sequence QA; an encoded TS-LM receives alignment, SFT and spatial-aware RL.",
+    "modules": [
+      {
+        "id": "streasoner2026:sde-synthesis",
+        "name": "Scenario-constrained network-SDE synthesis",
+        "layer": "TSK",
+        "dimensions": [
+          "Tools and Execution",
+          "Coordination and Scaling"
+        ],
+        "tasks": [
+          "data_augmentation_synthesis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Agents instantiate graph coupling, propagation delays and dynamics to generate controlled sequences.",
+        "role": "training_data",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning Network SDEs-based multi-agent",
+            "quote": "Network SDEs-based multi-agent spatio- temporal data synthesis pipeline. A key remaining challenge is how to align spatio- temporal dynamics with structured textual descriptions. To address this issue, we propose a network SDEs-based multi-agent data synthesis pipeline, illustrated in Figure 2. The framework consists of six agents. The Scenario Generation Agent produces high-level textual descriptions of",
+            "source_path": "references/pdfs/streasoner2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "streasoner2026:spatial-tslm",
+        "name": "Graph-conditioned temporal alignment and reasoning training",
+        "layer": "LLM",
+        "dimensions": [],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [
+          "temporal_question_answering"
+        ],
+        "scope_reason": "Learned temporal embeddings and three-stage training modify the TS-LM.",
+        "role": "model_training",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning Model Architecture",
+            "quote": "Model Architecture As shown in Figure 3, STReasoner processes mul- timodal inputs by separately encoding time series data and textual inputs, including the natural lan- guage query and the graph structure prompted in text. Following prior work on time series en- coding for LLMs (Zhang et al., 2025c; Chow et al., 2024; Xie et al.,",
+            "source_path": "references/pdfs/streasoner2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "data_augmentation_synthesis",
+      "forecasting_prediction"
+    ],
+    "other_tasks": [
+      "temporal_question_answering"
+    ],
+    "evaluation_summary": "ST-Bench etiological/entity/correlation reasoning and forecasting; accuracy, MAE and input-token/cost comparisons.",
+    "corrections": [
+      "The four ST-Bench tasks are not the survey four task families."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      7
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "mas4ts2026",
+    "title_checked": "Visual Reasoning over Time Series via Multi-Agent Systems",
+    "status": "paper_verified",
+    "claim_summary": "Analyzer/Reasoner/Executor agents combine plot anchors, continuous latent reconstruction and a reusable temporal operator library.",
+    "modules": [
+      {
+        "id": "mas4ts2026:temporal-carriers",
+        "name": "Plot-anchor and latent-trajectory reasoning",
+        "layer": "GTS",
+        "dimensions": [
+          "Interface and Interaction",
+          "Tools and Execution"
+        ],
+        "tasks": [
+          "forecasting_prediction",
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [
+          "time_series_classification",
+          "imputation"
+        ],
+        "scope_reason": "Shared representation is explicitly used for forecasting, classification, imputation and anomaly detection.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning The Reasoner aims",
+            "quote": "The Reasoner aims to bridge intuitive visual pattern recog- nition and precise numerical inference for time series anal- ysis. Rather than directly fitting historical trajectories, we leverage visual reasoning to identify sparse but informa- tive structural cues and subsequently enforce them through continuous-time latent dynamics. VLM-based Anchoring. Many salient temporal struc- tures in time series,",
+            "source_path": "references/pdfs/mas4ts2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "mas4ts2026:shared-memory",
+        "name": "Confidence-gated shared agent memory",
+        "layer": "GH",
+        "dimensions": [
+          "Memory and Context",
+          "Coordination and Scaling"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Hidden-state exchange and confidence-gated memory updates are a generic coordination mechanism.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning Shared Memory Mechanism.",
+            "quote": "Shared Memory Mechanism. We define a set of agents {Agent(i)}N i=1 for batch data processing, where in our in- stantiation N=3 corresponds to Analyzer, Reasoner, and Executor. Each agent has (i) an embedding function Embed(i)(·), (ii) a local memory view M(i), and (iii) a communication module Com(·). Cross-agent coordination is achieved through a shared memory",
+            "source_path": "references/pdfs/mas4ts2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "mas4ts2026:temporal-tools",
+        "name": "Task-routed temporal operator chain",
+        "layer": "GTS",
+        "dimensions": [
+          "Tools and Execution",
+          "Planning and Workflow"
+        ],
+        "tasks": [
+          "forecasting_prediction",
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [
+          "time_series_classification",
+          "imputation"
+        ],
+        "scope_reason": "A common time-series operation library is composed for multiple temporal tasks.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning Tool Library for Time Series.",
+            "quote": "Tool Library for Time Series. At execution time, an adaptive router selects a tool chain from a predefined li- brary T = {T1, . . . , TM}, where each tool implements a specialized operation (e.g., trend extrapolation, decomposi- tion, smoothing, statistical prediction, constraint projection, and residual correction). Tool routing adapts to the task type",
+            "source_path": "references/pdfs/mas4ts2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis",
+      "forecasting_prediction"
+    ],
+    "other_tasks": [
+      "time_series_classification",
+      "imputation"
+    ],
+    "evaluation_summary": "Forecasting MAE/MSE and UEA classification shown in inspected results; formulation also includes imputation and anomaly detection.",
+    "corrections": [
+      "VLM inference remains training-free; learned controller/latent modules do not by themselves establish LLM training.",
+      "PDF title uses plural Systems; ledger title was singular System."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "anomamind2026",
+    "title_checked": "AnomaMind: Agentic Time Series Anomaly Detection with Tool-Augmented Reasoning",
+    "status": "paper_verified",
+    "claim_summary": "AnomaMind localizes suspicious intervals, gathers diagnostic evidence and refines anomaly decisions, with a separately trained detector policy.",
+    "modules": [
+      {
+        "id": "anomamind2026:anomaly-workflow",
+        "name": "Coarse-to-fine tool-guided interval diagnosis",
+        "layer": "TSK",
+        "dimensions": [
+          "Tools and Execution",
+          "Planning and Workflow",
+          "Coordination and Scaling"
+        ],
+        "tasks": [
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Locator/actor/detector/evaluator roles are defined around anomaly intervals and their evidence.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning AnomaMind instantiates",
+            "quote": "AnomaMind instantiates the general process as a structured coarse-to-fine workflow. The workflow is organized into four implementation stages, each corresponding to one role in Table I: coarse evidence acquisition by the locator, adaptive evidence construction by the actor, anomaly detection by the detector, and iterative refinement by the evaluator. These stages provide a unified mechanism",
+            "source_path": "references/pdfs/anomamind2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "anomamind2026:detector-rl",
+        "name": "Anomaly detector SFT and reinforcement learning",
+        "layer": "LLM",
+        "dimensions": [],
+        "tasks": [
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Only the dedicated detection policy is trained with parsing, F1 and false-positive rewards.",
+        "role": "model_training",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.6; method passage beginning Before reinforcement learning",
+            "quote": "Before reinforcement learning, we conduct supervised fine-tuning to initialize the detection-specific policy with anomaly reasoning traces. This stage teaches the detector to interpret diagnostic context and generate interval-level outputs, while the RL stage further optimizes decision quality using parsing, F1-score, and false-positive rewards. While general- purpose reasoning is effective for evidence construction and workflow control,",
+            "source_path": "references/pdfs/anomamind2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Yahoo, KPI, IOPS and WSD anomaly benchmarks; distinction between point/segment labels.",
+    "corrections": [
+      "Do not infer GH from the use of general-purpose LLMs: the implemented locator/actor workflow is anomaly-bound."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "artist2026",
+    "title_checked": "Adaptive Time Series Reasoning via Segment Selection",
+    "status": "paper_verified",
+    "claim_summary": "ARTIST trains a shared language-model policy to select temporal segments and answer questions through controller/reasoner interaction.",
+    "modules": [
+      {
+        "id": "artist2026:joint-policy",
+        "name": "Hierarchical segment-selection reasoning policy",
+        "layer": "LLM",
+        "dimensions": [],
+        "tasks": [],
+        "other_tasks": [
+          "temporal_question_answering"
+        ],
+        "scope_reason": "The same LLM is SFT- and RL-trained in controller and reasoner roles.",
+        "role": "model_training",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.7; method passage beginning Training proceeds in two",
+            "quote": "Training proceeds in two stages: (1) SFT, utilizing LoRA-based fine-tuning on struc- tured reasoning traces that interleave natural language with segment-selection calls (Appendix C); and (2) RL, employ- ing full-parameter fine-tuning via our collaborative self- play algorithm. Performance is measured using average Accuracy and F1 scores across 8 independent runs per dataset. For ARTIST, we",
+            "source_path": "references/pdfs/artist2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "artist2026:segment-selection",
+        "name": "Iterative temporal-segment acquisition",
+        "layer": "TSK",
+        "dimensions": [
+          "Interface and Interaction",
+          "Planning and Workflow"
+        ],
+        "tasks": [],
+        "other_tasks": [
+          "temporal_question_answering"
+        ],
+        "scope_reason": "Segment selection and ACCEPT/CONTINUE decisions are conditioned on a QA answer contract.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning The controller decides",
+            "quote": "The controller decides which temporal segments to inspect and when to terminate the interaction, while the reasoner gen- erates a reasoning trace and a final answer conditioned on the accumulated segments. Each training iteration consists of (i) generating rollouts through Controller-Reasoner interaction and (ii) comput- ing a joint policy update. Figure 2 illustrates the rollout",
+            "source_path": "references/pdfs/artist2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [],
+    "other_tasks": [
+      "temporal_question_answering"
+    ],
+    "evaluation_summary": "Six QA benchmarks including ECG-QA/Sleep-QA/TSQA/TRQA; average accuracy and F1 over eight runs; segment-use analysis.",
+    "corrections": [
+      "Temporal QA is not automatically forecasting or decision support."
+    ],
+    "pages_inspected": [
+      1,
+      4,
+      5,
+      7
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "tfrbench2026",
+    "title_checked": "TFRBench: A Reasoning Benchmark for Evaluating Forecasting Systems",
+    "status": "paper_verified",
+    "claim_summary": "TFRBench constructs outcome-selected forecast reasoning references and evaluates numerical forecasts and narrative-to-number reasoning.",
+    "modules": [
+      {
+        "id": "tfrbench2026:reasoning-reference",
+        "name": "Forecast-reference construction and reasoning evaluation",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Generated references and judge dimensions are specific to numerical forecasting.",
+        "role": "evaluation",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.8; method passage beginning Evaluation Protocol.",
+            "quote": "Evaluation Protocol. To assess reasoning validity alongside numerical accuracy (which standard metrics like MASE, MAE), TFRBench introduces a standardized evaluation protocol (Figure 3) for re- search community. We employ an LLM-as-a-Judge to compare candidate outputs against our generated reasoning trajectories (which we consider the best possible reasoning available for evaluation) across four dimensions: Domain Relevance,",
+            "source_path": "references/pdfs/tfrbench2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Ten datasets/five domains; outputs numerical forecasts plus reasoning; MAE/MASE and judge scores for domain relevance, forecasting correctness, event relevance, logic-to-number consistency.",
+    "corrections": [
+      "Reference creation uses oracle future events and MASE-based ground-truth selection (p.8); do not characterize reference generation as an ex-ante agent deployment.",
+      "The generation agent architecture is benchmark construction, not proof of an independently trained LLM."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "tsag2026",
+    "title_checked": "Time Series Augmented Generation for Financial Applications",
+    "status": "paper_verified",
+    "claim_summary": "TSAG evaluates natural-language financial queries routed to typed temporal analysis tools, using deterministic tool stubs in its benchmark.",
+    "modules": [
+      {
+        "id": "tsag2026:temporal-tool-interface",
+        "name": "Financial temporal-tool invocation interface",
+        "layer": "GTS",
+        "dimensions": [
+          "Interface and Interaction",
+          "Tools and Execution"
+        ],
+        "tasks": [
+          "forecasting_prediction",
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [
+          "temporal_question_answering"
+        ],
+        "scope_reason": "Tools expose temporal windows, granularities, statistics and prediction interfaces across analytical requests; actual benchmark uses stubs.",
+        "role": "infrastructure",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning The initial tool set",
+            "quote": "The initial tool set, prioritizing reliability for this study, covers the following: • Seasonality/Pattern Analysis: Tools (peak_traded_volume, lowest_traded_volume, round_the_clock_pattern, abnormal_deviations) identifying recur- ring/anomalous volume patterns via statistical analysis. • Price and Volatility Analysis: Tools (price, volatility) retrieving current data or calculating historical metrics (e.g., Parkinson volatility (Parkin- son 1980)) along with respective prediction tools (predict_price,",
+            "source_path": "references/pdfs/tsag2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "tsag2026:stub-evaluation",
+        "name": "Deterministic tool-call evaluation",
+        "layer": "GH",
+        "dimensions": [
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Expected tool outputs test routing/argument extraction, not the numerical algorithms.",
+        "role": "evaluation",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning The stubs of the functions",
+            "quote": "The stubs of the functions delivered as part of the benchmark presented in this work are containing specific expected responses hard- coded in tsag/tools.py source code according to the benchmark in tests/benchmark.tsv. Future work includes implementing more sophisticated \"real\" functions and expanding the scope of applications to traditional finance. 3.4 Function Parameters and Defaults The",
+            "source_path": "references/pdfs/tsag2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis",
+      "forecasting_prediction"
+    ],
+    "other_tasks": [
+      "temporal_question_answering"
+    ],
+    "evaluation_summary": "100 natural-language queries; return rate, match accuracy, LLM-assessed accuracy, hallucination rate, seconds/query.",
+    "corrections": [
+      "Do not claim forecast accuracy or real dynamic data execution: tools in benchmark contain hard-coded expected responses."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results. Forecasting/anomaly tool names record advertised interface coverage; benchmark validates tool routing only, not corresponding numerical task performance."
+  },
+  {
+    "citation_key": "timeclaw2026explore",
+    "title_checked": "TimeClaw: A Time-Series AI Agent with Exploratory Execution Learning",
+    "status": "paper_verified",
+    "claim_summary": "TimeClaw explores alternative executable solutions, compares outcomes and distills external reusable experience for later inference.",
+    "modules": [
+      {
+        "id": "timeclaw2026explore:explore-distill",
+        "name": "Explore-compare-distill execution learning",
+        "layer": "GH",
+        "dimensions": [
+          "Planning and Workflow",
+          "Optimization and Evolution"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "The branch-generation, result-comparison and external-artifact update mechanism is task-parameterized rather than a temporal data operation.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning The exploration phase",
+            "quote": "The exploration phase is implemented by a constrained executor that turns autonomous execution into explicit exploratory execution learning. In exploration mode, the main agent can access exploration- only orchestration tools, including spawn_subagent for branch generation and evaluate_* tools for post-hoc comparison against ground truth. Unlike ordinary inference, exploration must satisfy an exploration contract: the agent",
+            "source_path": "references/pdfs/timeclaw2026explore.pdf"
+          }
+        ]
+      },
+      {
+        "id": "timeclaw2026explore:rule-injection",
+        "name": "Conflict-aware structured experience and injection",
+        "layer": "GH",
+        "dimensions": [
+          "Memory and Context",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Confidence, applicability and injection status govern reusable rules independently of temporal task semantics.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.6; method passage beginning The key runtime layer",
+            "quote": "The key runtime layer is MEMORY, whose entries are structured reusable rules rather than free-form reflections. A memory rule is represented as a 9-tuple: r = (κ, σ, χ, T +, T −, ρ, E, c, ι), (8) where κ is the rule kind (e.g., tool preference, condition-action, avoidance), σ is a concise summary, χ",
+            "source_path": "references/pdfs/timeclaw2026explore.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [
+      "time_series_classification",
+      "temporal_question_answering"
+    ],
+    "evaluation_summary": "MTBench 17-task/30-metric setting: finance MAE/MAPE and MACD MSE; weather MSE/MAE; trend/correlation/MCQA accuracy. Exploration corpus disjoint from tests; test-time reuse without online adaptation.",
+    "corrections": [
+      "No LLM weight update; experience-state learning is Harness-side.",
+      "Do not transfer runtime-native temporal objects or held-out tool growth claims from the separate TimeClaw Harness paper."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      6,
+      7
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "kairosagent2026",
+    "title_checked": "KairosAgent: Agentic Time Series Forecasting with Fused Semantic Reasoning",
+    "status": "paper_verified",
+    "claim_summary": "KairosAgent trains a tool-using morphology reasoner and fuses its semantic output into a numerical TSFM, assigning turn-level forecast-improvement rewards.",
+    "modules": [
+      {
+        "id": "kairosagent2026:reasoner-training",
+        "name": "Tool-grounded morphology SFT and turn-level RL",
+        "layer": "LLM",
+        "dimensions": [],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "SFT and policy optimization update the language reasoner.",
+        "role": "model_training",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning Stage I: SFT of the Reasoner.",
+            "quote": "Stage I: SFT of the Reasoner. We warm up the reasoner via SFT on T-STAR trajectories, format- ting each as a multi-turn chat containing system instructions, user queries, tool interactions, and the morphology description. We optimize the reasoner using a standard next-token prediction objective over all assistant-side tokens, including intermedi- ate tool calls. This stage",
+            "source_path": "references/pdfs/kairosagent2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "kairosagent2026:morphology-fusion",
+        "name": "Morphology-conditioned forecasting bridge",
+        "layer": "TSK",
+        "dimensions": [
+          "Tools and Execution"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Semantic morphology is injected into the forecasting TSFM for numerical horizon prediction.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning KAIROSAGENT fuses",
+            "quote": "KAIROSAGENT fuses tool-grounded reasoning into the TSFM hidden space as a se- mantic prior. Furthermore, rather than relying on the static text encodings typical of existing multi- modal models (Wu et al., 2025b; Liu et al., 2025a; Chowdhury et al., 2026), our framework dynami- cally constructs this prior through multi-turn tool interaction, specifically adapting to",
+            "source_path": "references/pdfs/kairosagent2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Time-MMD and a second multimodal benchmark discussed in experiments; evaluates future-morphology reasoning, zero-shot forecasting, credit-assignment/fusion ablations.",
+    "corrections": [
+      "TSFM alignment is distinct from LLM reasoning-policy training; do not count the same training stage twice."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "timefore2026",
+    "title_checked": "ODTQA-FoRe: An Open-Domain Tabular Question Answering Dataset for Future Data Forecasting and Reasoning",
+    "status": "paper_verified",
+    "claim_summary": "ODTQA-FoRe evaluates retrieval, forecasting and reasoning over real-estate tables; TimeFore retrieves SQL data, imputes history and invokes a numerical forecaster.",
+    "modules": [
+      {
+        "id": "timefore2026:sql-repair",
+        "name": "Execution-feedback SQL repair",
+        "layer": "GH",
+        "dimensions": [
+          "Tools and Execution",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "SQL error correction and bounded retries are independent of temporal forecasting.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.6; method passage beginning To ensure robustness and ad-",
+            "quote": "To ensure robustness and ad- dress potential syntax or logic errors, particularly in complex scenarios, the Retriever agent employs an execution-feedback loop, utilizing the sqlQuery- Tool to execute the SQL within the database. If execution fails, the agent refines the SQL based on the error feedback. This loop continues until success is achieved or a",
+            "source_path": "references/pdfs/timefore2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "timefore2026:forecast-tool",
+        "name": "Imputation-then-prediction tool workflow",
+        "layer": "TSK",
+        "dimensions": [
+          "Tools and Execution",
+          "Planning and Workflow"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Historical 24-month prices are imputed with TimesNet and predicted with TimeXer over 12 months.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.6; method passage beginning Its core action",
+            "quote": "Its core action is to invoke a predefined function, the imputationThenPredictionTool. This function encapsulates a sophisticated forecasting pipeline: it first validates and cleans the input time series, then employs the TimesNet model (Wu et al., 2023) for robust data imputation. Based on this com- plete and imputed sequence, the TimeXer model (Wang et al., 2024b)",
+            "source_path": "references/pdfs/timefore2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "timefore2026:future-table-evaluation",
+        "name": "Future-table forecasting and reasoning benchmark",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [
+          "temporal_question_answering"
+        ],
+        "scope_reason": "The benchmark isolates future-year tables as hidden targets and evaluates answers built from forecasts.",
+        "role": "evaluation",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.7; method passage beginning ODTQA-FoRe consists",
+            "quote": "ODTQA-FoRe consists of two subtasks: time- series forecasting and forecast-based reasoning. We evaluate time-series forecasting using Mean Squared Error (MSE), Mean Absolute Error (MAE), and Mean Relative Error (MRE). For forecast-based reasoning, we use Accuracy, Preci- sion (P), Recall (R), and F1-score (F1). To account for questions with multiple items, we compute F1 at the",
+            "source_path": "references/pdfs/timefore2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [
+      "temporal_question_answering"
+    ],
+    "evaluation_summary": "28,507 QA pairs/288 historical tables; project-disjoint split and 2022–23/2024 temporal split; forecasting MSE/MAE/MRE and reasoning exact-match accuracy/item-level P/R/F1.",
+    "corrections": [
+      "Do not conflate forecast-based QA with qualitative event-only forecasting."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      6,
+      7
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "batterylake2026",
+    "title_checked": "BatteryLake: Agentic, Physics-Grounded Curation of Heterogeneous Battery Aging Data and Benchmarking",
+    "status": "paper_verified",
+    "claim_summary": "BatteryLake uses evidence-grounded metadata extraction and validation-guided converter synthesis to curate battery aging data and reproducible SOH/RUL benchmarks.",
+    "modules": [
+      {
+        "id": "batterylake2026:quoted-metadata",
+        "name": "Quote-grounded metadata extraction with human review",
+        "layer": "GH",
+        "dimensions": [
+          "Memory and Context",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Verbatim-span validation, abstention and confidence review apply to general document extraction.",
+        "role": "infrastructure",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning An evidence-grounded extractor",
+            "quote": "An evidence-grounded extractor is a function Φ(F, E) = {(f, vf, ef, sf, cf)}f∈F , (1) where vf ∈dom(f) ∪{⊥} is the extracted value or the abstention symbol ⊥(rendered as “source page not stated”), ef is a verbatim evidence span from some Ei, sf = i records the provenance, and cf ∈[0, 1] is a",
+            "source_path": "references/pdfs/batterylake2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "batterylake2026:temporal-schema",
+        "name": "Canonical temporal measurement schema and validation",
+        "layer": "GTS",
+        "dimensions": [
+          "Interface and Interaction",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Ordered samples, units and signal conventions define reusable temporal data representation across downstream battery analyses.",
+        "role": "infrastructure",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning Time series T:",
+            "quote": "Time series T: one tuple per sample with canonical signals time_s, voltage_V, current_A, temperature_C, charge/discharge_capacity_Ah, step_type, un- der fixed units and the sign convention I > 0 on charge. Each attribute a carries a type τ(a), a unit u(a), and a domain dom(a) (e.g., dom(voltage_V) ⊆ [0, 6] V for single cells). Layers are linked",
+            "source_path": "references/pdfs/batterylake2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "batterylake2026:soh-rul-benchmark",
+        "name": "SOH/RUL reproducible benchmark package",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Outcome labels, temporal/cross-cell splits and metrics target battery-health prediction.",
+        "role": "evaluation",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.6; method passage beginning Benchmark Design",
+            "quote": "Benchmark Design On the curated lake, BatteryLake defines two primary tasks with standardized labels: SOH estimation (predict capacity retention at a cycle from partial-cycle signals or cycle-level features) and RUL prediction (predict cycles remaining to a manifest-recorded end-of-life threshold). Because split de- sign dominates apparent performance in battery ML, every experiment declares one of three",
+            "source_path": "references/pdfs/batterylake2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "SOH estimation and RUL prediction; random/temporal/cross-cell splits; eight baseline families, fixed seeds/configurations, RMSE/MAE/MAPE/R2.",
+    "corrections": [
+      "Physical electrochemistry constraints are domain-specific; do not present them as universal time-series requirements."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "finanalyst2026",
+    "title_checked": "Fin-Analyst at FinMMEval 2026 Task 3: A Live Hybrid Trading Agent with LLM Specialists and Rule-Based Signals",
+    "status": "paper_verified",
+    "claim_summary": "Fin-Analyst aggregates eight TSLA specialist verdicts and uses a separate rule-based BTC branch in a live daily trading service.",
+    "modules": [
+      {
+        "id": "finanalyst2026:specialist-trading",
+        "name": "Recency-weighted specialist trading aggregation",
+        "layer": "TSK",
+        "dimensions": [
+          "Memory and Context",
+          "Coordination and Scaling"
+        ],
+        "tasks": [
+          "decision_support"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Specialists and overrides are defined around dated financial disclosures and BUY/HOLD/SELL decisions.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning We propose a hierarchical agent",
+            "quote": "We propose a hierarchical agent with three layers: (i) a persistent memory of seven pre-processed corpora loaded at startup, (ii) eight role-conditioned LLM specialists, and (iii) a Meta-Agent that aggregates specialist verdicts into the final trading action. For TSLA, the full hierarchy is used, for BTC the system bypasses the LLM pipeline and applies a",
+            "source_path": "references/pdfs/finanalyst2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "finanalyst2026:inference-cache",
+        "name": "Prompt-keyed specialist response cache",
+        "layer": "GH",
+        "dimensions": [
+          "Tools and Execution"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Caching unchanged requests reduces repeated model calls independently of trading semantics.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning To bound latency and cost",
+            "quote": "To bound latency and cost, verdicts are cached by an MD5 hash of the prompt, so specialists reading unchanged low-frequency signal cards (e.g., the same most-recent 8-K on consecutive days) reuse a cached verdict rather than issuing a new API call. Any specialist or endpoint exception returns a HOLD verdict, ensuring compliance with the task’s",
+            "source_path": "references/pdfs/finanalyst2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "decision_support"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "CLEF FinMMEval 2026 Task 3 offline and live TSLA/BTC evaluation; portfolio return, alpha versus buy-and-hold, Sharpe, win rate; live returns net of fees.",
+    "corrections": [
+      "BTC bypasses the LLM pipeline; do not attribute BTC performance to multi-agent LLM reasoning."
+    ],
+    "pages_inspected": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "oilwellagent2026",
+    "title_checked": "An Explainable LLM Agent Layer for Open-World Anomaly Detection in Oil Wells",
+    "status": "paper_verified",
+    "claim_summary": "A prompted LLM uses sensor metrics and class profiles to explain/validate upstream oil-well anomaly proposals and name novel clusters.",
+    "modules": [
+      {
+        "id": "oilwellagent2026:metric-profile-diagnosis",
+        "name": "Sensor-metric/class-profile diagnostic layer",
+        "layer": "TSK",
+        "dimensions": [
+          "Memory and Context",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Profiles, structured metrics and outputs are bound to oil-well anomaly categories and upstream validation.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.7; method passage beginning Prompt: The agent receives",
+            "quote": "Prompt: The agent receives observed metrics, known class profiles with per-sensor statistics and distinguishing features, and task-specific instructions requesting ranked JSON output with justifications. • Output: JSON with top-3 ranked candidates, per-candidate justifica- tion citing sensor evidence, confidence label (High/Medium/Low), and for novelty cases a novel_name plus novel_description. 3.5. Study design Three studies evaluate the",
+            "source_path": "references/pdfs/oilwellagent2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Public 3W: 191 segments top-k classification, 187 upstream validation, 611 novelty/naming cases; top-k accuracy, validation precision and novelty detection.",
+    "corrections": [
+      "The LLM receives derived metrics, not raw series; it is not fine-tuned.",
+      "Do not conflate downstream explanation with replacement of upstream open-world detection."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "crafter2026",
+    "title_checked": "When Do Corrective Features Help? An Agent for Corrective Feature Discovery on Black-Box Forecasters",
+    "status": "paper_verified",
+    "claim_summary": "CRAFTER discovers features of frozen-forecaster residuals through compositional search and LLM proposals, filtering them with a source-blind validation gate.",
+    "modules": [
+      {
+        "id": "crafter2026:residual-feature-search",
+        "name": "Residual feature discovery and correction gate",
+        "layer": "TSK",
+        "dimensions": [
+          "Tools and Execution",
+          "Control, Verification, and Feedback",
+          "Optimization and Evolution"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "The target is unexplained forecasting residual and validation wMAPE; correction is forecast-specific.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning CRAFTER mines the residual",
+            "quote": "CRAFTER mines the residual with two generators of different character—an atomic search over the raw channels and an LLM that proposes named fea- tures (§3.2)—and routes both into a single source- blind acceptance gate (§3.3) that keeps a candidate only when it explains validation error the corrector cannot already account for, whichever generator produced it.",
+            "source_path": "references/pdfs/crafter2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "crafter2026:corrector-selection",
+        "name": "Validation-selected post-hoc corrector",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Identity/additive/multiplicative correctors are selected by forecast validation error.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning CRAFTER fits a small corrector",
+            "quote": "CRAFTER fits a small corrector set—an identity (NONE) map plus an additive and a multiplica- tive gradient-boosted corrector—and keeps the one with the best validation wMAPE. Trees are cho- sen because the residual is nonlinear and regime- dependent and because per-feature importances keep the correction auditable (App. D). The NONE option floors the risk on",
+            "source_path": "references/pdfs/crafter2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Six datasets × six frozen TSFM backbones, rolling-origin train/validation/test and blocked CV; test horizon-total wMAPE, budget and generator ablations.",
+    "corrections": [
+      "TSFM backbone remains frozen; no LLM training contribution is established."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "aqua2026",
+    "title_checked": "AQuA: Recursively Self-Improving Quantitative Trading Research Agents",
+    "status": "paper_verified",
+    "claim_summary": "AQuA implements two separate evidence-accumulating research loops for factor discovery and model development inside sealed evaluation sandboxes.",
+    "modules": [
+      {
+        "id": "aqua2026:manager-handoffs",
+        "name": "Manager-mediated specialist handoffs",
+        "layer": "GH",
+        "dimensions": [
+          "Planning and Workflow",
+          "Coordination and Scaling"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "All specialist handoffs pass through a manager with explicit per-agent assignments.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.6; method passage beginning An AI Manager mediates",
+            "quote": "An AI Manager mediates each run. It reads the research policy, the accumulated memory, and the record of previous runs, and from these it writes a plan that assigns every downstream agent a concrete task. The agents never call one another; each handoff passes through the Manager, which keeps a run auditable and reproducible. Figure",
+            "source_path": "references/pdfs/aqua2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "aqua2026:sealed-search",
+        "name": "Immutable evaluator and validation-only search feedback",
+        "layer": "GH",
+        "dimensions": [
+          "Control, Verification, and Feedback",
+          "Optimization and Evolution"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Proposals cannot edit the evaluator/data definitions; final-test scores are withheld from search.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning Sealing the data path",
+            "quote": "Sealing the data path closes leakage through generation, but a second channel remains through selection: a search that can read the metric it will ultimately report will, given enough iterations, learn to select for it. We close this channel by separating the metric the loop optimizes from the metric it reports. During search the harness",
+            "source_path": "references/pdfs/aqua2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "aqua2026:causal-factor-grammar",
+        "name": "Causal formulaic-alpha operator grammar",
+        "layer": "TSK",
+        "dimensions": [
+          "Tools and Execution"
+        ],
+        "tasks": [
+          "decision_support"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Trailing-window/current-time operator composition targets alpha-factor discovery.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning In Part I, the registry",
+            "quote": "In Part I, the registry O is the standard vocabulary of formulaic-alpha operators Kakushadze (2016); Zhang et al. (2020). Its leaves are raw fields (open, high, low, close, volume, vwap, returns); its inner nodes are operators of three kinds: cross-sectional operators that act across the universe at a fixed timestamp (rank, z-score, sector neutralization), time-series",
+            "source_path": "references/pdfs/aqua2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction",
+      "decision_support"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Independent factor-discovery and model-development studies; held-out IC, per-stock IC-squared, walk-forward trading and cost-aware Sharpe.",
+    "corrections": [
+      "Two systems do not share memory or candidates.",
+      "Underlying LLM and evaluator are not updated; do not call the model-development loop LLM fine-tuning."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      10
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "reasoncast2026",
+    "title_checked": "ReasonCast: Agentic Demand Forecasting with Selective Semantic Reasoning",
+    "status": "paper_verified",
+    "claim_summary": "ReasonCast learns selective semantic routing and event-conditioned fusion so numerical forecasting can incorporate useful event evidence or retain its no-text baseline.",
+    "modules": [
+      {
+        "id": "reasoncast2026:reasoner-posttraining",
+        "name": "Schema and forecast-utility reasoner training",
+        "layer": "LLM",
+        "dimensions": [],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "SFT and semantic/forecast reward optimization change the reasoner policy.",
+        "role": "model_training",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning ReasonCast is trained",
+            "quote": "ReasonCast is trained with a three-phase curriculum. First, schema SFT establishes valid structured outputs, after which semantic-field RL calibrates forecast-derived direction, temporal shape, ampli- tude, and peak fields. Second, the semantic-field policy regenerates the fusion-training corpus, on which we learn orthogonal event- subspace grounding, multimodal alignment, and selective dual-path fusion. Third, the trained forecaster is",
+            "source_path": "references/pdfs/reasoncast2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "reasoncast2026:selective-fusion",
+        "name": "Skip/Basic/Tool semantic forecast intervention",
+        "layer": "TSK",
+        "dimensions": [
+          "Tools and Execution",
+          "Planning and Workflow"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Routing and gated additive/multiplicative paths are defined by forecast utility.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning Skip terminates semantic processing",
+            "quote": "Skip terminates semantic processing, Basic uses available context, and Tool retrieves evidence or invokes temporal-statistics tools for ambiguous or high-entropy cases. Hard-triggered holidays and mega-sales use at least Basic. For either non-skip action, Qwen3- 32B [37] produces s𝑖= (𝑟𝑖, 𝑒𝑖, 𝑑𝑖, 𝑞𝑖, 𝑢𝑖, 𝑝𝑖, 𝑧𝑖), (5) where 𝑟𝑖denotes event relevance, 𝑒𝑖the dominant event, 𝑑𝑖demand direction,",
+            "source_path": "references/pdfs/reasoncast2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Event-centered holiday/mega-sale and M5 evaluations with WMAPE/MAE; stable-sales comparison of routed versus always-on semantics.",
+    "corrections": [
+      "Selective routing does not establish universal no-harm performance; exact no-text identity applies when the gate disables semantic processing."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "tracebench2026",
+    "title_checked": "TraceBench: Controlled Evaluation of LLM Agents for Time-Series Root-Cause Attribution",
+    "status": "paper_verified",
+    "claim_summary": "TraceBench simulates parameter interventions to test agent root-cause attribution and records programmatic generalization and exploration behavior.",
+    "modules": [
+      {
+        "id": "tracebench2026:root-cause-evaluation",
+        "name": "Controlled simulator-root-cause evaluation",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Ground truth is the changed simulator parameter or no-intervention class.",
+        "role": "evaluation",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning TraceBench is a simulation-based",
+            "quote": "TraceBench is a simulation-based framework for generating con- trolled agentic root-cause attribution tasks. Each TraceBench task presents an agent with a test batch of time-series samples gener- ated by simulating a dynamical system. The agent must, for each sample, identify which simulator parameter, if any, has changed. Depending on the experimental condition, the task may",
+            "source_path": "references/pdfs/tracebench2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "tracebench2026:execution-trace-metrics",
+        "name": "Agent exploration and resource trace metrics",
+        "layer": "GH",
+        "dimensions": [
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Tool calls, code, plots, tokens and elapsed time describe general agent execution behavior.",
+        "role": "evaluation",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning From the agentic log traces",
+            "quote": "From the agentic log traces, we extract metrics that characterize overall resource use and exploration be- havior. Specifically, we measure episode token usage and its cor- responding cost, episode time, and the number of tool calls. We additionally report fine-grained exploration and interaction met- rics, including the numbers of Python calls and Python statements; the",
+            "source_path": "references/pdfs/tracebench2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Axes: context, noise, support examples, direct/programmatic submission. Accuracy on episode and held-out samples plus token/cost/time/tool/Python/plot/console-output metrics.",
+    "corrections": [
+      "This is already agentic time-series benchmarking, so a blanket claim that no such benchmark exists is false."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "timeseriesgym2025",
+    "title_checked": "TimeSeriesGym: A Scalable Benchmark for (Time Series) Machine Learning Engineering Agents",
+    "status": "paper_verified",
+    "claim_summary": "TimeSeriesGym provides executable ML-engineering challenges with resources, task descriptions and artifact graders across time-series problems.",
+    "modules": [
+      {
+        "id": "timeseriesgym2025:challenge-environment",
+        "name": "Task resources, execution and artifact grading",
+        "layer": "GH",
+        "dimensions": [
+          "Tools and Execution",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Challenge packaging, execution budgets and diverse artifact grading are general ML-engineering benchmark mechanisms.",
+        "role": "evaluation",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning Each challenge in TimeSeriesGym",
+            "quote": "Each challenge in TimeSeriesGym is organized with a consistent structure: (1) resources including datasets, code repositories, related paper(s) and documentation relevant to the challenge; (2) a description file that outlines the challenge parameters, available resources, and provides specific instructions and hints for successful completion; and (3) challenge-specific grading functions to evaluate agent submissions. Some challenges",
+            "source_path": "references/pdfs/timeseriesgym2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "timeseriesgym2025:temporal-challenges",
+        "name": "Time-series engineering challenge collection",
+        "layer": "GTS",
+        "dimensions": [
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [
+          "time_series_classification",
+          "temporal_question_answering"
+        ],
+        "scope_reason": "The benchmark spans temporal modeling and engineering across multiple time-series problem types.",
+        "role": "evaluation",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning The current version features",
+            "quote": "The current version features 34 challenges from 23 unique data sources across 8 unique time series problems, spanning more than 15 domains. These challenges evaluate AI agents on a range of realistic ML engineering skills beyond just model development, including data labeling, model selection, and the utilization, improvement, and migration of research code (Tab. 3).",
+            "source_path": "references/pdfs/timeseriesgym2025.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [
+      "time_series_classification",
+      "temporal_question_answering"
+    ],
+    "evaluation_summary": "34 challenges from 23 sources; 8 temporal problem types; Docker execution, 4h/50 steps default, three seeds; task-native scores plus valid/reasonable submission rates.",
+    "corrections": [
+      "The source PDF title includes parenthetical (Time Series); preserve exact title when updating Bib.",
+      "Do not write there are no time-series Agent benchmarks."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "grammarwave2026",
+    "title_checked": "Grammar of the Wave: Towards Explainable Multivariate Time Series Event Detection via Neuro-Symbolic VLM Agents",
+    "status": "paper_verified",
+    "claim_summary": "SELA parses textual event descriptions into event-logic trees and uses visual inspection plus symbolic interval constraints to ground multivariate events.",
+    "modules": [
+      {
+        "id": "grammarwave2026:event-logic-grounding",
+        "name": "Event-logic schema and visual grounding",
+        "layer": "TSK",
+        "dimensions": [
+          "Interface and Interaction",
+          "Tools and Execution",
+          "Control, Verification, and Feedback",
+          "Coordination and Scaling"
+        ],
+        "tasks": [
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "SEQ/SYNC/GUARD/OR constraints and interval confidence implement event detection, including abnormal operational events.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning Agent workflow.",
+            "quote": "Agent workflow. SELA decomposes the task into two role-specific agents. The Logic Analyst receives only the textual event description and sub- mits an ELT schema. It does not access the time series, which prevents schema construction from being biased toward a particular sample. The Sig- nal Inspector receives the compiled schema and grounds it in",
+            "source_path": "references/pdfs/grammarwave2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "KITE Pressure Test and Climate Hazard data; event classes/boundaries and schema quality. Parsing metrics: validity, structural fidelity, primitive coverage/accuracy, semantic alignment.",
+    "corrections": [
+      "Event detection includes normal events (valid test) as well as failures/hazards; do not describe every event as an anomaly."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "bridge2025",
+    "title_checked": "{BRIDGE}: Bootstrapping Text to Control Time-Series Generation via Multi-Agent Iterative Optimization and Diffusion Modeling",
+    "status": "paper_verified",
+    "claim_summary": "BRIDGE builds text–time-series supervision by multi-agent template refinement and trains a text/prototype-conditioned diffusion generator.",
+    "modules": [
+      {
+        "id": "bridge2025:description-refinement",
+        "name": "Multi-agent text-template optimization for synthesis",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback",
+          "Coordination and Scaling"
+        ],
+        "tasks": [
+          "data_augmentation_synthesis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Text templates are evaluated and refined to construct controlled-generation paired data.",
+        "role": "training_data",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning Stage 2 Intra-group Discussion",
+            "quote": "Stage 2 Intra-group Discussion (independent teams iteratively refining outputs), two independent teams work iteratively to refine the text. Each team includes agents with specific roles: a planner who coordinates tasks, a scientist who ana- lyzes and identifies improvements, an engineer who imple- ments changes, and an observer who critiques the outputs. The teams refine their",
+            "source_path": "references/pdfs/bridge2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "bridge2025:text-diffusion",
+        "name": "Text/prototype-conditioned diffusion generation",
+        "layer": "TSK",
+        "dimensions": [
+          "Tools and Execution"
+        ],
+        "tasks": [
+          "data_augmentation_synthesis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "The generated output is a temporal sequence controlled by text and domain prototypes.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning The latter, i.e.",
+            "quote": "The latter, i.e., the diffusion-based generation model, we adopt a hybrid strategy where (i) a textual description is used as input. Meanwhile, (ii) we utilize the target domain’s time series and extract its corresponding domain prototypes and their weights using Prototype Assignment Module. These prototypes and weights are also used as inputs and are fused",
+            "source_path": "references/pdfs/bridge2025.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "data_augmentation_synthesis"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Twelve in-domain generation datasets and unseen stock/web domains; controlled generation and synthetic-data forecasting utility.",
+    "corrections": [
+      "Agent refinement occurs offline in dataset preparation.",
+      "The diffusion model is not an LLM; do not count its training as LLM contribution."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "agentfm2025",
+    "title_checked": "AgentFM: Role-Aware Failure Management for Distributed Databases with LLM-Driven Multi-Agents",
+    "status": "paper_verified",
+    "claim_summary": "AgentFM adapts distributed database roles, summarizes metric/log evidence and coordinates failure detection, diagnosis and mitigation.",
+    "modules": [
+      {
+        "id": "agentfm2025:role-management",
+        "name": "Runtime system-role reassignment",
+        "layer": "GH",
+        "dimensions": [
+          "Coordination and Scaling"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Configuration/state-driven assignment of node roles is generic distributed-system coordination.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning To handle this, we designed",
+            "quote": "To handle this, we designed an adaptive mechanism for system agents within the Meta Agent. As illustrated in Figure 2, the core component is the System Role Manager, which initializes by analyzing configuration files and system docs to identify each node’s role and importance. At runtime, it periodically queries the system state and updates roles",
+            "source_path": "references/pdfs/agentfm2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "agentfm2025:metric-description",
+        "name": "Metric preprocessing and temporal descriptions",
+        "layer": "GTS",
+        "dimensions": [
+          "Interface and Interaction",
+          "Tools and Execution"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Denoising/imputation and descriptions of intervals/trends expose temporal measurements before multiple failure-management tasks.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning Metric Agent: The overall",
+            "quote": "Metric Agent: The overall workflow of the Metric Agent begins with simple data preprocessing, which includes noise removal and imputation of missing values. After preprocessing, the multivariate Document Configuration System Role Manager Startup Node1 Node1 Node2 Node2 NodeN−1 NodeN−1 …. NodeN NodeN Role Level Role Level Role Level Role Level Nodes Query Global Status Runtime",
+            "source_path": "references/pdfs/agentfm2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "agentfm2025:failure-management",
+        "name": "Detection-diagnosis-mitigation orchestration",
+        "layer": "TSK",
+        "dimensions": [
+          "Memory and Context",
+          "Planning and Workflow",
+          "Coordination and Scaling"
+        ],
+        "tasks": [
+          "anomaly_detection_diagnosis",
+          "decision_support"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Task agents use failure-labeled history and database trace evidence for diagnosis and mitigation.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning After system agents collect",
+            "quote": "After system agents collect necessary data via data agents, the meta agent coordinates task agents to carry out failure management using trace data. This process involves three agent types—detection, diagnosis, and mitigation—which operate sequentially. Detection agents identify anomalies in each time window; upon detection, diagnosis agents locate and classify the issue; finally, mitigation agents propose",
+            "source_path": "references/pdfs/agentfm2025.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis",
+      "decision_support"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Preliminary Apache IoTDB injection experiment: 10 anomaly types ×20 injections, Qwen2.5-72B.",
+    "corrections": [
+      "Metric-to-language inference is not demonstrated LLM model training."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "openti2024",
+    "title_checked": "Open-TI: Open Traffic Intelligence with Augmented Language Model",
+    "status": "paper_verified",
+    "claim_summary": "Open-TI exposes traffic-analysis and simulation tools through a conversational augmented language agent, including signal-control and demand optimization.",
+    "modules": [
+      {
+        "id": "openti2024:conversational-execution",
+        "name": "Intent-to-tool execution interface",
+        "layer": "GH",
+        "dimensions": [
+          "Interface and Interaction",
+          "Tools and Execution"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Conversation-derived intent is matched to tool descriptions and wrapped multimedia results.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.9; method passage beginning When a user requirement",
+            "quote": "When a user requirement is detected from the conversation, it will be passed to the first components of Traffic LLMs, which use the language agent to extract accurate intentions and useful information from dialogues, then, the extracted intention will be compared with tools in augmentation pool, after matching, if the agent found a possible solution,",
+            "source_path": "references/pdfs/openti2024.pdf"
+          }
+        ]
+      },
+      {
+        "id": "openti2024:traffic-meta-control",
+        "name": "Language-policy traffic meta-control",
+        "layer": "TSK",
+        "dimensions": [
+          "Interface and Interaction",
+          "Planning and Workflow"
+        ],
+        "tasks": [
+          "decision_support"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Natural-language traffic policy is passed to a controller to select traffic-light actions.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.9; method passage beginning Third, our method leverages",
+            "quote": "Third, our method leverages the superior understanding capabilities of cur- rent LLMs to conduct meta-control by ChatLight agent: LLMs directly serve as a control agent, follow the understanding of the semantic description of the rules, and control the traffic light actions. This explores a higher level traffic light control mode, e.g., the traffic management department",
+            "source_path": "references/pdfs/openti2024.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "decision_support"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Traffic simulation/control case studies and prompt-component ablations are described; no numerical forecasting claim inferred from a tool list.",
+    "corrections": [
+      "Traffic LLMs refers here to prompted tool use, not evidence of LLM parameter training."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      8,
+      9,
+      10,
+      11
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "gruver2023llmtime",
+    "title_checked": "Large Language Models are Zero-Shot Time Series Forecasters",
+    "status": "paper_verified",
+    "claim_summary": "LLMTime uses model-aware decimal token serialization and rescaling to obtain zero-shot probabilistic forecasts from pretrained language models.",
+    "modules": [
+      {
+        "id": "gruver2023llmtime:decimal-representation",
+        "name": "Model-aware decimal time-series representation",
+        "layer": "LLM",
+        "dimensions": [],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "The contribution changes the model-facing temporal representation and continuous-density interpretation, without training model parameters.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning To remedy the tokenization",
+            "quote": "To remedy the tokenization of GPT models, we separate the digits with spaces to force a separate tokenization of each digit and use a comma (\" ,\") to separate each time step in a time series. Because decimal points are redundant given a fixed precision, we drop them in the encoding to save on context",
+            "source_path": "references/pdfs/gruver2023llmtime.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Darts, Monash and Informer benchmarks, 29 datasets overall; deterministic MAE and probabilistic density evaluation.",
+    "corrections": [
+      "A direct forecasting model, not an Agent Harness.",
+      "LLM-side representation contribution is training-free."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "ji2025lemad",
+    "title_checked": "LEMAD: LLM-Empowered Multi-Agent System for Anomaly Detection in Power Grid Services",
+    "status": "paper_verified",
+    "claim_summary": "LEMAD combines timestamp-aligned metric/log streams, asynchronous processing and LLM explanations in a service-anomaly diagnosis workflow.",
+    "modules": [
+      {
+        "id": "ji2025lemad:stream-normalization",
+        "name": "Timestamp and heterogeneous-stream normalization",
+        "layer": "GTS",
+        "dimensions": [
+          "Tools and Execution"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Alignment, normalization and missingness handling are temporal data preparation independent of alert outcome.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.8; method passage beginning Data Preprocessing Module:",
+            "quote": "Data Preprocessing Module: this performs timestamp alignment, data format normal- ization, and missing value handling for heterogeneous data sources, ensuring consistent and accurate data streams. Streaming Analysis Module: this utilizes engines such as PyFlink or Spark Streaming to conduct sliding window computations, multi-dimensional metric correlation analysis, and dynamic threshold-based anomaly detection on streaming data. Intelligent",
+            "source_path": "references/pdfs/ji2025lemad.pdf"
+          }
+        ]
+      },
+      {
+        "id": "ji2025lemad:stream-checkpoint",
+        "name": "Offset-based log collection recovery",
+        "layer": "GH",
+        "dimensions": [
+          "Tools and Execution",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Compression and checkpoint offsets provide task-independent restart recovery.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.7; method passage beginning Compression and Checkpointing Module:",
+            "quote": "Compression and Checkpointing Module: this applies compression algorithms (e.g., gzip or lz4) to log data and uses offset files to record collection progress, ensuring data consistency and integrity during system restarts. Log Forwarding Module: this leverages a Kafka producer to push structured logs to Kafka topics (e.g., structured-logs), facilitating consumption by the real-time analysis agent",
+            "source_path": "references/pdfs/ji2025lemad.pdf"
+          }
+        ]
+      },
+      {
+        "id": "ji2025lemad:anomaly-diagnosis",
+        "name": "Metric/log alert-to-diagnosis workflow",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback",
+          "Planning and Workflow",
+          "Coordination and Scaling"
+        ],
+        "tasks": [
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Agents detect suspicious service events, localize root causes and produce operational recommendations.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning Second, the real-time analysis agent",
+            "quote": "Second, the real-time analysis agent consumes both metric and log data in real time, performing multi-dimensional correlation analysis and initial anomaly iden- tification. It leverages LLMs to generate human-readable alert summaries and preliminary hy- potheses. Third, the anomaly detection agent further evaluates these suspicious events using hybrid models and contextual reasoning, producing confidence scores, root",
+            "source_path": "references/pdfs/ji2025lemad.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Power-grid service data: 1,289 services, 28.88M invocations; evaluated sample 10,000 normal +1,674 abnormal; precision/recall/F1 and latency.",
+    "corrections": [
+      "The selected dataset is not equal class-balanced despite that term appearing in source.",
+      "No LLM parameter-training contribution established."
+    ],
+    "pages_inspected": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "zhang2025llm",
+    "title_checked": "LLM-TSFD: An Industrial Time Series Human-in-the-Loop Fault Diagnosis Method Based on a Large Language Model",
+    "status": "repository_verified",
+    "claim_summary": "The author repository exposes partial DataFrame analysis/visualization code with temporal cleaning and anomaly-labeling prompts.",
+    "modules": [
+      {
+        "id": "zhang2025llm:dataframe-execution",
+        "name": "Conversational DataFrame code execution",
+        "layer": "GH",
+        "dimensions": [
+          "Interface and Interaction",
+          "Tools and Execution"
+        ],
+        "tasks": [],
+        "scope_reason": "The wrapper generates and executes Python over a supplied DataFrame; this generic mechanism is directly visible in repository source.",
+        "role": "infrastructure",
+        "evidence": [
+          {
+            "locator_type": "repository_file",
+            "locator": "src/__init__.py lines 30-36; LLM_TSFD.run/run_code",
+            "quote": "When the user asks the input question about the data entered above, your answer should be to use the python code that describes the dataframe \"df\" and run the result. Note: Record how many columns of tagname in the sheet table in the current csv file. If you want to determine whether a new device",
+            "source_path": "references/reviews/20261015_full_audit/shard_2_sources/llm-tsfd/__init__.py",
+            "source_url": "https://github.com/zq300/LLM-TSFD/blob/main/src/__init__.py"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis"
+    ],
+    "evaluation_summary": "No journal PDF available; the fetched README says partial code and enterprise-simulated mock data. No paper result verified.",
+    "corrections": [
+      "Replace prior paper_reviewed with repository_verified.",
+      "Prompt instructions mention multi-turn continuity, but this partial code does not establish a persistent history mechanism.",
+      "Default _max_retries=1 means generated error correction is not retried by the while loop; do not claim validated robust recovery."
+    ],
+    "pages_inspected": [],
+    "notes": "README.md and src/__init__.py fetched through local proxy 2026-10-15. Repository read only; no code executed. Title metadata retained from user-supplied bibliography, journal identity not revalidated here."
+  },
+  {
+    "citation_key": "finagent2024",
+    "title_checked": "A Multimodal Foundation Agent for Financial Trading: Tool-Augmented, Diversified, and Generalist",
+    "status": "paper_verified",
+    "claim_summary": "FinAgent combines multimodal market intelligence, vector memory, price-level reflection and trading-outcome reflection to select financial actions.",
+    "modules": [
+      {
+        "id": "finagent2024:vector-memory",
+        "name": "Vector-indexed summaries and query retrieval",
+        "layer": "GH",
+        "dimensions": [
+          "Memory and Context"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Summaries and query fields stored and retrieved by vector similarity form a generic memory mechanism.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning To realize the 3A superiority",
+            "quote": "To realize the 3A superiority - Acuity, Adaptability, and Amend- ability - in the memory mechanism, our development of the mem- ory module employed a vector storage architecture. This module is composed of three main components: market intelligence memory (service for (§4.1)), low-level reflection memory (service for (§4.3)), and high-level reflection memory (service for (§4.3)).",
+            "source_path": "references/pdfs/finagent2024.pdf"
+          }
+        ]
+      },
+      {
+        "id": "finagent2024:market-reflection",
+        "name": "Market and trade-outcome reflection",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback",
+          "Planning and Workflow"
+        ],
+        "tasks": [
+          "decision_support"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Low/high reflection explicitly interprets market-price movements and prior trading actions.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning The reflection framework",
+            "quote": "The reflection framework is divided into low-level reflec- tion and high-level reflection, each serving distinct purposes to enhance the agent’s trading decisions. The low-level reflection module involves reflecting on the relationship between the agent’s observations (e.g., news, financial reports, Kline chart and technical indicators) and the resultant price movements in the market, draw- ing connections",
+            "source_path": "references/pdfs/finagent2024.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "decision_support"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Trading experiments use AAPL, AMZN, GOOGL, MSFT, TSLA and ETHUSD from June 2022 to January 2024 (398 trading days); Table 4 reports annualized return, Sharpe ratio and maximum drawdown.",
+    "corrections": [
+      "The RL-style policy objective is a formulation, not proof of LLM parameter updates."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "structuredagenticworkflows2025",
+    "title_checked": "Structured Agentic Workflows for Financial Time-Series Modeling with LLMs and Reflective Feedback",
+    "status": "paper_verified",
+    "claim_summary": "TS-Agent retrieves prior modeling cases, then refines model code and hyperparameters with numerical feedback across forecasting and generation.",
+    "modules": [
+      {
+        "id": "structuredagenticworkflows2025:code-search",
+        "name": "Warm-up and round-robin code-refinement search",
+        "layer": "GH",
+        "dimensions": [
+          "Tools and Execution",
+          "Control, Verification, and Feedback",
+          "Optimization and Evolution"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Candidate code revisions are accepted/reverted by an external loss, with reusable logging and search control.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning Stage 2 employs a two-phase",
+            "quote": "Stage 2 employs a two-phase Round-Robin Search [21], consist- ing of the Warm-up Phase and the Optimization Phase. Its core building block is Code Refinement , which iteratively applies Refinement and Fine-tuning . If a candidate script reduces the loss, it replaces the incumbent and serves as the starting point for the next refinement-and-fine-tuning cycle;",
+            "source_path": "references/pdfs/structuredagenticworkflows2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "structuredagenticworkflows2025:temporal-model-bank",
+        "name": "Temporal model and metric resource bank",
+        "layer": "GTS",
+        "dimensions": [
+          "Memory and Context",
+          "Tools and Execution"
+        ],
+        "tasks": [
+          "forecasting_prediction",
+          "data_augmentation_synthesis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Implemented forecasting/generative model banks and task metrics support multiple temporal modeling tasks.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning The code base includes",
+            "quote": "The code base includes the implementation of a model bank and an evaluation measure bank. • Model Bank is a curated collection of implemented financial models. It includes the most representative models of time- series forecasting and generative models. For the forecasting task, there could be several main types, including the tree- based models, deep",
+            "source_path": "references/pdfs/structuredagenticworkflows2025.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "data_augmentation_synthesis",
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Forecasting Crypto/Exchange/Stock with RMSE, MAE, MAPE, sMAPE and success rate; financial fidelity uses differences in Sharpe/VaR/ES; generation is separate task.",
+    "corrections": [
+      "Fine-tuning in code-refinement loop means downstream model hyperparameters, not LLM weight updates.",
+      "Original prose mentions test metrics in feedback; do not assert a sealed final-test protocol without additional code verification."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "virtualtrafficpolice2026",
+    "title_checked": "Virtual Traffic Police: Large Language Model-Augmented Traffic Signal Control for Unforeseen Incidents",
+    "status": "paper_verified",
+    "claim_summary": "A high-level LLM maps incident descriptions to parameters of a lower-level adaptive traffic controller, with retrieved experience and verifier feedback.",
+    "modules": [
+      {
+        "id": "virtualtrafficpolice2026:hierarchical-control",
+        "name": "Incident-to-controller-parameter reasoning",
+        "layer": "TSK",
+        "dimensions": [
+          "Interface and Interaction",
+          "Planning and Workflow"
+        ],
+        "tasks": [
+          "decision_support"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Outputs tune traffic control parameters; the lower-level controller selects fast actions.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.6; method passage beginning This hierarchical framework consists",
+            "quote": "This hierarchical framework consists of two levels: (1) an upper-level LLM agent termed a virtual traffic police officer that generates fine-tuned traffic parameters via an LLM-based policy 𝐿𝐿𝑀in response to unforeseen incidents (see Section 3.2.1), and (2) a lower-level adaptive traffic signal controller that executes the fine-tuned parameters in the adaptive traffic signal controller (see",
+            "source_path": "references/pdfs/virtualtrafficpolice2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "virtualtrafficpolice2026:traffic-experience",
+        "name": "Verified traffic incident experience retrieval",
+        "layer": "TSK",
+        "dimensions": [
+          "Memory and Context",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "decision_support"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Historical incident-to-capacity/control mappings guide traffic-specific decisions.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.12; method passage beginning The system retrieves",
+            "quote": "The system retrieves top-𝑘 relevant historical Q-A pairs based on the embedding of the current traffic event 𝐸𝑠. The LLM Agent generates a control strategy, which is then evaluated by the LLM Verifier through judgment and feedback. Verified outputs are used to assist the controller and are also added as new Q-A pairs to continually",
+            "source_path": "references/pdfs/virtualtrafficpolice2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "decision_support"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "SUMO 60-minute morning-peak simulations with lane-blockage and priority incidents; tests with/without relevant retrieval examples.",
+    "corrections": [
+      "Fine-tuned parameters are controller parameters, not necessarily LLM fine-tuning."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      12
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "finmem2023",
+    "title_checked": "FinMem: A Performance-Enhanced LLM Trading Agent with Layered Memory and Character Design",
+    "status": "paper_verified",
+    "claim_summary": "FinMem combines risk-character prompts with finance-specific layered memory decay, promotion and reflection to select stock trades.",
+    "modules": [
+      {
+        "id": "finmem2023:layered-financial-memory",
+        "name": "Time-sensitive financial memory with promotion",
+        "layer": "TSK",
+        "dimensions": [
+          "Memory and Context"
+        ],
+        "tasks": [
+          "decision_support"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Decay horizons encode daily news, quarterly and annual reports; promotion depends on investment success.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.9; method passage beginning Furthermore, an access counter",
+            "quote": "Furthermore, an access counter function oversees the transfer of memory events among layers, ensuring that significant events influencing trading decisions ascend from shallower to deeper layers for extended retention and recurrent access by FINMEM. Conversely, less pertinent events gradually diminish. This process is facilitated by the LLM validation tool Guardrails AI [17], which monitors critical",
+            "source_path": "references/pdfs/finmem2023.pdf"
+          }
+        ]
+      },
+      {
+        "id": "finmem2023:trade-character",
+        "name": "Risk-conditioned trading action policy",
+        "layer": "TSK",
+        "dimensions": [
+          "Interface and Interaction",
+          "Planning and Workflow"
+        ],
+        "tasks": [
+          "decision_support"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Prompted risk preferences and top-ranked memories select BUY/SELL/HOLD.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.9; method passage beginning In its daily trading decisions",
+            "quote": "In its daily trading decisions, FINMEM is asked to select from three distinct actions for a single share of a specific stock by Guardrails AI text validation function: “Buy”, “Sell”, or “Hold”. Additionally, the inputs and results required by FINMEM’s decision- making module vary between its training and testing phases, with each phase’s specifics detailed",
+            "source_path": "references/pdfs/finmem2023.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "decision_support"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Single-stock discrete actions across TSLA/NFLX/AMZN/MSFT/COIN; cumulative return and Sharpe, with financial-risk metrics and Wilcoxon comparisons.",
+    "corrections": [
+      "Memory training uses future outcomes only during training; do not imply future prices available at test time.",
+      "Financially calibrated retention/promotion is TSK, not automatically GTS merely because timestamps appear."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      6,
+      7,
+      9,
+      11,
+      13,
+      15
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "tradingagents2024",
+    "title_checked": "TradingAgents: Multi-Agents LLM Financial Trading Framework",
+    "status": "paper_verified",
+    "claim_summary": "TradingAgents structures financial analysis, bullish/bearish debate, trading and risk approval around shared reports and differentiated model roles.",
+    "modules": [
+      {
+        "id": "tradingagents2024:structured-report-state",
+        "name": "Structured report-based shared communication",
+        "layer": "GH",
+        "dimensions": [
+          "Memory and Context",
+          "Coordination and Scaling"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Agents query/update explicit state entries instead of extending an unstructured conversation.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.8; method passage beginning Our model introduces",
+            "quote": "Our model introduces a structured communication protocol to govern agent interactions. By clearly defining each agent’s state, we ensure that each role only extracts or queries the necessary information, processes it, and returns a completed report. This streamlined approach reduces unnecessary steps, lowers the risk of message corruption, and keeps interactions focused and efficient, even",
+            "source_path": "references/pdfs/tradingagents2024.pdf"
+          }
+        ]
+      },
+      {
+        "id": "tradingagents2024:investment-debate",
+        "name": "Bullish/bearish research and risk deliberation",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback",
+          "Coordination and Scaling"
+        ],
+        "tasks": [
+          "decision_support"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Debate and approval roles explicitly evaluate investment opportunities and portfolio risk.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.6; method passage beginning The Researcher Team",
+            "quote": "The Researcher Team (Figure 3) is responsible for critically evaluating the information provided by the Analyst Team. Comprised of agents adopting both bullish and bearish perspectives, they engage in multiple rounds of debate to assess the potential risks and benefits of investment decisions. Bullish Goal: Evaluate the investment potential of Apple Inc. Key Points Summary:",
+            "source_path": "references/pdfs/tradingagents2024.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "decision_support"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Daily BUY/SELL/HOLD backtesting runs January 1 to March 29, 2024 using information available up to the trading day. Table 1 reports AAPL, GOOGL and AMZN using cumulative/annualized return, Sharpe ratio and maximum drawdown.",
+    "corrections": [
+      "Selection of fast/deep-thinking backbones is runtime routing, not LLM training."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10,
+      11
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "climateagent2025",
+    "title_checked": "CLIMATEAGENT: Multi-Agent Orchestration for Complex Climate Data Science Workflows",
+    "status": "paper_verified",
+    "claim_summary": "ClimateAgent coordinates planning, API acquisition and coding with persistent artifacts and recovery, and supplies an 85-task climate-workflow benchmark.",
+    "modules": [
+      {
+        "id": "climateagent2025:persistent-workflow",
+        "name": "Shared workflow state and checkpoint serialization",
+        "layer": "GH",
+        "dimensions": [
+          "Memory and Context",
+          "Coordination and Scaling"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Plans, scripts, files, results and logs persist across subtasks and restarts.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.6; method passage beginning Serialization and Persistence.",
+            "quote": "Serialization and Persistence. We serialize context to JSON after each subtask, enabling: (1) workflow resumption from the last completed subtask after interruption; (2) reproducibility by preserving complete decision history; (3) debugging without re-executing earlier stages. This persistent state transforms independent agents into a coherent, traceable workflow engine. 3.4 Adaptive Self-Correction Building on the contextual coordination",
+            "source_path": "references/pdfs/climateagent2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "climateagent2025:task-planning",
+        "name": "Plan-to-specialist execution orchestration",
+        "layer": "GH",
+        "dimensions": [
+          "Planning and Workflow",
+          "Coordination and Scaling"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Ordered subtask delegation and shared execution state are generic workflow mechanisms.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning The PLAN-AGENT decomposes",
+            "quote": "The PLAN-AGENT decomposes comprehensive climate queries into structured subtasks and delegates each to specialized agents with targeted domain expertise, forming a cooperative division of labor that improves the completeness and quality of the resulting analysis and reports. • Contextual Coordination. Agents operate on a shared, persistent context that enables cross-step commu- nication and propagation of",
+            "source_path": "references/pdfs/climateagent2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "climateagent2025:climate-workflows",
+        "name": "Climate analysis workflow benchmark",
+        "layer": "GTS",
+        "dimensions": [
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [
+          "scientific_temporal_analysis"
+        ],
+        "scope_reason": "Time-dependent climate analysis includes temporal aggregation, baselines, event duration and multiple scientific outputs.",
+        "role": "evaluation",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.8; method passage beginning CLIMATE-AGENT-BENCH-85 spans",
+            "quote": "CLIMATE-AGENT-BENCH-85 spans six climate phenomena representing diverse analysis patterns: • Atmospheric Rivers (AR, 15 tasks) require computing integrated vapor transport (IVT) from multi-level wind and humidity fields, applying physical thresholds, identifying spatial regions, and tracking temporal evolution. These tests involve vertical integration, spatial pattern recognition, and trajectory analysis with wraparound coordinates. • Drought (DR, 15",
+            "source_path": "references/pdfs/climateagent2025.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis"
+    ],
+    "other_tasks": [
+      "scientific_temporal_analysis"
+    ],
+    "evaluation_summary": "85 tasks, six domains (AR/DR/EP/HW/SST/TC); API acquisition, code and report artifacts, easy/medium/hard complexity, report completion/quality.",
+    "corrections": [
+      "Climate science analysis is broader than forecasting; do not label all tasks forecasting or decision support."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      8,
+      9
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "smartenergyagent2026",
+    "title_checked": "An Agentic AI Pipeline for Appliance-Level Energy Anomaly Detection and LLM-Driven Recommendations",
+    "status": "paper_verified",
+    "claim_summary": "An appliance pipeline combines SSA-LSTM forecasts and LSTM-VAE detection with context-retrieval, diagnosis and recommendation agents.",
+    "modules": [
+      {
+        "id": "smartenergyagent2026:appliance-diagnosis",
+        "name": "Reliability-aware appliance diagnosis and reporting",
+        "layer": "TSK",
+        "dimensions": [
+          "Memory and Context",
+          "Tools and Execution",
+          "Planning and Workflow"
+        ],
+        "tasks": [
+          "anomaly_detection_diagnosis",
+          "decision_support"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Mandatory reliability/baseline/knowledge retrieval and optional history/forecast context support anomaly recommendations.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning The Context Agent is a LangChain",
+            "quote": "The Context Agent is a LangChain tool-calling executor with six registered tools: 1) get_expert_knowledge() – semantic search over a FAISS-backed appliance knowledge base using all- MiniLM-L6-v2 embeddings. 2) get_model_reliability() – the false-alarm profile of the detector for that appliance. 3) get_hourly_baseline() – expected consumption for the specific hour and weekday. 4) get_global_baseline() – training-set energy",
+            "source_path": "references/pdfs/smartenergyagent2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis",
+      "decision_support"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Chronological 70/15/15 split; forecast MAE/RMSE/WAPE/R2; LLM diagnosis scored separately on 16 handcrafted scenarios using urgency, cause, confidence, flags and actionability.",
+    "corrections": [
+      "LLM reasoning quality is scenario-rubric evidence, not the same as field anomaly-detector accuracy.",
+      "SSA-LSTM/LSTM-VAE training is not LLM training."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "s2sfdd2026",
+    "title_checked": "S2S-FDD: Bridging Industrial Time Series and Natural Language for Explainable Zero-shot Fault Diagnosis",
+    "status": "paper_verified",
+    "claim_summary": "S2S-FDD summarizes abnormal sensor deviations, retrieves fault records and adaptively requests missing sensor evidence for zero-shot diagnosis.",
+    "modules": [
+      {
+        "id": "s2sfdd2026:sensor-fault-summary",
+        "name": "Fault-directed sensor selection and temporal summary",
+        "layer": "TSK",
+        "dimensions": [
+          "Interface and Interaction",
+          "Tools and Execution"
+        ],
+        "tasks": [
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Candidate sensors are selected by anomaly scores, onset time and variance for fault reasoning.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning Candidate variables are selected",
+            "quote": "Candidate variables are selected by top n1 anomaly scores (S1) and top n2 earliest fault times (S2), forming S = S1∪S2. Final selection uses variance comparison: Sfiltered = {j ∈S | var(Xfault[:, j]) > 2 · var(Xbase[:, j])} (7) For any target variable j ∈Sfiltered, there exists a cor- responding data table Tablej. The measured",
+            "source_path": "references/pdfs/s2sfdd2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "s2sfdd2026:diagnostic-retrieval",
+        "name": "Historical fault retrieval and iterative sensor inspection",
+        "layer": "TSK",
+        "dimensions": [
+          "Memory and Context",
+          "Tools and Execution",
+          "Planning and Workflow"
+        ],
+        "tasks": [
+          "anomaly_detection_diagnosis"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Maintenance-record similarity and tool-driven requests expand evidence for a fault label.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; method passage beginning First, fault knowledge base",
+            "quote": "First, fault knowledge base from diagnosis records and expert experience is encoded into embeddings ej = Embedder(Kj), where Kj are fault records. LLM-generated descriptions Di are also embedded (di), and their cosine similarity with ej is computed: sim(Di, Kj) = di · ej ∥di∥∥ej∥ (8) Fault records Ktarget with similarity above a threshold are included",
+            "source_path": "references/pdfs/s2sfdd2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "anomaly_detection_diagnosis"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Multiphase flow benchmark: five fault types, 13 cases, five reasoning runs/case and majority-vote diagnosis accuracy.",
+    "corrections": [
+      "Zero-shot language reasoning is not model training; no LLM-side parameter contribution established."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "chen2025trace",
+    "title_checked": "TRACE: Unlocking the Potential of LLMs in Time Series Forecasting for Distributed Energy Resources",
+    "status": "paper_verified",
+    "claim_summary": "TRACE uses DER-specific chain-of-thought selection and multi-agent thought refinement with factuality-checked aggregation for numerical power forecasting.",
+    "modules": [
+      {
+        "id": "chen2025trace:der-cot",
+        "name": "DER-specific reasoning-step selection",
+        "layer": "TSK",
+        "dimensions": [
+          "Planning and Workflow"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "CoT relevance is defined for energy forecasting with seasonality, behavior and scale cues.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning For a given task",
+            "quote": "For a given task, only a limited subset of CoT processes may be relevant. Therefore, the speciﬁc CoT elements required for a given task are determined by a relevance selector CoT −rele(·) CoT-rele(T) = {CoTi} i ∈top-k(shapley(CoT, T)) (6) where shapley(·, ·) represents the Shapley contribution of this step to task T, and top-k refers",
+            "source_path": "references/pdfs/chen2025trace.pdf"
+          }
+        ]
+      },
+      {
+        "id": "chen2025trace:forecast-consensus",
+        "name": "Forecast-consensus refinement and factuality scoring",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback",
+          "Coordination and Scaling"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Agents revise numerical forecasts from mean prediction summaries until consistency/iteration stopping.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; method passage beginning The thought reﬁnement process",
+            "quote": "The thought reﬁnement process consists of multiple iterative rounds. In each round, the Judge Agent aggregates the outputs of all predictor agents and generates n prediction summaries. Each summary includes the mean of all agents’ predictions and intermediate statistical metrics. These summaries are then fed back to the respective predictor agents, allowing each agent to",
+            "source_path": "references/pdfs/chen2025trace.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Multi-energy load, PV, wind, EV and storage; univariate/multivariate horizons 1/6/24/168, MAE/RMSE.",
+    "corrections": [
+      "PDF issue date is Feb 2026 whereas supplied Bib year is 2025; distinguish online-publication and issue dates.",
+      "The term instruction fine-tuning is not accompanied by checked parameter-update training details; do not infer a separate LLM-side training module."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "aiaforecaster2025",
+    "title_checked": "AIA Forecaster: Technical Report",
+    "status": "paper_verified",
+    "claim_summary": "AIA Forecaster combines adaptive evidence search, supervisor reconciliation and probability calibration for judgmental event forecasting.",
+    "modules": [
+      {
+        "id": "aiaforecaster2025:adaptive-search",
+        "name": "Adaptive multi-step evidence search",
+        "layer": "GH",
+        "dimensions": [
+          "Tools and Execution",
+          "Planning and Workflow"
+        ],
+        "tasks": [],
+        "other_tasks": [],
+        "scope_reason": "Queries depend on prior search results, a general evidence-acquisition mechanism.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.8; method passage beginning Each forecasting agent is granted",
+            "quote": "Each forecasting agent is granted access to an external search provider, which it can query as needed. As described above, a key feature of this search procedure is that it is agentic and adaptive: each agent is granted full discretion to determine whether and how to query the search provider, and can iteratively improve the",
+            "source_path": "references/pdfs/aiaforecaster2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "aiaforecaster2025:forecast-reconciliation",
+        "name": "Probability reconciliation and calibration",
+        "layer": "TSK",
+        "dimensions": [
+          "Control, Verification, and Feedback",
+          "Coordination and Scaling"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Independent event probabilities are reconciled by a supervisor and calibrated by Platt scaling.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.8; method passage beginning Those individual forecasts",
+            "quote": "Those individual forecasts are passed to a supervisor agent, which identifies disagreements among the M agents and is given a final chance to query our news database with any clarifying questions. After clarifying, the reconciliation pipeline outputs an aggregated forecast, which is then passed through a Platt scaling step to produce the final probability. Figure",
+            "source_path": "references/pdfs/aiaforecaster2025.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Binary-event probabilities evaluated on ForecastBench, MarketLiquid (1,610 questions) and live MarketNightly; comparisons to expert humans and prediction-market consensus.",
+    "corrections": [
+      "Judgmental event forecasting is adjacent to numerical time-series forecasting, not evidence of numeric-sequence modeling.",
+      "Do not count statistical calibration as LLM parameter training."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "auditforecast2026",
+    "title_checked": "From Narrative to Auditable Forecasts: A Structured Scaffold for Agentic Forecasting",
+    "status": "paper_verified",
+    "claim_summary": "AUDITFORECAST derives an explicit quantitative base probability, validates additional factors and aggregates their effects in odds space.",
+    "modules": [
+      {
+        "id": "auditforecast2026:auditable-odds",
+        "name": "Base-probability and factor-odds forecasting scaffold",
+        "layer": "TSK",
+        "dimensions": [
+          "Tools and Execution",
+          "Control, Verification, and Feedback",
+          "Planning and Workflow"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "The output is a resolved-event probability with inspectable baseline, factors and odds multipliers.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; method passage beginning Given a fore- casting question",
+            "quote": "Given a fore- casting question, AUDITFORECAST organizes the agent’s behavior into three explicit stages: deriving a base probability p0, identifying model-external factors, and assessing and aggregating factor up- dates. While the underlying agent may iterate within a stage through search, reasoning, and com- putation, the scaffold constrains the final output to a structured forecasting report",
+            "source_path": "references/pdfs/auditforecast2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Live Polymarket/Kalshi/FutureX, April–May 2026; Brier score, baseline/factor ablations and a TSFM value-threshold subset.",
+    "corrections": [
+      "Independence checks are agent judgments; odds decomposition does not establish empirically independent causal factors.",
+      "This is event-probability forecasting, not blanket multivariate time-series prediction."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  },
+  {
+    "citation_key": "openforecaster2026",
+    "title_checked": "Scaling Open-Ended Reasoning to Predict the Future",
+    "status": "paper_verified",
+    "claim_summary": "OpenForecaster trains a language model with accuracy-plus-calibration rewards on news-derived open-ended future-event questions.",
+    "modules": [
+      {
+        "id": "openforecaster2026:event-rl",
+        "name": "Open-ended forecast policy training",
+        "layer": "LLM",
+        "dimensions": [],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "GRPO updates the LLM to output a textual event answer with calibrated confidence.",
+        "role": "model_training",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.9; method passage beginning We train the Qwen3-8B thinking model",
+            "quote": "We train the Qwen3-8B thinking model with GRPO on OpenForesight which has ∼50,000 samples and also include 2000 binary resolved questions from Metaculus (from 2024), both with retrieval. For the reward, we use our Accuracy + Brier score for free-form questions and only brier score for binary questions. We provide configuration details for training and",
+            "source_path": "references/pdfs/openforecaster2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "openforecaster2026:dated-news-retrieval",
+        "name": "Resolution-date-bounded static news retrieval",
+        "layer": "TSK",
+        "dimensions": [
+          "Memory and Context"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "other_tasks": [],
+        "scope_reason": "Retrieval excludes the month before resolution to form the forecasting information set.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.9; method passage beginning To prevent leakage issues",
+            "quote": "To prevent leakage issues (Paleka et al., 2025a), we use our offline CCNews corpus, and only use articles up to one month before the question’s resolution date. Our overall pool consists of 1 million articles across 60 different sources. We de-duplicate the articles and split each into fixed-size chunks (512 tokens) and embed each chunk",
+            "source_path": "references/pdfs/openforecaster2026.pdf"
+          }
+        ]
+      }
+    ],
+    "task_memberships": [
+      "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "evaluation_summary": "Held-out OpenForesight May–August 2025 and FutureX; semantic-answer accuracy, paper-defined higher-is-better Brier reward/score, consistency and OOD calibration.",
+    "corrections": [
+      "Explicitly studies discrete natural-language world events rather than numerical time series (p.3).",
+      "Its higher-is-better Brier-derived score must not be conflated with ordinary lower-is-better Brier loss."
+    ],
+    "pages_inspected": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      9,
+      11
+    ],
+    "notes": "Identity and selected method/evaluation passages checked against local PDF text; not an independent reproduction of reported results."
+  }
+]

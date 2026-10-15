@@ -1,5 +1,5 @@
 {
-  "version": "2.2",
+  "version": "2.3",
   "description": "Multi-dimensional evidence ledger for Time-Series Agent survey",
   "dimensions": {
     "Interface and Interaction": {
@@ -75,17 +75,19 @@
     "anomaly_detection_diagnosis",
     "decision_support"
   ],
-  "module_level_unit": "One unique source-grounded module ID counts once at its assigned layer, irrespective of its dimension and task memberships. Legacy inferred labels are candidate annotations.",
+  "module_level_unit": "One source-grounded module ID counts once at its assigned layer, independently of its dimension/task labels. Background and blocked records contribute zero.",
   "module_level_fields": {
     "llm_side": "LLM-side subdimensions",
     "general_harness": "Seven General Harness dimensions and fine-grained labels",
     "general_ts_harness": "Seven temporal Harness dimensions and fine-grained labels",
-    "task_specific": "Four task families, each using the same seven dimensions"
+    "task_specific": "Task contracts indexed by the same seven mechanism dimensions, including explicit additional task values"
   },
   "review_states": [
     "paper_verified",
-    "survey_coded_needs_pdf_review",
-    "needs_pdf_reclassification"
+    "repository_verified",
+    "out_of_scope",
+    "blocked",
+    "survey_coded_needs_pdf_review"
   ],
   "contribution_layers": [
     "LLM",
@@ -101,7 +103,16 @@
     "tasks",
     "scope_reason",
     "role",
-    "evidence"
+    "evidence",
+    "other_tasks"
   ],
-  "maintenance_source": "paper_classification_ledger.csv; reviewed_modules_json is preserved during sync"
+  "maintenance_source": "paper_classification_ledger.csv; reviewed_modules_json is preserved during sync",
+  "additional_task_values": "other_tasks extends the existing task coordinate; it does not create another taxonomy.",
+  "module_roles": [
+    "method",
+    "model_training",
+    "training_data",
+    "infrastructure",
+    "evaluation"
+  ]
 }

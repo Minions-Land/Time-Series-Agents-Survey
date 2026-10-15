@@ -133,12 +133,21 @@ preserves this list and projects it into the existing layer fields. A shared
 module may have multiple task memberships or dimension labels but counts once.
 Distinct modules in the same dimension may occupy different layers.
 
-The legacy inferred fields remain candidate annotations until replaced by a
-source review. Claim-summary verification is distinct from module verification.
-The first revision batch verifies nine works and nineteen modules; see
-`reports/module-review-20261015.json`. The timeline includes candidate annotations
-and explicitly labels this coverage. It must not be described as a fully audited
-count of innovations.
+The 2026-10-15 full audit covers all 138 examined records. Of these, 134
+paper-supported works and two repository-supported resources contribute 292
+modules; GridMind and Tree-of-Evidence remain background records with zero
+contribution modules. Review evidence is in `reviews/20261015_full_audit/`.
+The 300 PDF excerpts and two repository excerpts pass transcription/locator
+checks. These checks verify quotation accuracy; scope judgments are recorded
+separately in each module's `scope_reason`.
+
+`other_tasks` extends the same task coordinate for classification, imputation,
+annotation, question answering, data quality, and other source-supported outputs.
+A TSK module must have a value in `tasks` or `other_tasks`. Module roles distinguish
+methods, model training, training data, infrastructure, and evaluation.
+`review_audit` preserves evaluated settings, inspected pages, corrections, and
+record disposition. Repository verification never becomes paper verification.
+The timeline counts only reviewed module IDs; no inferred candidates are included.
 
 After a reviewed-card change, run `classification_manager.py sync`,
 `classification_manager.py validate`, `sync_reviewed_manuscript.py`, and

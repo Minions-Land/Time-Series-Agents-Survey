@@ -1,0 +1,531 @@
+[
+  {
+    "citation_key": "flairr2025",
+    "modules": [
+      {
+        "id": "flairr2025:refinement",
+        "name": "Retrieval and error-driven prompt refinement",
+        "layer": "TSK",
+        "dimensions": [
+          "Memory and Context",
+          "Control, Verification, and Feedback",
+          "Optimization and Evolution"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "scope_reason": "The iterative update requires forecast candidates, horizon ground truth and MAE; it is a forecasting procedure.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.2; Section 2.1, Overall Agentic Architecture",
+            "quote": "The core iterative cycle (Alg. 1, lines 7-20) involves forecasting, evaluating the forecast against recent ground truth (e.g., via a metric like MAE), and refining the prompt. The Refiner agent can signal early termination if the forecast improve- ment falls below a defined threshold, τstop (e.g., a 5% reduction in MAE). Otherwise, if maximum iterations (Niter) are reached, the system defaults to the prompt that yielded the best observed MAE.",
+            "source_path": "references/pdfs/flairr2025.pdf"
+          },
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.2; Section 2.2, Retrieval Agent",
+            "quote": "Similarity between the current context window (XCtx) and the histor- ical segments is measured using Pearson’s cor- relation, with the top-M most similar segments being retrieved. These segments, along with their actual outcomes, provide illustrative examples of past pattern evolutions, directly augmenting the context (Caug) given to the Forecaster-agent (see Appendix D for data formatting details).",
+            "source_path": "references/pdfs/flairr2025.pdf"
+          }
+        ]
+      }
+    ],
+    "evidence_recheck": {
+      "status": "continuous_source_quotes_verified",
+      "source": "tmp/full_audit_sources/flairr2025.json",
+      "pages_inspected": [
+        2
+      ]
+    }
+  },
+  {
+    "citation_key": "timeseriesscientist2025",
+    "modules": [
+      {
+        "id": "timeseriesscientist2025:curator",
+        "name": "Temporal diagnostics and preprocessing",
+        "layer": "GTS",
+        "dimensions": [
+          "Tools and Execution"
+        ],
+        "tasks": [],
+        "scope_reason": "Statistics, missingness, outlier treatment and temporal diagnostics produce a processed series before forecaster selection. The operation is separable from the forecasting loss.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; Section 3.2, Quality Diagnostics & Preprocessing",
+            "quote": "Rather than computing fixed summaries, Curator leverages LLM-driven reasoning to both diagnose issues and execute appropriate preprocessing. Specifically, given a univariate series D = {xt}T t=1, the agent first outputs a vector Q containing data statistics S, missing value information M, outlier information O, and data-process strategy π.",
+            "source_path": "references/pdfs/timeseriesscientist2025.pdf"
+          }
+        ]
+      },
+      {
+        "id": "timeseriesscientist2025:selection",
+        "name": "Validation-driven forecaster selection",
+        "layer": "TSK",
+        "dimensions": [
+          "Planning and Workflow",
+          "Tools and Execution"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "scope_reason": "Model configuration and ranking optimize forecast validation MAPE.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.6; Section 3.3, Model Ranking",
+            "quote": "Model Ranking. After hyperparameter optimization, each candidate model mi is instantiated with its optimal configuration θ∗ i and associated validation metrics. To select a high-quality subset for ensemble construction, the np tuned models are ranked by their validation performance. We primarily adopt validation MAPE for ranking. Specifically, the top k models with the lowest validation MAPE scores are retained:",
+            "source_path": "references/pdfs/timeseriesscientist2025.pdf"
+          }
+        ]
+      }
+    ],
+    "evidence_recheck": {
+      "status": "continuous_source_quotes_verified",
+      "source": "tmp/full_audit_sources/timeseriesscientist2025.json",
+      "pages_inspected": [
+        5,
+        6
+      ]
+    }
+  },
+  {
+    "citation_key": "chatad2026",
+    "modules": [
+      {
+        "id": "chatad2026:tsevol",
+        "name": "Multi-agent temporal instruction construction",
+        "layer": "TSK",
+        "dimensions": [
+          "Coordination and Scaling",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "data_augmentation_synthesis",
+          "anomaly_detection_diagnosis"
+        ],
+        "scope_reason": "The agents produce and review anomaly-oriented instruction dialogues during data construction.",
+        "role": "training_data",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; Section 4.1.3, Supervisor Agent and Eq. (2)",
+            "quote": "Supervisor Agent: The Supervisor evaluates the quality of each evolution loop (a complete Q&A pair) and provides implicit feedback to guide sub- sequent question generation. As defined in Eq. (2), the evaluation Gk is a binary alignment check:",
+            "source_path": "references/pdfs/chatad2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "chatad2026:training",
+        "name": "LoRA supervision and TKTO reasoning training",
+        "layer": "LLM",
+        "dimensions": [],
+        "tasks": [
+          "anomaly_detection_diagnosis"
+        ],
+        "scope_reason": "SFT and preference optimization change the language model itself.",
+        "role": "model_training",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; Sections 4.2 and 4.2.1",
+            "quote": "As shown in Fig. 3(b), we propose a two-stage train- ing paradigm for ChatAD: initial SFT for AD task using TSEData, followed by TKTO optimization to bolster reasoning and generalization. 4.2.1 SFT for Anomaly Detection Task We adopt LoRA (Low-Rank Adaptation) (Hu et al., 2022)-based SFT to train the adapter.",
+            "source_path": "references/pdfs/chatad2026.pdf"
+          }
+        ]
+      }
+    ],
+    "evidence_recheck": {
+      "status": "continuous_source_quotes_verified",
+      "source": "tmp/full_audit_sources/chatad2026.json",
+      "pages_inspected": [
+        4,
+        5
+      ],
+      "correction": "Replaced interleaved two-column extraction with contiguous supervisor and LoRA-training passages; retained distinct TSK data-construction and LLM training modules."
+    }
+  },
+  {
+    "citation_key": "aion2026",
+    "modules": [
+      {
+        "id": "aion2026:lifecycle",
+        "name": "Lifecycle roles and communication protocols",
+        "layer": "GH",
+        "dimensions": [
+          "Planning and Workflow",
+          "Coordination and Scaling"
+        ],
+        "tasks": [],
+        "scope_reason": "Agent roles, workflow memory, review and stop protocols organize execution independently of a temporal output type.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; Section 3.2, Overview",
+            "quote": "Aion ∞is built from six component groups: agents, skills, rules, memory, evaluation, and protocols. Agents are the front-end roles that drive interpretation, evidence collection, solution construction, and review. Skills provide reusable priors and structured workflows that stabilize execution across the lifecycle. Rules define the admissible boundary of the workflow. Memory records progress, decisions, and structural state so that long executions do not drift. Evaluation turns runs into explicit assessment through suites, graders, and final acceptance checks.",
+            "source_path": "references/pdfs/aion2026.pdf"
+          },
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; Section 3.2 continued",
+            "quote": "specify how work, review, rechecking, stop signals, and memory updates communicate between different sessions. Together, these six groups constitute the harness that answers Q2. In our implementation, each group contains several named components, which are expanded in Appendix B.",
+            "source_path": "references/pdfs/aion2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "aion2026:validation",
+        "name": "Temporal admissibility checks",
+        "layer": "GTS",
+        "dimensions": [
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [],
+        "scope_reason": "Timestamp alignment and leakage boundaries are evaluated separately from task scores, with both forecast and structured-answer outputs described.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; Section 3.1, Validation interface, Eq. (3)",
+            "quote": "Validation interface. V maps a candidate output o to (g, s) = V(o), (3) where g records validity checks such as timestamp alignment, leakage boundaries, or format compliance, and s records scored metrics such as forecasting error, profit, or report quality. A candidate is admissible only when all validity checks in g pass, and admissible candidates are ranked by s.",
+            "source_path": "references/pdfs/aion2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "aion2026:grounding",
+        "name": "Temporal task and data interface",
+        "layer": "GTS",
+        "dimensions": [
+          "Interface and Interaction",
+          "Tools and Execution"
+        ],
+        "tasks": [],
+        "scope_reason": "Observation units, allowed history, timestamp granularity and data interfaces specify temporal inputs across output forms.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; Section 3.3.1, Temporal Grounding",
+            "quote": "Temporal grounding concerns the parts that are closest to the time series itself. Before asking which model to use, the harness must first determine what counts as one temporal observation, which horizon is requested, and whether the visible data can support that request. In this paper, temporal constraints are the time-related requirements that any valid answer must satisfy, including the observation unit, allowed history and cutoff, forecast or reasoning horizon, timestamp granularity, output frequency, and leakage boundary.",
+            "source_path": "references/pdfs/aion2026.pdf"
+          }
+        ]
+      }
+    ],
+    "evidence_recheck": {
+      "status": "continuous_source_quotes_verified",
+      "source": "tmp/full_audit_sources/aion2026.json",
+      "pages_inspected": [
+        4,
+        5
+      ]
+    }
+  },
+  {
+    "citation_key": "timeclaw2026harness",
+    "modules": [
+      {
+        "id": "timeclaw2026harness:workspace-tools",
+        "name": "Runtime-native temporal objects and tools",
+        "layer": "GTS",
+        "dimensions": [
+          "Interface and Interaction",
+          "Tools and Execution"
+        ],
+        "tasks": [],
+        "scope_reason": "Tools operate directly on full-precision temporal objects and return structured observations.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; Section 3.2, Runtime-Native Temporal Tools",
+            "quote": "Unlike conventional tool- augmented agents that must pass data through lan- guage messages, TIMECLAW executes these oper- ations inside the harness runtime, where the full time-series object already resides in the workspace W. Thus, the agent only specifies the intended operation and its parameters without the need to spend context budget on tool interaction. Each tool runs directly on W at numerical precision and returns a compact structured observation.",
+            "source_path": "references/pdfs/timeclaw2026harness.pdf"
+          }
+        ]
+      },
+      {
+        "id": "timeclaw2026harness:memory",
+        "name": "Signal-text episodic retrieval",
+        "layer": "GTS",
+        "dimensions": [
+          "Memory and Context"
+        ],
+        "tasks": [],
+        "scope_reason": "Retrieval keys jointly represent temporal signal structure and text context, beyond an ordinary dialogue buffer.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; Section 3.4, Episodic Multimodal Memory",
+            "quote": "Episodic memory is common in agentic systems, but its design is nontrivial in contextualized time- series settings, since relevance depends on both task framing and temporal structure. A text-based or jointly serialized retrieval space can (1) re- trieve misleading precedents, since token similarity does not necessarily preserve numerical proximity (Proposition 1); (2) risk modality imbalance for long series; (3) exhibit scale instability, as normal- ization choices can change which temporal patterns appear similar.",
+            "source_path": "references/pdfs/timeclaw2026harness.pdf"
+          },
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; Section 3.4, Memory records",
+            "quote": "For example, in the energy domain, ρ may note that a snowstorm scenario implies a sharp electricity demand increase due to air-conditioning load. The remaining fields ϕ and ψ serve as retrieval keys over the signal and text modalities, respectively.",
+            "source_path": "references/pdfs/timeclaw2026harness.pdf"
+          }
+        ]
+      },
+      {
+        "id": "timeclaw2026harness:tool-promotion",
+        "name": "Held-out execution gate for new tools",
+        "layer": "GH",
+        "dimensions": [
+          "Optimization and Evolution",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [],
+        "scope_reason": "The generate-execute-score-register mechanism is reusable; generated routines receive a temporal or task-specific scope individually.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; Section 3.3, Capability evolution mechanism",
+            "quote": "Each candidate tool is verified by execution on a held-out subset of similar tasks and is admitted into T only if its held-out success rate exceeds a threshold γ. Once admitted, the tool is immedi- ately registered alongside the seed tools and can be invoked in future rollouts.",
+            "source_path": "references/pdfs/timeclaw2026harness.pdf"
+          }
+        ]
+      }
+    ],
+    "evidence_recheck": {
+      "status": "continuous_source_quotes_verified",
+      "source": "tmp/full_audit_sources/timeclaw2026harness.json",
+      "pages_inspected": [
+        4
+      ]
+    }
+  },
+  {
+    "citation_key": "castfsr2026",
+    "modules": [
+      {
+        "id": "castfsr2026:forecast-revision",
+        "name": "Fast-slow-reflect forecast revision",
+        "layer": "TSK",
+        "dimensions": [
+          "Planning and Workflow",
+          "Tools and Execution",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "scope_reason": "The state and actions are defined around a numerical forecast prior and context-conditioned revision.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.2; Introduction, framework overview",
+            "quote": "In fast-thinking forecasting, CastFSR pro- files historical observations and autonomously selects suit- able lightweight forecasters to construct a data-driven fore- cast prior. In slow deliberative reasoning, it retrieves future- relevant evidence from long-range contextual histories, adap- tively identifies context-specific look-back windows, and rea- sons about how contextual factors reshape future dynamics to refine the forecast prior. In reflective evaluation, CastFSR it- eratively evaluates and adjusts candidate forecasts to enforce temporal regularities, contextual consistency, and domain constraints.",
+            "source_path": "references/pdfs/castfsr2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "castfsr2026:policy-training",
+        "name": "Distilled SFT and multi-turn policy training",
+        "layer": "LLM",
+        "dimensions": [],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "scope_reason": "Supervised distillation and multi-turn RL update the model policy, separately from the forecasting workflow.",
+        "role": "model_training",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.4; Model-Agnostic Instantiation of CastFSR, training paragraph",
+            "quote": "Specifically, we internalize the workflow in a small model through two-stage training. First, SFT learns executable Fast–Slow–Reflect be- havior from general LLM trajectories distilled on the full cross-domain training data. The validation removes trajecto- ries with illegal tool calls, incorrect stage order, ground-truth leakage, invalid timestamps, or incomplete forecasts. Second, multi-turn RL optimizes complete decision trajectories un- der delayed forecasting feedback.",
+            "source_path": "references/pdfs/castfsr2026.pdf"
+          }
+        ]
+      }
+    ],
+    "evidence_recheck": {
+      "status": "continuous_source_quotes_verified",
+      "source": "tmp/full_audit_sources/castfsr2026.json",
+      "pages_inspected": [
+        2,
+        4
+      ]
+    }
+  },
+  {
+    "citation_key": "scenariodiff2026",
+    "modules": [
+      {
+        "id": "scenariodiff2026:scenario-guidance",
+        "name": "Historical context, scenario and anchor guidance",
+        "layer": "TSK",
+        "dimensions": [
+          "Planning and Workflow",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "scope_reason": "The output is a future-horizon trajectory conditioned by historical summaries and scenario anchors; generation here is probabilistic prediction.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; Section IV.A, Framework Overview",
+            "quote": "SCENARIODIFF organizes contextual reasoning into three hi- erarchical levels. First, a frozen Historical Context Agent maps M1:L to stepwise context summaries sctx 1:L, grounding the model in document-aligned historical evidence. Second, a frozen Scenario Agent maps (x1:L, sctx 1:L) to a scenario description sscn, projecting a coarse qualitative prior over the forecast horizon. Third, an Anchor Guidance Agent maps (x1:L, sctx 1:L, sscn) to sparse anchor points A, which provide localized constraints for inference-time trajectory refinement.",
+            "source_path": "references/pdfs/scenariodiff2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "scenariodiff2026:diffusion",
+        "name": "Scenario-conditioned diffusion forecasting",
+        "layer": "TSK",
+        "dimensions": [
+          "Tools and Execution"
+        ],
+        "tasks": [
+          "forecasting_prediction"
+        ],
+        "scope_reason": "The denoising target is the clean future horizon, not an independent training-data augmentation output.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; Section IV.A, Framework Overview",
+            "quote": "During denoising, the model receives the observed history x1:L, the noisy future x(t), and the contextual conditions produced by the Historical Context Agent and the Scenario Agent. Starting from Gaussian noise, the reverse process generates a trajectory consistent with both numerical history and scenario-level context. Anchor points A are then used by Anchor Blended Sampling to locally refine the generated trajectory.",
+            "source_path": "references/pdfs/scenariodiff2026.pdf"
+          }
+        ]
+      }
+    ],
+    "evidence_recheck": {
+      "status": "continuous_source_quotes_verified",
+      "source": "tmp/full_audit_sources/scenariodiff2026.json",
+      "pages_inspected": [
+        3
+      ],
+      "correction": "Replaced preliminary conditional-DDPM Eq. (6) as evidence with the actual framework denoising and Anchor Blended Sampling description in Section IV.A; the numerical diffusion model is not an LLM parameter contribution."
+    }
+  },
+  {
+    "citation_key": "metacaster2026",
+    "modules": [
+      {
+        "id": "metacaster2026:job-execution",
+        "name": "Training-job scheduling and recovery",
+        "layer": "GH",
+        "dimensions": [
+          "Tools and Execution",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [],
+        "scope_reason": "Queue scheduling, process monitoring and interruption recovery are reusable execution mechanisms, separate from the forecasting objective.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; Section 3.5, FTAgent execution paragraph",
+            "quote": "As shown in Fig. 2, FTAGENT composes pro- grams to train each forecaster with a grid search of hyperparameters. It organizes training jobs – i.e., (forecaster, hyperparameter, dataset) triplets – into a queue and assigns available GPUs for maximally parallel execution. During training, it monitors pro- cesses, resolves errors when encountered, and re- covers interrupted jobs without human intervention. This procedure ends when the queue is emptied.",
+            "source_path": "references/pdfs/metacaster2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "metacaster2026:generation",
+        "name": "Few-shot training-series generation",
+        "layer": "TSK",
+        "dimensions": [
+          "Tools and Execution"
+        ],
+        "tasks": [
+          "forecasting_prediction",
+          "data_augmentation_synthesis"
+        ],
+        "scope_reason": "Generated training data are designed to train lightweight forecasters; one module has two task memberships.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.2; Introduction, deployment-time pipeline",
+            "quote": "At deployment time, given a few-shot support set Dsup and contextual descrip- tion C, METACASTER employs two agents: (1) MGAGENT refers to Dsup and C, and generates a sufficient dataset ¯D that complies with domain con- straints; and (2) FTAGENT trains and selects the best lightweight forecasters using ¯D.",
+            "source_path": "references/pdfs/metacaster2026.pdf"
+          }
+        ]
+      },
+      {
+        "id": "metacaster2026:harness-optimization",
+        "name": "Forecast-utility-driven harness optimization",
+        "layer": "TSK",
+        "dimensions": [
+          "Optimization and Evolution"
+        ],
+        "tasks": [
+          "forecasting_prediction",
+          "data_augmentation_synthesis"
+        ],
+        "scope_reason": "The optimized harness is scored by the error gap between authentic-data and generated-data forecasters.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.5; Section 3.6, Eq. (4) interpretation",
+            "quote": "which induces a penalty when the forecasting error ω( ¯fm l ) of the forecaster trained on the generated ¯Dtr is larger than ω(fm l ) of the forecaster trained on the authentic dataset Dtr, suggesting ¯Dtr needs improvements. Otherwise, Eq. (4) won’t induce any penalty when ¯fm l performs better than fm l .",
+            "source_path": "references/pdfs/metacaster2026.pdf"
+          }
+        ]
+      }
+    ],
+    "evidence_recheck": {
+      "status": "continuous_source_quotes_verified",
+      "source": "tmp/full_audit_sources/metacaster2026.json",
+      "pages_inspected": [
+        2,
+        5
+      ]
+    }
+  },
+  {
+    "citation_key": "merit2025",
+    "modules": [
+      {
+        "id": "merit2025:positive-views",
+        "name": "Retrieval, augmentation selection and view review",
+        "layer": "TSK",
+        "dimensions": [
+          "Memory and Context",
+          "Tools and Execution",
+          "Control, Verification, and Feedback"
+        ],
+        "tasks": [
+          "data_augmentation_synthesis"
+        ],
+        "scope_reason": "The reviewed output is a positive view for contrastive representation learning; downstream task evaluation is a separate step.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; Figure 2 caption",
+            "quote": "Our retrieval agent first selects neighborhood candidates with similarity, followed by refinement using an LLM. Our augmentation agent then selects suitable data augmentation strategies from the augmentation strategy library. Finally, our review agent evaluates the quality of the augmented sequences, which approves positive samples into a memory bank and returns to the retrieval agent for refinement if rejected. The augmented views and neighboring samples are utilized as positives for time series representation learning.",
+            "source_path": "references/pdfs/merit2025.pdf"
+          }
+        ]
+      }
+    ],
+    "evidence_recheck": {
+      "status": "continuous_source_quotes_verified",
+      "source": "tmp/full_audit_sources/merit2025.json",
+      "pages_inspected": [
+        3
+      ]
+    }
+  }
+]
