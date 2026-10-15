@@ -16,6 +16,7 @@ from datetime import datetime
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "paper_classification_ledger.json"
 OUT_PNG = ROOT / "artifacts" / "contribution_timeline.png"
+OUT_PDF = ROOT / "artifacts" / "contribution_timeline.pdf"
 OUT_CSV = ROOT / "artifacts" / "module_contribution_timeline.csv"
 
 
@@ -28,18 +29,22 @@ def count_module_labels(value: dict) -> int:
     back into GTS or GH.
     """
     dimensions = value.get("dimensions", value) if isinstance(value, dict) else {}
-    return sum(len(labels) for labels in dimensions.values() if isinstance(labels, list))
+    return len({label for labels in dimensions.values() if isinstance(labels, list) for label in labels})
 
 
 def contribution_counts(record: dict) -> dict[str, int]:
     module = record.get("module_level_contributions", {})
+    if "modules" in module:
+        counts = Counter(m["layer"] for m in module["modules"])
+        return {"LLM-side": counts["LLM"], "General Harness": counts["GH"],
+                "General Time-Series Harness": counts["GTS"], "Task-Specific Harness": counts["TSK"]}
     llm = module.get("llm_side", [])
     task = module.get("task_specific", {})
     return {
         "LLM-side": len(llm) if isinstance(llm, list) else 0,
         "General Harness": count_module_labels(module.get("general_harness", {})),
         "General Time-Series Harness": count_module_labels(module.get("general_ts_harness", {})),
-        "Task-Specific Harness": sum(count_module_labels(item) for item in task.values() if isinstance(item, dict)),
+        "Task-Specific Harness": len({label for item in task.values() if isinstance(item, dict) for labels in item.get("dimensions", {}).values() for label in labels}),
     }
 
 
@@ -119,6 +124,7 @@ def main() -> None:
     fig.autofmt_xdate(rotation=0, ha="center")
     fig.tight_layout()
     fig.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
+    fig.savefig(OUT_PDF, bbox_inches="tight")
     plt.close(fig)
 
 

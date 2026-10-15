@@ -1,6 +1,6 @@
 # Module-level paper card
 
-The survey uses one paper card per reviewed work. The JSON ledger is the source of truth; the appendix renders a human-readable view of selected fields.
+The survey uses one paper card per reviewed work. The CSV is the maintained source and the JSON ledger is its generated view; the appendix renders a human-readable view of selected fields.
 
 Each card contains:
 
@@ -16,3 +16,5 @@ Each card contains:
 The ledger keeps inclusive source descriptions so that a paper can record contributions at several levels. Aggregate plots use an exclusive deepest-layer projection: task-bound modules count as Task-Specific Harness, reusable temporal modules as General Time-Series Harness, and domain-independent runtime modules as General Harness. The LLM-side field is independent of this projection.
 
 New work extends the map by adding a card, adding a module under an existing dimension, or adding a task-specific branch with its own contract. It does not require rewriting the schema or changing the construction hierarchy.
+
+Reviewed modules use stable IDs, one layer, the shared seven dimensions, task memberships and source evidence. One module counts once regardless of the number of tags. See `references/CLASSIFICATION_LEDGER.md` for generation and review rules.

@@ -2,15 +2,15 @@
 
 `paper_classification_ledger.csv` is the maintained work-level source for the
 survey taxonomy. `paper_classification_ledger.json` is its generated structured mirror. Version
-2.0 adds separate LLM-side, General Harness, General Time-Series Harness, and
+2.2 maintains separate LLM-side, General Harness, General Time-Series Harness, and
 four-task module records. Each row represents one reviewed work and keeps four kinds of data
 distinct:
 
 1. Bibliographic identity and publication time from the production BibTeX,
    reference manifest, and official metadata.
 2. A concise paper-claim summary and its evidence/review status.
-3. Harness coding: all applicable GH, GTS, and TSK contributions, the primary
-   contribution locus used for aggregate counts, and modules from
+3. Harness coding: all applicable GH, GTS, and TSK contributions, a historical work-level
+   contribution summary, and modules from
    `harness_component_catalog.csv`.
 4. Multi-label task coding under four axes: forecasting and reasoning;
    augmentation and synthesis; anomaly detection and diagnosis; and decision
@@ -27,8 +27,7 @@ The version-2 taxonomy fields are deliberately independent and multi-label:
 - `task_specific_modules` contains the same seven-module lens under the four
   task families: forecasting/prediction, augmentation/synthesis,
   anomaly/diagnosis, and decision support.
-- `module_level_contributions` makes the aggregation unit explicit: every
-  non-empty fine-grained module annotation is one contribution unit, so one
+- `module_level_contributions` makes the aggregation unit explicit: each reviewed module ID is one contribution unit, so one
   paper can contribute multiple units across layers and task families.
 
 Empty arrays are valid. A paper can populate multiple records, and
@@ -91,8 +90,7 @@ uv run scripts/classification_manager.py validate
 `sync` updates bibliographic and Scholar fields from
 `TS_AGENT_HARNESS_SURVEY.bib` and `references/manifest.csv`; it preserves claim
 and classification judgments. `validate` checks unique keys, allowed loci,
-Harness module vocabulary, task coverage, Scholar-state agreement, and exact
-membership agreement with the 139-work contribution profile in `main.tex`.
+Harness module vocabulary, task coverage, Scholar-state agreement, and membership agreement with the maintained contribution profile in `main.tex`.
 
 Use `bootstrap` only to reconstruct the initial ledger from the current
 manuscript and historical CSV files. It overwrites classification judgments and
@@ -118,3 +116,31 @@ When adding a paper:
    label in `task_family_original` or `task_axis_other`.
 5. Add the corresponding work profile to the manuscript, run `sync`, and run
    `validate` before compiling.
+
+## Module identity and the unified taxonomy (2026-10-15)
+
+All Harness chapters and records use the same seven mechanism dimensions.
+Contribution scope (GH, GTS, TSK) and supported tasks are coordinates on that
+same record, not alternative taxonomies. LLM-side contributions remain separate.
+The historical component catalog supplies fine-grained aliases, not another
+chapter-level classification. `primary_locus` is historical work metadata and
+is never a plotting unit.
+
+`reviewed_modules_json` in the maintained CSV contains the source-reviewed
+module list. Each module has a stable ID, name, one layer, mechanism dimensions,
+task memberships, scope reason, role, and page/section evidence. Generation
+preserves this list and projects it into the existing layer fields. A shared
+module may have multiple task memberships or dimension labels but counts once.
+Distinct modules in the same dimension may occupy different layers.
+
+The legacy inferred fields remain candidate annotations until replaced by a
+source review. Claim-summary verification is distinct from module verification.
+The first revision batch verifies nine works and nineteen modules; see
+`reports/module-review-20261015.json`. The timeline includes candidate annotations
+and explicitly labels this coverage. It must not be described as a fully audited
+count of innovations.
+
+After a reviewed-card change, run `classification_manager.py sync`,
+`classification_manager.py validate`, `sync_reviewed_manuscript.py`, and
+`make_contribution_timeline.py`; then compile the manuscript. The manuscript
+synchronizer updates only the appendix snapshot and reviewed rows, not prose.

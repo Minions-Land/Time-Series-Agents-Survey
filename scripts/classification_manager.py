@@ -94,6 +94,7 @@ FIELDS = [
     "task_specific_modules_json",
     "module_level_contributions_json",
     "taxonomy_review_status",
+    "reviewed_modules_json",
 ]
 
 MODULE_RULES = {
@@ -257,41 +258,64 @@ def exclusive_harness_layers(
     gts: dict[str, list[str]],
     task: dict,
 ) -> tuple[dict[str, list[str]], dict[str, list[str]], dict]:
-    """Keep each module at its deepest Harness layer.
+    """Remove repeated module IDs, never unrelated modules in the same dimension."""
+    task_ids = {label for item in task.values() if isinstance(item, dict)
+                for labels in item.get("dimensions", {}).values() for label in labels}
+    gts_ids = {label for labels in gts.values() for label in labels}
+    return (
+        {d: [m for m in gh.get(d, []) if m not in task_ids | gts_ids] for d in DIMENSION_NAMES},
+        {d: [m for m in gts.get(d, []) if m not in task_ids] for d in DIMENSION_NAMES},
+        task,
+    )
 
-    LLM-side labels are independent and are therefore not passed here.  For
-    the nested Harness layers, a populated task contract owns its dimension;
-    otherwise a populated GTS dimension owns it; GH receives only the
-    remaining reusable runtime dimensions.
-    """
-    task_out = {}
-    task_by_dim = {name: [] for name in DIMENSION_NAMES}
-    for task_name, item in task.items():
-        if not isinstance(item, dict):
-            task_out[task_name] = item
-            continue
-        copied = dict(item)
-        dims = copied.get("dimensions", empty_dimensions())
-        for name in DIMENSION_NAMES:
-            for label in dims.get(name, []):
-                if label not in task_by_dim[name]:
-                    task_by_dim[name].append(label)
-        task_out[task_name] = copied
 
-    gts_out = empty_dimensions()
-    gh_out = empty_dimensions()
-    for name in DIMENSION_NAMES:
-        if task_by_dim[name]:
-            continue
-        if gts.get(name):
-            gts_out[name] = list(gts[name])
-            continue
-        gh_out[name] = list(gh.get(name, []))
-    return gh_out, gts_out, task_out
+def reviewed_module_record(row: dict[str, str]) -> dict | None:
+    raw = row.get("reviewed_modules_json", "")
+    if not raw:
+        return None
+    modules = json.loads(raw)
+    ids = set()
+    gh, gts = empty_dimensions(), empty_dimensions()
+    tasks = {}
+    llm = []
+    for m in modules:
+        mid = m["id"]
+        if mid in ids:
+            raise ValueError(f"{row['citation_key']}: duplicate reviewed module {mid}")
+        ids.add(mid)
+        if m["layer"] not in {"LLM", "GH", "GTS", "TSK"}:
+            raise ValueError(f"{mid}: unknown layer")
+        if not m.get("evidence") or not m.get("scope_reason"):
+            raise ValueError(f"{mid}: missing evidence or scope reason")
+        dims = m.get("dimensions", [])
+        if any(d not in DIMENSION_NAMES for d in dims):
+            raise ValueError(f"{mid}: unknown mechanism dimension")
+        if m["layer"] == "LLM":
+            llm.append(mid)
+        elif m["layer"] in {"GH", "GTS"}:
+            target = gh if m["layer"] == "GH" else gts
+            for d in dims:
+                target[d].append(mid)
+        else:
+            if not m.get("tasks"):
+                raise ValueError(f"{mid}: task-specific module without task")
+            for task in m["tasks"]:
+                item = tasks.setdefault(task, {"present": True, "dimensions": empty_dimensions(),
+                                               "source_evidence": [], "dimension_review_status": "paper_verified"})
+                for d in dims:
+                    item["dimensions"][d].append(mid)
+                item["source_evidence"].extend(m["evidence"])
+    return {"unit": "unique source-grounded module id", "modules": modules,
+            "llm_side": llm, "general_harness": gh, "general_ts_harness": gts,
+            "task_specific": tasks, "coding_basis": "primary_source_module_review",
+            "review_status": "paper_verified"}
 
 
 def module_contribution_record(row: dict[str, str]) -> dict:
     """Return module-level annotations with separate GH, GTS, and TSK coding."""
+    reviewed = reviewed_module_record(row)
+    if reviewed is not None:
+        return reviewed
     gh_raw = parse_json_value(row.get("general_harness_dimensions", ""), {})
     gts_raw = parse_json_value(row.get("general_ts_harness_dimensions", ""), {})
     task_raw = parse_json_value(row.get("task_specific_modules_json", ""), {})
@@ -530,6 +554,12 @@ def generate_json(rows: list[dict[str, str]]) -> None:
         module_contributions = parse_json_field(
             row, "module_level_contributions_json", module_contribution_record(row)
         )
+        reviewed = reviewed_module_record(row)
+        if reviewed is not None:
+            module_contributions = reviewed
+            exclusive_gh = general_dimensions = reviewed["general_harness"]
+            exclusive_gts = general_ts_dimensions = reviewed["general_ts_harness"]
+            task_modules = reviewed["task_specific"]
         llm_summary = row.get("llm_component_contribution", "")
         gts_review = row.get("taxonomy_review_status", "survey_coded_needs_pdf_review")
         output.append(
@@ -590,20 +620,20 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                     "dimensions": exclusive_gh,
                     "inclusive_dimensions": general_dimensions,
                     "source_dimensions": parse_json_field(row, "general_harness_dimensions", {}),
-                    "dimension_coding_basis": "derived_from_explicit_harness_modules",
+                    "dimension_coding_basis": "primary_source_module_review" if reviewed is not None else "derived_from_explicit_harness_modules",
                     "claim": row["general_harness_contribution"],
                     "source_evidence": json.loads(row["source_evidence_json"]) if row.get("source_evidence_json") else [],
-                    "review_status": "paper_verified" if row.get("claim_review_status") == "paper_verified" else "survey_coded_needs_pdf_review",
+                    "review_status": "paper_verified" if reviewed is not None else "survey_coded_needs_pdf_review",
                 },
                 "general_ts_harness_modules": {
                     "dimensions": exclusive_gts,
                     "inclusive_dimensions": general_ts_dimensions,
                     "source_dimensions": parse_json_field(row, "general_ts_harness_dimensions", {}),
-                    "dimension_coding_basis": "derived_from_temporal_specificity_reason_and_claim",
+                    "dimension_coding_basis": "primary_source_module_review" if reviewed is not None else "derived_from_temporal_specificity_reason_and_claim",
                     "claim": row["general_ts_harness_contribution"],
                     "ts_specificity_reason": gts_reason,
                     "source_evidence": json.loads(row["source_evidence_json"]) if row.get("source_evidence_json") else [],
-                    "review_status": "paper_verified" if row.get("claim_review_status") == "paper_verified" else ("needs_pdf_reclassification" if row["general_ts_harness_contribution"] else "not_recorded"),
+                    "review_status": "paper_verified" if reviewed is not None else ("needs_pdf_reclassification" if row["general_ts_harness_contribution"] else "not_recorded"),
                 },
                 "task_specific_modules": task_modules,
                 "module_level_contributions": module_contributions,
@@ -642,7 +672,7 @@ def sync(_: argparse.Namespace) -> None:
         row["module_level_contributions_json"] = json.dumps(
             module_contribution_record(row), ensure_ascii=False, sort_keys=True
         )
-        row["taxonomy_schema_version"] = "2.1"
+        row["taxonomy_schema_version"] = "2.2"
     write_csv(rows)
     generate_json(rows)
     print(f"synchronized Bib and manifest metadata for {len(rows)} records")
@@ -660,6 +690,10 @@ def validate(_: argparse.Namespace) -> None:
         errors.append("duplicate citation keys in classification ledger")
     for row in rows:
         key = row["citation_key"]
+        try:
+            reviewed_module_record(row)
+        except (ValueError, KeyError, TypeError) as exc:
+            errors.append(str(exc))
         repo_only = key in REPOSITORY_ONLY_KEYS or (
             manifest.get(key, {}).get("source_kind") == "github"
             and manifest.get(key, {}).get("pdf_expected", "").lower() == "false"

@@ -1,5 +1,5 @@
 {
-  "version": "2.1",
+  "version": "2.2",
   "description": "Multi-dimensional evidence ledger for Time-Series Agent survey",
   "dimensions": {
     "Interface and Interaction": {
@@ -75,7 +75,7 @@
     "anomaly_detection_diagnosis",
     "decision_support"
   ],
-  "module_level_unit": "Each non-empty fine-grained module annotation is one contribution unit; papers may contribute multiple units at multiple layers.",
+  "module_level_unit": "One unique source-grounded module ID counts once at its assigned layer, irrespective of its dimension and task memberships. Legacy inferred labels are candidate annotations.",
   "module_level_fields": {
     "llm_side": "LLM-side subdimensions",
     "general_harness": "Seven General Harness dimensions and fine-grained labels",
@@ -86,5 +86,22 @@
     "paper_verified",
     "survey_coded_needs_pdf_review",
     "needs_pdf_reclassification"
-  ]
+  ],
+  "contribution_layers": [
+    "LLM",
+    "GH",
+    "GTS",
+    "TSK"
+  ],
+  "reviewed_module_fields": [
+    "id",
+    "name",
+    "layer",
+    "dimensions",
+    "tasks",
+    "scope_reason",
+    "role",
+    "evidence"
+  ],
+  "maintenance_source": "paper_classification_ledger.csv; reviewed_modules_json is preserved during sync"
 }
