@@ -1,6 +1,6 @@
 # Editorial revision and resource-hub proposal
 
-Status: proposal, 2026-10-16. This incorporates the authors' discussion and supersedes the executable-adapter roadmap in the earlier Introduction/Paper2Agent review. The manuscript has not yet been rewritten to this proposal.
+Status: proposal, 2026-10-16. This incorporates the authors' discussion and supersedes the executable-adapter roadmap in the earlier Introduction/Paper2Agent review. The manuscript narrative was revised on 2026-10-16: LLM interaction now introduces the construction framework; method-level comparison and resource navigation guide the synthesis. Card-field enrichment and conversational navigation remain planned.
 
 ## Shared objective
 
@@ -89,7 +89,7 @@ The answer should provide relevant module choices, grounded comparisons, source 
 
 ## Next editing sequence
 
-1. Confirm this framing, then rewrite Introduction as a continuous argument.
+1. Completed: rewrite Introduction as a continuous argument, centering LLM interaction and Harness composition.
 2. Audit section/subsection endings, prioritizing General Time-Series Harness and Task-Specific Harness; add comparative synthesis where substantive judgments are missing.
 3. Correct self-description labels against source text and add structured resource links through the canonical ledger workflow.
 4. Generate task/module/resource navigation from the same data; add a conversational interface only after retrieval and evidence checks are in place.

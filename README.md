@@ -28,7 +28,7 @@ The survey connects four kinds of contribution:
 
 | Contribution | Design question |
 |---|---|
-| **LLM side** | What temporal understanding, representation, and reasoning capabilities does the model provide? |
+| **LLM side** | How does the model interpret observations, select tools, and respond to feedback? Which learned temporal capabilities help the workflow? |
 | **General Harness** | How are interaction, memory, tools, execution, planning, feedback, and coordination organized? |
 | **General Time-Series Harness** | How are temporal data, operations, context, memory, and validation handled across tasks? |
 | **Task-Specific Harness** | How are those capabilities specialized for the required output and objective? |
