@@ -1,0 +1,570 @@
+{
+  "agenticrag2024:pattern-prompt-pool": {
+    "action": "change",
+    "basis": "Source-located proposal checked against primary text and independent cross-review.",
+    "module": {
+      "id": "agenticrag2024:pattern-prompt-pool",
+      "name": "Differentiable temporal prompt-pool conditioning",
+      "layer": "LLM",
+      "dimensions": [
+        "Memory and Context"
+      ],
+      "tasks": [
+        "forecasting_prediction",
+        "anomaly_detection_diagnosis"
+      ],
+      "scope_reason": "The pool supplies continuous prompt embeddings, concatenated with the numerical input and projected by a learnable W; this is a differentiable model-facing adaptation, not an external episodic store. Move to LLM.",
+      "role": "model_interface",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.3; passage beginning \"The dynamic prompting approach\"",
+          "quote": "The dynamic prompting approach utilizes a shared pool of prompts stored as key-value pairs. For time series applications, each prompt is represented by a key vector encoding the essential global characteristics associated with that prompt. The correspond- ing value matrix contains specific knowledge related to those trends or patterns, such as seasonality, cyclicality, irregularities, and other effects. The key vector acts as an identifier or",
+          "source_path": "references/pdfs/agenticrag2024.pdf"
+        },
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.3; Section 3.1, equation projecting concatenated prompt and temporal embeddings",
+          "quote": "where 𝑊∈R𝑑×(𝐾𝑙+1)𝑑is a learnable weight matrix.",
+          "source_path": "references/pdfs/agenticrag2024.pdf"
+        }
+      ],
+      "other_tasks": [
+        "imputation",
+        "time_series_classification"
+      ],
+      "function_view": {
+        "functions": [],
+        "view_status": "model_side",
+        "rationale": "Differentiable prompt embeddings and learnable projection condition the language model.",
+        "evidence_indices": [
+          0
+        ],
+        "reuse_proposals": []
+      }
+    }
+  },
+  "timeseriesexamagent2026:exam-template-generation": {
+    "action": "change",
+    "basis": "Source-located proposal checked against primary text and independent cross-review.",
+    "module": {
+      "id": "timeseriesexamagent2026:exam-template-generation",
+      "name": "Temporal question-template generation",
+      "layer": "TSK",
+      "dimensions": [
+        "Tools and Execution",
+        "Control, Verification, and Feedback"
+      ],
+      "tasks": [],
+      "scope_reason": "Templates encode question logic, options, selection of instances and answer computation. The produced artifact is a QA exam, so multiple concept/domain coverage does not make it task-independent; move GTS to TSK.",
+      "role": "evaluation",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.5; passage beginning \"We propose TimeSeriesExamAgent\"",
+          "quote": "We propose TimeSeriesExamAgent, a multi-agent framework that combines planning, generation, and verification to enable automatic benchmark construction on user-provided datasets. Dataset Handler + getDataframe() + query(id) . . . Sampled question Template What kind of AV conduction abnormality is presnet in this rec? A) . . . B) . . . C) . . . D) . . . Dataset Input def question(num_samples:int) -> List[QAPair]:",
+          "source_path": "references/pdfs/timeseriesexamagent2026.pdf"
+        }
+      ],
+      "other_tasks": [
+        "temporal_question_answering"
+      ],
+      "function_view": {
+        "functions": [],
+        "view_status": "resource_level",
+        "rationale": "Question-template generation is bound to a temporal QA benchmark output; concept diversity does not remove that task contract.",
+        "evidence_indices": [
+          0
+        ],
+        "reuse_proposals": []
+      }
+    }
+  },
+  "tsqbench2026:quality-assessment": {
+    "action": "change",
+    "basis": "Source-located proposal checked against primary text and independent cross-review.",
+    "module": {
+      "id": "tsqbench2026:quality-assessment",
+      "name": "Dimension-wise temporal quality assessment",
+      "layer": "GTS",
+      "dimensions": [
+        "Tools and Execution",
+        "Control, Verification, and Feedback",
+        "Coordination and Scaling"
+      ],
+      "tasks": [],
+      "scope_reason": "Missingness, frequency, trend and pattern quality are assessed before downstream forecasting/classification.",
+      "role": "method",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.4; 3.1 Overview",
+          "quote": "TSQAgent is a multi-agent framework for pairwise time series quality assessment, designed to determine which of two time series exhibits higher overall quality through structured reasoning and tool-grounded analysis.",
+          "source_path": "references/pdfs/tsqbench2026.pdf"
+        }
+      ],
+      "function_view": {
+        "functions": [
+          "validation"
+        ],
+        "view_status": "mapped",
+        "rationale": "Missingness, frequency, trend and pattern quality are assessed before downstream forecasting/classification.",
+        "evidence_indices": [
+          0
+        ],
+        "reuse_proposals": []
+      },
+      "other_tasks": [
+        "data_quality_assessment"
+      ]
+    }
+  },
+  "tsqbench2026:perceiver-training": {
+    "action": "change",
+    "basis": "Source-located proposal checked against primary text and independent cross-review.",
+    "module": {
+      "id": "tsqbench2026:perceiver-training",
+      "name": "Temporal quality-dimension policy training",
+      "layer": "LLM",
+      "dimensions": [
+        "Optimization and Evolution"
+      ],
+      "tasks": [],
+      "scope_reason": "GRPO updates LLM dimension-selection reasoning rather than only an external selection workflow.",
+      "role": "model_training",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.5; 3.2 Perceiver",
+          "quote": "we introduce a TS quality-tailored GRPO (Group Relative Policy Optimization) training strategy (Shao et al., 2024), which serves as the underlying optimization framework.",
+          "source_path": "references/pdfs/tsqbench2026.pdf"
+        }
+      ],
+      "function_view": {
+        "functions": [],
+        "view_status": "model_side",
+        "rationale": "Model capability or training contribution; no Harness function is inferred.",
+        "evidence_indices": [
+          0
+        ],
+        "reuse_proposals": []
+      },
+      "other_tasks": [
+        "data_quality_assessment"
+      ]
+    }
+  },
+  "tsqbench2026:quality-benchmark": {
+    "action": "change",
+    "basis": "Source-located proposal checked against primary text and independent cross-review.",
+    "module": {
+      "id": "tsqbench2026:quality-benchmark",
+      "name": "Controlled temporal quality comparison benchmark",
+      "layer": "GTS",
+      "dimensions": [
+        "Control, Verification, and Feedback"
+      ],
+      "tasks": [],
+      "scope_reason": "Synthetic paired degradations evaluate time-series quality independently of downstream task metrics.",
+      "role": "evaluation",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.3; 2 Measuring LLM Capabilities",
+          "quote": "TSQBench is built on a controlled synthetic generation pipeline (details in Appendix B), where paired time series are derived from a shared template and then injected with dimension-specific degradations.",
+          "source_path": "references/pdfs/tsqbench2026.pdf"
+        }
+      ],
+      "function_view": {
+        "functions": [
+          "validation"
+        ],
+        "view_status": "mapped",
+        "rationale": "Synthetic paired degradations evaluate time-series quality independently of downstream task metrics.",
+        "evidence_indices": [
+          0
+        ],
+        "reuse_proposals": []
+      },
+      "other_tasks": [
+        "data_quality_assessment"
+      ]
+    }
+  },
+  "timeseriesgym2025:temporal-challenges": {
+    "action": "change",
+    "basis": "Source-located proposal checked against primary text and independent cross-review.",
+    "module": {
+      "id": "timeseriesgym2025:temporal-challenges",
+      "name": "Time-series engineering challenge collection",
+      "layer": "GTS",
+      "dimensions": [
+        "Control, Verification, and Feedback"
+      ],
+      "tasks": [
+        "forecasting_prediction",
+        "anomaly_detection_diagnosis"
+      ],
+      "other_tasks": [
+        "time_series_classification",
+        "temporal_question_answering"
+      ],
+      "scope_reason": "The benchmark spans temporal modeling and engineering across multiple time-series problem types.",
+      "role": "evaluation",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.4; method passage beginning The current version features",
+          "quote": "The current version features 34 challenges from 23 unique data sources across 8 unique time series problems, spanning more than 15 domains. These challenges evaluate AI agents on a range of realistic ML engineering skills beyond just model development, including data labeling, model selection, and the utilization, improvement, and migration of research code (Tab. 3).",
+          "source_path": "references/pdfs/timeseriesgym2025.pdf"
+        },
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.4; Section 3, original challenge examples",
+          "quote": "Implement the MOMENT [6] time series foundation model for anomaly detection",
+          "source_path": "references/pdfs/timeseriesgym2025.pdf"
+        }
+      ],
+      "function_view": {
+        "functions": [],
+        "view_status": "resource_level",
+        "rationale": "Broad temporal dataset or evaluation workflow; retained as a resource rather than attributed to a single runtime function.",
+        "evidence_indices": [
+          0
+        ],
+        "reuse_proposals": []
+      }
+    }
+  },
+  "timeomni2026:tsr-suite": {
+    "action": "change",
+    "basis": "Source-located proposal checked against primary text and independent cross-review.",
+    "module": {
+      "id": "timeomni2026:tsr-suite",
+      "name": "TSR-SUITE reasoning task construction",
+      "layer": "LLM",
+      "dimensions": [],
+      "tasks": [
+        "forecasting_prediction",
+        "decision_support"
+      ],
+      "scope_reason": "TSR-SUITE is explicitly constructed to develop temporal reasoning models: hierarchical human-reviewed CoT examples become SFT and RL data. As a single existing data-construction record its primary contribution is training_data, consistent with ChatTS; multiple task labels alone do not make it a reusable runtime module. The test split remains recorded as evaluation evidence.",
+      "role": "training_data",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.5; passage beginning \"To mitigate the scarcity\"",
+          "quote": "To mitigate the scarcity of data in the field, we construct Time Series Reasoning Suite (TSR-SUITE), the first unified dataset suite tailored for time series reasoning. Unlike prior benchmarks designed purely for evaluation, TSR-SUITE is built as a training-and-evaluation suite that supports TSRMs development. The dataset spans 10 diverse domains and contains 23,605 curated QA pairs. Among them, 2,339 samples are annotated through a human-guided",
+          "source_path": "references/pdfs/timeomni2026.pdf"
+        },
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.6; Section 3.3 Stage 1 temporal priors",
+          "quote": "Stage 1: Injecting Time Series Reasoning Priors. Human-guided reasoning priors instruct LLMs on how to decompose time se- ries tasks into meaningful com- ponents. These traces narrow the exploration space to focus on three key capabilities (i.e., percep- tion, extrapolation, and decision- making) instead of drifting to- ward commonsense heuristics or generic algebraic QA. We inject this knowledge through supervised fine-tuning (SFT). Implementation details of SFT are provided in Ap- pendix F.1.",
+          "source_path": "references/pdfs/timeomni2026.pdf"
+        }
+      ],
+      "other_tasks": [
+        "temporal_question_answering",
+        "causal_discovery"
+      ],
+      "function_view": {
+        "functions": [],
+        "view_status": "model_side",
+        "rationale": "TSR-SUITE is explicitly constructed to develop temporal reasoning models: hierarchical human-reviewed CoT examples become SFT and RL data. As a single existing data-construction record its primary contribution is training_data, consistent with ChatTS; multiple task labels alone do not make it a reusable runtime module. The test split remains recorded as evaluation evidence.",
+        "evidence_indices": [
+          0,
+          1
+        ],
+        "reuse_proposals": []
+      }
+    }
+  },
+  "chatad2026:tsevol": {
+    "action": "change",
+    "basis": "Source-located proposal checked against primary text and independent cross-review.",
+    "module": {
+      "id": "chatad2026:tsevol",
+      "name": "Multi-agent temporal instruction construction",
+      "layer": "LLM",
+      "dimensions": [],
+      "tasks": [
+        "data_augmentation_synthesis",
+        "anomaly_detection_diagnosis"
+      ],
+      "scope_reason": "The multi-agent procedure constructs time-text instruction supervision that is learned by the target MTSLLM through LoRA SFT. The recorded contribution develops model capability through training data; its supervisor filters those instructions against reference answers.",
+      "role": "training_data",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.4; Section 4.1.3, Supervisor Agent and Eq. (2)",
+          "quote": "Supervisor Agent: The Supervisor evaluates the quality of each evolution loop (a complete Q&A pair) and provides implicit feedback to guide sub- sequent question generation. As defined in Eq. (2), the evaluation Gk is a binary alignment check:",
+          "source_path": "references/pdfs/chatad2026.pdf"
+        },
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.4; Section 4.1.2 Cognitive Reasoning Layer",
+          "quote": "CRL aims to enhance the reasoning of subsequent MTSLLM by generating high-quality time–text data. Due to the high cost of constructing such data, it leverages a reason- ing LLM like DeepSeek-R1 (Guo et al., 2025) and ChatGPT-o3 (Lin et al., 2025) to create the en- hanced TS instruction data, which is then further learned by the target MTSLLM. This essentially follows a knowledge distillation paradigm involv- ing two dialogue agents, Consultant and Client.",
+          "source_path": "references/pdfs/chatad2026.pdf"
+        }
+      ],
+      "function_view": {
+        "functions": [],
+        "view_status": "model_side",
+        "rationale": "The multi-agent procedure constructs time-text instruction supervision that is learned by the target MTSLLM through LoRA SFT. The recorded contribution develops model capability through training data; its supervisor filters those instructions against reference answers.",
+        "evidence_indices": [
+          0,
+          1
+        ],
+        "reuse_proposals": []
+      }
+    }
+  },
+  "gridagent2025:grid-action-plan": {
+    "action": "exclude",
+    "basis": "Root and independent reviewer checked static power-flow formulation and scenario experiments, PDF pp.3–7. Retain paper as background."
+  },
+  "gridagent2025:rollback": {
+    "action": "exclude",
+    "basis": "Root and independent reviewer checked static power-flow formulation and scenario experiments, PDF pp.3–7. Retain paper as background."
+  },
+  "climateagent2025:climate-workflows": {
+    "action": "change",
+    "basis": "Source-located proposal checked against primary text and independent cross-review.",
+    "module": {
+      "id": "climateagent2025:climate-workflows",
+      "name": "Climate analysis workflow benchmark",
+      "layer": "TSK",
+      "dimensions": [
+        "Control, Verification, and Feedback"
+      ],
+      "tasks": [
+        "anomaly_detection_diagnosis"
+      ],
+      "other_tasks": [
+        "scientific_temporal_analysis"
+      ],
+      "scope_reason": "CLIMATE-AGENT-BENCH-85 specifies scientific analysis/report workflows, including named phenomenon detectors, derived indices, visualisations and rubric-based outputs. It is an evaluation task suite, not a reusable cross-task temporal operation; domain diversity alone does not warrant GTS. Keep scientific_temporal_analysis as the explicit task value.",
+      "role": "evaluation",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.8; method passage beginning CLIMATE-AGENT-BENCH-85 spans",
+          "quote": "CLIMATE-AGENT-BENCH-85 spans six climate phenomena representing diverse analysis patterns: • Atmospheric Rivers (AR, 15 tasks) require computing integrated vapor transport (IVT) from multi-level wind and humidity fields, applying physical thresholds, identifying spatial regions, and tracking temporal evolution. These tests involve vertical integration, spatial pattern recognition, and trajectory analysis with wraparound coordinates. • Drought (DR, 15",
+          "source_path": "references/pdfs/climateagent2025.pdf"
+        }
+      ],
+      "function_view": {
+        "functions": [],
+        "view_status": "task_procedure",
+        "rationale": "CLIMATE-AGENT-BENCH-85 specifies scientific analysis/report workflows, including named phenomenon detectors, derived indices, visualisations and rubric-based outputs. It is an evaluation task suite, not a reusable cross-task temporal operation; domain diversity alone does not warrant GTS. Keep scientific_temporal_analysis as the explicit task value.",
+        "evidence_indices": [
+          0
+        ],
+        "reuse_proposals": []
+      }
+    }
+  },
+  "tsagent2025:intent-evidence-gate": {
+    "action": "change",
+    "basis": "Source-located proposal checked against primary text and independent cross-review.",
+    "module": {
+      "id": "tsagent2025:intent-evidence-gate",
+      "name": "Intent-specific temporal QA evidence gate",
+      "layer": "TSK",
+      "dimensions": [
+        "Control, Verification, and Feedback"
+      ],
+      "tasks": [],
+      "scope_reason": "The implemented gate maps question keywords to fixed intent classes, required predicates and answer schemas, including MCQ anomaly-location options. This concrete validator is bound to temporal question answering, so its deepest scope is TSK.",
+      "role": "method",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.5; passage beginning \"In practice (detect_question_intents())\"",
+          "quote": "In practice (detect_question_intents()), ϕintent is realized via transparent rule bundles: keyword/pattern matches map questions into a small set of intent classes (e.g., MCQ_anomaly_location, trend_direction, seasonality_type, relation_lagged), each declaring its schema and R. For example, a question of “In which part of the time series does the anomaly occur?” triggers MCQ_anomaly_location with R = { has_anomaly, anomaly_segment ∈{head, middle, end} }. As tools run, the log",
+          "source_path": "references/pdfs/tsagent2025.pdf"
+        }
+      ],
+      "other_tasks": [
+        "temporal_question_answering"
+      ],
+      "function_view": {
+        "functions": [
+          "validation"
+        ],
+        "view_status": "mapped",
+        "rationale": "The implemented gate maps question keywords to fixed intent classes, required predicates and answer schemas, including MCQ anomaly-location options. This concrete validator is bound to temporal question answering, so its deepest scope is TSK.",
+        "evidence_indices": [
+          0
+        ],
+        "reuse_proposals": []
+      }
+    }
+  },
+  "hierarchicalmeteorologist2025:multiscale-context": {
+    "action": "change",
+    "basis": "Rejected proposed GTS→TSK reassignment after independent cross-review: PDF p.2 defines a separable numerical aggregation operation; p.3 context-selection policy must not silently widen this module. Retain GTS and sharpen boundary evidence.",
+    "module": {
+      "id": "hierarchicalmeteorologist2025:multiscale-context",
+      "name": "Variable-aware multiscale temporal aggregation",
+      "layer": "GTS",
+      "dimensions": [
+        "Interface and Interaction",
+        "Memory and Context"
+      ],
+      "tasks": [],
+      "scope_reason": "The non-LLM Assistant implements variable-aware windowed means, extrema, sums and circular means before report generation. This module denotes that numerical aggregation operation; the forecast-lead-time context selection and report schema belong to the downstream reporting procedure.",
+      "role": "method",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.3; passage beginning \"To enable interpretation at multiple time scales\"",
+          "quote": "To enable interpretation at multiple time scales while con- trolling context length, the Assistant aggregates over non- overlapping windows W ∈{6h, 1d} using means/minima/- maxima for T, means for RH and U, sums for P. Wind di- rection is averaged on the circle and stored only for 6-hour windows. The resulting modes are: • Baseline Context: location and climatology plus the full hourly table (short-range",
+          "source_path": "references/pdfs/hierarchicalmeteorologist2025.pdf"
+        },
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.2; Hierarchical temporal aggregation",
+          "quote": "To support multi-\nscale interpretation while controlling context length, the As-\nsistant block forms two groups of aggregates over non-\noverlapping windows",
+          "source_path": "references/pdfs/hierarchicalmeteorologist2025.pdf"
+        }
+      ],
+      "other_tasks": [],
+      "function_view": {
+        "functions": [
+          "processing"
+        ],
+        "view_status": "mapped",
+        "rationale": "The non-LLM Assistant implements variable-aware windowed means, extrema, sums and circular means before report generation. This module denotes that numerical aggregation operation; the forecast-lead-time context selection and report schema belong to the downstream reporting procedure.",
+        "evidence_indices": [
+          0,
+          1
+        ],
+        "reuse_proposals": []
+      }
+    }
+  },
+  "siren2026:case-analogy": {
+    "action": "change",
+    "basis": "Source-located proposal checked against primary text and independent cross-review.",
+    "module": {
+      "id": "siren2026:case-analogy",
+      "name": "Case-retrieval instruction template",
+      "layer": "GH",
+      "dimensions": [
+        "Memory and Context"
+      ],
+      "tasks": [
+        "forecasting_prediction",
+        "decision_support"
+      ],
+      "scope_reason": "Appendix K.2 supplies the actual instruction: inspect a collection, rank by task intent/conditions and case metadata, retain at most six question-answer examples, then resume solving. Target task and historical collection are placeholders; no warning-specific score or temporal eligibility calculation is implemented in this retrieval template. Retain temporal/event fields as case metadata and task tags, while classifying this concrete orchestration pattern as GH.",
+      "role": "method",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.5; passage beginning \"SIREN-RAG augments\"",
+          "quote": "SIREN-RAG augments SIREN-Base with a re- trieval harness for case-based analogy. Guided by a retrieval in- struction 𝐼rag, the agent first runs the code-execution loop with policy 𝜋𝜃(· | 𝑞,ℎ𝑡, 𝐼rag) to search K and identify a small set of cases Krag ⊂K that provide useful analogies for the current task based on both task intent and event conditions. The retrieval phase termi- nates when",
+          "source_path": "references/pdfs/siren2026.pdf"
+        },
+        {
+          "locator_type": "page_section",
+          "locator": "Appendix K.2, PDF p.16",
+          "quote": "Rank cases by their usefulness for the target task. Consider task intent, event conditions, reference time, location, event type, question form, answer format, source variables, and available labels. 3. Select at most six cases. Preserve each selected case’s question, reference answer, and event metadata so that its analogy remains interpretable.",
+          "source_path": "references/pdfs/siren2026.pdf"
+        }
+      ],
+      "other_tasks": [],
+      "function_view": {
+        "functions": [],
+        "view_status": "general_runtime",
+        "rationale": "Appendix K.2 supplies the actual instruction: inspect a collection, rank by task intent/conditions and case metadata, retain at most six question-answer examples, then resume solving. Target task and historical collection are placeholders; no warning-specific score or temporal eligibility calculation is implemented in this retrieval template. Retain temporal/event fields as case metadata and task tags, while classifying this concrete orchestration pattern as GH.",
+        "evidence_indices": [
+          0,
+          1
+        ],
+        "reuse_proposals": []
+      }
+    }
+  },
+  "siren2026:warning-skill-rehearsal": {
+    "action": "change",
+    "basis": "Source-located proposal checked against primary text and independent cross-review.",
+    "module": {
+      "id": "siren2026:warning-skill-rehearsal",
+      "name": "Reference-guided rehearsal and skill refinement",
+      "layer": "GH",
+      "dimensions": [
+        "Memory and Context",
+        "Optimization and Evolution"
+      ],
+      "tasks": [
+        "forecasting_prediction",
+        "decision_support"
+      ],
+      "scope_reason": "The complete rehearsal/refinement prompts hide the reference answer, execute a selected example, reveal the answer, compare reasoning/tool choices, and retain short procedures while excluding event-specific answers and facts. These are task-placeholder instructions with a reusable procedural-update contract; the implemented update pattern is GH. Unlike FinCon’s fixed investment analyst outputs, this prompt does not require a financial/weather decision variable or task score.",
+      "role": "method",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.5; passage beginning \"3.2.3 SIREN-Skill.\"",
+          "quote": "3.2.3 SIREN-Skill. SIREN-Skill uses historical cases as practice tasks to acquire reusable solution procedures. The harness con- sists of three phases: retrieval, rehearsal, and target solving. First, a rehearsal-selection instruction 𝐼reh guides the agent to retrieve Kreh = {K𝑗}𝑚 𝑗=1 ⊂K, where the selected cases exercise reason- ing patterns relevant to the current task. Second, for each case K𝑗= (𝑞𝑗,𝑦𝑗), the agent solves 𝑞𝑗without access",
+          "source_path": "references/pdfs/siren2026.pdf"
+        },
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.17; Appendix K.2 Skill Refinement Prompt",
+          "quote": "1. Identify which reasoning steps, evidence choices, tool-use strategies, or answer-format decisions were effective. 2. Diagnose errors by comparing the rehearsal solution with the reference answer and the supporting evidence. 3. Add or revise only short, actionable guidance that can improve future tasks of the same kind. Keep one reusable procedure per item. 4. Preserve useful existing guidance and remove an item only when the rehearsal provides clear evidence that it is misleading. 5. Exclude the rehearsal’s final answer and event-specific facts from the refined skill. Return only the revised skill guidance.",
+          "source_path": "references/pdfs/siren2026.pdf"
+        }
+      ],
+      "other_tasks": [],
+      "function_view": {
+        "functions": [],
+        "view_status": "general_runtime",
+        "rationale": "The complete rehearsal/refinement prompts hide the reference answer, execute a selected example, reveal the answer, compare reasoning/tool choices, and retain short procedures while excluding event-specific answers and facts. These are task-placeholder instructions with a reusable procedural-update contract; the implemented update pattern is GH. Unlike FinCon’s fixed investment analyst outputs, this prompt does not require a financial/weather decision variable or task score.",
+        "evidence_indices": [
+          0,
+          1
+        ],
+        "reuse_proposals": []
+      }
+    }
+  },
+  "fincon2024:manager-analyst": {
+    "action": "change",
+    "basis": "Source-located proposal checked against primary text and independent cross-review.",
+    "module": {
+      "id": "fincon2024:manager-analyst",
+      "name": "Manager–analyst information aggregation",
+      "layer": "TSK",
+      "dimensions": [
+        "Coordination and Scaling"
+      ],
+      "tasks": [
+        "decision_support"
+      ],
+      "scope_reason": "The concrete seven analyst roles deliver investment insights to a sole trading manager, including stock selection and risk feedback. The recorded manager-analyst module is task-bound; a generic delegation pattern is an abstraction, not a separate implemented module here.",
+      "role": "method",
+      "evidence": [
+        {
+          "locator_type": "page_section",
+          "locator": "PDF p.5; passage beginning \"Analyst Agents.\"",
+          "quote": "Analyst Agents. In FINCON, analyst agents distill concise investment insights from large volumes of multi-source market data, each focused on a specific trading target. To ensure high-quality reasoning by reducing task load and sharpening focus, each agent processes information from a single source in a uni-modal fashion, providing pre-specified outputs based on prompts. This setup mimics an efficient human team, where each analyst specializes in",
+          "source_path": "references/pdfs/fincon2024.pdf"
+        }
+      ],
+      "other_tasks": [],
+      "function_view": {
+        "functions": [],
+        "view_status": "task_procedure",
+        "rationale": "The concrete seven analyst roles deliver investment insights to a sole trading manager, including stock selection and risk feedback. The recorded manager-analyst module is task-bound; a generic delegation pattern is an abstraction, not a separate implemented module here.",
+        "evidence_indices": [
+          0
+        ],
+        "reuse_proposals": []
+      }
+    }
+  }
+}

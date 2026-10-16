@@ -2,7 +2,7 @@
 
 `paper_classification_ledger.csv` is the maintained work-level source for the
 survey taxonomy. `paper_classification_ledger.json` is its generated structured mirror. Version
-2.2 maintains separate LLM-side, General Harness, General Time-Series Harness, and
+2.5 maintains separate LLM-side, General Harness, General Time-Series Harness, and
 four-task module records. Each row represents one reviewed work and keeps four kinds of data
 distinct:
 
@@ -12,7 +12,7 @@ distinct:
 3. Harness coding: all applicable GH, GTS, and TSK contributions, a historical work-level
    contribution summary, and modules from
    `harness_component_catalog.csv`.
-4. Multi-label task coding under four axes: forecasting and reasoning;
+4. Multi-label task coding under four axes: forecasting and prediction;
    augmentation and synthesis; anomaly detection and diagnosis; and decision
    support.
 
@@ -153,3 +153,7 @@ After a reviewed-card change, run `classification_manager.py sync`,
 `classification_manager.py validate`, `sync_reviewed_manuscript.py`, and
 `make_contribution_timeline.py`; then compile the manuscript. The manuscript
 synchronizer updates only the appendix snapshot and reviewed rows, not prose.
+
+## Current maintenance workflow
+
+See [ledger maintenance](../docs/ledger-maintenance.md) for schema 2.5, preserved task aliases, attributed official links and read-only checks. The complete 2026-10-16 boundary review and independent adjudications are in `references/reviews/20261016_boundary_audit/`. Historical review files are preserved; the CSV remains the current source.

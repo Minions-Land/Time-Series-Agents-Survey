@@ -19,6 +19,7 @@ from collections import Counter
 from pathlib import Path
 
 import bibtexparser
+from ledger_schema import SCHEMA_VERSION, canonical_task, canonical_tasks
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -96,6 +97,10 @@ FIELDS = [
     "taxonomy_review_status",
     "reviewed_modules_json",
     "review_audit_json",
+    "official_resources_json",
+    "resource_review_status",
+    "task_aliases_source_json",
+    "boundary_review_json",
 ]
 
 MODULE_RULES = {
@@ -605,15 +610,20 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                 },
                 "tasks": {
                     "source_label": row["task_family_original"],
-                    "axes": [name for name in TASK_AXES if row[f"task_axis_{name}"] == "Yes"],
+                    "axes": [canonical_task(name) for name in TASK_AXES if row[f"task_axis_{name}"] == "Yes"],
                     "other": row["task_axis_other"] or None,
+                    "other_labels": canonical_tasks([v.strip() for v in row["task_axis_other"].split(";")]),
+                    "original_values": parse_json_field(row, "task_aliases_source_json", {}),
                 },
                 "work_type": row["work_type"],
                 "inclusion": row.get("included_as", ""),
                 "review_audit": parse_json_field(row, "review_audit_json", {}),
                 "claimed_as_agent": row["claimed_as_agent"] == "Yes",
                 "agent_claim_evidence": row.get("agent_claim_evidence", ""),
-                "schema_version": row.get("taxonomy_schema_version") or "2.1",
+                "schema_version": row.get("taxonomy_schema_version") or SCHEMA_VERSION,
+                "official_resources": parse_json_field(row, "official_resources_json", []),
+                "resource_review_status": row.get("resource_review_status") or "pending",
+                "boundary_review": parse_json_field(row, "boundary_review_json", {}),
                 "llm_side_contribution": {
                     "present": bool(llm_summary or llm_subdimensions),
                     "subdimensions": llm_subdimensions,
@@ -677,7 +687,7 @@ def sync(_: argparse.Namespace) -> None:
         row["module_level_contributions_json"] = json.dumps(
             module_contribution_record(row), ensure_ascii=False, sort_keys=True
         )
-        row["taxonomy_schema_version"] = "2.3"
+        row["taxonomy_schema_version"] = SCHEMA_VERSION
     write_csv(rows)
     generate_json(rows)
     print(f"synchronized Bib and manifest metadata for {len(rows)} records")

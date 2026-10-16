@@ -4,9 +4,10 @@ The reviewed CSV remains authoritative. The mapping is an explicitly reviewed
 annotation, not keyword inference; coverage decisions include non-applicability.
 """
 import csv,json
+from ledger_schema import SCHEMA_VERSION
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-MAPPING=ROOT/'references/reviews/20261015_function_grid/module_function_mapping.json'
+MAPPING=ROOT/'references/reviews/20261016_boundary_audit/module_function_mapping.json'
 
 def apply_view(rows, mapping):
     assignments=mapping['assignments']; seen=set()
@@ -21,7 +22,7 @@ def apply_view(rows, mapping):
             if m['layer'] in {'GH','LLM'} and a['functions']:raise ValueError(f'Temporal functions inferred for {m["layer"]}: {mid}')
             m['function_view']=a
         row['reviewed_modules_json']=json.dumps(modules,ensure_ascii=False)
-        row['taxonomy_schema_version']='2.4'
+        row['taxonomy_schema_version']=SCHEMA_VERSION
     if seen != assignments.keys():raise ValueError('Stale module IDs in function map')
     return rows
 

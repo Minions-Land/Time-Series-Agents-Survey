@@ -1,0 +1,131 @@
+{
+  "reviewer": "evidence_audit",
+  "cross_reviews": [
+    {
+      "citation_key": "chatad2026",
+      "module_ids": [
+        "chatad2026:tsevol"
+      ],
+      "decision": "agree",
+      "layer": "LLM",
+      "reason": "TSEvol is constructed expressly to generate enhanced instruction QA learned by the target MTSLLM. The supervisor filters training examples, and the next section explicitly uses these data for LoRA SFT. Multi-agent construction does not turn the data contribution into a deployed anomaly-solving harness.",
+      "pages_read": [
+        4,
+        5
+      ],
+      "evidence": [
+        {
+          "source_path": "references/pdfs/chatad2026.pdf",
+          "locator": "PDF p.4",
+          "quote": "CRL aims to enhance the reasoning of subsequent MTSLLM by generating high-quality time–text data. Due to the high cost of constructing such data, it leverages a reason- ing LLM like DeepSeek-R1 (Guo et al., 2025) and ChatGPT-o3 (Lin et al., 2025) to create the en- hanced TS instruction data, which is then further learned by the target MTSLLM. This essentially follows a knowledge distillation paradigm involv- ing two dialogue agents, Consultant and Client. Consultant Agent: This agent generates guiding questions via the seven evolution attributes defined in the IEP, steering the trajectory of the multi-turn dialogue. The CRL’s design is inspir"
+        },
+        {
+          "source_path": "references/pdfs/chatad2026.pdf",
+          "locator": "PDF p.5",
+          "quote": "4.2 ChatAD Model Training As shown in Fig. 3(b), we propose a two-stage train- ing paradigm for ChatAD: initial SFT for AD task using TSEData, followed by TKTO optimization to bolster reasoning and generalization. 4.2.1 SFT for Anomaly Detection Task We adopt LoRA (Low-Rank Adaptation) (Hu et al., 2022)-based SFT to train the adapter. In this stage, we contribute three models using TSED-20K as shown in Tabl"
+        }
+      ]
+    },
+    {
+      "citation_key": "timeomni2026",
+      "module_ids": [
+        "timeomni2026:tsr-suite"
+      ],
+      "decision": "agree",
+      "layer": "LLM",
+      "reason": "The suite has a dual training/evaluation purpose, with human-reviewed CoT used directly for SFT and task data for RL. Retain evaluation evidence separately; classify this existing data-construction module by its explicit model-development role, without creating a duplicate GTS module for the same suite.",
+      "pages_read": [
+        5,
+        6
+      ],
+      "evidence": [
+        {
+          "source_path": "references/pdfs/timeomni2026.pdf",
+          "locator": "PDF p.5",
+          "quote": "3.2 TSR-SUITE To mitigate the scarcity of data in the field, we construct Time Series Reasoning Suite (TSR-SUITE), the first unified dataset suite tailored for time series reasoning. Unlike prior benchmarks designed purely for evaluation, TSR-SUITE is built as a training-and-evaluation suite that supports TSRMs development. The dataset spans 10 diverse domains and contains 23,605 curated QA pairs. Among them, 2,339 samples are annotated through a human-guided hierarchical annotation process. Detailed statistics for each task are provided in Appendix D.2. As shown in Figure 3(a), the data organization co"
+        },
+        {
+          "source_path": "references/pdfs/timeomni2026.pdf",
+          "locator": "PDF p.6",
+          "quote": "Stage 1: Injecting Time Series Reasoning Priors. Human-guided reasoning priors instruct LLMs on how to decompose time se- ries tasks into meaningful com- ponents. These traces narrow the exploration space to focus on three key capabilities (i.e., percep- tion, extrapolation, and decision- making) instead of drifting to- ward commonsense heuristics or generic algebraic QA. We inject this knowledge through supervised fine-tuning (SFT). Implementation details of SFT are provided in Ap- pendix F.1. "
+        }
+      ]
+    },
+    {
+      "citation_key": "climateagent2025",
+      "module_ids": [
+        "climateagent2025:climate-workflows"
+      ],
+      "decision": "agree",
+      "layer": "TSK",
+      "reason": "As currently delimited, this record is the benchmark of end-to-end climate scientific analysis/report workflows: event tracking, indices, thresholds and report requirements determine accepted outputs. It is not a reusable temporal primitive. Retain scientific_temporal_analysis; distinguish the corpus-specific workflow tasks from generic planning/state machinery already recorded as GH. Domain identity alone is not the reason for TSK.",
+      "pages_read": [
+        8,
+        9
+      ],
+      "evidence": [
+        {
+          "source_path": "references/pdfs/climateagent2025.pdf",
+          "locator": "PDF p.8",
+          "quote": "Each task requires executable code that retrieves data from operational APIs, processes multi-dimensional datasets, performs domain-appropriate analyses, and generates publication-quality reports. The benchmark evaluates code generation, workflow planning, error recovery under API constraints, and scientific correctness. This benchmark operationalizes the three capability dimensions defined in §3 — planning, persistent context, and robustness — by translating them into measur"
+        },
+        {
+          "source_path": "references/pdfs/climateagent2025.pdf",
+          "locator": "PDF p.8",
+          "quote": "Drought (DR, 15 tasks) compute multi-timescale indices (SPI, soil moisture anomalies) requiring 30-year climatological baselines, statistical standardization handling seasonal cycles, and categorical severity visualization. These evaluate temporal aggregation, statistical edge cases (zero variance, missing data), and standard visualization conventions. • Extreme Precipitation (EP, 15 tasks) analyze precipitation extremes through percentile metrics, spatial extent, a"
+        }
+      ]
+    },
+    {
+      "citation_key": "gridagent2025",
+      "module_ids": [
+        "gridagent2025:grid-action-plan",
+        "gridagent2025:rollback"
+      ],
+      "decision": "agree_background_reference",
+      "reason": "The physical problem uses a current network snapshot, static load reduction, placement and P/Q power bounds. Algorithm 1 iterates planning/solver calls on that snapshot; the iteration index is agent computation, not a sampled temporal input. Experiment scenarios inject simultaneous violations rather than evaluate temporal trajectories or intertemporal dispatch. The local GH/TSK mechanisms remain valid as background examples but should not count in the Time-Series Agent corpus.",
+      "pages_read": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "evidence": [
+        {
+          "source_path": "references/pdfs/gridagent2025.pdf",
+          "locator": "PDF p.3",
+          "quote": "Herein, load curtailment is modeled as a continuous reduction in the active power demand P load i at buses belonging to the set of curtailable loads NL ⊆N. The reduction is parameterized by a curtailment fraction γi, resulting in a new load value given by P new load i = P orig load i · (1 −γi) (6) 0 ≤γi ≤γmax, ∀i ∈NL (7) Further, battery placement and dispatch involve two coupled decisions: a discrete choice of where to place batteries,"
+        },
+        {
+          "source_path": "references/pdfs/gridagent2025.pdf",
+          "locator": "PDF p.4",
+          "quote": "Algorithm 1 LLM-Based Multi-Agent Power Grid Optimiza- tion Require: Network N, Maximum iterations Tmax, Available actions Aavailable Ensure: Optimized network state N ∗ 1: Nwork ←Initialize sandboxed environment(N) 2: V ←Analyze violations(Nwork) 3: iter ←0 4: while ¬IsResolved(V) and iter < Tmax do 5: // Multi-Agent Planning Phase 6: C ←Generate Network representation(Nwork, V) 7: A ←LLM planning(C, Aavailable) 8: // Action Execution Phase 9: for action ∈A do 10: Execute action(action, Nwork) 11: Vnew ←Analyze violations(N"
+        },
+        {
+          "source_path": "references/pdfs/gridagent2025.pdf",
+          "locator": "PDF p.6",
+          "quote": "An au- tomated script was used to generate these violation scenarios, ensuring repeatable and comprehensive testing across different violation types and severity levels. Table I summarizes the specifications of the benchmark networks employed in this study. B. LLM Test Suite Configuration The core o"
+        }
+      ]
+    }
+  ],
+  "resource_field_audit": {
+    "scope": "All currently present shard_1/2/3 resource entries; completeness of provenance and availability fields and existence of source paths, not a second fetch of every URL.",
+    "counts": {
+      "shard_1.json": {
+        "works": 46,
+        "links": 35
+      },
+      "shard_2.json": {
+        "works": 46,
+        "links": 35
+      },
+      "shard_3.json": {
+        "works": 46,
+        "links": 30
+      }
+    },
+    "issues": []
+  }
+}

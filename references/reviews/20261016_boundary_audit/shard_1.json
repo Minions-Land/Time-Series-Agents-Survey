@@ -1,0 +1,2883 @@
+[
+  {
+    "citation_key": "agenticrag2024",
+    "modules": [
+      {
+        "id": "agenticrag2024:slm-adaptation",
+        "decision": "keep",
+        "old_layer": "LLM",
+        "new_layer": "LLM",
+        "rationale": "PEFT/QLoRA and preference optimization explicitly update Gemma/Llama parameters; retain model-side training.",
+        "pages_read": [
+          2,
+          3,
+          4
+        ],
+        "supporting_quote": "We perform instruction-tuning of SLMs with an im- proved context length [19](32K tokens) using parameter-efficient fine-tuning (PEFT) techniques on their associated specific tasks (e.g., forecasting, imputation) using the corresponding time-series datasets. This approach could significantly enhance the effective- ness of SLMs in processing extensive time-series data. We leverage Direct Preference Optimization (DPO; [32]), which involves ran- domly masking 50 % of the data and performing",
+        "source_path": "references/pdfs/agenticrag2024.pdf",
+        "locator": "PDF p.4; passage beginning \"We perform instruction-tuning\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "agenticrag2024:master-router",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "The ReAct master routes requests to isolated specialists. Routing itself has no timestamp or outcome-specific acceptance rule; GH remains appropriate. Do not claim demonstrated chained subagents.",
+        "pages_read": [
+          2,
+          3,
+          4
+        ],
+        "supporting_quote": "The master agent for sub-agent orchestration utilizes the ’ReAct’ prompting technique[45], encouraging the general-purpose SLM to think step-by-step and use external tools (sub-agents, each uti- lizing a fine-tuned SLM for specific time series tasks) to generate responses. The master agent can even chain sub-agents together to handle complex, multi-step time series analysis tasks, addressing more intricate challenges. However, in this work, the sub-agents operate in",
+        "source_path": "references/pdfs/agenticrag2024.pdf",
+        "locator": "PDF p.2; passage beginning \"The master agent for sub-agent\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "agenticrag2024:pattern-prompt-pool",
+        "decision": "change",
+        "old_layer": "GTS",
+        "new_layer": "LLM",
+        "rationale": "The pool supplies continuous prompt embeddings, concatenated with the numerical input and projected by a learnable W; this is a differentiable model-facing adaptation, not an external episodic store. Move to LLM.",
+        "pages_read": [
+          2,
+          3,
+          4
+        ],
+        "supporting_quote": "where 𝑊∈R𝑑×(𝐾𝑙+1)𝑑is a learnable weight matrix.",
+        "source_path": "references/pdfs/agenticrag2024.pdf",
+        "locator": "PDF p.3; Section 3.1, prompt concatenation and learnable projection equations",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them.",
+        "proposed_module": {
+          "id": "agenticrag2024:pattern-prompt-pool",
+          "name": "Differentiable temporal prompt-pool conditioning",
+          "layer": "LLM",
+          "dimensions": [
+            "Memory and Context"
+          ],
+          "tasks": [
+            "forecasting_prediction",
+            "anomaly_detection_diagnosis"
+          ],
+          "scope_reason": "The pool supplies continuous prompt embeddings, concatenated with the numerical input and projected by a learnable W; this is a differentiable model-facing adaptation, not an external episodic store. Move to LLM.",
+          "role": "model_interface",
+          "evidence": [
+            {
+              "locator_type": "page_section",
+              "locator": "PDF p.3; passage beginning \"The dynamic prompting approach\"",
+              "quote": "The dynamic prompting approach utilizes a shared pool of prompts stored as key-value pairs. For time series applications, each prompt is represented by a key vector encoding the essential global characteristics associated with that prompt. The correspond- ing value matrix contains specific knowledge related to those trends or patterns, such as seasonality, cyclicality, irregularities, and other effects. The key vector acts as an identifier or",
+              "source_path": "references/pdfs/agenticrag2024.pdf"
+            },
+            {
+              "locator_type": "page_section",
+              "locator": "PDF p.3; Section 3.1, equation projecting concatenated prompt and temporal embeddings",
+              "quote": "where 𝑊∈R𝑑×(𝐾𝑙+1)𝑑is a learnable weight matrix.",
+              "source_path": "references/pdfs/agenticrag2024.pdf"
+            }
+          ],
+          "other_tasks": [
+            "imputation",
+            "time_series_classification"
+          ],
+          "function_view": {
+            "functions": [],
+            "view_status": "model_side",
+            "rationale": "Differentiable prompt embeddings and learnable projection condition the language model.",
+            "evidence_indices": [
+              0
+            ],
+            "reuse_proposals": []
+          }
+        }
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "argos2025",
+    "modules": [
+      {
+        "id": "argos2025:python-rule-synthesis",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "The generated inference function returns anomaly labels and is reviewed against detection accuracy; it is a detection procedure.",
+        "pages_read": [
+          6
+        ],
+        "supporting_quote": "The Detection Agent is tasked with writ- ing a Python function, inference(sample: np.ndarray) -> np.ndarray, to output prediction labels based on the input sample. We prompt the Detection Agent to first describe the abnormal rules in the form of comments, and then write the corresponding Python code that implements these abnor- mal rules. This step-by-step process generates commented anomaly detection rules that are easily understandable",
+        "source_path": "references/pdfs/argos2025.pdf",
+        "locator": "PDF p.6; passage beginning \"The Detection Agent is tasked\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "argos2025:syntax-repair",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Dummy-input execution and traceback-guided repair stop when syntax/runtime errors disappear; that acceptance criterion is independent of anomaly labels.",
+        "pages_read": [
+          6
+        ],
+        "supporting_quote": "Repair Agent. Upon receiving anomlay detection rules from the Detection Agent, the Repair Agent first checks for syntax errors by executing the rules on dummy data that mim- ics the format of the input data. If syntax errors are detected, ARGOS provides error messages and call stack information to the Repair Agent, which then proposes a corrected version of the rules using a new prompt",
+        "source_path": "references/pdfs/argos2025.pdf",
+        "locator": "PDF p.6; passage beginning \"Repair Agent. Upon receiving\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "argos2025:detector-fusion",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "The aggregator separately corrects false-negative and false-positive anomaly labels; its semantics are detector-specific.",
+        "pages_read": [
+          7
+        ],
+        "supporting_quote": "Aggregator. Algorithm 1 presents the aggregation algo- rithm for the Aggregator in ARGOS. The anomaly detection rule for false negatives effectively corrects the normal labels from the base detector but does not address the abnormal la- bels. Similarly, the anomaly detection rule for false positives corrects the abnormal labels from the base detector but does not affect the normal labels. This is because a set",
+        "source_path": "references/pdfs/argos2025.pdf",
+        "locator": "PDF p.7; passage beginning \"Aggregator. Algorithm 1\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "finarena2025",
+    "modules": [
+      {
+        "id": "finarena2025:adaptive-retrieval",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Unfamiliar knowledge triggers an adaptive retrieval decision; the mechanism is text-knowledge acquisition rather than financial return optimization.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "On this basis, we design an adaptive RAG approach that enables LLM to perform uncertainty-driven adaptive information retrieval. Our News Agent leverages the strengths of LLM and adapts to dynamic and evolving news content. The comparison is shown in Figure 2. Traditional information retrieval and forecasting methods, as depicted in Figure 2(A), depend on static pre-trained corpora, which may not encompass the dynamic vocabulary found",
+        "source_path": "references/pdfs/finarena2025.pdf",
+        "locator": "PDF p.5; passage beginning \"On this basis, we design\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "finarena2025:risk-aware-report",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Human risk preferences condition predicted stock movement and investment advice; outputs and feedback bind it to financial decisions.",
+        "pages_read": [
+          7
+        ],
+        "supporting_quote": "Report Agent provide a port for human-agent interaction, which is set in two places: before giving a rise and fall forecast and before giving investment advice. Investors have the flexibility to interact their risk preferences with LLM agents in either natural language or specific risk metrics, such as “conservative” or Sharpe Ratio, thus achieve a Human-Agent collaboration for financial investment. To further illustrate our approach,",
+        "source_path": "references/pdfs/finarena2025.pdf",
+        "locator": "PDF p.7; passage beginning \"Report Agent provide\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "dataset",
+        "url": "https://huggingface.co/datasets/Illogicaler/FinArena-low-cost-dataset",
+        "provenance": {
+          "source_path": "references/pdfs/finarena2025.pdf",
+          "locator": "PDF p.8; author resource link",
+          "quote": "utilized for analyzing and forecasting the company’s future. However, the full 2https://huggingface.co/datasets/Illogicaler/FinArena-low-cost-dataset 8"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://huggingface.co/datasets/Illogicaler/FinArena-low-cost-dataset",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "timemaster2025",
+    "modules": [
+      {
+        "id": "timemaster2025:sft-grpo",
+        "decision": "keep",
+        "old_layer": "LLM",
+        "new_layer": "LLM",
+        "rationale": "SFT followed by token-level GRPO updates the time-series multimodal model; output-format/class rewards supervise model parameters.",
+        "pages_read": [
+          6
+        ],
+        "supporting_quote": "To enable TimeMaster to generate high-quality, structured reasoning over time-series inputs, we adopt a two-stage training pipeline. We begin with SFT on a low-resource dataset consisting of 1k high-quality examples sampled from GPT-4o outputs 2. This stage provides a strong initialization by aligning the model with the desired structured output format and domain semantics. We then proceed to RL, where we optimize the model using",
+        "source_path": "references/pdfs/timemaster2025.pdf",
+        "locator": "PDF p.6; passage beginning \"To enable TimeMaster\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/langfengQ/TimeMaster",
+        "provenance": {
+          "source_path": "references/pdfs/timemaster2025.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "le and capable of zero- and few-shot generalization, ∗Equal contribution. Code: https://github.com/langfengQ/TimeMaster Preprint. Under review."
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/langfengQ/TimeMaster",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "zara2025",
+    "modules": [
+      {
+        "id": "zara2025:activity-evidence",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "The evidence bank encodes pairwise activity discriminants and sensor-specific examples. Reusing it for another output requires replacing class priors, hence TSK.",
+        "pages_read": [
+          3
+        ],
+        "supporting_quote": "ZARA addresses this by decoupling information into two sources: Universal Knowledge (K): A static reference registry storing pairwise feature- importance profiles. Rather than embedding sensor- grounded priors into model weights, it acts as a lookup table identifying which physical properties are most discriminative for separating specific ac- tivities (e.g., instructing the agent that \"vertical acceleration variance\" is the critical metric to dis- tinguish Running from",
+        "source_path": "references/pdfs/zara2025.pdf",
+        "locator": "PDF p.3; passage beginning \"ZARA addresses this by decoupling\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/zechenli03/ZARA",
+        "provenance": {
+          "source_path": "references/pdfs/zara2025.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "tion understanding beyond dataset- specific artifacts. Our code is available at https://github.com/zechenli03/ZARA. 1 Introduction Human activity recognition (HAR) from on-body motion sensors underpins applications from dig- ital heal"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/cruiseresearchgroup/ZARA",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "timecopilot2025",
+    "modules": [
+      {
+        "id": "timecopilot2025:forecast-orchestration",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "The three-stage flow explicitly chooses forecasters using temporal diagnostics, cross-validation, and forecast metrics; retain forecast-specific orchestration.",
+        "pages_read": [
+          3
+        ],
+        "supporting_quote": "The TimeCopilot Agent orchestrates the forecasting workflow in three structured steps: (i) Time Series Feature Analysis: computes focused diagnostics (trend, seasonality, stationarity) that directly inform model choice [33, 34] (ii) Model Selection and Evaluation: proposes candidate models starting from simple statistical baselines, documents their assumptions, evaluates them through cross-validation, and escalates to more complex models only when needed.",
+        "source_path": "references/pdfs/timecopilot2025.pdf",
+        "locator": "PDF p.3; 2.1 TimeCopilot Agent",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "timecopilot2025:forecaster-hub",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "The unified API and ensemble operate on forecasting models/outputs; interface uniformity does not remove the horizon/output restriction.",
+        "pages_read": [
+          3
+        ],
+        "supporting_quote": "The TimeCopilot Forecaster executes the models proposed by the agent. It provides access to the largest unified hub of TSFMs under a single API 2, alongside statistical, machine learning, and deep learning methods.",
+        "source_path": "references/pdfs/timecopilot2025.pdf",
+        "locator": "PDF p.3; 2.2 TimeCopilot Forecaster",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "project",
+        "url": "https://timecopilot.dev",
+        "provenance": {
+          "source_path": "references/pdfs/timecopilot2025.pdf",
+          "locator": "PDF p.2; author resource link",
+          "quote": "straints. 1TimeCopilot is available via uv add timecopilot and documentation at https://timecopilot.dev. 2"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://timecopilot.dev/",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      },
+      {
+        "kind": "documentation",
+        "url": "https://timecopilot.dev/model-hub/",
+        "provenance": {
+          "source_path": "references/pdfs/timecopilot2025.pdf",
+          "locator": "PDF p.3; author resource link",
+          "quote": "perimentation. 2A complete and regularly updated list of models is available at https://timecopilot.dev/model-hub/ 3Live leaderboard and details available at https://huggingface.co/spaces/Salesforce/GIFT-Eval 4https://timecopilot.dev/"
+        },
+        "availability": {
+          "status": "http_error",
+          "http_status": "404",
+          "resolved_url": "https://timecopilot.dev/model-hub/",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      },
+      {
+        "kind": "evaluation",
+        "url": "https://timecopilot.dev/experiments/gift-eval",
+        "provenance": {
+          "source_path": "references/pdfs/timecopilot2025.pdf",
+          "locator": "PDF p.3; author resource link",
+          "quote": "/timecopilot.dev/api/models/ensembles 5The full experiment can be reproduced at https://timecopilot.dev/experiments/gift-eval. 3"
+        },
+        "availability": {
+          "status": "http_error",
+          "http_status": "404",
+          "resolved_url": "https://timecopilot.dev/experiments/gift-eval",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "timeseriesscientist2025",
+    "modules": [
+      {
+        "id": "timeseriesscientist2025:curator",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "The Curator emits statistics, missingness, preprocessing strategies, transformed series and temporal diagnostics before any forecast-loss comparison. Retain GTS for that delimited preparation module; cross-task efficacy is not experimentally established here.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "Rather than computing fixed summaries, Curator leverages LLM-driven reasoning to both diagnose issues and execute appropriate preprocessing. Specifically, given a univariate series D = {xt}T t=1, the agent first outputs a vector Q containing data statistics S, missing value information M, outlier information O, and data-process strategy π.",
+        "source_path": "references/pdfs/timeseriesscientist2025.pdf",
+        "locator": "PDF p.5; Section 3.2, Quality Diagnostics & Preprocessing",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "timeseriesscientist2025:selection",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Validation MAPE ranks model configurations and a subsequent ensemble strategy is fixed before test access; retain forecast-specific selection.",
+        "pages_read": [
+          6
+        ],
+        "supporting_quote": "Model Ranking. After hyperparameter optimization, each candidate model mi is instantiated with its optimal configuration θ∗ i and associated validation metrics. To select a high-quality subset for ensemble construction, the np tuned models are ranked by their validation performance. We primarily adopt validation MAPE for ranking. Specifically, the top k models with the lowest validation MAPE scores are retained:",
+        "source_path": "references/pdfs/timeseriesscientist2025.pdf",
+        "locator": "PDF p.6; Section 3.3, Model Ranking",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/Y-Research-SBU/TimeSeriesScientist",
+        "provenance": {
+          "source_path": "references/pdfs/timeseriesscientist2025.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "that makes the forecasting workflow more transparent and interpretable. Github: https://github.com/Y-Research-SBU/TimeSeriesScientist/ Website: https://y-research-sbu.github.io/TimeSeriesScientist/ Corresponding Author: chenyu.you@stonybrook.edu 1 Intro"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/Y-Research-SBU/TimeSeriesScientist",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      },
+      {
+        "kind": "project",
+        "url": "https://y-research-sbu.github.io/TimeSeriesScientist/",
+        "provenance": {
+          "source_path": "references/pdfs/timeseriesscientist2025.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "etable. Github: https://github.com/Y-Research-SBU/TimeSeriesScientist/ Website: https://y-research-sbu.github.io/TimeSeriesScientist/ Corresponding Author: chenyu.you@stonybrook.edu 1 Introduction Time series forecasting guides decision making in domain"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://y-research-sbu.github.io/TimeSeriesScientist/",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "alphacast2025",
+    "modules": [
+      {
+        "id": "alphacast2025:forecast-case-context",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Each retrieved case pairs history with its optimal forecast model and target trajectory; this is not generic historical-context retrieval.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "Case Library. To simulate the expert use of historical experiences, AlphaCast constructs a case library by associat- ing each training sample ⟨Xi, Yi⟩with its optimal candidate model Mi selected from the candidate pool M (detailed in Appendix B.2). To enable efficient retrieval and generation of case-based predictions, we perform K-means clustering (detailed in Appendix A.2)",
+        "source_path": "references/pdfs/alphacast2025.pdf",
+        "locator": "PDF p.4; method passage beginning Case Library.",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "alphacast2025:forecast-reasoning",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "The generator changes a forecast trajectory through case, scale, shape and contextual reasoning, then evaluates that forecast; TSK.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "Given the consolidated context Icon, AlphaCast derives an intermediate prediction Yint through reasoning-driven gener- ation instead of single-pass regression. The model initializes with the case-based prediction Ycase as a reliable reference. To handle distribution shifts between neighbor Xnb and the current sequence Xen, AlphaCast uses the neighbor trajec- tory Ynb to adjust for scale and",
+        "source_path": "references/pdfs/alphacast2025.pdf",
+        "locator": "PDF p.4; method passage beginning Given the consolidated context",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/echo01-ai/AlphaCast",
+        "provenance": {
+          "source_path": "references/pdfs/alphacast2025.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "p learning (Beni- dis et al., 2022), and recent foundation models (Das et al., 1https://github.com/echo01-ai/AlphaCast 1State Key Laboratory of Cognitive Intelligence, University of Science and Technology of China, Hefei, China. Correspon"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/ustc-time-series/AlphaCast",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "streasoner2026",
+    "modules": [
+      {
+        "id": "streasoner2026:sde-synthesis",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Agents synthesize controlled numerical trajectories from graph/SDE/scenario specifications; retain synthesis-task procedure even though resulting pairs train a language model.",
+        "pages_read": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "supporting_quote": "Network SDEs-based multi-agent spatio- temporal data synthesis pipeline. A key remaining challenge is how to align spatio- temporal dynamics with structured textual descriptions. To address this issue, we propose a network SDEs-based multi-agent data synthesis pipeline, illustrated in Figure 2. The framework consists of six agents. The Scenario Generation Agent produces high-level textual descriptions of",
+        "source_path": "references/pdfs/streasoner2026.pdf",
+        "locator": "PDF p.3; method passage beginning Network SDEs-based multi-agent",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "streasoner2026:spatial-tslm",
+        "decision": "keep",
+        "old_layer": "LLM",
+        "new_layer": "LLM",
+        "rationale": "A learned TS encoder, alignment pretraining, SFT and spatial-reward GRPO directly alter the TS-LM; LLM.",
+        "pages_read": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "supporting_quote": "Model Architecture As shown in Figure 3, STReasoner processes mul- timodal inputs by separately encoding time series data and textual inputs, including the natural lan- guage query and the graph structure prompted in text. Following prior work on time series en- coding for LLMs (Zhang et al., 2025c; Chow et al., 2024; Xie et al.,",
+        "source_path": "references/pdfs/streasoner2026.pdf",
+        "locator": "PDF p.5; method passage beginning Model Architecture",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/LingFengGold/STReasoner",
+        "provenance": {
+          "source_path": "references/pdfs/streasoner2026.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "ry models and generalizes robustly to real-world data. Our code is available at https://github.com/LingFengGold/STReasoner. 1 Introduction Time series data are ubiquitous in real-world sys- tems and often exhibit complex spatio-temporal struc"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/LingFengGold/STReasoner",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "multimodaldebate2026",
+    "modules": [
+      {
+        "id": "multimodaldebate2026:modality-debate",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Modality-isolated first reports followed by structured cross-report refinement is a generic evidence-coordination protocol; the numerical/spectral interfaces are separately recorded.",
+        "pages_read": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "supporting_quote": "Modality-Specialized Analysts For each modal- ity m ∈M, TS-Debate instantiates an analyst Am. • Text analyst AT(q, c, k) interprets contextual constraints and textual descriptions, without di- rect numerical verification. • Visual analyst AV(q, Charttime, Chartfreq, k) ex- tracts qualitative, global structure from the gen- erated charts. • Numerical analyst AN(q, Lookup(x1:T ), k) pro- duces precise, checkable statements about values and derived features via",
+        "source_path": "references/pdfs/multimodaldebate2026.pdf",
+        "locator": "PDF p.4; passage beginning \"Modality-Specialized Analysts\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "multimodaldebate2026:temporal-views",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "Time-domain, spectral and statistical views expose measured temporal structure; their construction does not depend on a particular requested answer class.",
+        "pages_read": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "supporting_quote": "Time-Frequency Views From x1:T , we derive complementary representational views below. • Temporal View (vtime): a time-domain represen- tation emphasizing trends, change points, and extrema. • Spectral View (vfreq): a frequency-domain rep- resentation highlighting periodicities and oscilla- tory structure (e.g., seasonality and recurrences). • Feature/Statistical View (vfeat): summary statis- tics and detected events (e.g., peaks, troughs, and anomalies) for precise quantitative checks. Multimodal Query Interfaces",
+        "source_path": "references/pdfs/multimodaldebate2026.pdf",
+        "locator": "PDF p.3; passage beginning \"Time-Frequency Views\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "multimodaldebate2026:temporal-verification",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "VCC distinguishes verifiability of observed-time claims from future claims and retains uncertainty for unobserved outcomes; that temporal scope check is distinct from selecting a task answer.",
+        "pages_read": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "supporting_quote": "Temporal scope further modulates calibration. For past-present tasks, direct verification against x1:T dominates. For future-oriented tasks, TS-Debate cannot verify future outcomes from past data; in- stead, it evaluates whether the causes of observed",
+        "source_path": "references/pdfs/multimodaldebate2026.pdf",
+        "locator": "PDF p.5; passage beginning \"Temporal scope further modulates\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/DeepAuto-AI/TS-Debate",
+        "provenance": {
+          "source_path": "references/pdfs/multimodaldebate2026.pdf",
+          "locator": "PDF p.12; author resource link",
+          "quote": "they typically rely on a single fusion step within an MLLM (Kong et al., 2026). TS-Debate departs from this paradigm in two key ways. First, instead of learning new multimodal encoders, we keep the underlying models fixed and instantiate mo"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/DeepAuto-AI/TS-Debate",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "veritime2026",
+    "modules": [
+      {
+        "id": "veritime2026:process-labelled-data",
+        "decision": "keep",
+        "old_layer": "LLM",
+        "new_layer": "LLM",
+        "rationale": "TSRgen generates process labels expressly for RFT supervision. Retain LLM as training-data contribution, not deployment-time evidence verification; only selected steps receive labels.",
+        "pages_read": [
+          3,
+          4
+        ],
+        "supporting_quote": "Verifiable Process Annotation Extraction. To facilitate Reinforcement Learning (RL) for improving LLM time series reasoning performance, both the final label and the effective supervision of intermediate reasoning steps are crucial. TSRgen first conducts cross-LLM validation to evaluate the quality of reasoning steps (details presented in subsection C.2), and then utilizes a rule-based annotation extractor to derive verifiable process-level labels from the reasoning chains generated by",
+        "source_path": "references/pdfs/veritime2026.pdf",
+        "locator": "PDF p.3; passage beginning \"Verifiable Process Annotation Extraction.\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "veritime2026:scheduled-rft",
+        "decision": "keep",
+        "old_layer": "LLM",
+        "new_layer": "LLM",
+        "rationale": "Warmup SFT, learnability split, normal-sample SFT and hard-sample GRPO update the reasoning policy; LLM.",
+        "pages_read": [
+          3,
+          4
+        ],
+        "supporting_quote": "Two-stage RFT Training. The training process consists of two stages, corresponding to the two subsets defined above. First, we fine-tune the model πθ1 on Dnormal to enhance stability and general reasoning capability: θ2 = arg min θ 1 |Dnormal| X (xi,yi)∈Dnormal LSFT \u0000πθ(xi), yi \u0001 . (4) Subsequently, to further enhance reasoning performance, we apply reinforcement learning using the GRPO algorithm (Shao et al., 2024)",
+        "source_path": "references/pdfs/veritime2026.pdf",
+        "locator": "PDF p.4; passage beginning \"Two-stage RFT Training.\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://anonymous.4open.science/r/VeriTime-E017",
+        "provenance": {
+          "source_path": "references/pdfs/veritime2026.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": " LLMs. The code for VeriTime is available at https://anonymous.4open. science/r/VeriTime-E017. 1Sun Yat-sen University 2Xiaomi Corporation 3National University of Singapore. Correspondence to: Dan Li <li- dan263@mail.sysu.edu.cn>. Proceedings of t"
+        },
+        "availability": {
+          "status": "http_error",
+          "http_status": "401",
+          "resolved_url": "https://anonymous.4open.science/api/repo/VeriTime-E017/file/",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "agriworld2026",
+    "modules": [
+      {
+        "id": "agriworld2026:reflective-execution",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Execute-observe-refine patches code using diagnostic feedback and a validator result; the loop can accept an external task checker without requiring agricultural mathematics.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "We introduce AGRO-REFLECTIVE, which utilizes an iterative Execute– Observe–Refine loop driven by structured feedback. Policy and Trace. At step t, the agent acts according to a policy πθ(ct | mt−1) conditioned on the mem- ory mt−1. The execution yields an observation tuple (ot, Ot) ←E(ct). The interaction trace is formalized as a sequence τt = ⟨(c1, o1, O1), . . . , (ct, ot, Ot)⟩.",
+        "source_path": "references/pdfs/agriworld2026.pdf",
+        "locator": "PDF p.4; passage beginning \"We introduce AGRO-REFLECTIVE\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "agriworld2026:typed-world",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "Typed raster/weather/event state and units constitute a temporal data interface across the environment tasks. Domain specificity alone does not make this a single-task procedure.",
+        "pages_read": [
+          3
+        ],
+        "supporting_quote": "Unified Tool Interface and Artifacts To ground reasoning in computation, AGRIWORLD ex- poses a set of functional tools F. We model a tool exe- cution not as a side-effect-free query, but as a state tran- sition that produces an artifact: (ˆv, α) = f(sin; θ), f ∈F, (2) where sin ⊆S is the input data subset, ˆv is the return value (e.g., a time-series DataFrame),",
+        "source_path": "references/pdfs/agriworld2026.pdf",
+        "locator": "PDF p.3; passage beginning \"Unified Tool Interface and Artifacts\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "agriworld2026:intervention-checker",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "The checker compares a specified intervention with baseline simulation and a required effect direction/magnitude; this decision-support contract makes it TSK.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "Counterfactual Consistency: For \"what-if\" analysis (e.g., \"Does irrigation I reduce stress?\"), we verify the causal direction. Let M(s, a) be the simulator func-",
+        "source_path": "references/pdfs/agriworld2026.pdf",
+        "locator": "PDF p.4; passage beginning \"Counterfactual Consistency:\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "agriworld2026:domain-lora",
+        "decision": "keep",
+        "old_layer": "LLM",
+        "new_layer": "LLM",
+        "rationale": "LoRA on Qwen training splits is parameter adaptation, separate from the execution loop.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "We finetune the Qwen3 series (8B and 32B parameters) using Low- Rank Adaptation (LoRA) [66; 67] on the training split. We compare three distinct interaction paradigms: • Text-only Baseline: The model answers queries using internal parametric knowledge only. This serves as a baseline to measure the hallucination rate of pure LLMs. • AgriWorld-Direct (One-shot): A standard “Code In- terpreter” approach where the agent generates and",
+        "source_path": "references/pdfs/agriworld2026.pdf",
+        "locator": "PDF p.5; passage beginning \"We finetune the Qwen3\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "weathertgd2026",
+    "modules": [
+      {
+        "id": "weathertgd2026:caption-feedback",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Statistical, physical and meteorological feedback revises weather captions under a caption-quality/length output contract.",
+        "pages_read": [
+          7,
+          8,
+          9
+        ],
+        "supporting_quote": "The Statistical Analyst Agent generates textual gradients focusing on quantitative data characteristics including trend analysis that identifies mono- tonic increases, decreases, periodic fluctuations, and stationary states; dis- tribution characteristics that detect normal, skewed, or multimodal distri- butions in the observed variables; and key metrics extraction that computes mean, variance, extreme values, and anomaly points. Formally, the statistical 7",
+        "source_path": "references/pdfs/weathertgd2026.pdf",
+        "locator": "PDF p.7; passage beginning \"The Statistical Analyst Agent\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "weathertgd2026:consensus-fusion",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "The consensus operation clusters semantic feedback fragments and preserves distinct views by embedding similarity; this delimited fusion operation is independent of weather physics.",
+        "pages_read": [
+          7,
+          8,
+          9
+        ],
+        "supporting_quote": "We address this limitation through a two- stage fusion process inspired by gradient clustering in multi-agent optimiza- tion [23]. In the consensus extraction stage, we identify information frag- ments with high semantic similarity across agent gradients using embedding- based similarity computation: sim(gi, gj) = vi · vj ∥vi∥∥vj∥ (2) where vi is the semantic embedding of gradient fragment gi obtained from a pre-trained sentence encoder",
+        "source_path": "references/pdfs/weathertgd2026.pdf",
+        "locator": "PDF p.8; passage beginning \"We address this limitation\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "timeseriesexamagent2026",
+    "modules": [
+      {
+        "id": "timeseriesexamagent2026:exam-template-generation",
+        "decision": "change",
+        "old_layer": "GTS",
+        "new_layer": "TSK",
+        "rationale": "Templates encode question logic, options, selection of instances and answer computation. The produced artifact is a QA exam, so multiple concept/domain coverage does not make it task-independent; move GTS to TSK.",
+        "pages_read": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "supporting_quote": "We propose TimeSeriesExamAgent, a multi-agent framework that combines planning, generation, and verification to enable automatic benchmark construction on user-provided datasets. Dataset Handler + getDataframe() + query(id) . . . Sampled question Template What kind of AV conduction abnormality is presnet in this rec? A) . . . B) . . . C) . . . D) . . . Dataset Input def question(num_samples:int) -> List[QAPair]:",
+        "source_path": "references/pdfs/timeseriesexamagent2026.pdf",
+        "locator": "PDF p.5; passage beginning \"We propose TimeSeriesExamAgent\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them.",
+        "proposed_module": {
+          "id": "timeseriesexamagent2026:exam-template-generation",
+          "name": "Temporal question-template generation",
+          "layer": "TSK",
+          "dimensions": [
+            "Tools and Execution",
+            "Control, Verification, and Feedback"
+          ],
+          "tasks": [],
+          "scope_reason": "Templates encode question logic, options, selection of instances and answer computation. The produced artifact is a QA exam, so multiple concept/domain coverage does not make it task-independent; move GTS to TSK.",
+          "role": "evaluation",
+          "evidence": [
+            {
+              "locator_type": "page_section",
+              "locator": "PDF p.5; passage beginning \"We propose TimeSeriesExamAgent\"",
+              "quote": "We propose TimeSeriesExamAgent, a multi-agent framework that combines planning, generation, and verification to enable automatic benchmark construction on user-provided datasets. Dataset Handler + getDataframe() + query(id) . . . Sampled question Template What kind of AV conduction abnormality is presnet in this rec? A) . . . B) . . . C) . . . D) . . . Dataset Input def question(num_samples:int) -> List[QAPair]:",
+              "source_path": "references/pdfs/timeseriesexamagent2026.pdf"
+            }
+          ],
+          "other_tasks": [
+            "temporal_question_answering"
+          ],
+          "function_view": {
+            "functions": [],
+            "view_status": "resource_level",
+            "rationale": "Question-template generation is bound to a temporal QA benchmark output; concept diversity does not remove that task contract.",
+            "evidence_indices": [
+              0
+            ],
+            "reuse_proposals": []
+          }
+        }
+      },
+      {
+        "id": "timeseriesexamagent2026:capability-filter",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "The retained submodule filters items by relative solver capability, without using time-index semantics. Retain GH as generic benchmark-item quality control, with its exam-generation role explicit.",
+        "pages_read": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "supporting_quote": "Capability-Aligned Filtering Inspired by TimeSeriesExam, which leverages IRT to enhance differentiability across questions, we adopted a similar but localized framework that operates at the level of each template. To detect templates that generate overly simple or irrelevant exams, we evaluate them using a set of test-taking LLMs with varying capabilities. This approach is supported by the educational theory, particularly the expertise reversal effect [20]. A",
+        "source_path": "references/pdfs/timeseriesexamagent2026.pdf",
+        "locator": "PDF p.6; passage beginning \"Capability-Aligned Filtering\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/magwiazda/TimeSeriesExamAgent",
+        "provenance": {
+          "source_path": "references/pdfs/timeseriesexamagent2026.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": " time series understanding in these models. TimeSeriesExamAgent is available at https://github.com/magwiazda/TimeSeriesExamAgent 1 INTRODUCTION Recent studies have successfully applied Large Language Models (LLMs) to time series analysis tasks incl"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/magwiazda/TimeSeriesExamAgent",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      },
+      {
+        "kind": "dataset",
+        "url": "https://huggingface.co/datasets/AutonLab/TimeSeriesExam",
+        "provenance": {
+          "source_path": "references/pdfs/timeseriesexamagent2026.pdf",
+          "locator": "PDF p.2; author resource link",
+          "quote": "tanding. Our contributions are as follows: Foundational benchmark. We introduce TimeSeriesExam, a controlled evaluation framework that systematically assesses whether LLMs understand core time series concepts. This templated approach provides valuable ins"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://huggingface.co/datasets/AutonLab/TimeSeriesExam1",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      },
+      {
+        "kind": "code",
+        "url": "https://github.com/moment-timeseries-foundation-model/TimeSeriesExam",
+        "provenance": {
+          "source_path": "references/pdfs/timeseriesexamagent2026.pdf",
+          "locator": "PDF p.2; author resource link",
+          "quote": "tanding. Our contributions are as follows: Foundational benchmark. We introduce TimeSeriesExam, a controlled evaluation framework that systematically assesses whether LLMs understand core time series concepts. This templated approach provides valuable insights into LL"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/moment-timeseries-foundation-model/TimeSeriesExam",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "marstsc2026",
+    "modules": [
+      {
+        "id": "marstsc2026:class-knowledge-bank",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "The Generator/Reflector/Modifier alter class-specific feature bullets using labeled train/validation classification errors; TSK.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "To dynamically refine the knowledge bank, thereby implicitly im- proving the precision of locating the decision boundaries between classes, we introduce an iterative reflective reasoning framework comprising three collaborative roles: a Generator, a Reflector, and a Modifier. Rather than updating model parameters, these three roles engage in a cooperative trial-and-error process over the few-shot training and validation samples. In detail, the Generator produces classification decisions",
+        "source_path": "references/pdfs/marstsc2026.pdf",
+        "locator": "PDF p.5; passage beginning \"To dynamically refine the knowledge bank\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "marstsc2026:test-time-knowledge",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Two-pass pseudo-label agreement and deferred updates modify class-specific knowledge. The acceptance rule depends on classification outputs.",
+        "pages_read": [
+          6
+        ],
+        "supporting_quote": "Refine on Pseudo Label. Another purpose of our two-pass gen- eration design is to provide a pseudo-supervisory signal for test time refinement. Specifically, we treat second pass prediction as a pseudo-label and perform reflection under the hypothesis that the current test sample belongs to class ˆ𝑦2. We first examine the consis- tency between the two passes. If the two predictions disagree, we regard this as",
+        "source_path": "references/pdfs/marstsc2026.pdf",
+        "locator": "PDF p.6; passage beginning \"Refine on Pseudo Label.\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "aion2026",
+    "modules": [
+      {
+        "id": "aion2026:lifecycle",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Agent roles, skills, rules, progress memory and protocols organize general executable work; the temporal interfaces are isolated in other modules.",
+        "pages_read": [
+          4,
+          5
+        ],
+        "supporting_quote": "Aion ∞is built from six component groups: agents, skills, rules, memory, evaluation, and protocols. Agents are the front-end roles that drive interpretation, evidence collection, solution construction, and review. Skills provide reusable priors and structured workflows that stabilize execution across the lifecycle. Rules define the admissible boundary of the workflow. Memory records progress, decisions, and structural state so that long executions do not drift. Evaluation turns runs into explicit assessment through suites, graders, and final acceptance checks.",
+        "source_path": "references/pdfs/aion2026.pdf",
+        "locator": "PDF p.4; Section 3.2, Overview",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "aion2026:validation",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "The validator separates alignment/leakage admissibility from forecast/profit/report scores. This record concerns the temporal admissibility part only, so GTS.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "Validation interface. V maps a candidate output o to (g, s) = V(o), (3) where g records validity checks such as timestamp alignment, leakage boundaries, or format compliance, and s records scored metrics such as forecasting error, profit, or report quality. A candidate is admissible only when all validity checks in g pass, and admissible candidates are ranked by s.",
+        "source_path": "references/pdfs/aion2026.pdf",
+        "locator": "PDF p.4; Section 3.1, Validation interface, Eq. (3)",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "aion2026:grounding",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "Observation granularity, history cutoff, output frequency and evidence coverage define temporal meaning across forecast tables and analytical answers; GTS.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "Temporal grounding concerns the parts that are closest to the time series itself. Before asking which model to use, the harness must first determine what counts as one temporal observation, which horizon is requested, and whether the visible data can support that request. In this paper, temporal constraints are the time-related requirements that any valid answer must satisfy, including the observation unit, allowed history and cutoff, forecast or reasoning horizon, timestamp granularity, output frequency, and leakage boundary.",
+        "source_path": "references/pdfs/aion2026.pdf",
+        "locator": "PDF p.5; Section 3.3.1, Temporal Grounding",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/ztxtech/aion",
+        "provenance": {
+          "source_path": "references/pdfs/aion2026.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "ence: Shirui Pan s.pan@griffith.edu.au; Ming Jin ming.jin@griffith.edu.au Code: https://github.com/ztxtech/aion 1 Introduction Time series research has expanded well beyond standalone forecasting models (Jin et al., 2023; Goswami e"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/ztxtech/aion",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "timesagemt2026",
+    "modules": [
+      {
+        "id": "timesagemt2026:workflow-evaluation",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "Visible slices, numerical references and traceable multi-turn analysis span exploratory, synthesis and decision stages. Retain GTS as cross-task evaluation infrastructure, not a deployed solving policy.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "Each task (see Figure 3 and Appendix B) includes the source time series, a visible data slice, a multi-turn dialogue, an analysis trajectory, reference code, numerical ground truth, reasoning annotations, and level-specific output requirements.",
+        "source_path": "references/pdfs/timesagemt2026.pdf",
+        "locator": "PDF p.4; 3 TimeSage-MT Benchmark",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "timesagemt2026:orchestrated-runtime",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Planner/Reporter plus deterministic Validator/Profiler/Executor/Evaluator provide generic orchestration; individual TS skills are a separate record.",
+        "pages_read": [
+          7
+        ],
+        "supporting_quote": "A fully orchestrated agentic pipeline of 6 stages, of which 2 use an LLM (Planner and Reporter) and 4 are deterministic (Validator, Profiler, Executor, and Evaluator).",
+        "source_path": "references/pdfs/timesagemt2026.pdf",
+        "locator": "PDF p.7; 4.2 Agentic system settings",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "timesagemt2026:temporal-skill-library",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "The shared 226-skill library covers temporal analysis, forecasting, generation, imputation and causal diagnostics. GTS denotes the library interface/collection, not every contained skill as a universal contribution.",
+        "pages_read": [
+          7
+        ],
+        "supporting_quote": "The Planner decomposes each user turn into a workflow over the TimeSage skill library, which contains 226 skills across 36 categories and a general purpose code skill for cases outside the set.",
+        "source_path": "references/pdfs/timesagemt2026.pdf",
+        "locator": "PDF p.7; 4.2 Agentic system settings",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/TimeSage-Series/TimeSage-MT",
+        "provenance": {
+          "source_path": "references/pdfs/timesagemt2026.pdf",
+          "locator": "PDF p.2; author resource link",
+          "quote": "at https://huggingface.co/datasets/TimeSage-Series/TimeSa ge-MT and the code at https://github.com/TimeSage-Series/TimeSage-MT. Our main contributions are summarized below: • The first multi-turn benchmark for agentic time series reasoning. To th"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/TimeSage-Series/TimeSage-MT",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      },
+      {
+        "kind": "dataset",
+        "url": "https://huggingface.co/datasets/TimeSage-Series/TimeSage-MT",
+        "provenance": {
+          "source_path": "references/pdfs/timesagemt2026.pdf",
+          "locator": "PDF p.2; author resource link",
+          "quote": "apabilities, domains, and task types. To address these challenges, we introduce TimeSage-MT, a multi-turn benchmark and evaluation suite for agentic time series reasoning. TimeSage-MT contains 240 tasks and 2,680 dialog turns across 8 real-world domains, orga"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://huggingface.co/datasets/TimeSage-Series/TimeSage-MT",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "tsqbench2026",
+    "modules": [
+      {
+        "id": "tsqbench2026:quality-assessment",
+        "decision": "change",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "Pairwise quality judgments assess missingness, noise and temporal structure before downstream use. Retain GTS as data-quality validation with an explicit quality-comparison output, not general QA. Add the existing canonical data_quality_assessment task label to reflect the actual output/training target.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "TSQAgent is a multi-agent framework for pairwise time series quality assessment, designed to determine which of two time series exhibits higher overall quality through structured reasoning and tool-grounded analysis.",
+        "source_path": "references/pdfs/tsqbench2026.pdf",
+        "locator": "PDF p.4; 3.1 Overview",
+        "task_function_review": "Add other_tasks=data_quality_assessment; retain validation function for the quality checker/benchmark and empty functions for model training.",
+        "proposed_module": {
+          "id": "tsqbench2026:quality-assessment",
+          "name": "Dimension-wise temporal quality assessment",
+          "layer": "GTS",
+          "dimensions": [
+            "Tools and Execution",
+            "Control, Verification, and Feedback",
+            "Coordination and Scaling"
+          ],
+          "tasks": [],
+          "scope_reason": "Missingness, frequency, trend and pattern quality are assessed before downstream forecasting/classification.",
+          "role": "method",
+          "evidence": [
+            {
+              "locator_type": "page_section",
+              "locator": "PDF p.4; 3.1 Overview",
+              "quote": "TSQAgent is a multi-agent framework for pairwise time series quality assessment, designed to determine which of two time series exhibits higher overall quality through structured reasoning and tool-grounded analysis.",
+              "source_path": "references/pdfs/tsqbench2026.pdf"
+            }
+          ],
+          "function_view": {
+            "functions": [
+              "validation"
+            ],
+            "view_status": "mapped",
+            "rationale": "Missingness, frequency, trend and pattern quality are assessed before downstream forecasting/classification.",
+            "evidence_indices": [
+              0
+            ],
+            "reuse_proposals": []
+          },
+          "other_tasks": [
+            "data_quality_assessment"
+          ]
+        }
+      },
+      {
+        "id": "tsqbench2026:perceiver-training",
+        "decision": "change",
+        "old_layer": "LLM",
+        "new_layer": "LLM",
+        "rationale": "Quality-dimension selection is trained with GRPO and dimension-set reward; retain LLM adaptation. Add the existing canonical data_quality_assessment task label to reflect the actual output/training target.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "we introduce a TS quality-tailored GRPO (Group Relative Policy Optimization) training strategy (Shao et al., 2024), which serves as the underlying optimization framework.",
+        "source_path": "references/pdfs/tsqbench2026.pdf",
+        "locator": "PDF p.5; 3.2 Perceiver",
+        "task_function_review": "Add other_tasks=data_quality_assessment; retain validation function for the quality checker/benchmark and empty functions for model training.",
+        "proposed_module": {
+          "id": "tsqbench2026:perceiver-training",
+          "name": "Temporal quality-dimension policy training",
+          "layer": "LLM",
+          "dimensions": [
+            "Optimization and Evolution"
+          ],
+          "tasks": [],
+          "scope_reason": "GRPO updates LLM dimension-selection reasoning rather than only an external selection workflow.",
+          "role": "model_training",
+          "evidence": [
+            {
+              "locator_type": "page_section",
+              "locator": "PDF p.5; 3.2 Perceiver",
+              "quote": "we introduce a TS quality-tailored GRPO (Group Relative Policy Optimization) training strategy (Shao et al., 2024), which serves as the underlying optimization framework.",
+              "source_path": "references/pdfs/tsqbench2026.pdf"
+            }
+          ],
+          "function_view": {
+            "functions": [],
+            "view_status": "model_side",
+            "rationale": "Model capability or training contribution; no Harness function is inferred.",
+            "evidence_indices": [
+              0
+            ],
+            "reuse_proposals": []
+          },
+          "other_tasks": [
+            "data_quality_assessment"
+          ]
+        }
+      },
+      {
+        "id": "tsqbench2026:quality-benchmark",
+        "decision": "change",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "Controlled degradations test intrinsic temporal-data quality independent of forecast/classifier accuracy; retain GTS evaluation resource rather than runtime module. Add the existing canonical data_quality_assessment task label to reflect the actual output/training target.",
+        "pages_read": [
+          3
+        ],
+        "supporting_quote": "TSQBench is built on a controlled synthetic generation pipeline (details in Appendix B), where paired time series are derived from a shared template and then injected with dimension-specific degradations.",
+        "source_path": "references/pdfs/tsqbench2026.pdf",
+        "locator": "PDF p.3; 2 Measuring LLM Capabilities",
+        "task_function_review": "Add other_tasks=data_quality_assessment; retain validation function for the quality checker/benchmark and empty functions for model training.",
+        "proposed_module": {
+          "id": "tsqbench2026:quality-benchmark",
+          "name": "Controlled temporal quality comparison benchmark",
+          "layer": "GTS",
+          "dimensions": [
+            "Control, Verification, and Feedback"
+          ],
+          "tasks": [],
+          "scope_reason": "Synthetic paired degradations evaluate time-series quality independently of downstream task metrics.",
+          "role": "evaluation",
+          "evidence": [
+            {
+              "locator_type": "page_section",
+              "locator": "PDF p.3; 2 Measuring LLM Capabilities",
+              "quote": "TSQBench is built on a controlled synthetic generation pipeline (details in Appendix B), where paired time series are derived from a shared template and then injected with dimension-specific degradations.",
+              "source_path": "references/pdfs/tsqbench2026.pdf"
+            }
+          ],
+          "function_view": {
+            "functions": [
+              "validation"
+            ],
+            "view_status": "mapped",
+            "rationale": "Synthetic paired degradations evaluate time-series quality independently of downstream task metrics.",
+            "evidence_indices": [
+              0
+            ],
+            "reuse_proposals": []
+          },
+          "other_tasks": [
+            "data_quality_assessment"
+          ]
+        }
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/clsr1008/TSQualityAgent",
+        "provenance": {
+          "source_path": "references/pdfs/tsqbench2026.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "ng to enhanced downstream performance and data efficiency. Our code repository: https://github.com/clsr1008/TSQualityAgent. 1 Introduction The quality of time-series (TS) data plays a critical role in building performant TS models, as low-qua"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/clsr1008/TSQAgent",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "batterylake2026",
+    "modules": [
+      {
+        "id": "batterylake2026:quoted-metadata",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Verbatim span checks, abstention and selective human verification govern document extraction regardless of signal type; GH.",
+        "pages_read": [
+          2,
+          3,
+          6
+        ],
+        "supporting_quote": "An evidence-grounded extractor is a function Φ(F, E) = {(f, vf, ef, sf, cf)}f∈F , (1) where vf ∈dom(f) ∪{⊥} is the extracted value or the abstention symbol ⊥(rendered as “source page not stated”), ef is a verbatim evidence span from some Ei, sf = i records the provenance, and cf ∈[0, 1] is a",
+        "source_path": "references/pdfs/batterylake2026.pdf",
+        "locator": "PDF p.3; method passage beginning An evidence-grounded extractor",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "batterylake2026:temporal-schema",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "Time samples, physical units and sign conventions form a reusable ingestion schema for multiple battery analyses; keep GTS with battery-domain scope stated, not universal plug-and-play.",
+        "pages_read": [
+          2,
+          3,
+          6
+        ],
+        "supporting_quote": "Time series T: one tuple per sample with canonical signals time_s, voltage_V, current_A, temperature_C, charge/discharge_capacity_Ah, step_type, un- der fixed units and the sign convention I > 0 on charge. Each attribute a carries a type τ(a), a unit u(a), and a domain dom(a) (e.g., dom(voltage_V) ⊆ [0, 6] V for single cells). Layers are linked",
+        "source_path": "references/pdfs/batterylake2026.pdf",
+        "locator": "PDF p.3; method passage beginning Time series T:",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "batterylake2026:soh-rul-benchmark",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "SOH/RUL labels, end-of-life thresholds and split/metric protocol target health prediction; TSK.",
+        "pages_read": [
+          2,
+          3,
+          6
+        ],
+        "supporting_quote": "Benchmark Design On the curated lake, BatteryLake defines two primary tasks with standardized labels: SOH estimation (predict capacity retention at a cycle from partial-cycle signals or cycle-level features) and RUL prediction (predict cycles remaining to a manifest-recorded end-of-life threshold). Because split de- sign dominates apparent performance in battery ML, every experiment declares one of three",
+        "source_path": "references/pdfs/batterylake2026.pdf",
+        "locator": "PDF p.6; method passage beginning Benchmark Design",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "project",
+        "url": "https://tianwen1209.github.io/batterylake/",
+        "provenance": {
+          "source_path": "references/pdfs/batterylake2026.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "ilies. The platform, benchmark, and curation protocol are publicly available at https://tianwen1209.github.io/batterylake/. Index Terms—Data curation, data lakes, large language models, human-in-the-loop, benchmarks, battery health management"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://batterytwin.ai/",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "finanalyst2026",
+    "modules": [
+      {
+        "id": "finanalyst2026:specialist-trading",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Specialists aggregate dated disclosures into BUY/HOLD/SELL under recency/confidence overrides; task-bound decision support.",
+        "pages_read": [
+          3
+        ],
+        "supporting_quote": "We propose a hierarchical agent with three layers: (i) a persistent memory of seven pre-processed corpora loaded at startup, (ii) eight role-conditioned LLM specialists, and (iii) a Meta-Agent that aggregates specialist verdicts into the final trading action. For TSLA, the full hierarchy is used, for BTC the system bypasses the LLM pipeline and applies a",
+        "source_path": "references/pdfs/finanalyst2026.pdf",
+        "locator": "PDF p.3; method passage beginning We propose a hierarchical agent",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "finanalyst2026:inference-cache",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Identical-prompt hash caching avoids repeated calls; cache identity and retrieval do not require trading semantics.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "To bound latency and cost, verdicts are cached by an MD5 hash of the prompt, so specialists reading unchanged low-frequency signal cards (e.g., the same most-recent 8-K on consecutive days) reuse a cached verdict rather than issuing a new API call. Any specialist or endpoint exception returns a HOLD verdict, ensuring compliance with the task’s",
+        "source_path": "references/pdfs/finanalyst2026.pdf",
+        "locator": "PDF p.4; method passage beginning To bound latency and cost",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "castfsr2026",
+    "modules": [
+      {
+        "id": "castfsr2026:forecast-revision",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Fast/slow/reflect actions construct and revise a numerical horizon from forecast priors and context; TSK even though several tool functions are reusable.",
+        "pages_read": [
+          2
+        ],
+        "supporting_quote": "In fast-thinking forecasting, CastFSR pro- files historical observations and autonomously selects suit- able lightweight forecasters to construct a data-driven fore- cast prior. In slow deliberative reasoning, it retrieves future- relevant evidence from long-range contextual histories, adap- tively identifies context-specific look-back windows, and rea- sons about how contextual factors reshape future dynamics to refine the forecast prior. In reflective evaluation, CastFSR it- eratively evaluates and adjusts candidate forecasts to enforce temporal regularities, contextual consistency, and domain constraints.",
+        "source_path": "references/pdfs/castfsr2026.pdf",
+        "locator": "PDF p.2; Introduction, framework overview",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "castfsr2026:policy-training",
+        "decision": "keep",
+        "old_layer": "LLM",
+        "new_layer": "LLM",
+        "rationale": "SFT and multi-turn GRPO internalize executable workflows into a compact language policy; LLM.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "Specifically, we internalize the workflow in a small model through two-stage training. First, SFT learns executable Fast–Slow–Reflect be- havior from general LLM trajectories distilled on the full cross-domain training data. The validation removes trajecto- ries with illegal tool calls, incorrect stage order, ground-truth leakage, invalid timestamps, or incomplete forecasts. Second, multi-turn RL optimizes complete decision trajectories un- der delayed forecasting feedback.",
+        "source_path": "references/pdfs/castfsr2026.pdf",
+        "locator": "PDF p.4; Model-Agnostic Instantiation of CastFSR, training paragraph",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/Xiaoyu-Tao/CastFSR",
+        "provenance": {
+          "source_path": "references/pdfs/castfsr2026.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "CastFSR: A Fast–Slow–Reflect Agentic Reasoning Framework for Context-Aware Time Series Forecasting Xiaoyu Tao, Mingyue Cheng, Bokai Pan, Chuang Jiang, Huanji"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/Xiaoyu-Tao/CastFSR",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "tracemas2026",
+    "modules": [
+      {
+        "id": "tracemas2026:cld-forecast-lineage",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Document-factor/proxy/lag/model lineage is the shared artifact used to construct and revise a forecast; retain TSK.",
+        "pages_read": [
+          3
+        ],
+        "supporting_quote": "Definition 2 (Data-Grounded CLD). A Data-Grounded CLD is defined as 𝐺𝐷= (𝑉𝐷, 𝐸𝐷, 𝑀). The nodes 𝑉𝐷and edges 𝐸𝐷are derived from the Ideal CLD by selecting, merging, replacing, or extending factors and hypotheses according to data availability and proxy feasibility. The mapping function 𝑀links each node 𝑣∈𝑉𝐷 to an internal time series, an externally collected time series, or a documented proxy. The Data-Grounded CLD is",
+        "source_path": "references/pdfs/tracemas2026.pdf",
+        "locator": "PDF p.3; passage beginning \"Definition 2 (Data-Grounded CLD).\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "tracemas2026:temporal-risk-review",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "The delimited checks for leakage, timestamp mismatch, units and provenance are temporal admissibility checks. Retain GTS without counting the broader forecast reviewer twice.",
+        "pages_read": [
+          3
+        ],
+        "supporting_quote": "The Risk Reviewer checks generated data, code, mappings, and model outputs for leakage, timestamp misalignment, inconsistent units, missing sources, and hard-coded values. Across iterations, changes to factors, hypothe- ses, proxies, features, review signals, and model components are recorded as versioned updates, allowing users to compare how agent decisions propagate through the forecasting pipeline. 2.2 CLD-Based Shared Representation Causal loop diagrams are widely used in system",
+        "source_path": "references/pdfs/tracemas2026.pdf",
+        "locator": "PDF p.3; passage beginning \"The Risk Reviewer checks\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "agentictwin2026",
+    "modules": [
+      {
+        "id": "agentictwin2026:dt-residual-event",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Digital-twin residuals feed trained fault labels and structured anomaly events; this numerical detector is a task component, not LLM training.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "The proposed anomaly classifier infers faults by jointly considering observed system values, DT estimates, and the corresponding residual information. The DT-informed input can be defined as: zt = [xt, ˆxt, rt] , (6) where rt is the residual vector that captures discrepancies between observed and expected system behavior: rt = xt −ˆxt. (7) The anomaly classification task can be formulated as: At = (at, ˆyt),",
+        "source_path": "references/pdfs/agentictwin2026.pdf",
+        "locator": "PDF p.4; passage beginning \"The proposed anomaly classifier\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "agentictwin2026:fault-retrieval-mitigation",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Retrieval explicitly filters by predicted fault types and produces diagnosis/mitigation; task-specific evidence routing.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "At the core of the AgenticTwin framework is the multi- agent LLM interface, forming the reasoning layer of the proposed framework. Its primary objective is to transform structured anomaly events into interpretable diagnosis explanations, contextual historical evidence, and mitigation recommendations for human operators. Rather than relying on a single monolithic LLM, AgenticTwin decomposes anomaly reasoning into multiple specialized agents coordinated through a supervisory architecture. Figure",
+        "source_path": "references/pdfs/agentictwin2026.pdf",
+        "locator": "PDF p.5; passage beginning \"At the core of the AgenticTwin\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "timesageev2026",
+    "modules": [
+      {
+        "id": "timesageev2026:evolving-cutoff-benchmark",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "Release-by-release evidence expansion with the current release withheld defines a reusable chronological evaluation interface across analytical questions.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "As the benchmark progresses from tk to tk+1, the task specification remains fixed, but the evidence state expands: X≤tk ⊆X≤tk+1, R<tk ∪{Rtk} ⊆R<tk+1. Thus, each step introduces a new evidence state in which the time series is extended, the previous target release becomes prior evidence, and the next target release is withheld for evaluation. The agent must continuously revise its judgments without vi- olating the",
+        "source_path": "references/pdfs/timesageev2026.pdf",
+        "locator": "PDF p.4; passage beginning \"As the benchmark progresses\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "timesageev2026:skill-library",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Induct/retrieve reusable Python routines and callable/interface checks are generic skill management; activation timing is separately recorded.",
+        "pages_read": [
+          24
+        ],
+        "supporting_quote": "Skill-library tools. TimeSage-1.0 augments the baseline smolagent harness with a skill-library layer, leaving the sandbox, inputs, and required arti- facts unchanged. It adds two tools: induct_skill saves a small reusable Python function with a name, description, and notes when the agent identifies a recurring analysis idiom, and retrieve_skill re- turns the full body of a saved skill when its short description is insufficient for reliable",
+        "source_path": "references/pdfs/timesageev2026.pdf",
+        "locator": "PDF p.24; passage beginning \"Skill-library tools.\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "timesageev2026:chronological-skill-registration",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "Activation only at the next evidence release enforces chronological causality. This temporal registration restriction is GTS rather than generic skill storage.",
+        "pages_read": [
+          24
+        ],
+        "supporting_quote": "Chronological registration. Accepted skills be- come callable tools from the next period, so a skill induced in the period tk cannot alter the current answer but can affect behavior in tk+1 and beyond. This preserves the chronological structure of the evolving environment. Prompting and reuse. The library is exposed through a period-level skill-index block. When empty, it seeds the agent toward compact reusable idioms, such",
+        "source_path": "references/pdfs/timesageev2026.pdf",
+        "locator": "PDF p.24; passage beginning \"Chronological registration.\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/TimeSage-Series/TimeSage-EV",
+        "provenance": {
+          "source_path": "references/pdfs/timesageev2026.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "TimeSage-EV: A Live Benchmark for Agentic Time Series Analysis in Evolving Environments Qingren Yao1*, Yaxuan Kong2,3*, Yuqi Nie, Yichen Li3, Stefan Zohren2, Anna Vet"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/TimeSage-Series/TimeSage-EV",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      },
+      {
+        "kind": "dataset",
+        "url": "https://huggingface.co/datasets/TimeSage-Series/TimeSage-EV",
+        "provenance": {
+          "source_path": "references/pdfs/timesageev2026.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "TimeSage-EV: A Live Benchmark for Agentic Time Series Analysis in Evolving Environments Qingren Yao1*, Yaxuan Kong2,3*, Yuqi Nie, Yichen Li3, Stefan Zohren2, Anna Vettoruzzo1, Qin"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://huggingface.co/datasets/TimeSage-Series/TimeSage-EV",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "evotsagent2026",
+    "modules": [
+      {
+        "id": "evotsagent2026:trajectory-evolution",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Revision, strategy switch and recombination accept external validation scores and preserve an incumbent executable trajectory; no change-point equation is required for this controller.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "During the optimization stage, EvoTS-Agent iteratively improves the incumbent trajectory through three trajectory-level evolution operators. Under normal circumstances, the agent performs Revi- sion, which refines the incumbent based on recent successful trajec- tories stored in memory.",
+        "source_path": "references/pdfs/evotsagent2026.pdf",
+        "locator": "PDF p.4; 4 Orchestration",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "evotsagent2026:cp-model-selection",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "The selection record includes change-sensitive adjacent-window statistics and a CP detector bank; TSK.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "Before optimization, the agent performs lightweight EDA to guide baseline model selection. A reproducibly sampled time series is summarized using temporal, spectral, and change-sensitive fea- tures, including lag-1 autocorrelation, trend strength, nonstation- arity, spectral concentration, periodicity, and local mean and vari- ance discrepancies.",
+        "source_path": "references/pdfs/evotsagent2026.pdf",
+        "locator": "PDF p.4; 4.1 EDA-based Model Selection",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "tracebench2026",
+    "modules": [
+      {
+        "id": "tracebench2026:root-cause-evaluation",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "The target is the intervened simulator parameter or no change; root-cause attribution determines ground truth and scoring.",
+        "pages_read": [
+          3
+        ],
+        "supporting_quote": "TraceBench is a simulation-based framework for generating con- trolled agentic root-cause attribution tasks. Each TraceBench task presents an agent with a test batch of time-series samples gener- ated by simulating a dynamical system. The agent must, for each sample, identify which simulator parameter, if any, has changed. Depending on the experimental condition, the task may",
+        "source_path": "references/pdfs/tracebench2026.pdf",
+        "locator": "PDF p.3; method passage beginning TraceBench is a simulation-based",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "tracebench2026:execution-trace-metrics",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Tokens, elapsed time, tool counts, plots and console exposure measure generic execution behavior; retain GH evaluation role.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "From the agentic log traces, we extract metrics that characterize overall resource use and exploration be- havior. Specifically, we measure episode token usage and its cor- responding cost, episode time, and the number of tool calls. We additionally report fine-grained exploration and interaction met- rics, including the numbers of Python calls and Python statements; the",
+        "source_path": "references/pdfs/tracebench2026.pdf",
+        "locator": "PDF p.5; method passage beginning From the agentic log traces",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "project",
+        "url": "https://tracebench.github.io",
+        "provenance": {
+          "source_path": "references/pdfs/tracebench2026.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "ts, agent trajectories, experimental results, and a leaderboard on our website, tracebench.github.io. CCS Concepts • Computing methodologies →Artificial intelligence; • In- formation systems →Data analytics; • Applied computing "
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://tracebench.github.io/",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      },
+      {
+        "kind": "code",
+        "url": "https://github.com/TommasoBendinelli/TraceBench",
+        "provenance": {
+          "source_path": "references/pdfs/tracebench2026.pdf",
+          "locator": "PDF p.8; author resource link",
+          "quote": " substantially improving performance. 6 Conclusion In this paper, we introduced TraceBench, a framework for generat- ing controlled time-series root-cause attribution tasks. These tasks evaluate how LLM agents analyze time series generated by dyna"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/TommasoBendinelli/TraceBench",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      },
+      {
+        "kind": "dataset",
+        "url": "https://huggingface.co/datasets/eth-siplab/tracebench",
+        "provenance": {
+          "source_path": "references/pdfs/tracebench2026.pdf",
+          "locator": "PDF p.8; author resource link",
+          "quote": "TommasoBendinelli/TraceBench, the dataset at huggingface.co/datasets/eth-siplab/tracebench, and the project website, which includes a public leaderboard, at tracebench.github.io. Acknowledgments. We thank Dominik Hollidt and Demirel Berken for helpful d"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://huggingface.co/datasets/eth-siplab/tracebench",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "timeseriesgym2025",
+    "modules": [
+      {
+        "id": "timeseriesgym2025:challenge-environment",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Resource bundles, executable submission artifacts and graders form a generic ML-engineering challenge interface.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "Each challenge in TimeSeriesGym is organized with a consistent structure: (1) resources including datasets, code repositories, related paper(s) and documentation relevant to the challenge; (2) a description file that outlines the challenge parameters, available resources, and provides specific instructions and hints for successful completion; and (3) challenge-specific grading functions to evaluate agent submissions. Some challenges",
+        "source_path": "references/pdfs/timeseriesgym2025.pdf",
+        "locator": "PDF p.4; method passage beginning Each challenge in TimeSeriesGym",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "timeseriesgym2025:temporal-challenges",
+        "decision": "change",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "The collection spans temporal ML problem types; retain GTS as a cross-task benchmark collection, not a claim that each challenge is task-independent. Add the omitted anomaly-detection task explicitly included among original engineering challenges.",
+        "pages_read": [
+          3,
+          4,
+          5
+        ],
+        "supporting_quote": "Implement the MOMENT [6] time series foundation model for anomaly detection",
+        "source_path": "references/pdfs/timeseriesgym2025.pdf",
+        "locator": "PDF p.4; Section 3, original challenge examples",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them.",
+        "proposed_module": {
+          "id": "timeseriesgym2025:temporal-challenges",
+          "name": "Time-series engineering challenge collection",
+          "layer": "GTS",
+          "dimensions": [
+            "Control, Verification, and Feedback"
+          ],
+          "tasks": [
+            "forecasting_prediction",
+            "anomaly_detection_diagnosis"
+          ],
+          "other_tasks": [
+            "time_series_classification",
+            "temporal_question_answering"
+          ],
+          "scope_reason": "The benchmark spans temporal modeling and engineering across multiple time-series problem types.",
+          "role": "evaluation",
+          "evidence": [
+            {
+              "locator_type": "page_section",
+              "locator": "PDF p.4; method passage beginning The current version features",
+              "quote": "The current version features 34 challenges from 23 unique data sources across 8 unique time series problems, spanning more than 15 domains. These challenges evaluate AI agents on a range of realistic ML engineering skills beyond just model development, including data labeling, model selection, and the utilization, improvement, and migration of research code (Tab. 3).",
+              "source_path": "references/pdfs/timeseriesgym2025.pdf"
+            },
+            {
+              "locator_type": "page_section",
+              "locator": "PDF p.4; Section 3, original challenge examples",
+              "quote": "Implement the MOMENT [6] time series foundation model for anomaly detection",
+              "source_path": "references/pdfs/timeseriesgym2025.pdf"
+            }
+          ],
+          "function_view": {
+            "functions": [],
+            "view_status": "resource_level",
+            "rationale": "Broad temporal dataset or evaluation workflow; retained as a resource rather than attributed to a single runtime function.",
+            "evidence_indices": [
+              0
+            ],
+            "reuse_proposals": []
+          }
+        }
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/moment-timeseries-foundation-model/TimeSeriesGym",
+        "provenance": {
+          "source_path": "references/pdfs/timeseriesgym2025.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "Mellon University {yifuc, xinyul2, mgoswami, mwilinsk, gwelter, awd}@cs.cmu.edu https://github.com/moment-timeseries-foundation-model/TimeSeriesGym Abstract We introduce TimeSeriesGym, a scalable benchmarking framework for evaluating Artificial Intelligence (AI) agen"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/moment-timeseries-foundation-model/TimeSeriesGym",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "grammarwave2026",
+    "modules": [
+      {
+        "id": "grammarwave2026:event-logic-grounding",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Event-description logic is instantiated into interval evidence and root confidence; temporal operators are governed by a specific event-detection contract.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "Agent workflow. SELA decomposes the task into two role-specific agents. The Logic Analyst receives only the textual event description and sub- mits an ELT schema. It does not access the time series, which prevents schema construction from being biased toward a particular sample. The Sig- nal Inspector receives the compiled schema and grounds it in",
+        "source_path": "references/pdfs/grammarwave2026.pdf",
+        "locator": "PDF p.4; method passage beginning Agent workflow.",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/cw-wan/SELA",
+        "provenance": {
+          "source_path": "references/pdfs/grammarwave2026.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "o structured temporal logic over signal primitives. Building on ELT, we present SELA, a neuro- symbolic VLM agent framework that iteratively grounds primitives from signal visualizations and composes them under ELT constraints, pr"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/cw-wan/SELA",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "bridge2025",
+    "modules": [
+      {
+        "id": "bridge2025:description-refinement",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "The multi-agent template refinement is evaluated for text-conditioned TS generation, fixing the task output despite domain-general templates.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "Stage 2 Intra-group Discussion (independent teams iteratively refining outputs), two independent teams work iteratively to refine the text. Each team includes agents with specific roles: a planner who coordinates tasks, a scientist who ana- lyzes and identifies improvements, an engineer who imple- ments changes, and an observer who critiques the outputs. The teams refine their",
+        "source_path": "references/pdfs/bridge2025.pdf",
+        "locator": "PDF p.5; method passage beginning Stage 2 Intra-group Discussion",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "bridge2025:text-diffusion",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Text/prototype-conditioned diffusion generates numerical series; TSK numerical generator component. It is not an LLM-parameter contribution or independently an agent.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "The latter, i.e., the diffusion-based generation model, we adopt a hybrid strategy where (i) a textual description is used as input. Meanwhile, (ii) we utilize the target domain’s time series and extract its corresponding domain prototypes and their weights using Prototype Assignment Module. These prototypes and weights are also used as inputs and are fused",
+        "source_path": "references/pdfs/bridge2025.pdf",
+        "locator": "PDF p.4; method passage beginning The latter, i.e.",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/microsoft/TimeCraft/tree/main/BRIDGE",
+        "provenance": {
+          "source_path": "references/pdfs/bridge2025.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "BRIDGE: Bootstrapping Text to Control Time-Series Generation via Multi-Agent Iterative Optimization and Diffusion Modeling Hao Li * 1 2 Yu-Hao Huang * 1 3 Chang Xu 1 Viktor Sc"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/microsoft/TimeCraft/tree/main/BRIDGE",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "agentfm2025",
+    "modules": [
+      {
+        "id": "agentfm2025:role-management",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Role assignment follows changing distributed-node configuration/status; generic coordination independent of temporal diagnostics.",
+        "pages_read": [
+          3
+        ],
+        "supporting_quote": "To handle this, we designed an adaptive mechanism for system agents within the Meta Agent. As illustrated in Figure 2, the core component is the System Role Manager, which initializes by analyzing configuration files and system docs to identify each node’s role and importance. At runtime, it periodically queries the system state and updates roles",
+        "source_path": "references/pdfs/agentfm2025.pdf",
+        "locator": "PDF p.3; method passage beginning To handle this, we designed",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "agentfm2025:metric-description",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "Denoising, missingness handling and interval/trend descriptions expose temporal evidence before detection/diagnosis/mitigation; retain GTS.",
+        "pages_read": [
+          3
+        ],
+        "supporting_quote": "Metric Agent: The overall workflow of the Metric Agent begins with simple data preprocessing, which includes noise removal and imputation of missing values. After preprocessing, the multivariate Document Configuration System Role Manager Startup Node1 Node1 Node2 Node2 NodeN−1 NodeN−1 …. NodeN NodeN Role Level Role Level Role Level Role Level Nodes Query Global Status Runtime",
+        "source_path": "references/pdfs/agentfm2025.pdf",
+        "locator": "PDF p.3; method passage beginning Metric Agent: The overall",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "agentfm2025:failure-management",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Labeled historical failures and trace evidence guide anomaly detection, root-cause labels and mitigation; TSK.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "After system agents collect necessary data via data agents, the meta agent coordinates task agents to carry out failure management using trace data. This process involves three agent types—detection, diagnosis, and mitigation—which operate sequentially. Detection agents identify anomalies in each time window; upon detection, diagnosis agents locate and classify the issue; finally, mitigation agents propose",
+        "source_path": "references/pdfs/agentfm2025.pdf",
+        "locator": "PDF p.4; method passage beginning After system agents collect",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "openti2024",
+    "modules": [
+      {
+        "id": "openti2024:conversational-execution",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Intent extraction, augmentation-tool matching and multimedia output wrapping define generic conversational execution.",
+        "pages_read": [
+          9
+        ],
+        "supporting_quote": "When a user requirement is detected from the conversation, it will be passed to the first components of Traffic LLMs, which use the language agent to extract accurate intentions and useful information from dialogues, then, the extracted intention will be compared with tools in augmentation pool, after matching, if the agent found a possible solution,",
+        "source_path": "references/pdfs/openti2024.pdf",
+        "locator": "PDF p.9; method passage beginning When a user requirement",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "openti2024:traffic-meta-control",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Natural-language traffic requirements alter traffic-light actions through ChatLight; the action space fixes decision-support scope.",
+        "pages_read": [
+          9
+        ],
+        "supporting_quote": "Third, our method leverages the superior understanding capabilities of cur- rent LLMs to conduct meta-control by ChatLight agent: LLMs directly serve as a control agent, follow the understanding of the semantic description of the rules, and control the traffic light actions. This explores a higher level traffic light control mode, e.g., the traffic management department",
+        "source_path": "references/pdfs/openti2024.pdf",
+        "locator": "PDF p.9; method passage beginning Third, our method leverages",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/DaRL-LibSignal/OpenTI.git",
+        "provenance": {
+          "source_path": "references/pdfs/openti2024.pdf",
+          "locator": "PDF p.4; author resource link",
+          "quote": "ers) to achieve diversified tasks in both digital ∗We have released the code at:https://github.com/DaRL-LibSignal/OpenTI.git. †https://blog.google/products/search/search-language-understanding-bert/"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/DaRL-LibSignal/OpenTI",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "gruver2023llmtime",
+    "modules": [
+      {
+        "id": "gruver2023llmtime:decimal-representation",
+        "decision": "keep",
+        "old_layer": "LLM",
+        "new_layer": "LLM",
+        "rationale": "Digit serialization, tokenizer-specific spacing and continuous-density interpretation alter the language-model interface without finetuning; LLM-side representation is the appropriate independent axis.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "To remedy the tokenization of GPT models, we separate the digits with spaces to force a separate tokenization of each digit and use a comma (\" ,\") to separate each time step in a time series. Because decimal points are redundant given a fixed precision, we drop them in the encoding to save on context",
+        "source_path": "references/pdfs/gruver2023llmtime.pdf",
+        "locator": "PDF p.4; method passage beginning To remedy the tokenization",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/ngruver/llmtime",
+        "provenance": {
+          "source_path": "references/pdfs/gruver2023llmtime.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "es forecasting as next-token prediction in text, unlocking ∗Equal contribution 2https://github.com/ngruver/llmtime 37th Conference on Neural Information Processing Systems (NeurIPS 2023). arXiv:2310.07820v3 [cs.LG] 12 Aug 2024"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/ngruver/llmtime",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "ji2025lemad",
+    "modules": [
+      {
+        "id": "ji2025lemad:stream-normalization",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "Timestamp alignment, format normalization and missing values are upstream temporal ingestion operations; retain GTS.",
+        "pages_read": [
+          8
+        ],
+        "supporting_quote": "Data Preprocessing Module: this performs timestamp alignment, data format normal- ization, and missing value handling for heterogeneous data sources, ensuring consistent and accurate data streams. Streaming Analysis Module: this utilizes engines such as PyFlink or Spark Streaming to conduct sliding window computations, multi-dimensional metric correlation analysis, and dynamic threshold-based anomaly detection on streaming data. Intelligent",
+        "source_path": "references/pdfs/ji2025lemad.pdf",
+        "locator": "PDF p.8; method passage beginning Data Preprocessing Module:",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "ji2025lemad:stream-checkpoint",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Log compression and offsets support restart consistency without a temporal-analysis objective; GH.",
+        "pages_read": [
+          7
+        ],
+        "supporting_quote": "Compression and Checkpointing Module: this applies compression algorithms (e.g., gzip or lz4) to log data and uses offset files to record collection progress, ensuring data consistency and integrity during system restarts. Log Forwarding Module: this leverages a Kafka producer to push structured logs to Kafka topics (e.g., structured-logs), facilitating consumption by the real-time analysis agent",
+        "source_path": "references/pdfs/ji2025lemad.pdf",
+        "locator": "PDF p.7; method passage beginning Compression and Checkpointing Module:",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "ji2025lemad:anomaly-diagnosis",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Service-window anomaly alerts, root-cause diagnosis and operational recommendations are task outputs; TSK.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "Second, the real-time analysis agent consumes both metric and log data in real time, performing multi-dimensional correlation analysis and initial anomaly iden- tification. It leverages LLMs to generate human-readable alert summaries and preliminary hy- potheses. Third, the anomaly detection agent further evaluates these suspicious events using hybrid models and contextual reasoning, producing confidence scores, root",
+        "source_path": "references/pdfs/ji2025lemad.pdf",
+        "locator": "PDF p.5; method passage beginning Second, the real-time analysis agent",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "zhang2025llm",
+    "modules": [
+      {
+        "id": "zhang2025llm:dataframe-execution",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Repository class LLM_TSFD wraps a DataFrame, emits and executes Python, and refines responses; this delimited execution wrapper is GH. Cleaning/labeling instructions in its prompt should not be mistaken for proven new temporal algorithms.",
+        "pages_read": [],
+        "supporting_quote": "When the user asks the input question about the data entered above, your answer should be to use the python code that describes the dataframe \"df\" and run the result. Note: Record how many columns of tagname in the sheet table in the current csv file. If you want to determine whether a new device",
+        "source_path": "references/reviews/20261015_full_audit/shard_2_sources/llm-tsfd/__init__.py",
+        "locator": "src/__init__.py lines 30-36; LLM_TSFD.run/run_code",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/zq300/LLM-TSFD",
+        "provenance": {
+          "source_path": "references/reviews/20261015_full_audit/shard_2_sources/llm-tsfd/__init__.py",
+          "locator": "Repository source src/__init__.py; class LLM_TSFD",
+          "quote": "Repository source class LLM_TSFD; source URL https://github.com/zq300/LLM-TSFD/blob/main/src/__init__.py"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/zq300/LLM-TSFD",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Repository-only work: existing source snapshot inspected; no PDF claimed."
+    ]
+  },
+  {
+    "citation_key": "finagent2024",
+    "modules": [
+      {
+        "id": "finagent2024:vector-memory",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "The isolated vector-store mechanism uses query fields/summaries and similarity matching; market-dependent reflection is separately recorded, so retain GH for storage/retrieval plumbing.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "To realize the 3A superiority - Acuity, Adaptability, and Amend- ability - in the memory mechanism, our development of the mem- ory module employed a vector storage architecture. This module is composed of three main components: market intelligence memory (service for (§4.1)), low-level reflection memory (service for (§4.3)), and high-level reflection memory (service for (§4.3)).",
+        "source_path": "references/pdfs/finagent2024.pdf",
+        "locator": "PDF p.5; method passage beginning To realize the 3A superiority",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "finagent2024:market-reflection",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Low/high reflection explicitly associates news and technical evidence with realized price changes and trading actions; TSK.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "The reflection framework is divided into low-level reflec- tion and high-level reflection, each serving distinct purposes to enhance the agent’s trading decisions. The low-level reflection module involves reflecting on the relationship between the agent’s observations (e.g., news, financial reports, Kline chart and technical indicators) and the resultant price movements in the market, draw- ing connections",
+        "source_path": "references/pdfs/finagent2024.pdf",
+        "locator": "PDF p.5; method passage beginning The reflection framework",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "structuredagenticworkflows2025",
+    "modules": [
+      {
+        "id": "structuredagenticworkflows2025:code-search",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Round-robin warmup/search accepts code by external validation loss and rolls back failed candidates; generic code-agent controller.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "Stage 2 employs a two-phase Round-Robin Search [21], consist- ing of the Warm-up Phase and the Optimization Phase. Its core building block is Code Refinement , which iteratively applies Refinement and Fine-tuning . If a candidate script reduces the loss, it replaces the incumbent and serves as the starting point for the next refinement-and-fine-tuning cycle;",
+        "source_path": "references/pdfs/structuredagenticworkflows2025.pdf",
+        "locator": "PDF p.5; method passage beginning Stage 2 employs a two-phase",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "structuredagenticworkflows2025:temporal-model-bank",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "The bank combines forecasting and generative model implementations and evaluation measures. Retain GTS as shared temporal modeling infrastructure; each model/metric is not separately counted as task-independent.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "The code base includes the implementation of a model bank and an evaluation measure bank. • Model Bank is a curated collection of implemented financial models. It includes the most representative models of time- series forecasting and generative models. For the forecasting task, there could be several main types, including the tree- based models, deep",
+        "source_path": "references/pdfs/structuredagenticworkflows2025.pdf",
+        "locator": "PDF p.4; method passage beginning The code base includes",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "virtualtrafficpolice2026",
+    "modules": [
+      {
+        "id": "virtualtrafficpolice2026:hierarchical-control",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "The upper LLM changes traffic-control parameters and lower controller executes traffic actions; task-specific control hierarchy.",
+        "pages_read": [
+          6
+        ],
+        "supporting_quote": "This hierarchical framework consists of two levels: (1) an upper-level LLM agent termed a virtual traffic police officer that generates fine-tuned traffic parameters via an LLM-based policy 𝐿𝐿𝑀in response to unforeseen incidents (see Section 3.2.1), and (2) a lower-level adaptive traffic signal controller that executes the fine-tuned parameters in the adaptive traffic signal controller (see",
+        "source_path": "references/pdfs/virtualtrafficpolice2026.pdf",
+        "locator": "PDF p.6; method passage beginning This hierarchical framework consists",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "virtualtrafficpolice2026:traffic-experience",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Retrieved event-to-capacity-to-control Q/A pairs are validated to refine traffic strategies; memory acceptance depends on traffic action utility.",
+        "pages_read": [
+          12
+        ],
+        "supporting_quote": "The system retrieves top-𝑘 relevant historical Q-A pairs based on the embedding of the current traffic event 𝐸𝑠. The LLM Agent generates a control strategy, which is then evaluated by the LLM Verifier through judgment and feedback. Verified outputs are used to assist the controller and are also added as new Q-A pairs to continually",
+        "source_path": "references/pdfs/virtualtrafficpolice2026.pdf",
+        "locator": "PDF p.12; method passage beginning The system retrieves",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "finmem2023",
+    "modules": [
+      {
+        "id": "finmem2023:layered-financial-memory",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Layer horizons track financial news/report cadence and promotions depend on investment success. This is trading-conditioned memory, not generic vector storage.",
+        "pages_read": [
+          9
+        ],
+        "supporting_quote": "Furthermore, an access counter function oversees the transfer of memory events among layers, ensuring that significant events influencing trading decisions ascend from shallower to deeper layers for extended retention and recurrent access by FINMEM. Conversely, less pertinent events gradually diminish. This process is facilitated by the LLM validation tool Guardrails AI [17], which monitors critical",
+        "source_path": "references/pdfs/finmem2023.pdf",
+        "locator": "PDF p.9; method passage beginning Furthermore, an access counter",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "finmem2023:trade-character",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Trader character, risk preferences and ranked memories choose daily stock actions; TSK.",
+        "pages_read": [
+          9
+        ],
+        "supporting_quote": "In its daily trading decisions, FINMEM is asked to select from three distinct actions for a single share of a specific stock by Guardrails AI text validation function: “Buy”, “Sell”, or “Hold”. Additionally, the inputs and results required by FINMEM’s decision- making module vary between its training and testing phases, with each phase’s specifics detailed",
+        "source_path": "references/pdfs/finmem2023.pdf",
+        "locator": "PDF p.9; method passage beginning In its daily trading decisions",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/pipiku915/FinMem-LLM-StockTrading/",
+        "provenance": {
+          "source_path": "references/pdfs/finmem2023.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": "Author-designated resource hyperlink embedded in PDF page 1: https://github.com/pipiku915/FinMem-LLM-StockTrading/"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/pipiku915/FinMem-LLM-StockTrading/",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "tradingagents2024",
+    "modules": [
+      {
+        "id": "tradingagents2024:structured-report-state",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "The module is explicitly a structured global-report/state communication mechanism; domain content is supplied by roles, so GH.",
+        "pages_read": [
+          8
+        ],
+        "supporting_quote": "Our model introduces a structured communication protocol to govern agent interactions. By clearly defining each agent’s state, we ensure that each role only extracts or queries the necessary information, processes it, and returns a completed report. This streamlined approach reduces unnecessary steps, lowers the risk of message corruption, and keeps interactions focused and efficient, even",
+        "source_path": "references/pdfs/tradingagents2024.pdf",
+        "locator": "PDF p.8; method passage beginning Our model introduces",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "tradingagents2024:investment-debate",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Bullish/bearish debate and risk approval evaluate investment positions, fixing the decision objective; TSK.",
+        "pages_read": [
+          6
+        ],
+        "supporting_quote": "The Researcher Team (Figure 3) is responsible for critically evaluating the information provided by the Analyst Team. Comprised of agents adopting both bullish and bearish perspectives, they engage in multiple rounds of debate to assess the potential risks and benefits of investment decisions. Bullish Goal: Evaluate the investment potential of Apple Inc. Key Points Summary:",
+        "source_path": "references/pdfs/tradingagents2024.pdf",
+        "locator": "PDF p.6; method passage beginning The Researcher Team",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "code",
+        "url": "https://github.com/TauricResearch/TradingAgents",
+        "provenance": {
+          "source_path": "references/pdfs/tradingagents2024.pdf",
+          "locator": "PDF p.1; author resource link",
+          "quote": " multi-agent LLM frameworks in financial trading. TRADINGAGENTS is available at https://github.com/TauricResearch/TradingAgents. 1. Introduction Autonomous agents leveraging Large Language Models (LLMs) present a transformative approach to decisio"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/TauricResearch/TradingAgents",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories."
+    ]
+  },
+  {
+    "citation_key": "merit2025",
+    "modules": [
+      {
+        "id": "merit2025:positive-views",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Retrieved and augmented sequences are accepted as contrastive positive views. The construction target is augmentation for representation learning, despite evaluation across several downstream tasks.",
+        "pages_read": [
+          3
+        ],
+        "supporting_quote": "Our retrieval agent first selects neighborhood candidates with similarity, followed by refinement using an LLM. Our augmentation agent then selects suitable data augmentation strategies from the augmentation strategy library. Finally, our review agent evaluates the quality of the augmented sequences, which approves positive samples into a memory bank and returns to the retrieval agent for refinement if rejected. The augmented views and neighboring samples are utilized as positives for time series representation learning.",
+        "source_path": "references/pdfs/merit2025.pdf",
+        "locator": "PDF p.3; Figure 2 caption",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "pandaai2026",
+    "modules": [
+      {
+        "id": "pandaai2026:regime-conditioned-cq2",
+        "decision": "keep",
+        "old_layer": "LLM",
+        "new_layer": "LLM",
+        "rationale": "Learned soft tokens plus CQ2 SFT/preference training alter the language policy. Retain LLM; proposed continuous adaptation should not be equated with independently validated deployment.",
+        "pages_read": [
+          5,
+          6,
+          7,
+          16,
+          17
+        ],
+        "supporting_quote": "Regime-Conditioned Instruction Tuning A financial instruction dataset DSFT is constructed where each sample v is tagged with the originating market state zt from Module M. Each sample v contains three components (x, y, zt), where x denotes the question and y corresponds to the answer. This teaches the model to condition financial concepts on market context. The same underlying concept must be implemented differ- ently",
+        "source_path": "references/pdfs/pandaai2026.pdf",
+        "locator": "PDF p.17; passage beginning \"Regime-Conditioned Instruction Tuning\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "pandaai2026:constrained-alpha-mcts",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "MCTS candidate values and constraints use financial backtests, factor redundancy and turnover; TSK alpha search.",
+        "pages_read": [
+          5,
+          6,
+          7,
+          16,
+          17
+        ],
+        "supporting_quote": "We conceptualize Alpha Mining not as creative writing, but as a Constrained Search Problem over a Directed Acyclic Graph (DAG) of operators. We implement an LLM- guided Monte Carlo Tree Search (MCTS) framework to navigate this sparse solution space. The process ensures robustness through four quant-specific phases that incorporate the constraint set C and the market state zt at distinct checkpoints (visualized in Figure 2);",
+        "source_path": "references/pdfs/pandaai2026.pdf",
+        "locator": "PDF p.6; passage beginning \"We conceptualize Alpha Mining\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "pandaai2026:regime-portfolio-execution",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Regime-conditioned risk aversion, portfolio allocation and liquidity-sensitive execution optimize financial actions; TSK.",
+        "pages_read": [
+          5,
+          6,
+          7,
+          16,
+          17
+        ],
+        "supporting_quote": "Portfolio Optimization (P) We solve the regime-conditioned convex problem: wt = arg max w∈Cport(wTst −λ(zt) · wTΣw) (1) where λ(zt) automatically increases during high-volatility regimes to prioritize capital preservation. Execution Control (E) To minimize implementation shortfall (IS), the execution pol- icy πexec(a|wt, zt) selects strategies (e.g., TWAP, VWAP) isomorphic to the inferred liquid- ity profile. This closes the ”simulation-to-reality” gap by accounting for market friction.",
+        "source_path": "references/pdfs/pandaai2026.pdf",
+        "locator": "PDF p.7; passage beginning \"Portfolio Optimization (P)\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "pandaai2026:feedback-rule-induction",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "The fast update induces factor constraints from profitable/unprofitable cases within market regimes. Keep TSK for symbolic rule induction; the separate slow LoRA loop is not part of this module.",
+        "pages_read": [
+          5,
+          6,
+          7,
+          16,
+          17
+        ],
+        "supporting_quote": "Fast Loop (Symbolic Rule Induction) Upon detecting statistically significant fail- ure clusters in E, the system triggers symbolic induction. By contrastively prompting the LLM with failed samples (Sharpe < 0) against successful ones within regime zt, U extracts logical predicates—for instance, identifying that reversal operators underperform during high-momentum phases. These insights are formalized as symbolic rules (e.g., IF Trend(zt) > τ THEN Ban(Reversal)) and immediately",
+        "source_path": "references/pdfs/pandaai2026.pdf",
+        "locator": "PDF p.7; passage beginning \"Fast Loop (Symbolic Rule Induction)\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere.",
+      "PDF p.17 states the fine-tuning dataset is not publicly available owing to client privacy/NDA restrictions; do not invent a public data link."
+    ]
+  },
+  {
+    "citation_key": "genautoml2026",
+    "modules": [
+      {
+        "id": "genautoml2026:dynamic-architecture-registry",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Dynamic class discovery, AST loading and runtime registration integrate generated neural code; general execution machinery.",
+        "pages_read": [
+          4,
+          5,
+          6
+        ],
+        "supporting_quote": "3.3 Just-In-Time (JIT) Architectural Integration Integrating newly generated code into an environment that is already operational is a significant engineering challenge in agentic systems. This is resolved by GenAutoML via a Reflection-based Orchestration pipeline. The logic used in the integration process is recursive. First, through Introspection, the system searches the dynamic registry for new class definitions that inherit from torch.nn.Module using Python’s inspect module. Next,",
+        "source_path": "references/pdfs/genautoml2026.pdf",
+        "locator": "PDF p.5; passage beginning \"3.3 Just-In-Time (JIT) Architectural Integration\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "genautoml2026:forecast-shape-contract",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Forward validation fixes lookback/horizon/feature tensor dimensions for forecasts; TSK output contract.",
+        "pages_read": [
+          4,
+          5,
+          6
+        ],
+        "supporting_quote": "In order to ensure the generated code is compatible with the downstream training pipeline, the agent is controlled by a Structural Geometric Contract: 1. Temporal Invariance: All the generated modules Mgen should accept a 3D input tensor X ∈RB×L×D where B is the batch size, L is the lookback length, and D is the feature dimension. 2. Output Integrity: The model should return a prediction",
+        "source_path": "references/pdfs/genautoml2026.pdf",
+        "locator": "PDF p.4; passage beginning \"In order to ensure the generated code is compatible\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "genautoml2026:revin-wrapper",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "Instance statistics normalize temporal channels and restore scale around generated models across forecast/reconstruction pipelines; GTS adoption/integration of RevIN, not invention of RevIN or a guarantee of stationarity.",
+        "pages_read": [
+          4,
+          5,
+          6
+        ],
+        "supporting_quote": "To address this, we integrate a Dynamic Reversible Instance Normalization (Dyn-RevIN) wrapper, directly adopting the mathematical framework proposed by [19]. Rather than proposing a new normalization technique, our contribution lies in utilizing RevIN as an automated statistical guardrail. This layer explicitly decouples the untrusted architectural logic generated by the agent from the strict statistical stationarity constraints required for convergence. 3.5 Mathematical Formulation Applying the standard",
+        "source_path": "references/pdfs/genautoml2026.pdf",
+        "locator": "PDF p.5; passage beginning \"To address this, we integrate a Dynamic Reversible Instance Normalization\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere.",
+      "PDF p.18 refers to a supplementary code repository but supplies no retrievable URL in text or PDF annotations."
+    ]
+  },
+  {
+    "citation_key": "mosaic2026",
+    "modules": [
+      {
+        "id": "mosaic2026:blueprint-composition",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Case/code-bank retrieval and blueprint realization construct executable modeling programs under an external loss; generic workflow construction.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "Knowledge banks. MOSAIC assumes access to external knowledge resources K = (Ecase, Ecode, Erefine),where Ecase is a case bank of prior task–solution pairs, Ecode is a repository of reusable model architectures, training routines, feature transformations, and evaluation components, and Erefine is a refinement knowledge bank containing domain-specific optimisation heuristics. These knowledge banks define the reusable modelling capabilities from which new workflows can be constructed (see",
+        "source_path": "references/pdfs/mosaic2026.pdf",
+        "locator": "PDF p.4; passage beginning \"Knowledge banks.\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "mosaic2026:failure-aware-refinement",
+        "decision": "keep",
+        "old_layer": "GH",
+        "new_layer": "GH",
+        "rationale": "Checkpoint rollback and invalid-action masks depend on execution errors or deteriorating loss, not temporal mathematics. Retain GH for this guardrail component; learned refinement-policy training is distinct.",
+        "pages_read": [
+          6
+        ],
+        "supporting_quote": "Offline trajectory construction. The refinement policy is trained offline. For each generated training task, MOSAIC instantiates an executable modelling program and explores alternative refinement paths using an LLM-based refinement agent. At each step, the agent proposes a struc- tured refinement action, the LLM realises it as a concrete code edit, the edited program is exe- cuted, and the resulting loss and diagnostics are recorded. This",
+        "source_path": "references/pdfs/mosaic2026.pdf",
+        "locator": "PDF p.6; passage beginning \"Offline trajectory construction.\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "mosaic2026:temporal-semantic-eda",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "ADF, temporal plots and regime/volatility summaries provide shared temporal EDA before choosing forecasting or generation programs; GTS.",
+        "pages_read": [
+          15
+        ],
+        "supporting_quote": "C Semantic-aware EDA with Multimodal Support EDA & Feature Engineering. To bridge the gap between raw numerical data and LLM reasoning, the MOSAIC pipeline begins with a semantic-aware EDA module that maps continuous statistical properties into discrete, text-based semantic anchors. Rather than merely computing basic statistics, the module extracts high-level meta-features, such as data scale, task type, volatility, feature interde- pendence via correlation, and Augmented",
+        "source_path": "references/pdfs/mosaic2026.pdf",
+        "locator": "PDF p.15; passage beginning \"C Semantic-aware EDA with Multimodal Support\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "duan2025factormad",
+    "modules": [
+      {
+        "id": "duan2025factormad:factor-debate",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Debate starts from alpha-factor code/performance and critiques return-prediction factors; task-specific search.",
+        "pages_read": [
+          3
+        ],
+        "supporting_quote": "3.2 Agent Debate Framework We propose a multi-agent debate framework for factor mining that consists of three key components: agent initialization, debate pro- cess, and convergence criteria. First, we initialize two LLM agents with distinct perspectives on factor design to ensure diverse view- points during the debate. Second, these agents engage in an iterative debate process where they alternate between critiquing each other’s proposals and",
+        "source_path": "references/pdfs/duan2025factormad.pdf",
+        "locator": "PDF p.3; passage beginning \"3.2 Agent Debate Framework\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "duan2025factormad:factor-validation",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Factor-specific dimension/comparability rules plus IC/ICIR/correlation determine acceptance; TSK. Generic execution checks are implementation ingredients, not extra modules.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "3.3.2 Validation. In the validation phase, we implement a compre- hensive verification process to ensure the generated factor code meets essential standards for factor implementation. This validation phase evaluates multiple critical aspects, such as error-free code ex- ecution, no look-ahead bias, time-series stationarity, and dimension consistency. The detailed validation criteria and corresponding sug- gestions are summarized in Table 1. Factors that successfully pass all validation",
+        "source_path": "references/pdfs/duan2025factormad.pdf",
+        "locator": "PDF p.5; passage beginning \"3.3.2 Validation.\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "duan2025factormad:causal-window-check",
+        "decision": "keep",
+        "old_layer": "GTS",
+        "new_layer": "GTS",
+        "rationale": "The delimited causal-window rule forbids future timestamps and full-series statistics; temporal availability is independent of financial utility, hence GTS.",
+        "pages_read": [
+          6
+        ],
+        "supporting_quote": "LOOK-AHEAD BIAS Please make sure not to include any data from future timestamps when calculating the factor value. 1. Use rolling functions instead of computing values over the entire time series, e.g., x.rolling(window).mean() instead of x.mean(). DIMENSION Ensure that factor values are dimensionless and comparable across different symbols. 1. Normalize price-related variables by dividing by the latest price or computing the rate of change. 2.",
+        "source_path": "references/pdfs/duan2025factormad.pdf",
+        "locator": "PDF p.6; passage beginning \"LOOK-AHEAD BIAS\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  },
+  {
+    "citation_key": "conversationaltsfm2025",
+    "modules": [
+      {
+        "id": "conversationaltsfm2025:forecast-judge-adaptation",
+        "decision": "keep",
+        "old_layer": "LLM",
+        "new_layer": "LLM",
+        "rationale": "SFT and GRPO train a Qwen ensemble-decider policy from forecast optimization trajectories; LLM.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "3.4 R1-Style Fine-tuning for Reasoning and Decision Capability While LLMs can analyze optimization trajectories and reason about future temporal incompatibility evolution, they lack the domain-specific intuitions critical for ensemble weight selection. Time series optimization demands recognizing numerical convergence patterns, calibrating stopping decisions against overfitting risks, and understanding how valida- tion performance translates to future forecasting accuracy—capabilities absent from language pretraining. Raw LLMs exhibit problematic behaviors:",
+        "source_path": "references/pdfs/conversationaltsfm2025.pdf",
+        "locator": "PDF p.5; passage beginning \"3.4 R1-Style Fine-tuning for Reasoning and Decision Capability\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "conversationaltsfm2025:forecast-ensemble-control",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "SLSQP convex weights and accept/continue decisions optimize an ensemble forecast metric; task-bound control.",
+        "pages_read": [
+          4
+        ],
+        "supporting_quote": "Therefore, we employ Sequential Least Squares Programming (SLSQP)[Joshy and Hwang, 2024] to discover optimal ensemble weights that exploit these specialization patterns. We solve the constrained optimization problem: w∗= arg minw L(y, Xw) s.t. w ≥0, PM i=1 wi = 1, where y ∈RN represents true values, X ∈RN×M contains individual model forecasts, and L is the chosen forecasting metric (e.g., MAE, MASE). The non-negativity and",
+        "source_path": "references/pdfs/conversationaltsfm2025.pdf",
+        "locator": "PDF p.4; passage beginning \"Therefore, we employ Sequential Least Squares Programming\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "conversationaltsfm2025:ensemble-audit-reflection",
+        "decision": "keep",
+        "old_layer": "TSK",
+        "new_layer": "TSK",
+        "rationale": "Audit records forecast weights, error, confidence and acceptance explanations; its content and faithfulness procedure are ensemble-specific.",
+        "pages_read": [
+          6
+        ],
+        "supporting_quote": "3.5 Interpretability Through Reflective Explanation After completing the multi-turn optimization dialogue, the system leverages the accumulated conversation history to generate comprehensive reflections that synthesize insights across all iterations. This reflection process transforms raw optimization trajectories into actionable understanding, combining performance analysis with faithfulness validation to build practitioner confidence in the final ensemble configuration. The system maintains complete traceability through comprehensive audit trails: A = {(w∗",
+        "source_path": "references/pdfs/conversationaltsfm2025.pdf",
+        "locator": "PDF p.6; passage beginning \"3.5 Interpretability Through Reflective Explanation\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [
+      {
+        "kind": "evaluation_submission",
+        "url": "https://github.com/SalesforceAIResearch/gift-eval/pull/51",
+        "provenance": {
+          "source_path": "references/pdfs/conversationaltsfm2025.pdf",
+          "locator": "PDF p.18; author resource link",
+          "quote": "significant improvements in Healthcare, with a mass reduction in 1Pull Request: https://github.com/SalesforceAIResearch/gift-eval/pull/51 18"
+        },
+        "availability": {
+          "status": "reachable",
+          "http_status": "200",
+          "resolved_url": "https://github.com/SalesforceAIResearch/gift-eval/pull/51",
+          "checked_at": "2026-10-16",
+          "method": "HTTP HEAD through configured local proxy; code not downloaded",
+          "error": ""
+        }
+      }
+    ],
+    "resource_review_status": "source_reviewed",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "The linked GIFT-Eval PR is an author evaluation submission, not the complete method repository."
+    ]
+  },
+  {
+    "citation_key": "stride2026",
+    "modules": [
+      {
+        "id": "stride2026:reasoning-distillation",
+        "decision": "keep",
+        "old_layer": "LLM",
+        "new_layer": "LLM",
+        "rationale": "Teacher access to training pseudo-future creates supervision; student causal language modeling learns reasoning from history. LLM distillation, not future access at inference.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "3.3. Reference Reasoning Generation and Distillation Phase 1: Oracle Reasoning Generation. First, we construct a high-quality reference reasoning dataset using the training splits of the GIFT-Eval (Aksu et al., 2024), partitioning sampled temporal windows into a historical context 𝑋and a pseudo-future ground truth 𝑌. We adapt the oracle reasoning generation method introduced in TFRBench (Ahamed et al., 2026) to generate target reasoning traces. Using a",
+        "source_path": "references/pdfs/stride2026.pdf",
+        "locator": "PDF p.5; passage beginning \"3.3. Reference Reasoning Generation and Distillation\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      },
+      {
+        "id": "stride2026:latent-fusion",
+        "decision": "keep",
+        "old_layer": "LLM",
+        "new_layer": "LLM",
+        "rationale": "LLM hidden states, learned projection, TSFM training and LoRA form model-side cross-modal fusion; retain LLM rather than numerical-tool orchestration.",
+        "pages_read": [
+          5
+        ],
+        "supporting_quote": "3.4. Cross-Modal Fusion and End-to-End Training As formalized in the joint optimization phase of Algorithm 1, we bypass discrete tokenization to inject the generated reasoning into the numerical forecaster via a end-to-end trainable fusion pipeline. Step 1: Latent Projection. Let 𝐻∈ℝ𝐿×𝑑𝑙𝑙𝑚represent the last hidden states of the Student LLM. We mean-pool these states over the sequence dimension to extract a global reasoning embedding ℎ𝑅. A",
+        "source_path": "references/pdfs/stride2026.pdf",
+        "locator": "PDF p.5; passage beginning \"3.4. Cross-Modal Fusion and End-to-End Training\"",
+        "task_function_review": "Reviewed against the source-defined input, output and acceptance criterion; retain existing task/function memberships unless proposed_module changes them."
+      }
+    ],
+    "resource_links": [],
+    "resource_review_status": "not_found_in_source",
+    "notes": [
+      "Reviewed module mechanisms in primary-source method context. Retention is a scope judgment, not an assertion of independently demonstrated transfer.",
+      "Resource audit searched all extracted PDF pages and embedded hyperlinks, with manual rejection of cited third-party repositories.",
+      "No author-designated code/project/data resource found in the inspected primary source; this does not assert absence elsewhere."
+    ]
+  }
+]

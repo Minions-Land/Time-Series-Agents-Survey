@@ -11,6 +11,8 @@ Each card contains:
 - **Harness modules:** seven General Harness dimensions, reusable General Time-Series Harness modules, and task-specific modules.
 - **Task contract:** forecasting, augmentation and synthesis, anomaly detection and diagnosis, decision support, or another explicitly recorded task.
 - **Evaluation:** benchmark, process evidence, temporal-contract checks, task metrics, and deployment or decision evidence.
+- **Official resources:** author-attributed repository, project, model, dataset and evaluation URLs with source locators and availability checks.
+- **Boundary review:** per-module source review and independent adjudication records.
 - **Review state:** source quality, Scholar/BibTeX status, and whether PDF-level review remains pending.
 
 The ledger keeps inclusive source descriptions so that a paper can record contributions at several levels. Aggregate plots use an exclusive deepest-layer projection: task-bound modules count as Task-Specific Harness, reusable temporal modules as General Time-Series Harness, and domain-independent runtime modules as General Harness. The LLM-side field is independent of this projection.

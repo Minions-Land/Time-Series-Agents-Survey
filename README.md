@@ -39,15 +39,17 @@ The comparison unit is a concrete module. A paper can contribute several modules
 
 ## Evidence-linked Paper Cards
 
-Cards connect a paper's identity and claims to concrete modules, task assumptions, evaluation evidence, and source passages. Follow the paper links in the cards and the resource links cited in the manuscript to explore the original works. Structured official repository links remain to be curated across the cards.
+Cards connect a paper's identity and claims to concrete modules, task assumptions, evaluation evidence, and source passages. Follow the paper links in the cards and the resource links cited in the manuscript to explore the original works. The [official resource index](docs/official-resources.md) provides 100 author-attributed links across 76 works, with source locations and availability status.
 
-The ledger snapshot contains **138 examined records**, **136 retained works and resources**, and **292 module entries**. These are curation counts, not a count of independently reproduced systems. Field definitions and review states are documented in the [card schema](references/reports/paper-card-schema.md).
+The ledger snapshot contains **138 examined records**, **135 retained works and resources**, and **290 module entries**. These are curation counts, not a count of independently reproduced systems. Field definitions and review states are documented in the [card schema](references/reports/paper-card-schema.md).
 
 | Resource | Role |
 |---|---|
 | [CSV ledger](paper_classification_ledger.csv) | Maintained source for paper and module annotations |
 | [JSON ledger](paper_classification_ledger.json) | Generated structured view for search, analysis, and downstream interfaces |
 | [BibTeX](TS_AGENT_HARNESS_SURVEY.bib) | Manuscript citation records |
+| [Official resources](docs/official-resources.md) | Original repositories, data, models, and evaluation resources |
+| [Maintenance workflow](docs/ledger-maintenance.md) | Schema migration, boundary review, and read-only checks |
 | [Taxonomy schema](references/taxonomy_schema.json) | Classification vocabulary |
 | [Curation guide](references/CLASSIFICATION_LEDGER.md) | Evidence requirements, aggregation rules, and maintenance commands |
 

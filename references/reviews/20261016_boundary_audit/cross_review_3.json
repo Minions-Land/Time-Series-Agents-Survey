@@ -1,0 +1,143 @@
+{
+  "reviews": [
+    {
+      "id": "tsagent2025:intent-evidence-gate",
+      "citation_key": "tsagent2025",
+      "reviewer": "card_consistency_audit",
+      "decision": "agree",
+      "proposed_layer": "TSK",
+      "source_path": "references/pdfs/tsagent2025.pdf",
+      "pages_read": [
+        5
+      ],
+      "rationale": "The general evidence-gap equation is implemented by a fixed question-intent mapping to MCQ anomaly segments, trend, seasonality and relation schemas. The concrete acceptance test validates a temporal-QA answer, so TSK follows the implemented contract rather than the broad critic abstraction.",
+      "supporting_quote": "keyword/pattern matches map questions into a small set of intent classes"
+    },
+    {
+      "id": "hierarchicalmeteorologist2025:multiscale-context",
+      "citation_key": "hierarchicalmeteorologist2025",
+      "reviewer": "card_consistency_audit",
+      "decision": "disagree",
+      "proposed_layer": "GTS",
+      "source_path": "references/pdfs/hierarchicalmeteorologist2025.pdf",
+      "pages_read": [
+        2,
+        3
+      ],
+      "rationale": "The existing module is named Variable-aware multiscale temporal aggregation. PDF p.2 independently specifies the non-LLM Assistant numerical operation: mean/extrema, accumulation and circular averaging over time windows. These semantics transfer to temporal analysis/report tasks beyond weather forecasting. The p.3 lead-time-dependent context packaging rule is an adjacent specialised policy, not necessary to the aggregation operator. Keep this existing module GTS and strengthen its evidence with p.2, rather than expanding its identity to include packaging and moving the whole item to TSK.",
+      "supporting_quote": "To support multi-scale interpretation while controlling context length, the Assistant block forms two groups of aggregates over non-overlapping windows",
+      "proposed_module": {
+        "id": "hierarchicalmeteorologist2025:multiscale-context",
+        "name": "Variable-aware multiscale temporal aggregation",
+        "layer": "GTS",
+        "dimensions": [
+          "Interface and Interaction",
+          "Memory and Context"
+        ],
+        "tasks": [],
+        "scope_reason": "The non-LLM Assistant applies variable-aware temporal window aggregation, including means/extrema, sums for accumulated measurements and circular means for angular quantities. This time-series processing operation supplies multiple analysis/report workflows; forecast-lead-dependent context packaging is a separate task policy.",
+        "role": "method",
+        "evidence": [
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.3; passage beginning \"To enable interpretation at multiple time scales\"",
+            "quote": "To enable interpretation at multiple time scales while con- trolling context length, the Assistant aggregates over non- overlapping windows W ∈{6h, 1d} using means/minima/- maxima for T, means for RH and U, sums for P. Wind di- rection is averaged on the circle and stored only for 6-hour windows. The resulting modes are: • Baseline Context: location and climatology plus the full hourly table (short-range",
+            "source_path": "references/pdfs/hierarchicalmeteorologist2025.pdf"
+          },
+          {
+            "locator_type": "page_section",
+            "locator": "PDF p.2; Section 3 Hierarchical temporal aggregation, numerical definitions",
+            "quote": "Hierarchical temporal aggregation. To support multi- scale interpretation while controlling context length, the As- sistant block forms two groups of aggregates over non- overlapping windows W ∈{6h, 1d}: T W = 1 |W| X t∈W Tt, T max W = max t∈W Tt, T min W = min t∈W Tt, RHW = 1 |W| X t∈W RHt, U W = 1 |W| X t∈W Ut, PW = X t∈W Pt. Wind direction is averaged on the circle, ¯θW = atan2 \u0000 1 |W| X t∈W sin θt, 1 |W| X t∈W cos θt \u0001 [◦], and is stored for 6-hour windows; for daily windows we omit ¯θ1d to avoid misleading circular averages. Dew point and visibility are aggregated as means; winds are summarized by mean and (optionally) maxima. Thus each 6-hour record contains { T, T max, T min, RH, U, ¯θ, P }; each daily record mirrors this set except for wind direction.",
+            "source_path": "references/pdfs/hierarchicalmeteorologist2025.pdf"
+          }
+        ],
+        "other_tasks": [],
+        "function_view": {
+          "functions": [
+            "processing"
+          ],
+          "view_status": "mapped",
+          "rationale": "The non-LLM Assistant applies variable-aware temporal window aggregation, including means/extrema, sums for accumulated measurements and circular means for angular quantities. This time-series processing operation supplies multiple analysis/report workflows; forecast-lead-dependent context packaging is a separate task policy.",
+          "evidence_indices": [
+            0,
+            1
+          ],
+          "reuse_proposals": []
+        }
+      }
+    },
+    {
+      "id": "siren2026:case-analogy",
+      "citation_key": "siren2026",
+      "reviewer": "card_consistency_audit",
+      "decision": "agree",
+      "proposed_layer": "GH",
+      "source_path": "references/pdfs/siren2026.pdf",
+      "pages_read": [
+        5,
+        16
+      ],
+      "rationale": "K.2 directly instantiates a reusable instruction template: inspect a collection, rank relevant cases, retain question/answer/metadata, then solve the target. Time/location/event types are metadata for relevance, with no specialised numerical temporal similarity or warning decision boundary. GH reflects the concrete prompt-level procedure, not a hypothetical generalisation of the warning task.",
+      "supporting_quote": "Select at most six cases. Preserve each selected case’s question, reference answer, and event metadata so that its analogy remains interpretable.",
+      "recommended_field_fix": {
+        "function_view.evidence_indices": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "id": "siren2026:warning-skill-rehearsal",
+      "citation_key": "siren2026",
+      "reviewer": "card_consistency_audit",
+      "decision": "agree",
+      "proposed_layer": "GH",
+      "source_path": "references/pdfs/siren2026.pdf",
+      "pages_read": [
+        5,
+        16,
+        17
+      ],
+      "rationale": "K.2 hides a reference answer, rehearses a task, reveals reference feedback, and distils short procedures while excluding case-specific facts. The update output is generic skill guidance and the prompt uses task placeholders rather than a warning-specific prediction, action, or loss. GH is consistent with the generic experience update accepted for TimeClaw.",
+      "supporting_quote": "Add or revise only short, actionable guidance that can improve future tasks of the same kind. Keep one reusable procedure per item.",
+      "recommended_field_fix": {
+        "function_view.evidence_indices": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "id": "fincon2024:manager-analyst",
+      "citation_key": "fincon2024",
+      "reviewer": "card_consistency_audit",
+      "decision": "agree",
+      "proposed_layer": "TSK",
+      "source_path": "references/pdfs/fincon2024.pdf",
+      "pages_read": [
+        5,
+        6
+      ],
+      "rationale": "The instantiated analyst outputs are investment signals, momentum/CVaR and stock selection; the sole manager forms sequential trading actions and portfolio weights. This particular aggregation contract is financially specialised. Unlike SIREN K.2, the source does not define this record as a task-placeholder coordination template independently of those outputs.",
+      "supporting_quote": "We implement seven distinct types of analyst agents using LLMs, each producing unique investment insights",
+      "required_field_fix": {
+        "function_view.view_status": "task_procedure",
+        "function_view.functions": []
+      }
+    }
+  ],
+  "shared_boundary_rule": "Classify the implemented module contract. Domain-labelled input metadata alone does not imply TSK; task-required outputs/actions/objectives do. Distinct numerical temporal transformations may remain GTS even when their enclosing pipeline has task-specific context-selection rules.",
+  "schema_review": {
+    "files_read": [
+      "scripts/ledger_schema.py",
+      "scripts/migrate_ledger_schema.py",
+      "scripts/classification_manager.py",
+      "scripts/apply_boundary_audit.py",
+      "scripts/check_ledger_consistency.py",
+      "scripts/tests/test_schema_migration.py",
+      "references/taxonomy_schema.json"
+    ],
+    "result": "Field export and schema 2.5 migration consistent. Module IDs/evidence remain preserved, aliases canonicalised, original labels retained. Read-only migration regression tests passed (2 tests).",
+    "remaining_validator_gap": "check_ledger_consistency.py currently validates index bounds and field projections but not layer versus function_view.view_status; the FinCon proposal demonstrates why an additional semantic-status consistency assertion is useful. Availability statuses and resource kinds are also not yet checked against enums."
+  }
+}
