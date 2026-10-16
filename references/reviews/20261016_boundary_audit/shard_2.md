@@ -364,4 +364,3 @@ Record disposition: background_reference
   - repository: https://github.com/OpenForecaster/scaling-forecasting-training — reachable; PDF p.1; author release statement or embedded hyperlink
   - model: https://huggingface.co/collections/nikhilchandak/openforecaster — reachable; PDF p.1; author release statement or embedded hyperlink
 - Resource search inspected all extracted PDF pages and embedded hyperlink targets. Third-party baseline repositories and dataset citations were not treated as this work's official release.
-

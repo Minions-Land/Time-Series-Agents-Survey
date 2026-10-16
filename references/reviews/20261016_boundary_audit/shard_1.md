@@ -347,4 +347,3 @@ Resources: [evaluation_submission](https://github.com/SalesforceAIResearch/gift-
 - **stride2026:latent-fusion** — keep; LLM → LLM. LLM hidden states, learned projection, TSFM training and LoRA form model-side cross-modal fusion; retain LLM rather than numerical-tool orchestration. Source: PDF p.5; passage beginning "3.4. Cross-Modal Fusion and End-to-End Training".
 
 Resources: not_found_in_source
-
