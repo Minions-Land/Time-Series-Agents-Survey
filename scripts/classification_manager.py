@@ -612,6 +612,7 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                 "inclusion": row.get("included_as", ""),
                 "review_audit": parse_json_field(row, "review_audit_json", {}),
                 "claimed_as_agent": row["claimed_as_agent"] == "Yes",
+                "agent_claim_evidence": row.get("agent_claim_evidence", ""),
                 "schema_version": row.get("taxonomy_schema_version") or "2.1",
                 "llm_side_contribution": {
                     "present": bool(llm_summary or llm_subdimensions),

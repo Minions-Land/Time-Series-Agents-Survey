@@ -18,6 +18,10 @@ for line in lines:
  if mods is None:raise ValueError('Unreviewed profile '+key)
  if view['review_status'] in ['out_of_scope','blocked']:continue
  first=line.split('& \\textbf{')[0]
+ # Keep the printed Agent terminology marker aligned with the canonical record.
+ first=first.replace(r'\selfclaim{}','')
+ if not r['claimed_as_agent'] and match:
+  first=first.replace(match.group(0),match.group(0)+r'\selfclaim{}',1)
  # Replace old inferred task label with the current contract description.
  first=first.split(r'\newline')[0]+r'\newline '+escape(r['tasks']['source_label'])+' '
  parts=[]
