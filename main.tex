@@ -80,7 +80,7 @@
 \Title{From General to Specific: A Survey of Time-Series Agent Systems}
 \Author{Jiaming~Ma~$^{1}$,
 Yanjun~Zhao~$^{2}$,
-Shu~Wan~$^{3}$,
+Shu~Wan~$^{3,4}$,
 Hou~Zhu~$^{4}$,
 Rui~Zhu~$^{4}$,
 Ruichu~Xia~$^{5}$,
@@ -95,7 +95,7 @@ Jingrui~He~$^{2}$, and Qingsong~Wen~$^{7,8,*}$}
 \quad $^{4}$ \quad Abel AI Lab\\
 \quad $^{5}$ \quad Stanford University\\
 \quad $^{6}$ \quad University of Nottingham\\
-\quad $^{7}$ \quad Squirrel Ai Learning\\
+\quad $^{7}$ \quad Squirrel AI Learning\\
 \quad $^{8}$ \quad University of Oxford
 }
 \corres{Correspondence: \href{mailto:qingsongedu@gmail.com}{qingsongedu@gmail.com}}
@@ -152,7 +152,7 @@ Table~\ref{tab:direct-prior-comparison} compares explicit organizing dimensions 
 
 Our principal contribution is a module-level taxonomy based on the scope of reuse. \GeneralHarness{} organizes domain-independent interaction, memory, planning, tool execution, and feedback. \GeneralTSHarness{} introduces temporal semantics and operations that can serve different time-series tasks. \TaskSpecificHarness{} specifies procedures whose outputs, objectives, or validation rules depend on the target task. LLM-side capabilities form an independent component that interacts with these layers. Existing approaches develop both action selection through tool feedback \citep{tsagent2025} and temporal interpretation through model adaptation \citep{jin2024timellm,chatts2025}; our taxonomy locates these capabilities alongside the runtime mechanisms they use. The three Harness layers describe a progression from a general runtime, through shared temporal capabilities, to a specialized task procedure.
 
-The unit of classification is a concrete module. We examine the conditions on its inputs, state, operations, feedback, and outputs to assign it to the most specific applicable layer. A paper can contribute several modules at different layers. Synthesizing the Agent and Harness literature \citep{ning2026codeharness,lin2026agenticharness,changsurvey2026}, we use seven mechanism dimensions---interface and interaction; memory and context; tools and execution; control, verification, and feedback; planning and workflow; optimization and evolution; and coordination and scaling---to describe module functions across these layers. Shared temporal mechanisms are examined through data management, processing, context and memory, and temporal validation. Task-specific implementations are organized around forecasting and prediction, augmentation and synthesis, anomaly detection and diagnosis, and decision support, following the task grouping in prior time-series Agent synthesis \citep{chen2026tsagentsurvey}. These coordinates answer complementary questions: what result is required, what mechanism produces it, and under what conditions that mechanism can be reused. Figure~\ref{fig:task-function-grid} connects the task and temporal-function views developed in the subsequent chapters.
+The unit of classification is a concrete module. We examine the conditions on its inputs, state, operations, feedback, and outputs to assign it to the most specific applicable layer. A paper can contribute several modules at different layers. Synthesizing the Agent and Harness literature \citep{ning2026codeharness,lin2026agenticharness,changsurvey2026}, we use five mechanism dimensions---interface and interaction; memory and context; tools and execution; planning and orchestration; and optimization and evolution---to describe module functions across these layers. Shared temporal mechanisms are examined through data management, processing, context and memory, and temporal validation. Task-specific implementations are organized around forecasting and prediction, augmentation and synthesis, anomaly detection and diagnosis, and decision support, following the task grouping in prior time-series Agent synthesis \citep{chen2026tsagentsurvey}. These coordinates answer complementary questions: what result is required, what mechanism produces it, and under what conditions that mechanism can be reused. Figure~\ref{fig:task-function-grid} connects the task and temporal-function views developed in the subsequent chapters.
 
 Figure~\ref{fig:contribution-trend} shows how the reviewed module contributions accumulate across the independent LLM side and the three Harness layers. Task-specific procedures account for the largest number of annotations in the coded corpus, alongside contributions to shared temporal capabilities and general execution. Each module is counted once at its assigned layer, while distinct modules from one paper may appear on different curves. This distribution motivates examining the reusable mechanisms within task-oriented systems and comparing their specialization requirements. The coding procedure and complete profiles appear in Appendix~\ref{app:full-ledger}.
 
@@ -178,7 +178,7 @@ In Figure~\ref{fig:overview}, the left branch is the independent LLM-side contri
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{artifacts/active/Figure3_construction_rsi_adapted.pdf}
+\includegraphics[width=\linewidth]{artifacts/paper_figures/Overvieww.pdf}
 \caption{Contribution layers in a Time-Series Agent. The LLM side remains independent of the nested Harness stack: General Harness contains reusable runtime mechanisms, General Time-Series Harness contains temporal mechanisms that transfer across tasks, and Task-Specific Harness instantiates a task contract. The evaluation panel connects the hierarchy to benchmark requirements and module-level evidence. Visual styling follows a prior survey \citep{rsi2026survey}.}
 \label{fig:overview}
 \end{figure}
@@ -227,9 +227,9 @@ At an abstract level, the runtime can be written as
 \end{equation}
 where $s_k$ is the visible state at execution step $k$, $a_k$ is a tool or environment action, $o_{k+1}$ is the returned observation, and $\mathcal{H}$ is the Harness transition. Time-Series Harness Modules add temporal type information to each state, action, and observation.
 
-We describe each contribution using one set of coordinates: its LLM or Harness locus, its mechanism, and its task. LLM-side contributions change how the model represents temporal inputs, produces analytical responses, or selects actions from workflow feedback. A Harness module receives one scope: General Harness for domain-independent execution, General Time-Series Harness for reusable temporal functionality, or Task-Specific Harness for a procedure tied to a task output or objective. The seven mechanism dimensions in Table~\ref{tab:component-vocab} provide a common comparison vocabulary throughout the Harness chapters. Task labels describe the outputs supported by a module. Functional labels expose temporal data management, processing, context and memory, and validation within this same record. A paper may contribute several modules, and a module may have several mechanism or task labels while contributing one unit to its assigned layer.
+We describe each contribution using one set of coordinates: its LLM or Harness locus, its mechanism, and its task. LLM-side contributions change how the model represents temporal inputs, produces analytical responses, or selects actions from workflow feedback. A Harness module receives one scope: General Harness for domain-independent execution, General Time-Series Harness for reusable temporal functionality, or Task-Specific Harness for a procedure tied to a task output or objective. The five mechanism dimensions in Table~\ref{tab:component-vocab} provide a common comparison vocabulary throughout the Harness chapters. Task labels describe the outputs supported by a module. Functional labels expose temporal data management, processing, context and memory, and validation within this same record. A paper may contribute several modules, and a module may have several mechanism or task labels while contributing one unit to its assigned layer.
 
-Task, function, and scope answer different design questions. The task specifies the required result; the function identifies the problem a module solves; and the scope records the assumptions that constrain its reuse. The four temporal functions used in Section~\ref{sec:general-ts-harness} group concrete applications of the seven mechanism dimensions. A temporal-data interface, for example, combines interface and state mechanisms, while a temporal validator combines control, feedback, and executable checks. A module retains its scope when another task calls it; a new task-specific objective can instead motivate a distinct specialized module.
+Task, function, and scope answer different design questions. The task specifies the required result; the function identifies the problem a module solves; and the scope records the assumptions that constrain its reuse. The four temporal functions used in Section~\ref{sec:general-ts-harness} group concrete applications of these mechanism dimensions. A temporal-data interface, for example, combines interface and state mechanisms, while a temporal validator combines control, feedback, and executable checks. A module retains its scope when another task calls it; a new task-specific objective can instead motivate a distinct specialized module.
 
 Figure~\ref{fig:task-function-grid} provides two routes through the literature. Reading a row compares a temporal need across tasks; reading a column identifies functions to combine for one task. The colored labels locate source-supported examples: TimeSeriesScientist's Curator \citep{timeseriesscientist2025} and SAGE-AD's dual representation \citep{sagead2026} supply shared temporal functions, while MERIT's positive-view procedure \citep{merit2025} and FinMem's financial memory \citep{finmem2023} depend on their task objectives. A task column can therefore contain both GTS and TSK modules. The functions are many-to-many annotations of the same module records, and contribution counts continue to use unique module identifiers.
 
@@ -281,6 +281,15 @@ Sections~3--7 develop these choices from model interfaces and reusable runtime m
 
 Within the Agent loop, the LLM interprets observations, selects actions, and responds to tool or environment feedback. Temporal model adaptation provides one way to improve particular parts of this interaction. We review three intervention points: the representation presented to the model, the temporal instructions used to train it, and the policy for operating an analytical workflow. The design question is which capability the application needs from the model and which interface connects it to the runtime. A learned encoder needs matching numerical preprocessing; a trained workflow policy needs the tools, observations, and feedback used to define its actions.
 
+Figure~\ref{fig:llm-contributions} locates these interventions within the interaction loop. The upper row distinguishes input alignment, temporal supervision, and workflow learning; the lower loop shows how the resulting model still relies on Harness execution, state, and feedback. The four evaluation targets at the bottom connect each learned capability to the evidence needed to assess it.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{artifacts/paper_figures/abel/03_LLM_Side_visual.pdf}
+\caption{LLM-side intervention points in a Time-Series Agent. Representation learning connects numerical inputs to language space; temporal supervision shapes analytical responses; workflow learning shapes action selection. These routes can overlap within one method, as illustrated by temporal interfaces and supervision in ChatTS \citep{chatts2025}. The lower loop separates model contributions from the Harness that executes calls and returns observations. Forecast accuracy, explanation faithfulness, evidence grounding, and action quality require distinct evaluation evidence.}
+\label{fig:llm-contributions}
+\end{figure}
+
 \subsection{Temporal representation and alignment}
 
 Time-LLM \citep{jin2024timellm} makes a frozen language backbone operate on temporal patches. It constructs a compact set of text prototypes $E'$ from the pretrained word-embedding space and uses the temporal patch embeddings as attention queries. For channel $i$ and attention head $k$, its reprogramming operation is
@@ -306,14 +315,9 @@ For numerical forecasting, Time-LLM \citep{jin2024timellm} offers prototype-base
 
 \subsection{Temporal instruction and reasoning}
 
-A temporal encoder becomes useful for analysis through supervision that links signal structure to questions and explanations. ChatTS \citep{chatts2025} generates synthetic series with selected temporal attributes, constructs matching text, and evolves instructions for understanding and reasoning. Figure~\ref{fig:chatts-overview} follows that sequence from attributes to model training. Controlling the generated attributes supplies known temporal properties around which analytical instructions can be built.
+A temporal encoder becomes useful for analysis through supervision that links signal structure to questions and explanations. ChatTS \citep{chatts2025} generates synthetic series with selected temporal attributes, constructs matching text, and evolves instructions for understanding and reasoning. Controlling the generated attributes supplies known temporal properties around which analytical instructions can be built.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.88\linewidth]{artifacts/active/Figure_LLM_side_native_v3.pdf}
-\caption{Temporal attribute selection, synthetic supervision, instruction generation, and model training in ChatTS \citep{chatts2025}, adapted from its Fig.~3. The pipeline connects a numerical input interface to learned temporal interaction.}
-\label{fig:chatts-overview}
-\end{figure}
+
 
 \textit{Towards Time-Series Reasoning with LLMs} \citep{chow2024tsreasoning} follows a related learning route through temporal encoding and reasoning supervision. Its encoder warm-up and subsequent language-model adaptation connect temporal perception to explicit reasoning traces. Time-R1 \citep{timer12025} specializes this idea for forecasting: supervised warm-up teaches structured reasoning and complete forecast outputs, followed by reinforcement fine-tuning with format, length, and numerical feedback. Its MSE-based reward maps normalized forecast error to a bounded signal,
 \begin{equation}
@@ -356,14 +360,14 @@ These methods differ in the learned role and the feedback available to train it.
 \section{General Harness}
 \label{sec:general-harness}
 
-The General Harness connects the LLM's action choices to executable operations, persistent state, and feedback. We synthesize seven recurring runtime functions from the Agent and Harness literature \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness,changsurvey2026,chen2026tsagentsurvey,xu2026forecastagentsurvey}. Table~\ref{tab:component-vocab} associates each function with a design question and the operations it includes. The dimensions can coexist: an analytical episode may retrieve context, plan a sequence, execute tools, and revise an artifact using validation feedback. The examples below examine how time-series systems implement these functions and which parts of their implementation can support another task. Temporal requirements and task objectives subsequently determine how these runtime choices are specialized in Sections~\ref{sec:general-ts-harness} and \ref{sec:task-specific-harness}.
+The General Harness connects the LLM's action choices to executable operations, persistent state, and feedback. We synthesize five recurring runtime functions from the Agent and Harness literature \citep{ning2026codeharness,lee2026metaharness,lin2026agenticharness,changsurvey2026,chen2026tsagentsurvey,xu2026forecastagentsurvey}. Table~\ref{tab:component-vocab} associates each function with a design question and the operations it includes. The dimensions can coexist: an analytical episode may retrieve context, plan a sequence, execute tools, and revise an artifact using validation feedback. The examples below examine how time-series systems implement these functions and which parts of their implementation can support another task. Temporal requirements and task objectives subsequently determine how these runtime choices are specialized in Sections~\ref{sec:general-ts-harness} and \ref{sec:task-specific-harness}.
 
 \begingroup
 \small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.12}
 \begin{longtable}{L{\fulltextcol{0.24}} L{\fulltextcol{0.30}} L{\fulltextcol{0.46}}}
-\caption{Seven General Harness dimensions and their associated design questions. A system may combine several dimensions within one workflow.}
+\caption{Five General Harness functions and their associated design questions. A system may combine several dimensions within one workflow.}
 \label{tab:component-vocab}\\
 \toprule
 \textbf{Dimension} & \textbf{Question} & \textbf{Elements}\\
@@ -376,24 +380,23 @@ The General Harness connects the LLM's action choices to executable operations, 
 Interface and Interaction & How does the agent receive state and act on its environment? & Reasoning interfaces, action interfaces, environment modeling, user interaction, and state--action loops.\\
 Memory and Context & How does the agent preserve and organize information across steps? & Context management, working and long-term memory, state stores, retrieval, and experience reuse.\\
 Tools and Execution & How does the agent invoke external capabilities and execute actions? & Tool registries, APIs, retrieval, code execution, databases, forecasting models, and simulators.\\
-Control, Verification, and Feedback & How does the agent detect errors, revise behavior, and assess reliability? & Control loops, error recovery, validators, feedback, review, evaluation interfaces, and observability.\\
-Planning and Workflow & How does the agent organize multi-step work? & Task decomposition, planning, search, workflow orchestration, policy selection, and stopping conditions.\\
+Planning and Orchestration &How does the harness plan, organize, and coordinate actions to achieve a goal? & Task decomposition, planning, search, workflow orchestration, execution control, delegation, and multi-agent coordination.\\
 Optimization and Evolution & How does the agent or Harness improve from experience? & Prompt, tool, memory, policy, and Harness optimization; reflection and trajectory-driven evolution.\\
-Coordination and Scaling & How do multiple agents divide work, communicate, and cooperate? & Role assignment, delegation, shared state, debate, review, and multi-agent orchestration.\\
+
 \bottomrule
 \end{longtable}
 \endgroup
 
-Figure~\ref{fig:general-harness-seven-dimensions} places the LLM runtime interface at the center of seven mechanism families that can operate together. A Time-Series Agent can reuse these mechanisms while temporal semantics are added in the next layer. The dimensions follow Table~\ref{tab:component-vocab}.
+Figure~\ref{fig:general-harness-functions} follows an interaction episode around the LLM: the interface supplies observations, planning organizes actions, tools execute them, and memory retains evidence. The lower band shows how recorded trajectories can improve prompts, memory, or tools across episodes. The five functions in Table~\ref{tab:component-vocab} therefore describe both running a workflow and improving its reusable components.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.96\linewidth]{artifacts/active/Figure4_general_harness_native_v2.pdf}
-\caption{The seven reusable dimensions of a General Harness. The center represents the runtime around an LLM; each surrounding node is a mechanism family that can recur across domains. A paper may contribute to several dimensions, while temporal semantics are coded separately in the General Time-Series Harness layer.}
-\label{fig:general-harness-seven-dimensions}
+\includegraphics[width=\linewidth]{artifacts/paper_figures/abel/04_General_Harness_visual.pdf}
+\caption{Five functions of the General Harness, synthesized from Agent and Harness research \citep{ning2026codeharness,lin2026agenticharness}. The central LLM interacts with planning, tools, memory, and the observation interface during execution. Optimization and evolution use recorded trajectories to update reusable assets across episodes. Planning and orchestration includes execution control, verification checkpoints, and coordination between roles.}
+\label{fig:general-harness-functions}
 \end{figure}
 
-The seven dimensions organize the evidence below. Each subsection first states the general mechanism and then points to its use in a Time-Series Agent. A work may instantiate any subset of these dimensions.
+The five functions organize the evidence below. Each subsection first states the general mechanism and then points to its use in a Time-Series Agent. A work may instantiate any subset of these dimensions.
 
 \subsection{Interface and Interaction}
 
@@ -413,17 +416,19 @@ Execution converts a selected action into a computation and returns its result, 
 
 MetaCaster's Forecaster Trainer \citep{metacaster2026} demonstrates execution at the level of computational jobs. It assembles jobs indexed by model, hyperparameters, and dataset, queues them, assigns available GPUs, monitors processes, and recovers errors or interrupted runs. The reusable mechanism is scheduling and recovery; the job's forecasting objective is supplied by the task procedure. For an engineering Agent, this distinction separates the ability to complete a computation from the quality of the model produced by that computation.
 
-\subsection{Control, Verification, and Feedback}
+\subsection{Planning and Orchestration}
+
+Planning specifies dependencies among the operations needed to deliver an artifact. TS-Agent \citep{tsagent2025} chooses actions incrementally from accumulated observations. TS-Reasoner \citep{tsreasoner2026} constructs an ordered executable plan and revises it after failure. The first approach makes the next action sensitive to newly observed evidence; the second provides an explicit plan that can be inspected and rerun as a whole.
+
+AION \citep{aion2026} extends planning to the lifecycle of work through protocols for execution, review, rechecking, memory updates, and stopping. The resulting design separates exploratory choices from required checkpoints. For example, an Agent may explore several analytical routes while all routes must still pass an artifact validator. This is useful when the practitioner needs both flexibility in solving the task and a repeatable acceptance process.
 
 Control determines whether the Agent continues, revises its work, requests review, or terminates. TS-Reasoner \citep{tsreasoner2026} provides an executable example: its task decomposer produces an ordered operator plan, the executor runs it, and an execution error triggers a new end-to-end plan. The error message is actionable feedback about the current procedure. AION \citep{aion2026} adds artifact-level validity checks and a separate scored evaluation, allowing a candidate to be returned for revision before acceptance.
 
 The source and timing of feedback determine what can change during an episode. An execution error is immediately available; a resolved forecast error is available only after the target window has been observed. FLAIRR-TS \citep{flairr2025} uses recent ground truth to refine forecasting prompts and is therefore developed with the forecasting methods. A system that combines these controls should expose both the retry policy for failed operations and the schedule under which task outcomes become available for learning.
 
-\subsection{Planning and Workflow}
+Coordination defines responsibilities and the information passed between roles. TradingAgents \citep{tradingagents2024} uses structured report-based communication so that each role consumes a defined state and returns a completed result. AION \citep{aion2026} makes work, review, rechecking, and stop signals explicit in the communication protocol. These arrangements connect the ownership of an artifact to the condition under which the next role can act.
 
-Planning specifies dependencies among the operations needed to deliver an artifact. TS-Agent \citep{tsagent2025} chooses actions incrementally from accumulated observations. TS-Reasoner \citep{tsreasoner2026} constructs an ordered executable plan and revises it after failure. The first approach makes the next action sensitive to newly observed evidence; the second provides an explicit plan that can be inspected and rerun as a whole.
-
-AION \citep{aion2026} extends planning to the lifecycle of work through protocols for execution, review, rechecking, memory updates, and stopping. The resulting design separates exploratory choices from required checkpoints. For example, an Agent may explore several analytical routes while all routes must still pass an artifact validator. This is useful when the practitioner needs both flexibility in solving the task and a repeatable acceptance process.
+The task determines the content of the handoff. In FinCon \citep{fincon2024}, analysts and a manager aggregate financial evidence before portfolio actions; in TimeSeriesScientist \citep{timeseriesscientist2025}, curation and planning outputs guide forecasting and reporting. Their financial or forecasting objectives are analyzed in Section~\ref{sec:task-specific-harness}. These examples suggest defining a role around the artifact it must deliver and the check that permits the next role to proceed. This makes handoffs inspectable and gives failures a recovery point. Across these runtime functions, the shared design objective is to keep action selection, execution state, and feedback connected.
 
 \subsection{Optimization and Evolution}
 
@@ -431,16 +436,10 @@ A Harness can improve through changes to external experience, prompts, or execut
 
 These mechanisms change different reusable assets. Experience distillation changes the guidance available to the reasoner, while tool promotion changes what the executor can call. Both require a record of the source episodes and the criterion used to accept an update. The procedure's analytical content determines its temporal or task scope; the mechanism for extracting, testing, and installing the update remains reusable. The focused TimeClaw analysis gives the source equations for the experience update.
 
-\subsection{Coordination and Scaling}
-
-Coordination defines responsibilities and the information passed between roles. TradingAgents \citep{tradingagents2024} uses structured report-based communication so that each role consumes a defined state and returns a completed result. AION \citep{aion2026} makes work, review, rechecking, and stop signals explicit in the communication protocol. These arrangements connect the ownership of an artifact to the condition under which the next role can act.
-
-The task determines the content of the handoff. In FinCon \citep{fincon2024}, analysts and a manager aggregate financial evidence before portfolio actions; in TimeSeriesScientist \citep{timeseriesscientist2025}, curation and planning outputs guide forecasting and reporting. Their financial or forecasting objectives are analyzed in Section~\ref{sec:task-specific-harness}. These examples suggest defining a role around the artifact it must deliver and the check that permits the next role to proceed. This makes handoffs inspectable and gives failures a recovery point. Across the seven runtime dimensions, the shared design objective is to keep action selection, execution state, and feedback connected. The next section examines the temporal meaning carried by those interfaces.
-
 \section{General Time-Series Harness}
 \label{sec:general-ts-harness}
 
-The General Time-Series Harness specializes the seven General Harness dimensions through temporal order, index, frequency, window, horizon, regime, availability time, and leakage control. We organize these requirements around the temporal-grounding mechanisms of AION \citep{aion2026} and the runtime-native operations of TIMECLAW \citep{timeclaw2026harness}. These temporal mechanisms build on the interaction, execution, and feedback interfaces of the General Harness.
+The General Time-Series Harness specializes the General Harness functions through temporal order, index, frequency, window, horizon, regime, availability time, and leakage control. We organize these requirements around the temporal-grounding mechanisms of AION \citep{aion2026} and the runtime-native operations of TIMECLAW \citep{timeclaw2026harness}. These temporal mechanisms build on the interaction, execution, and feedback interfaces of the General Harness.
 
 The contract boundary makes the distinction explicit. General Harness specifies how an Agent stores state, invokes tools, coordinates roles, and verifies outputs. General Time-Series Harness specifies what a valid temporal state or operation means: which observations were available, how a window is aligned, which frequency and units apply, and how a revision is represented. TIMECLAW \citep{timeclaw2026harness} and AION \citep{aion2026} make this boundary explicit through time-series-native execution, temporal grounding, and reliability mechanisms.
 
@@ -451,16 +450,16 @@ For a temporal state at decision time $\tau$, the admissible information can be 
 \end{equation}
 where $t_i$ is the event time and $v_i$ is the time at which the value became available. The availability boundary admits information published by $\tau$, including a known future calendar event; the task specifies which observation and target windows may be used.
 
-Figure~\ref{fig:aion-principles} connects AION's three temporal-runtime principles to the GTS layer: temporal grounding controls what information is available, knowledge-grounded reasoning ties outputs to evidence, and reliability mechanisms check the resulting artifact. The three principles constrain the same workflow. The design is adapted from AION~\citep{aion2026}.
+Figure~\ref{fig:temporal-harness-functions} illustrates the four shared functions through a store-sales example. Read from the timestamped sources on the left to the operations in the middle and the observations returned to the LLM on the right. The same series supports data-quality checks, windowed processing, and contextual retrieval. Availability time determines whether a news item or report can enter the workflow, so a late report is excluded even when its event concerns the historical window. These operations implement the temporal grounding and evidence checks emphasized by AION \citep{aion2026} and TIMECLAW \citep{timeclaw2026harness}.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.90\linewidth]{artifacts/active/Figure_support_aion.png}
-\caption{AION's three coupled time-series harness principles, adapted from AION \citep{aion2026}, Fig.~2. Temporal grounding, knowledge-grounded reasoning, and reliability mechanisms show why GTS is a temporal contract layered on top of a general runtime.}
-\label{fig:aion-principles}
+\includegraphics[width=\linewidth]{artifacts/paper_figures/abel/05_General_TS_Harness_visual.pdf}
+\caption{Shared temporal functions illustrated at a decision time $\tau$. Data management preserves timestamps and units, processing selects temporal windows and operations, context and memory align events with observations, and validation checks information availability. Blue arrows request operations; green arrows return observations; the red path excludes a late report. Event time $t$ and availability time $v$ are distinct: the boundary $v\leq\tau$ governs access. The example illustrates the temporal-runtime requirements discussed in AION \citep{aion2026} and TIMECLAW \citep{timeclaw2026harness}.}
+\label{fig:temporal-harness-functions}
 \end{figure}
 
-The four functions below organize the temporal requirements encountered when constructing an Agent: managing its data, operating on the series, retrieving context, and validating temporal evidence. They are a reading view over the seven mechanisms in Table~\ref{tab:component-vocab}. Data management draws on interfaces and state; processing on tools and workflow; context on memory and retrieval; and validation on control and feedback. A workflow can combine several functions, and coordination or optimization can act on any of them. Section~\ref{sec:task-specific-harness} examines how target outputs specialize these shared capabilities.
+The four functions below organize the temporal requirements encountered when constructing an Agent: managing its data, operating on the series, retrieving context, and validating temporal evidence. They are a reading view over the five functions in Table~\ref{tab:component-vocab}. Data management draws on interfaces and state; processing on tools and workflow; context on memory and retrieval; and validation on control and feedback. A workflow can combine several functions, and coordination or optimization can act on any of them. Section~\ref{sec:task-specific-harness} examines how target outputs specialize these shared capabilities.
 
 \subsection{Temporal Data Management}
 \label{sec:temporal-data}
@@ -531,12 +530,12 @@ The task contract determines the final object being optimized. For forecasting, 
 \end{equation}
 where $H$ is the declared horizon and $\mathcal{I}_{\tau}$ contains observed target history and covariates known at the origin, including future calendar information available under Eq.~\ref{eq:temporal-availability}.
 
-The four branches in Figure~\ref{fig:task-specific-harness} show how the shared Harness vocabulary supports different output contracts. Read each branch from temporal input to validation: forecasting emphasizes horizon and backtesting, augmentation emphasizes fidelity and utility, anomaly diagnosis emphasizes localization and evidence, and decision support emphasizes utility, risk, cost, and review authority. The task output determines the relevant acceptance criterion.
+The four panels in Figure~\ref{fig:task-specific-harness} show how the shared Harness vocabulary supports different output contracts. Read each panel from temporal input through operations to outputs and feedback: forecasting emphasizes horizon and backtesting, augmentation emphasizes fidelity and utility, anomaly diagnosis emphasizes localization and evidence, and decision support emphasizes utility, risk, cost, and review authority. The task output determines the relevant acceptance criterion.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.98\linewidth,trim=140bp 315bp 140bp 16bp,clip]{artifacts/active/Figure6_task_contracts_rsi_adapted.pdf}
-\caption{The four task families and their task-specific Harness contracts. The branches show how task objectives specialize inputs, analytical procedures, and acceptance criteria. Visual layout adapted from Figure~6 of \textit{Recursive Self-Improvement in AI: A Survey} \citep{rsi2026survey}; the task content is developed for this survey.}
+\includegraphics[width=\linewidth]{artifacts/paper_figures/abel/06_Task_Specific_Harness_visual.pdf}
+\caption{Task-specific procedures and their feedback. Read each panel from input series through Harness operations and numerical tools to the output; dashed paths return feedback for revision. Forecasting revises models or forecasts, synthesis revises generated data and supervision, anomaly analysis refines intervals and diagnostic evidence, and decision support compares actions under risk and outcome feedback. The bottom of each panel states what evaluation must measure. These patterns synthesize the workflows discussed below, including TimeSeriesScientist \citep{timeseriesscientist2025}, FLAIRR-TS \citep{flairr2025}, AnomaMind \citep{anomamind2026}, and TradingAgents \citep{tradingagents2024}.}
 \label{fig:task-specific-harness}
 \end{figure}
 
@@ -899,7 +898,7 @@ This perspective turns the literature into a guide for composing and evaluating 
 \appendix
 \section{Module-Level Contribution Ledger}
 \label{app:full-ledger}
-The machine-readable JSON ledger is a central research artifact of this survey. It records, for each work, the bibliographic identity, publication date, claim, source locator and quotation, LLM-side contribution, General Harness dimensions, General Time-Series Harness dimensions, Task-Specific Harness dimensions, task family, work type, and review status. The ledger is extensible: each new paper adds a supported module-level record to the construction hierarchy. The human-readable profiles below expose the same information in a form suitable for inspection. The function view additionally links each module to the four temporal reading categories in Section~\ref{sec:general-ts-harness}, with explicit applicability decisions for model-side contributions, general runtime mechanisms, broad resources, and task procedures outside those categories. Function tags preserve the original scope, seven mechanism dimensions, task memberships, and source evidence. Source-derived interface summaries are kept separately from proposed reuse. The cards also retain author-provided repository, project, data, and evaluation links together with their source locations and availability checks. These links connect a module description to its original development resources.
+The machine-readable JSON ledger is a central research artifact of this survey. It records, for each work, the bibliographic identity, publication date, claim, source locator and quotation, LLM-side contribution, General Harness dimensions, General Time-Series Harness dimensions, Task-Specific Harness dimensions, task family, work type, and review status. The ledger is extensible: each new paper adds a supported module-level record to the construction hierarchy. The human-readable profiles below expose the same information in a form suitable for inspection. The function view additionally links each module to the four temporal reading categories in Section~\ref{sec:general-ts-harness}, with explicit applicability decisions for model-side contributions, general runtime mechanisms, broad resources, and task procedures outside those categories. Function tags preserve the original scope, detailed mechanism labels, task memberships, and source evidence. Source-derived interface summaries are kept separately from proposed reuse. The cards also retain author-provided repository, project, data, and evaluation links together with their source locations and availability checks. These links connect a module description to its original development resources.
 
 \subsection{Paper Card schema}
 
@@ -973,7 +972,7 @@ FinCon \citep{fincon2024} & Multi-agent financial evidence synthesis for portfol
 \end{longtable}
 \endgroup
 
-The seven dimensions in Table~\ref{tab:component-vocab} are used throughout the cards and the Harness chapters. Fine-grained labels name concrete procedures within those dimensions. A reviewed module has a stable identifier, one contribution layer, one or more mechanism labels, task memberships, and source evidence. Its function view records applicable temporal functions and the supporting evidence indices; selected interfaces also summarize the source-defined inputs, outputs, and scope boundary. Dimension labels and task memberships do not create additional contribution units.
+The five functions in Table~\ref{tab:component-vocab} organize the Harness chapters. In the cards, detailed control, verification, feedback, and coordination labels map to planning and orchestration. Fine-grained labels name concrete procedures within those dimensions. A reviewed module has a stable identifier, one contribution layer, one or more mechanism labels, task memberships, and source evidence. Its function view records applicable temporal functions and the supporting evidence indices; selected interfaces also summarize the source-defined inputs, outputs, and scope boundary. Dimension labels and task memberships do not create additional contribution units.
 
 Three examined works remain background records: GridMind \citep{gridmind2025} studies static power-system optimization and contingency scenarios; Grid-Agent \citep{gridagent2025} addresses static power-flow violation repair; and Tree-of-Evidence \citep{treeofevidence2026} uses encoder-based evidence search without an LLM Agent. Their source evidence is retained in the review history, and they contribute zero modules to the statistics.
 
