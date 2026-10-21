@@ -235,8 +235,8 @@ Figure~\ref{fig:task-function-grid} provides two routes through the literature. 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{artifacts/figure04_revision_20261021/pdf/Figure04_Task_Module_Grid.pdf}
-\caption{From task requirements to Harness modules. (a) Columns identify four task families; rows identify shared temporal functions. Icons and short labels indicate the data, operations, context, and checks needed at each intersection. Reading down a column assembles requirements for one task; reading across a row compares how a function serves different tasks. (b) An illustrative demand-planning workflow combines general execution, shared temporal preparation, and task-specific forecast and inventory procedures. The resource beneath each stage serves a different role: executable-artifact testing, contextual forecasting evaluation, numerical models, or scenario simulation. Module scope follows the assumptions of its implementation, as illustrated by the examples discussed in the text.}
+\includegraphics[width=\linewidth]{artifacts/concrete_revision_20261021/pdf/Figure04_Concrete.pdf}
+\caption{From task requirements to Harness modules. (a) Columns identify four task families; rows identify shared temporal functions. Icons and short labels indicate the data, operations, context, and checks needed at each intersection. Reading down a column assembles requirements for one task; reading across a row compares how a function serves different tasks. (b) An illustrative demand-planning workflow combines general execution, shared temporal preparation, and task-specific forecast and inventory procedures. The labels beneath the stages distinguish artifact checks, context tests, model libraries, and scenario evaluation; concrete resource examples are discussed in the text. Module scope follows the assumptions of its implementation, as illustrated by the examples discussed in the text.}
 \label{fig:task-function-grid}
 \end{figure}
 
@@ -450,12 +450,12 @@ For a temporal state at decision time $\tau$, the admissible information can be 
 \end{equation}
 where $t_i$ is the event time and $v_i$ is the time at which the value became available. The availability boundary admits information published by $\tau$, including a known future calendar event; the task specifies which observation and target windows may be used.
 
-Figure~\ref{fig:temporal-harness-functions} places the four shared functions inside one temporal workspace. Read the upper timeline first: availability time determines whether a source can be used at decision time $\tau$. The workspace then preserves data properties, applies temporal operations, aligns contextual evidence, and checks validity before returning observations to the LLM. The timestamped records, sliding window, aligned event tracks, and availability gate show the different objects each function manages. These operations implement the temporal grounding and evidence checks emphasized by AION \citep{aion2026} and TIMECLAW \citep{timeclaw2026harness}.
+Figure~\ref{fig:temporal-harness-functions} connects the four shared functions through the objects they manage. Read the upper timeline first: availability time determines whether a source can be used at decision time $\tau$. The middle row follows timestamped values, a selected processing window, an aligned event, and an evidence-admission check. The lower paths connect the LLM to requests and returned observations. These operations implement the temporal grounding and evidence checks emphasized by AION \citep{aion2026} and TIMECLAW \citep{timeclaw2026harness}.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{artifacts/illustrated_revision_20261021/fig07_09/pdf/Figure07_Illustrated.pdf}
-\caption{A temporal workspace connecting sources, operations, and the LLM. The upper timeline separates available evidence from a late release at decision time $\tau$. Inside the workspace, data management preserves timestamps and missingness, processing applies windowed operations, context and memory align events with observations, and validation enforces the availability boundary. Requests and observations connect these shared functions to the LLM. This synthesis follows the temporal-runtime requirements of AION \citep{aion2026} and TIMECLAW \citep{timeclaw2026harness}.}
+\includegraphics[width=\linewidth]{artifacts/concrete_revision_20261021/pdf/Figure07_Concrete.pdf}
+\caption{A temporal workspace connecting sources, operations, and the LLM. The upper timeline separates available evidence from a late release at decision time $\tau$. The middle row illustrates each shared function with a concrete object: timestamped values with a missing entry, a selected window, an event aligned to a series, and an availability check. Requests and observations connect these shared functions to the LLM. This synthesis follows the temporal-runtime requirements of AION \citep{aion2026} and TIMECLAW \citep{timeclaw2026harness}.}
 \label{fig:temporal-harness-functions}
 \end{figure}
 
@@ -534,8 +534,8 @@ The four panels in Figure~\ref{fig:task-specific-harness} connect each task outp
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{artifacts/illustrated_revision_20261021/fig07_09/pdf/Figure08_Illustrated.pdf}
-\caption{Task-specific objects, procedures, and evaluation. The illustrations depict forecasts, generated series, anomaly evidence, and action alternatives. Each panel connects these objects to the required inputs, the operations that construct or revise them, and the criterion used to evaluate the result. Forecasting concerns numerical error and calibration, synthesis concerns fidelity and learning utility, diagnosis concerns detection and supporting evidence, and decision support concerns action utility and risk. These patterns synthesize the workflows discussed below, including TimeSeriesScientist \citep{timeseriesscientist2025}, FLAIRR-TS \citep{flairr2025}, AnomaMind \citep{anomamind2026}, and TradingAgents \citep{tradingagents2024}.}
+\includegraphics[width=\linewidth]{artifacts/concrete_revision_20261021/pdf/Figure08_Concrete.pdf}
+\caption{Task-specific procedures and their evaluation. Read each panel from the input series through model selection, generation, diagnosis, or action comparison to the resulting artifact. The return paths show feedback used to revise the procedure; the bottom of each panel identifies its evaluation target. Forecasting concerns numerical error and calibration, synthesis concerns fidelity and learning utility, diagnosis concerns detection and supporting evidence, and decision support concerns action utility and risk. These patterns synthesize the workflows discussed below, including TimeSeriesScientist \citep{timeseriesscientist2025}, FLAIRR-TS \citep{flairr2025}, AnomaMind \citep{anomamind2026}, and TradingAgents \citep{tradingagents2024}.}
 \label{fig:task-specific-harness}
 \end{figure}
 
@@ -643,8 +643,8 @@ Figure~\ref{fig:merit-augmentation} makes the design choice explicit: retrieval 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{artifacts/illustrated_revision_20261021/fig07_09/pdf/Figure09_Illustrated.pdf}
-\caption{MERIT\textquotesingle s retrieval, augmentation, and review procedure \citep{merit2025}, redrawn as a module-level schematic. Retrieved series inform transformation choices; the review agent assesses generated positive views. Accepted views enter contrastive learning, while the feedback path revises generation. The waveform cards depict retrieved and augmented series, and the embedding illustration connects accepted views to representation learning.}
+\includegraphics[width=\linewidth]{artifacts/concrete_revision_20261021/pdf/Figure09_Concrete.pdf}
+\caption{MERIT\textquotesingle s retrieval, augmentation, and review procedure \citep{merit2025}, redrawn as a module-level schematic. Retrieved series inform transformation choices; the review agent assesses generated positive views. The schematic series show retrieved examples and generated views. Accepted views enter contrastive learning; rejected views return feedback to transformation selection.}
 \label{fig:merit-augmentation}
 \end{figure}
 
@@ -677,7 +677,7 @@ AD-AGENT \citep{adagent2025} constructs a pipeline from a natural-language reque
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{artifacts/illustrated_revision_20261021/fig10_12/pdf/Figure10_AnomaMind_Illustrated.pdf}
+\includegraphics[width=\linewidth]{artifacts/concrete_revision_20261021/pdf/Figure10_Concrete.pdf}
 \caption{AnomaMind\textquotesingle s evidence acquisition, construction, interval detection, and refinement procedure \citep{anomamind2026}. Read the upper sequence from retrieved knowledge and diagnostics to an updated interval decision. The highlighted candidate regions show what detection and refinement operate on; the return path updates the accumulated evidence state. The lower left identifies the supporting toolkit, and the lower right separates the detector-training signals from inference-time refinement. Adapted from the method\textquotesingle s workflow.}
 \label{fig:anomamind-workflow}
 \end{figure}
@@ -740,8 +740,8 @@ Figure~\ref{fig:evaluation-stack} follows an episode from its task contract and 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{artifacts/illustrated_revision_20261021/fig10_12/pdf/Figure11_Evaluation_Episode_Illustrated.pdf}
-\caption{An evaluation episode and its complementary records, synthesized from AION \citep{aion2026} and TimeSeriesGym \citep{timeseriesgym2025}. The upper sequence connects the task contract, accessible resources, execution, and submitted artifact. The illustrations show examples of resources and outputs. The lower panels separate task performance, artifact validity, and execution history, supporting analysis of prediction quality, implementation errors, and operational failures.}
+\includegraphics[width=\linewidth]{artifacts/concrete_revision_20261021/pdf/Figure11_Concrete.pdf}
+\caption{An evaluation episode and its complementary records, synthesized from AION \citep{aion2026} and TimeSeriesGym \citep{timeseriesgym2025}. The upper sequence connects the task contract, accessible resources, execution, and submitted artifact. The documents show the requested output contract, an execution trace, and a saved artifact; the lower plot illustrates comparison with a reference. The lower panels separate task performance, artifact validity, and execution history, supporting analysis of prediction quality, implementation errors, and operational failures.}
 \label{fig:evaluation-stack}
 \end{figure}
 
@@ -751,8 +751,8 @@ TimeSeriesGym \citep{timeseriesgym2025} evaluates time-series ML engineering thr
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{artifacts/illustrated_revision_20261021/fig10_12/pdf/Figure12_TimeSeriesGym_Illustrated.pdf}
-\caption{Executable evaluation in TimeSeriesGym \citep{timeseriesgym2025}. Challenge resources and instructions enter an execution environment in which an Agent produces code, models, or other outputs. A challenge-specific grader checks the submitted artifact and its task metrics. The shared challenge contract enables comparison across Agents; the illustrated workspace shows example resource and artifact types. Adapted from the benchmark\textquotesingle s evaluation structure.}
+\includegraphics[width=\linewidth]{artifacts/concrete_revision_20261021/pdf/Figure12_Concrete.pdf}
+\caption{Executable evaluation in TimeSeriesGym \citep{timeseriesgym2025}. Challenge resources and instructions enter an execution environment in which an Agent produces code, models, or other outputs. A challenge-specific grader checks the submitted artifact and its task metrics. The shared challenge contract enables comparison across Agents; the workspace shows how working files, tool execution, and saved outputs connect the challenge package to its grader. Adapted from the benchmark\textquotesingle s evaluation structure.}
 \label{fig:benchmark-landscape}
 \end{figure}
 
@@ -798,8 +798,8 @@ TS-Agent \citep{tsagent2025} illustrates this connection through analytical oper
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{artifacts/illustrated_revision_20261021/fig13_15/pdf/Figure13_TSAgent_illustrated.pdf}
-\caption{An evidence-conditioned analytical workflow in TS-Agent \citep{tsagent2025}. Read from the question and observed series to numerical tools, evidence review, and the grounded response. The return path requests another operation or revises the analysis. The lower record links tool inputs and outputs to source provenance and the final response. The illustrated plots and source documents depict the information handled by each module. Adapted from the method\textquotesingle s analytical workflow.}
+\includegraphics[width=\linewidth]{artifacts/concrete_revision_20261021/pdf/Figure13_Concrete.pdf}
+\caption{An evidence-conditioned analytical workflow in TS-Agent \citep{tsagent2025}. Read from the question and observed series to numerical tools, evidence review, and the grounded response. The return path requests another operation or revises the analysis. The lower record links tool inputs and outputs to source provenance and the final response. The schematic plots show analytical outputs, and the response document links findings to evidence and sources. Adapted from the method\textquotesingle s analytical workflow.}
 \label{fig:benchmark-qa}
 \end{figure}
 
@@ -813,7 +813,7 @@ TIMECLAW \citep{timeclaw2026harness} in Figure~\ref{fig:benchmark-infrastructure
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{artifacts/illustrated_revision_20261021/fig13_15/pdf/Figure14_TIMECLAW_illustrated.pdf}
+\includegraphics[width=\linewidth]{artifacts/concrete_revision_20261021/pdf/Figure14_Concrete.pdf}
 \caption{TIMECLAW\textquotesingle s numerical workspace, temporal tools, multimodal memory, and capability evolution \citep{timeclaw2026harness}. The upper path keeps series, windows, and metadata addressable while tools operate on them and retrieve analytical context. The lower path extracts reusable procedures from execution traces, tests candidates on held-out similar tasks, and registers accepted tools with invocation descriptions. This path returns new capabilities to the runtime. Adapted from the system\textquotesingle s runtime and tool-promotion mechanisms.}
 \label{fig:benchmark-infrastructure}
 \end{figure}
@@ -849,12 +849,12 @@ A shared tool also needs a stable record of what it operated on. AION \citep{aio
 
 \noindent\textbf{Closing the prediction-to-decision loop.} Forecast quality matters through its use. FinCon \citep{fincon2024} couples analytical evidence to portfolio positions, and CoLLMLight \citep{collmllight2026} connects local traffic observations to network control. These settings introduce action costs, risk, delayed feedback, and effects on subsequent observations. Evaluations should compare the complete decision procedure under the same information and action constraints, recording both predictive performance and the resulting utility. A method that changes recommendations also needs evaluation across repeated decisions, where its own actions can alter the future data distribution.
 
-Figure~\ref{fig:open-problems-cases} connects these questions to the system interfaces they affect. Read the five panels from the illustrated intervention to the comparison and outcome that could test it. Changing the information release, task setting, evidence, or output criterion exposes a different aspect of reuse and reliability. The three design analyses below isolate complementary choices along that path: the numerical input interface, retained execution experience, and the forecasting substrate.
+Figure~\ref{fig:open-problems-cases} connects these questions to the system interfaces they affect. Read each of the five rows from the open question to the controlled comparison and the evidence to record. Changing the information release, task setting, evidence, or output criterion exposes a different aspect of reuse and reliability. The three design analyses below isolate complementary choices along that path: the numerical input interface, retained execution experience, and the forecasting substrate.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{artifacts/illustrated_revision_20261021/fig13_15/pdf/Figure15_Open_Problems_illustrated.pdf}
-\caption{Controlled comparisons for reusable Time-Series Agents. The five panels pair an open problem with a testable contrast: model judgment and tool use, old and revised evidence, seen and held-out settings, supporting evidence and its removal, and forecast quality and downstream action utility. The illustrations show the objects and interventions involved; the labels identify the outcomes to examine. Matching the backbone and resource budget helps isolate the factor under study. This agenda synthesizes temporal interfaces \citep{chatts2025}, evolving execution \citep{timeclaw2026harness,timesageev2026}, controlled evidence \citep{drcik2026}, and decision workflows \citep{fincon2024}.}
+\includegraphics[width=\linewidth]{artifacts/concrete_revision_20261021/pdf/Figure15_Concrete.pdf}
+\caption{Controlled comparisons for reusable Time-Series Agents. The five rows pair an open problem with a testable contrast: model judgment and tool use, old and revised evidence, seen and held-out settings, supporting evidence and its removal, and forecast quality and downstream action utility. The paired objects show the intervention: a tool call, a revised release, a held-out series, evidence removal, or an inventory action. The right column identifies the outcomes to examine. Matching the backbone and resource budget helps isolate the factor under study. This agenda synthesizes temporal interfaces \citep{chatts2025}, evolving execution \citep{timeclaw2026harness,timesageev2026}, controlled evidence \citep{drcik2026}, and decision workflows \citep{fincon2024}.}
 \label{fig:open-problems-cases}
 \end{figure}
 
