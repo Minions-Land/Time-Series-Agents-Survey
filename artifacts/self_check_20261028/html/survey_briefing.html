@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>From General to Specific — Time-Series Agent Survey</title>
+<style>
+:root{--ink:#172033;--muted:#61708a;--paper:#f7f8fb;--line:#dce3ee;--blue:#2b6ca3;--violet:#7658a8;--amber:#b27a20;--green:#39866e;--navy:#1d2b48}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;line-height:1.48} .wrap{max-width:1180px;margin:auto;padding:32px 28px 72px}
+.hero{background:linear-gradient(135deg,#16233e 0%,#254b76 58%,#3b7d83 100%);color:white;border-radius:28px;padding:54px 58px 48px;box-shadow:0 20px 55px #18304a24;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:440px;height:440px;border:1px solid #ffffff3b;border-radius:50%;right:-110px;top:-170px;box-shadow:0 0 0 25px #ffffff09,0 0 0 60px #ffffff06}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:12px;font-weight:700;color:#d6e9fa;margin-bottom:20px}.hero h1{font-family:Georgia,serif;font-size:clamp(34px,5vw,66px);line-height:1.04;max-width:800px;margin:0 0 20px}.hero p{font-size:19px;max-width:800px;color:#eaf4ff;margin:0}.hero .tag{display:inline-block;margin-top:26px;padding:8px 13px;border:1px solid #ffffff66;border-radius:999px;font-size:13px;color:#fff}
+section{margin-top:38px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:18px}.section-head h2{font-family:Georgia,serif;font-size:30px;margin:0}.section-head p{margin:0;color:var(--muted);max-width:560px;text-align:right}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:white;border:1px solid var(--line);border-radius:18px;padding:21px 22px;box-shadow:0 9px 25px #1a2b4210}.card h3{margin:0 0 8px;font-size:17px}.card p{margin:0;color:#53617a;font-size:15px}.claim{background:#fff;border-left:6px solid var(--amber);border-radius:16px;padding:22px 26px;font-family:Georgia,serif;font-size:22px;line-height:1.35;box-shadow:0 8px 24px #1a2b4210}
+.taxonomy{display:grid;grid-template-columns:1fr 1.2fr 1.2fr 1.2fr;gap:10px;align-items:stretch}.layer{background:#fff;border:1px solid var(--line);border-top:6px solid var(--blue);border-radius:16px;padding:18px;position:relative}.layer:not(:last-child):after{content:"→";position:absolute;right:-20px;top:45%;font-size:25px;color:#97a8bd;z-index:2}.layer:nth-child(2){border-top-color:var(--violet)}.layer:nth-child(3){border-top-color:var(--amber)}.layer:nth-child(4){border-top-color:var(--green)}.layer h3{margin:0 0 6px;font-size:16px}.layer .small{font-size:13px;color:var(--muted)}.layer strong{display:block;font-size:13px;margin-top:14px;color:var(--ink)}
+.overview{background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:0 12px 30px #1a2b4210}.overview img{display:block;width:100%;height:auto;border-radius:12px}.caption{font-size:13px;color:var(--muted);margin:10px 6px 0}
+.path{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap}.step{flex:1 1 170px;background:white;border:1px solid var(--line);border-radius:16px;padding:18px}.step .n{font-size:12px;font-weight:800;color:var(--blue);letter-spacing:.1em}.step h3{font-size:16px;margin:6px 0}.step p{font-size:14px;color:var(--muted);margin:0}.step + .step{position:relative}.step + .step:before{content:"→";position:absolute;left:-18px;top:42%;color:#97a8bd;font-size:22px}
+.route{display:grid;grid-template-columns:1fr 1fr;gap:18px}.route .card{min-height:180px}.route h3{color:var(--navy)}.quote{background:#eef4fa;border-radius:18px;padding:20px 24px;color:#304b6d;font-size:18px;border:1px solid #ceddec}.footer{margin-top:48px;color:#728097;font-size:13px;display:flex;justify-content:space-between;gap:18px;border-top:1px solid var(--line);padding-top:18px}
+@media(max-width:800px){.wrap{padding:18px 14px 50px}.hero{padding:34px 28px}.grid,.route{grid-template-columns:1fr}.taxonomy{grid-template-columns:1fr}.layer:not(:last-child):after{content:"↓";right:48%;top:auto;bottom:-24px}.step + .step:before{display:none}.section-head{display:block}.section-head p{text-align:left;margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <div class="eyebrow">Survey briefing · 2026</div>
+  <h1>From General to Specific</h1>
+  <p>A construction-oriented survey of Time-Series Agent Systems.</p>
+  <span class="tag">The survey is a map for building the next system.</span>
+</header>
+
+<section>
+  <div class="section-head"><h2>The question</h2><p>Start with the developer's decision, not with a list of papers.</p></div>
+  <div class="claim">Given a new time-series scenario, which Agent components can be reused, which need temporal adaptation, and which must be redesigned around the task?</div>
+  <div class="grid" style="margin-top:16px">
+    <div class="card"><h3>General capability</h3><p>Interaction, memory, planning, tool use, execution, and feedback can often transfer across domains.</p></div>
+    <div class="card"><h3>Temporal capability</h3><p>Order, windows, units, versions, availability time, and leakage rules define what a valid operation means.</p></div>
+    <div class="card"><h3>Task contract</h3><p>Forecasts, diagnoses, synthetic series, and actions require different outputs, feedback, and evaluation.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><h2>Our organizing answer</h2><p>Classify modules by their scope of reuse.</p></div>
+  <div class="taxonomy">
+    <div class="layer"><h3>LLM side</h3><div class="small">Representation, temporal instruction, workflow policy</div><strong>How the model interprets and chooses actions</strong></div>
+    <div class="layer"><h3>General Harness</h3><div class="small">Interaction, memory, tools, planning, execution</div><strong>What can transfer across domains</strong></div>
+    <div class="layer"><h3>General Time-Series Harness</h3><div class="small">Data, processing, context, validation</div><strong>What must preserve temporal meaning</strong></div>
+    <div class="layer"><h3>Task-Specific Harness</h3><div class="small">Forecasting, synthesis, diagnosis, decisions</div><strong>What is bound to the output objective</strong></div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><h2>Read the landscape</h2><p>The radial overview turns the taxonomy into a map of the literature.</p></div>
+  <div class="overview"><img src="overview-1.png" alt="Landscape of Time-Series Agent Systems"/><div class="caption">Start at the center, move outward through the three Harness layers, and read the radial sectors and outer tags as the mechanism, task, and representative-work coordinates.</div></div>
+</section>
+
+<section>
+  <div class="section-head"><h2>One construction path</h2><p>Demand forecasting is a simple running example.</p></div>
+  <div class="path">
+    <div class="step"><div class="n">01 · SCENARIO</div><h3>Demand planning</h3><p>Define horizon, target, covariates, and downstream inventory decision.</p></div>
+    <div class="step"><div class="n">02 · REUSE</div><h3>General runtime</h3><p>Reuse tool calling, memory, planning, execution, and artifact checks.</p></div>
+    <div class="step"><div class="n">03 · ADAPT</div><h3>Temporal contract</h3><p>Preserve windows, availability time, units, versions, and leakage boundaries.</p></div>
+    <div class="step"><div class="n">04 · SPECIALIZE</div><h3>Forecast procedure</h3><p>Select models, revise forecasts, backtest, calibrate, and connect to action.</p></div>
+    <div class="step"><div class="n">05 · EVALUATE</div><h3>Benchmark choice</h3><p>Test prediction, execution, evidence use, and inventory utility separately.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><h2>How the paper is organized</h2><p>Each section answers the next construction or evaluation question.</p></div>
+  <div class="route">
+    <div class="card"><h3>1 · LLM-side contributions</h3><p>How numerical inputs, temporal instructions, and workflow policies reach the model.</p></div>
+    <div class="card"><h3>2 · General Harness</h3><p>Which runtime mechanisms execute the interaction loop and preserve state.</p></div>
+    <div class="card"><h3>3 · General Time-Series Harness</h3><p>Which shared modules keep temporal operations meaningful and auditable.</p></div>
+    <div class="card"><h3>4 · Task-Specific Harness</h3><p>How output contracts determine procedures, feedback, and stopping rules.</p></div>
+    <div class="card"><h3>5 · Infrastructure and Benchmarks</h3><p>Which resources expose execution, evidence, temporal validity, and downstream utility.</p></div>
+    <div class="card"><h3>6 · Open Problems</h3><p>Where reuse, transfer, and evaluation still fail under changing information.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><h2>Supporting resource</h2><p>The structured record supports the taxonomy; it is not the main claim.</p></div>
+  <div class="quote">Paper Cards connect each module to source evidence, formulas, task contracts, evaluation conditions, and official resource links. The repository keeps the map inspectable and extendable as new systems appear.</div>
+</section>
+
+<footer class="footer"><span>Time-Series Agent Survey · briefing page</span><span>Prepared for discussion with Qingsong Wen</span></footer>
+</div>
+</body>
+</html>
