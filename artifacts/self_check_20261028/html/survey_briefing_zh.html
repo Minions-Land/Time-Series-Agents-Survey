@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>从通用到专精：时间序列智能体综述</title>
+<style>
+:root{--ink:#172033;--muted:#61708a;--paper:#f7f8fb;--line:#dce3ee;--blue:#2b6ca3;--violet:#7658a8;--amber:#b27a20;--green:#39866e;--navy:#1d2b48}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",Arial,sans-serif;line-height:1.58}.wrap{max-width:1180px;margin:auto;padding:32px 28px 72px}
+.hero{background:linear-gradient(135deg,#16233e 0%,#254b76 58%,#3b7d83 100%);color:white;border-radius:28px;padding:54px 58px 48px;box-shadow:0 20px 55px #18304a24;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:440px;height:440px;border:1px solid #ffffff3b;border-radius:50%;right:-110px;top:-170px;box-shadow:0 0 0 25px #ffffff09,0 0 0 60px #ffffff06}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:12px;font-weight:700;color:#d6e9fa;margin-bottom:20px}.hero h1{font-family:Georgia,"Songti SC",serif;font-size:clamp(34px,5vw,62px);line-height:1.08;max-width:850px;margin:0 0 20px}.hero p{font-size:19px;max-width:800px;color:#eaf4ff;margin:0}.hero .tag{display:inline-block;margin-top:26px;padding:8px 13px;border:1px solid #ffffff66;border-radius:999px;font-size:13px;color:#fff}
+section{margin-top:38px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:18px}.section-head h2{font-family:Georgia,"Songti SC",serif;font-size:30px;margin:0}.section-head p{margin:0;color:var(--muted);max-width:560px;text-align:right}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:white;border:1px solid var(--line);border-radius:18px;padding:21px 22px;box-shadow:0 9px 25px #1a2b4210}.card h3{margin:0 0 8px;font-size:17px}.card p{margin:0;color:#53617a;font-size:15px}.claim{background:#fff;border-left:6px solid var(--amber);border-radius:16px;padding:22px 26px;font-family:Georgia,"Songti SC",serif;font-size:22px;line-height:1.45;box-shadow:0 8px 24px #1a2b4210}
+.taxonomy{display:grid;grid-template-columns:1fr 1.2fr 1.2fr 1.2fr;gap:10px;align-items:stretch}.layer{background:#fff;border:1px solid var(--line);border-top:6px solid var(--blue);border-radius:16px;padding:18px;position:relative}.layer:not(:last-child):after{content:"→";position:absolute;right:-20px;top:45%;font-size:25px;color:#97a8bd;z-index:2}.layer:nth-child(2){border-top-color:var(--violet)}.layer:nth-child(3){border-top-color:var(--amber)}.layer:nth-child(4){border-top-color:var(--green)}.layer h3{margin:0 0 6px;font-size:16px}.layer .small{font-size:13px;color:var(--muted)}.layer strong{display:block;font-size:13px;margin-top:14px;color:var(--ink)}
+.overview{background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:0 12px 30px #1a2b4210}.overview img{display:block;width:100%;height:auto;border-radius:12px}.caption{font-size:13px;color:var(--muted);margin:10px 6px 0}
+.path{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap}.step{flex:1 1 170px;background:white;border:1px solid var(--line);border-radius:16px;padding:18px}.step .n{font-size:12px;font-weight:800;color:var(--blue);letter-spacing:.1em}.step h3{font-size:16px;margin:6px 0}.step p{font-size:14px;color:var(--muted);margin:0}.step + .step{position:relative}.step + .step:before{content:"→";position:absolute;left:-18px;top:42%;color:#97a8bd;font-size:22px}
+.route{display:grid;grid-template-columns:1fr 1fr;gap:18px}.route .card{min-height:150px}.route h3{color:var(--navy)}.quote{background:#eef4fa;border-radius:18px;padding:20px 24px;color:#304b6d;font-size:18px;border:1px solid #ceddec}.footer{margin-top:48px;color:#728097;font-size:13px;display:flex;justify-content:space-between;gap:18px;border-top:1px solid var(--line);padding-top:18px}
+@media(max-width:800px){.wrap{padding:18px 14px 50px}.hero{padding:34px 28px}.grid,.route{grid-template-columns:1fr}.taxonomy{grid-template-columns:1fr}.layer:not(:last-child):after{content:"↓";right:48%;top:auto;bottom:-24px}.step + .step:before{display:none}.section-head{display:block}.section-head p{text-align:left;margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <div class="eyebrow">Survey briefing · 2026</div>
+  <h1>从通用到专精</h1>
+  <p>一篇面向时间序列智能体系统构建的综述。</p>
+  <span class="tag">这篇综述要成为构建下一代系统的研究地图。</span>
+</header>
+
+<section>
+  <div class="section-head"><h2>我们要回答的问题</h2><p>从开发者真正面对的选择开始，而不是从论文清单开始。</p></div>
+  <div class="claim">面对一个新的时间序列场景，哪些智能体组件可以直接复用，哪些需要加入时间语义，哪些必须围绕目标任务重新设计？</div>
+  <div class="grid" style="margin-top:16px">
+    <div class="card"><h3>通用能力</h3><p>交互、记忆、规划、工具调用、执行和反馈，通常可以跨领域复用。</p></div>
+    <div class="card"><h3>时间序列能力</h3><p>顺序、窗口、单位、数据版本、可用时间和泄漏规则，决定操作是否保持时间意义。</p></div>
+    <div class="card"><h3>任务契约</h3><p>预测、合成、异常诊断和决策支持需要不同的输出、反馈和评价方式。</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><h2>我们的组织答案</h2><p>按照模块能够复用的范围来组织文献。</p></div>
+  <div class="taxonomy">
+    <div class="layer"><h3>LLM 侧</h3><div class="small">表示、时间指令、工作流策略</div><strong>模型如何理解观察并选择动作</strong></div>
+    <div class="layer"><h3>General Harness</h3><div class="small">交互、记忆、工具、规划、执行</div><strong>哪些机制可以跨领域迁移</strong></div>
+    <div class="layer"><h3>General Time-Series Harness</h3><div class="small">数据、处理、上下文、验证</div><strong>哪些能力必须保持时间含义</strong></div>
+    <div class="layer"><h3>Task-Specific Harness</h3><div class="small">预测、合成、诊断、决策</div><strong>哪些流程绑定于目标任务</strong></div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><h2>如何阅读这张图</h2><p>径向 overview 把 taxonomy 变成一张领域地图。</p></div>
+  <div class="overview"><img src="overview-1.png" alt="时间序列智能体系统总览"/><div class="caption">从中心的 Time-Series Agent Systems 出发，向外阅读三层 Harness，再沿径向区分机制和任务，最后查看对应的代表性工作。</div></div>
+</section>
+
+<section>
+  <div class="section-head"><h2>一个具体的构建路径</h2><p>用需求预测作为贯穿全篇的例子。</p></div>
+  <div class="path">
+    <div class="step"><div class="n">01 · 场景</div><h3>需求规划</h3><p>定义预测起点、目标、预测窗口、协变量和库存决策。</p></div>
+    <div class="step"><div class="n">02 · 复用</div><h3>通用运行时</h3><p>复用工具调用、记忆、规划、执行和产物检查。</p></div>
+    <div class="step"><div class="n">03 · 适配</div><h3>时间契约</h3><p>保持历史窗口、可用时间、单位、版本和泄漏边界。</p></div>
+    <div class="step"><div class="n">04 · 专精</div><h3>预测流程</h3><p>选择模型、修订预测、回测、校准，并连接到后续行动。</p></div>
+    <div class="step"><div class="n">05 · 评测</div><h3>基准选择</h3><p>分别检查预测质量、执行过程、证据使用和库存效用。</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><h2>论文的阅读路线</h2><p>每个 section 回答下一个构建或评测问题。</p></div>
+  <div class="route">
+    <div class="card"><h3>1 · LLM-side Contributions</h3><p>数值输入、时间指令和工作流策略如何进入模型。</p></div>
+    <div class="card"><h3>2 · General Harness</h3><p>哪些通用运行机制负责执行交互循环和保存状态。</p></div>
+    <div class="card"><h3>3 · General Time-Series Harness</h3><p>哪些共享模块让时间序列操作保持有效和可审计。</p></div>
+    <div class="card"><h3>4 · Task-Specific Harness</h3><p>输出契约如何决定流程、反馈和停止规则。</p></div>
+    <div class="card"><h3>5 · Infrastructure and Benchmarks</h3><p>哪些资源可以检验执行、证据、时间有效性和下游效用。</p></div>
+    <div class="card"><h3>6 · Open Problems</h3><p>哪些模块在变化的信息环境下仍然无法可靠复用和迁移。</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><h2>Paper Card 的定位</h2><p>它服务于 taxonomy，是证据载体，不是论文的第一 claim。</p></div>
+  <div class="quote">Paper Card 把每个模块连接到原文证据、公式、任务契约、评价条件和官方资源。GitHub 仓库让这张研究地图可以被核验、检索，并随着新系统出现继续扩展。</div>
+</section>
+
+<footer class="footer"><span>Time-Series Agent Survey · 中文汇报页</span><span>用于与 Qingsong Wen 讨论</span></footer>
+</div>
+</body>
+</html>
