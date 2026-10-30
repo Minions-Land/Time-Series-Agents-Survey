@@ -67,7 +67,7 @@
 \newcommand{\typeSMshort}{\textsf{S--M}}
 \newcommand{\typeBenchshort}{\textsf{Bench}}
 % Harvey ball with #1 filled quarters (0--4).
-\DeclareRobustCommand{\hb}[1]{\tikz[baseline=-0.6ex]{\draw[line width=0.45pt] (0,0) circle (0.8ex);\ifnum#1>0 \fill (0,0) -- (90:0.8ex) arc[start angle=90, delta angle=-#1*90, radius=0.8ex] -- cycle;\fi}}
+\DeclareRobustCommand{\hb}[1]{\tikz[baseline=-0.6ex]{\draw[surveyBlue, line width=0.5pt] (0,0) circle (0.85ex);\ifnum#1>0 \fill[surveyBlue] (0,0) -- (90:0.85ex) arc[start angle=90, delta angle=-#1*90, radius=0.85ex] -- cycle;\fi}}
 \newcommand{\selfclaim}{\textsuperscript{\dag}}
 \newcommand{\RepoMoirai}{\textsuperscript{a}}
 \newcommand{\RepoLLMTSFD}{\textsuperscript{b}}
@@ -127,7 +127,7 @@ Recent surveys of LLM-driven time series analysis organize the literature throug
 
 These surveys establish complementary views of model capabilities, reasoning, and applications. Task-oriented organization brings together methods that address similar outputs \citep{chen2026tsagentsurvey}, while model- and mechanism-oriented organization reveals shared technical choices \citep{promptstoagents2026,changsurvey2026}. System construction additionally requires tracing how those choices depend on temporal semantics and task objectives. Our taxonomy uses the scope of module reuse to connect these perspectives: it distinguishes the runtime mechanisms that can be carried across domains, the temporal capabilities shared across tasks, and the procedures whose objectives and feedback are task-bound. This distinction provides the organizing basis for comparing and selecting components throughout the survey.
 
-Table~\ref{tab:direct-prior-comparison} compares the closest time series Agent surveys. All of them treat Agent runtime mechanisms systematically, and most treat LLM-side adaptation and evaluation in depth; the prediction-focused survey also treats information availability and leakage systematically \citep{xu2026forecastagentsurvey}. The surveys differ mainly in their organizing basis and unit of analysis. Prior surveys classify papers or systems by agent components \citep{promptstoagents2026}, reasoning topology and objective \citep{changsurvey2026}, task family \citep{chen2026tsagentsurvey}, or architecture type \citep{xu2026forecastagentsurvey}. This survey instead assigns each module of a work to a layer by its scope of reuse, so a single paper can contribute to several layers, and it links every classification to source passages in machine-readable records. Two prior surveys also maintain per-paper codes in public repositories \citep{promptstoagents2026,changsurvey2026}.
+Table~\ref{tab:direct-prior-comparison} compares the closest time series Agent surveys. All of them treat Agent runtime mechanisms systematically, and most treat LLM-side adaptation and evaluation in depth; the prediction-focused survey treats information availability and leakage more completely than ours \citep{xu2026forecastagentsurvey}. The surveys differ mainly in their organizing basis and unit of analysis. Prior surveys classify papers or systems by agent components \citep{promptstoagents2026}, reasoning topology and objective \citep{changsurvey2026}, task family \citep{chen2026tsagentsurvey}, or architecture type \citep{xu2026forecastagentsurvey}. This survey instead assigns each module of a work to a layer by its scope of reuse, so a single paper can contribute to several layers, and it links every classification to source passages in machine-readable records. Two prior surveys also maintain per-paper codes in public repositories \citep{promptstoagents2026,changsurvey2026}.
 
 \begin{table}[htbp]
 \centering\footnotesize
@@ -138,15 +138,15 @@ Table~\ref{tab:direct-prior-comparison} compares the closest time series Agent s
 \toprule
 \textbf{Survey} & \textbf{Focus} & \textbf{Organizing basis} & \textbf{Unit} & \textbf{LLM} & \textbf{Runtime} & \textbf{Temporal validity} & \textbf{Evaluation} & \textbf{Records}\\
 \midrule
-Zhang et al.~\citep{promptstoagents2026} & Prompting to Agents & Agent components: planning, tools, memory, self-refinement & Paper & \hb{4} & \hb{4} & \hb{0} & \hb{4} & \hb{2}\\
-Chang et al.~\citep{changsurvey2026} & Reasoning and agentic systems & Reasoning topology and primary objective & Paper & \hb{4} & \hb{4} & \hb{2} & \hb{2} & \hb{2}\\
-Chen et al.~\citep{chen2026tsagentsurvey} & Time series Agents & Task family; architecture, tools, memory & System & \hb{2} & \hb{4} & \hb{0} & \hb{4} & \hb{2}\\
-Xu et al.~\citep{xu2026forecastagentsurvey} & Forecasting Agents & Architecture type; training; evaluation & System & \hb{4} & \hb{4} & \hb{4} & \hb{4} & \hb{0}\\
+Zhang et al.~\citep{promptstoagents2026} & Prompting to Agents & Agent components: planning, tools, memory, self-refinement & Paper & \hb{4} & \hb{4} & \hb{0} & \hb{3} & \hb{3}\\
+Chang et al.~\citep{changsurvey2026} & Reasoning and agentic systems & Reasoning topology and primary objective & Paper & \hb{3} & \hb{3} & \hb{1} & \hb{2} & \hb{3}\\
+Chen et al.~\citep{chen2026tsagentsurvey} & Time series Agents & Task family; architecture, tools, memory & System & \hb{2} & \hb{3} & \hb{0} & \hb{3} & \hb{2}\\
+Xu et al.~\citep{xu2026forecastagentsurvey} & Forecasting Agents & Architecture type; training; evaluation & System & \hb{4} & \hb{3} & \hb{4} & \hb{4} & \hb{1}\\
 \midrule
-\textbf{Ours} & LLMs, harness, evaluation & Scope of module reuse: general, temporal, task-specific & Module & \hb{4} & \hb{4} & \hb{4} & \hb{4} & \hb{4}\\
+\textbf{Ours} & LLMs, harness, evaluation & Scope of module reuse: general, temporal, task-specific & Module & \hb{4} & \hb{4} & \hb{3} & \hb{4} & \hb{4}\\
 \bottomrule
 \end{tabularx}
-\caption{Comparison with related time series Agent surveys. Focus, organizing basis, and unit follow each survey's stated structure; the unit is the object that receives a category. Coverage: \hb{4} treated systematically in a dedicated part of the review; \hb{2} discussed without systematic treatment; \hb{0} absent or mentioned only in passing. \emph{LLM}: adaptation of the model or its temporal interface. \emph{Runtime}: planning, tools, memory, and self-refinement. \emph{Temporal validity}: information availability, look-ahead leakage, and knowledge cut-off. \emph{Evaluation}: benchmarks and protocols linked to tasks or components. \emph{Records}: \hb{4} per-work records linked to source passages; \hb{2} per-work codes or annotations without such links.}
+\caption{Comparison with related time series Agent surveys. Focus, organizing basis, and unit follow each survey's stated structure; the unit is the object that receives a category. Coverage: \hb{4} treated systematically and completely, organizing the review or coded for every work; \hb{3} treated systematically but covering only part of the dimension; \hb{2} discussed without systematic treatment; \hb{1} mentioned in passing; \hb{0} absent. \emph{LLM}: adaptation of the model or its temporal interface. \emph{Runtime}: planning, tools, memory, and self-refinement. \emph{Temporal validity}: information availability, look-ahead leakage, and knowledge cut-off. \emph{Evaluation}: benchmarks and protocols linked to tasks or components. \emph{Records} applies the same levels to documentation depth: \hb{1} representative examples, \hb{2} per-work annotations in the paper, \hb{3} a maintained repository with per-work codes, \hb{4} per-work records linked to source passages.}
 \label{tab:direct-prior-comparison}
 \end{table}
 

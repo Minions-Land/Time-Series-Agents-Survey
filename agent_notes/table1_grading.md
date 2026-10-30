@@ -1,16 +1,18 @@
-# Table 1 grading evidence (revised 2026-10-30)
+# Table 1 grading evidence (revised 2026-10-30, five levels)
 
-Scale (3 levels): ● treated systematically in a dedicated part of the review; ◐ discussed without systematic treatment; ○ absent or mentioned only in passing.
-Records: ● per-work records linked to source passages; ◐ per-work codes or annotations without such links; ○ neither.
-Borderline cells for prior surveys were given the higher grade.
+Scale: ● (4) systematic and complete, organizing the review or coded for every work; ◕ (3) systematic but covering only part of the dimension; ◑ (2) dedicated discussion without systematic treatment; ◔ (1) mentioned in passing; ○ (0) absent.
+Records: ◔ representative examples; ◑ per-work annotations in the paper; ◕ maintained repository with per-work codes; ● per-work records linked to source passages.
+Borderline cells for prior surveys were given the higher grade. Harvey balls are drawn in surveyBlue (#1F4E79).
 
 | Survey | Unit | LLM | Runtime | Temporal validity | Evaluation | Records |
 |---|---|---|---|---|---|---|
-| Zhang (promptstoagents2026) | Paper | ● | ● | ○ | ● | ◐ |
-| Chang (changsurvey2026) | Paper | ● | ● | ◐ | ◐ | ◐ |
-| Chen (chen2026tsagentsurvey) | System | ◐ | ● | ○ | ● | ◐ |
-| Xu (xu2026forecastagentsurvey) | System | ● | ● | ● | ● | ○ |
-| Ours | Module | ● | ● | ● | ● | ● |
+| Zhang (promptstoagents2026) | Paper | 4 | 4 | 0 | 3 | 3 |
+| Chang (changsurvey2026) | Paper | 3 | 3 | 1 | 2 | 3 |
+| Chen (chen2026tsagentsurvey) | System | 2 | 3 | 0 | 3 | 2 |
+| Xu (xu2026forecastagentsurvey) | System | 4 | 3 | 4 | 4 | 1 |
+| Ours | Module | 4 | 4 | 3 | 4 | 4 |
+
+Five-level rationale beyond the notes below: Chang LLM 3 (adaptation regimes coded per paper, no representation axis); Chang/Chen/Xu Runtime 3 (no systematic memory or self-refinement axis); Chang Temporal validity 1 (leakage only in a related-work remark and a reporting recommendation); Chen LLM 2 (online-adaptation paragraph in §6, graded up); Chen Temporal validity 0 (its single "contamination" line concerns anomaly updates, not temporal leakage); Zhang Evaluation 3 (§7 datasets by primary task and a Weather-only comparison; components not linked); Xu LLM 4 (§3.1 representation plus §4 training and adaptation incl. RL); Ours LLM 4 (§3 plus llm_side_contribution coded for all 135 works with source evidence); Ours Temporal validity 3 (benchmarks not graded by leakage control; Xu is more complete).
 
 Zhang full text: Zenodo record 17492801 v2 (2025-10-31), 36 pages. Earlier repo-only grades were wrong on Runtime (memory and self-refinement are §5.3–5.4).
 
