@@ -174,11 +174,11 @@ Figure~\ref{fig:overview} provides the landscape view of this survey. Start at t
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/paper_figures/Overvieww.pdf}
-\caption{Landscape of Time Series Agent Systems. The three sectors correspond to the General Harness, General Time Series Harness, and Task-Specific Harness layers, and each sector uses its own dimension: mechanism functions, temporal functions, and task families, respectively. Outer tags place representative works in these coordinates, and a work may appear in several sectors. LLM-side contributions form an independent component (Section~3) and are not drawn as a sector. GridMind, Grid-Agent, and Tree-of-Evidence are shown as background records and are excluded from the contribution counts (Appendix~\ref{app:full-ledger}). Module-level assignments are recorded in the Paper Cards and discussed in the subsequent sections.}
+\caption{Landscape of Time Series Agent Systems. The three sectors correspond to the General Harness, General Time Series Harness, and Task-Specific Harness layers, and each sector uses its own dimension: mechanism functions, temporal functions, and task families, respectively. Outer tags place representative works in these coordinates, and a work may appear in several sectors. Module-level assignments are recorded in the Paper Cards and discussed in the subsequent sections.}
 \label{fig:overview}
 \end{figure}
 
-Figure~\ref{fig:contribution-trend} shows how the reviewed module contributions accumulate across the independent LLM side and the three Harness layers. Task-specific procedures account for the largest number of annotations in the coded corpus, alongside contributions to shared temporal capabilities and general execution. Each module is counted once at its assigned layer, while distinct modules from one paper may appear on different curves. This distribution motivates examining the reusable mechanisms within task-oriented systems and comparing their specialization requirements. The coding procedure and complete profiles appear in Appendix~\ref{app:full-ledger}.
+Figure~\ref{fig:contribution-trend} traces how the reviewed module contributions developed across the LLM side and the three Harness layers. Task-specific procedures account for the largest number of modules and have led the LLM side since January 2025. The composition of new work has also shifted: the LLM side supplied 37\% of new modules in the second half of 2024 but between 9\% and 16\% in each later period, while the three Harness layers supplied between 84\% and 91\%. General Harness overtook the LLM side in July 2026, and General Time Series Harness reached 22\% of new modules in the first half of 2026. Research effort is therefore moving from adapting the model toward engineering the runtime and temporal modules around it, which motivates examining the reusable mechanisms within task-oriented systems. The coding procedure and complete profiles appear in Appendix~\ref{app:full-ledger}.
 
 
 
@@ -196,7 +196,7 @@ The paper follows this construction order: Section~2 defines the Agent and its n
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/contribution_timeline.pdf}
-\caption{Cumulative source-reviewed module annotations across 134 dated records, covering methods, model training, training data, infrastructure, and evaluation. Each module counts once at its assigned layer. Dates follow the first public version, with year-only dates placed in January; the undated repository record is omitted. The logarithmic axis separates the four curves; dashed lines and hollow markers identify General Harness.}
+\caption{Module contributions by layer over time, from 134 dated records. (a) Cumulative counts, with each module counted once at its assigned layer. Task-Specific Harness has led the LLM side since January 2025, and General Harness has led it since July 2026. (b) Share of newly published modules in each period, with the number of modules above each bar; the last bar covers July--September 2026. Dates follow the first public version, with year-only dates placed in January.}
 \label{fig:contribution-trend}
 \end{figure}
 
@@ -236,9 +236,9 @@ We describe each contribution using one set of coordinates: its LLM or Harness l
 
 Task, function, and scope answer different design questions. The task specifies the required result; the function identifies the problem a module solves; and the scope records the assumptions that constrain its reuse. The four temporal functions used in Section~\ref{sec:general-ts-harness} group concrete applications of these mechanism dimensions. A temporal-data interface, for example, combines interface and state mechanisms, while a temporal validator combines control, feedback, and executable checks. A module retains its scope when another task calls it; a new task-specific objective can instead motivate a distinct specialized module.
 
-\paragraph{Scope of inclusion.} Inclusion in the corpus does not imply that every reviewed work is a complete Agent. We distinguish three roles. \emph{Model-side supporting techniques} supply temporal encoding, understanding, reasoning, or prediction, as in Time-LLM \citep{jin2024timellm} and ChatTS \citep{chatts2025}; they are reviewed for the capabilities they provide to the LLM side. \emph{Fixed workflows} execute a predetermined sequence of model and tool calls; they serve as components of larger systems and as reference points for adaptive control. \emph{Feedback-driven Agents} select or revise subsequent actions according to observations returned by tools or environments, as in Eq.~\eqref{eq:agent-loop}. Multiple roles, tool calls, or reasoning chains are not sufficient on their own for the third role; the defining condition is that returned feedback changes later actions.
+\paragraph{Scope of inclusion.} The reviewed works play three roles. \emph{Model-side supporting techniques} supply temporal encoding, understanding, reasoning, or prediction, as in Time-LLM \citep{jin2024timellm} and ChatTS \citep{chatts2025}; they are reviewed for the capabilities they provide to the LLM side. \emph{Fixed workflows} execute a predetermined sequence of model and tool calls; they serve as components of larger systems and as reference points for adaptive control. \emph{Feedback-driven Agents} select or revise subsequent actions according to observations returned by tools or environments, as in Eq.~\eqref{eq:agent-loop}. The defining condition of the third role is that returned feedback changes later actions.
 
-\paragraph{Layer assignment.} Table~\ref{tab:layer-rules} states the assignment rule. The tests are applied from the most specific layer to the most general, and each module receives the first layer whose condition it meets. A layer describes the scope implied by a module's inputs, state, and assumptions. Demonstrated cross-task reuse is a separate claim that requires evaluation on more than one task or domain. Accordingly, a module is not task-specific merely because it first appears in a forecasting paper, and a generic interface does not by itself establish transfer.
+\paragraph{Layer assignment.} Table~\ref{tab:layer-rules} states the assignment rule. The tests are applied from the most specific layer to the most general, and each module receives the first layer whose condition it meets. A layer describes the scope implied by a module's inputs, state, and assumptions; demonstrated cross-task reuse additionally requires evaluation on more than one task or domain.
 
 \begin{table}[H]
 \centering\small
@@ -747,7 +747,7 @@ A new decision-support Agent should specify these quantities before choosing its
 \subsection{Cross-task comparison of representative systems}
 \label{sec:task-comparison}
 
-Table~\ref{tab:representative-systems} compares eleven representative systems across the four task families and the main design routes, and Table~\ref{tab:representative-conditions} records the conditions and limitations stated in each source. Entries marked NR are not reported in the source paper; they do not imply that a capability is absent. Performance figures are not pooled because datasets, budgets, and metrics differ across the papers.
+Table~\ref{tab:representative-systems} compares eleven representative systems across the four task families and the main design routes, and Table~\ref{tab:representative-conditions} records the conditions and limitations stated in each source.
 
 \begin{table}[!t]
 \centering\scriptsize
@@ -776,7 +776,7 @@ FinCon \citep{fincon2024} & Trading, portfolio allocation & Frozen (GPT-4-Turbo)
 CoLLMLight \citep{collmllight2026} & Traffic signal control & SFT on simulator-selected chains & Complexity-gated reasoning depth & LLM predicts neighbor states & Recent observation--action window & NR & CityFlow queue length (simulator)\\
 \bottomrule
 \end{tabularx}
-\caption{Representative Time Series Agents compared by design route. NR: not reported in the source paper, which does not imply absence. ``Delayed'' marks feedback that exists only after the target is realized.}
+\caption{Representative Time Series Agents compared by design route. NR: not reported. ``Delayed'' marks feedback that exists only after the target is realized.}
 \label{tab:representative-systems}
 \end{table}
 
@@ -872,7 +872,7 @@ TraceBench \citep{tracebench2026} & Root causes or diagnostic code & Known simul
 TSQBench \citep{tsqbench2026} & Data-quality judgments & Controlled degradations, dimension-wise comparison, selection utility. & NR\\
 \bottomrule
 \end{tabularx}
-\caption{Benchmark selection by required output, observable evidence, and temporal control. Each resource tests a particular part of the Agent workflow; the surrounding text describes its protocol and interpretation. Temporal control states how the benchmark constrains the information available relative to time; NR denotes not reported in the source.}
+\caption{Benchmark selection by required output, observable evidence, and temporal control. Each resource tests a particular part of the Agent workflow; the surrounding text describes its protocol and interpretation. Temporal control states how the benchmark constrains the information available relative to time; NR: not reported.}
 \label{tab:benchmark-families}
 \end{table}
 

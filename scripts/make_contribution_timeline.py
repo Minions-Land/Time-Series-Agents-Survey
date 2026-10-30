@@ -86,55 +86,110 @@ def main() -> None:
         writer.writeheader()
         writer.writerows(rows)
 
-    dates = [datetime.strptime(month, "%Y-%m") for month in months]
-    colors = {
-        "General Harness": "#1f4e79",
-        "General Time Series Harness": "#c88719",
-        "Task-Specific Harness": "#2f7d5c",
-        "LLM-side": "#7851a9",
-    }
     (ROOT/'artifacts/module_contribution_timeline_coverage.json').write_text(json.dumps({
         'dated_records': len(dated_records), 'undated_records': undated,
         'plotted_modules': dict(running), 'counting_unit': 'unique reviewed module ID',
         'year_only_placement': 'January; date precision retained in ledger'
     }, indent=2)+'\n')
-    plt.rcParams.update({"font.family":"serif", "font.serif":["Times New Roman", "DejaVu Serif"], "font.size": 10, "axes.titlesize": 11, "axes.labelsize": 10})
-    fig, ax = plt.subplots(figsize=(8.4, 4.6))
-    # Keep all four module-level series in one plot. Curves can share a
-    # cumulative value because different module sets may have the same size;
-    # each concrete module has already been assigned to its deepest layer.
-    ax.plot(dates, cumulative["General Time Series Harness"], lw=2.5, label="General Time Series Harness", color=colors["General Time Series Harness"], zorder=2)
-    ax.plot(dates, cumulative["Task-Specific Harness"], lw=2.5, label="Task-Specific Harness", color=colors["Task-Specific Harness"], zorder=3)
-    ax.plot(dates, cumulative["LLM-side"], lw=2.5, label="LLM-side", color=colors["LLM-side"], zorder=4)
-    ax.plot(
-        dates,
-        cumulative["General Harness"],
-        lw=1.8,
-        ls="--",
-        dashes=(5, 2),
-        marker="o",
-        markevery=max(1, len(dates) // 10),
-        ms=4.5,
-        mfc="white",
-        mec=colors["General Harness"],
-        label="General Harness",
-        color=colors["General Harness"],
-        zorder=5,
-    )
-    ax.set_title("Module-level contributions across the reviewed corpus")
-    ax.set_yscale("log")
-    ax.set_ylabel("Cumulative module annotations (log scale)")
-    ax.legend(frameon=False, ncol=2, loc="upper left", fontsize=8.5)
-    ax.grid(axis="y", alpha=0.25)
-    ax.spines[["top", "right"]].set_visible(False)
-    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=4))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
-    fig.autofmt_xdate(rotation=0, ha="center")
-    fig.tight_layout()
-    fig.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
-    fig.savefig(OUT_PDF, bbox_inches="tight")
-    plt.close(fig)
+    plot_timeline(months, cumulative)
 
+
+# Layer order follows the taxonomy (LLM side, then general to specific). Colors
+# passed the dataviz palette validator (all pairs, light surface); the
+# red/aqua pair sits in the 6-8 deutan band, so lines carry end labels and bars
+# carry surface gaps as secondary encoding.
+LAYERS = ["LLM-side", "General Harness", "General Time Series Harness", "Task-Specific Harness"]
+COLORS = dict(zip(LAYERS, ["#e34948", "#2a78d6", "#eda100", "#1baf7a"]))
+INK, MUTED, GRID = "#1a1a1a", "#5f5e5a", "#e6e4df"
+PERIODS = [("2023\u201324 H1", "2024-06"), ("2024 H2", "2024-12"), ("2025 H1", "2025-06"),
+           ("2025 H2", "2025-12"), ("2026 H1", "2026-06"), ("2026 Q3", "2026-09")]
+
+
+def value_at(months: list[str], series: list[int], month: str) -> int:
+    """Cumulative value at the end of ``month`` (last observation on or before it)."""
+    value = 0
+    for m, v in zip(months, series):
+        if m <= month:
+            value = v
+    return value
+
+
+def first_lasting_lead(months, leader, other):
+    """First month from which ``leader`` stays strictly above ``other``."""
+    for i, month in enumerate(months):
+        if all(a > b for a, b in zip(leader[i:], other[i:])):
+            return i
+    return None
+
+
+def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
+    plt.rcParams.update({
+        "font.family": "sans-serif", "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
+        "font.size": 8, "axes.labelsize": 8, "xtick.labelsize": 7.5, "ytick.labelsize": 7.5,
+        "axes.edgecolor": MUTED, "axes.labelcolor": INK, "xtick.color": MUTED, "ytick.color": MUTED,
+        "pdf.fonttype": 42,
+    })
+    dates = [datetime.strptime(month, "%Y-%m") for month in months]
+    fig = plt.figure(figsize=(7.0, 3.0))
+    grid = fig.add_gridspec(1, 2, width_ratios=[1.55, 1], wspace=0.28, left=0.07, right=0.985, top=0.80, bottom=0.12)
+    ax, bx = fig.add_subplot(grid[0]), fig.add_subplot(grid[1])
+
+    # (a) Cumulative modules: step lines, because counts change only when a work appears.
+    for name in LAYERS:
+        ax.step(dates, cumulative[name], where="post", color=COLORS[name], lw=1.6, label=name, zorder=3)
+        ax.plot(dates[-1], cumulative[name][-1], "o", ms=3.6, color=COLORS[name], zorder=4)
+        ax.annotate(str(cumulative[name][-1]), (dates[-1], cumulative[name][-1]), xytext=(4, 0),
+                    textcoords="offset points", va="center", fontsize=7.5, color=INK)
+    callouts = [("Task-Specific Harness", "LLM-side", "Task-Specific stays ahead\nof LLM-side", (-62, 26)),
+                ("General Harness", "LLM-side", "General Harness passes\nLLM-side", (-168, 50))]
+    for leader, other, text, offset in callouts:
+        i = first_lasting_lead(months, cumulative[leader], cumulative[other])
+        if i is None:
+            continue
+        point = (dates[i], cumulative[leader][i])
+        ax.plot(*point, "o", ms=6, mfc="white", mec=INK, mew=0.9, zorder=5)
+        ax.annotate(f"{text} ({dates[i]:%b %Y})", point, xytext=offset, textcoords="offset points",
+                    fontsize=7, color=INK, ha="left", va="bottom",
+                    arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.7, shrinkA=0, shrinkB=4))
+    ax.set_ylabel("Cumulative modules")
+    ax.set_ylim(0, 160)
+    ax.set_xlim(dates[0], datetime(2026, 12, 1))
+    ax.xaxis.set_major_locator(mdates.YearLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+    ax.grid(axis="y", color=GRID, lw=0.6)
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.tick_params(length=2.5, width=0.6)
+    ax.set_title("(a) Cumulative module contributions", loc="left", fontsize=8.5, color=INK, fontweight="bold")
+
+    # (b) Share of newly published modules per period (part-to-whole over time).
+    previous = {name: 0 for name in LAYERS}
+    for x, (label, end) in enumerate(PERIODS):
+        current = {name: value_at(months, cumulative[name], end) for name in LAYERS}
+        new = {name: current[name] - previous[name] for name in LAYERS}
+        total = sum(new.values())
+        bottom = 0.0
+        for name in LAYERS:
+            share = 100 * new[name] / total
+            bx.bar(x, share, bottom=bottom, width=0.72, color=COLORS[name], edgecolor="white", linewidth=1.0, zorder=3)
+            if name == "LLM-side" and share >= 8:
+                bx.text(x, bottom + share / 2, f"{share:.0f}%", ha="center", va="center", fontsize=6.8, color="white", fontweight="bold")
+            bottom += share
+        bx.text(x, 101.5, f"n={total}", ha="center", va="bottom", fontsize=6.8, color=MUTED)
+        previous = current
+    bx.set_xticks(range(len(PERIODS)), [label.replace(" ", "\n", 1) for label, _ in PERIODS])
+    bx.set_ylim(0, 108)
+    bx.set_yticks([0, 25, 50, 75, 100], ["0", "25", "50", "75", "100%"])
+    bx.set_ylabel("Share of new modules")
+    bx.spines[["top", "right"]].set_visible(False)
+    bx.tick_params(length=2.5, width=0.6)
+    bx.set_title("(b) Share of new modules by period", loc="left", fontsize=8.5, color=INK, fontweight="bold")
+
+    handles = [plt.Line2D([], [], color=COLORS[n], lw=2.2) for n in LAYERS]
+    fig.legend(handles, LAYERS, loc="upper center", ncol=4, frameon=False, fontsize=7.8,
+               bbox_to_anchor=(0.5, 1.0), handlelength=1.6, columnspacing=1.6)
+    fig.savefig(OUT_PNG, dpi=300)
+    fig.savefig(OUT_PDF)
+    plt.close(fig)
 
 if __name__ == "__main__":
     main()
