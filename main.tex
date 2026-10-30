@@ -5,6 +5,7 @@
 \usepackage{amssymb}
 \usepackage{enumitem}
 \usepackage{xcolor}
+\usepackage{colortbl}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -127,26 +128,26 @@ Recent surveys of LLM-driven time series analysis organize the literature throug
 
 These surveys establish complementary views of model capabilities, reasoning, and applications. Task-oriented organization brings together methods that address similar outputs \citep{chen2026tsagentsurvey}, while model- and mechanism-oriented organization reveals shared technical choices \citep{promptstoagents2026,changsurvey2026}. System construction additionally requires tracing how those choices depend on temporal semantics and task objectives. Our taxonomy uses the scope of module reuse to connect these perspectives: it distinguishes the runtime mechanisms that can be carried across domains, the temporal capabilities shared across tasks, and the procedures whose objectives and feedback are task-bound. This distinction provides the organizing basis for comparing and selecting components throughout the survey.
 
-Table~\ref{tab:direct-prior-comparison} compares the closest time series Agent surveys. All of them treat Agent runtime mechanisms systematically, and most treat LLM-side adaptation and evaluation in depth; the prediction-focused survey treats information availability and leakage more completely than ours \citep{xu2026forecastagentsurvey}. The surveys differ mainly in their organizing basis and unit of analysis. Prior surveys classify papers or systems by agent components \citep{promptstoagents2026}, reasoning topology and objective \citep{changsurvey2026}, task family \citep{chen2026tsagentsurvey}, or architecture type \citep{xu2026forecastagentsurvey}. This survey instead assigns each module of a work to a layer by its scope of reuse, so a single paper can contribute to several layers, and it links every classification to source passages in machine-readable records. Two prior surveys also maintain per-paper codes in public repositories \citep{promptstoagents2026,changsurvey2026}.
+Table~\ref{tab:direct-prior-comparison} compares the closest time series Agent surveys. All of them treat Agent runtime mechanisms systematically, and most treat LLM-side adaptation and evaluation in depth; the prediction-focused survey also treats information availability and leakage systematically \citep{xu2026forecastagentsurvey}. The surveys differ mainly in their organizing basis and unit of analysis. Prior surveys classify papers or systems by agent components \citep{promptstoagents2026}, reasoning topology and objective \citep{changsurvey2026}, task family \citep{chen2026tsagentsurvey}, or architecture type \citep{xu2026forecastagentsurvey}. This survey instead assigns each module of a work to a layer by its scope of reuse, so a single paper can contribute to several layers, and it links every classification to source passages in machine-readable records. Two prior surveys also maintain per-paper codes in public repositories \citep{promptstoagents2026,changsurvey2026}.
 
 \begin{table}[htbp]
 \centering\footnotesize
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{1.2}
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}\renewcommand{\tabularxcolumn}[1]{m{#1}}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}m{0.135\linewidth}>{\raggedright\arraybackslash}m{0.13\linewidth}>{\raggedright\arraybackslash}X M{0.065\linewidth}M{0.06\linewidth}M{0.07\linewidth}M{0.08\linewidth}M{0.08\linewidth}M{0.07\linewidth}@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}m{0.135\linewidth}>{\raggedright\arraybackslash}X M{0.085\linewidth}M{0.06\linewidth}M{0.07\linewidth}M{0.08\linewidth}M{0.08\linewidth}M{0.07\linewidth}@{}}
 \toprule
-\textbf{Survey} & \textbf{Focus} & \textbf{Organizing basis} & \textbf{Unit} & \textbf{LLM} & \textbf{Runtime} & \textbf{Temporal validity} & \textbf{Evaluation} & \textbf{Records}\\
+\textbf{Survey} & \textbf{Focus and organizing basis} & \textbf{Unit} & \textbf{LLM} & \textbf{Runtime} & \textbf{Temporal validity} & \textbf{Evaluation} & \textbf{Records}\\
 \midrule
-Zhang et al.~\citep{promptstoagents2026} & Prompting to Agents & Agent components: planning, tools, memory, self-refinement & Paper & \hb{4} & \hb{4} & \hb{0} & \hb{3} & \hb{3}\\
-Chang et al.~\citep{changsurvey2026} & Reasoning and agentic systems & Reasoning topology and primary objective & Paper & \hb{3} & \hb{3} & \hb{1} & \hb{2} & \hb{3}\\
-Chen et al.~\citep{chen2026tsagentsurvey} & Time series Agents & Task family; architecture, tools, memory & System & \hb{2} & \hb{3} & \hb{0} & \hb{3} & \hb{2}\\
-Xu et al.~\citep{xu2026forecastagentsurvey} & Forecasting Agents & Architecture type; training; evaluation & System & \hb{4} & \hb{3} & \hb{4} & \hb{4} & \hb{1}\\
+Zhang et al.~\citep{promptstoagents2026} & \textit{Prompting to Agents}; agent components (planning, tools, memory, self-refinement) & Paper & \hb{4} & \hb{4} & \hb{0} & \hb{3} & \hb{3}\\
+Chang et al.~\citep{changsurvey2026} & \textit{Reasoning and agentic systems}; reasoning topology and primary objective & Paper & \hb{3} & \hb{3} & \hb{1} & \hb{2} & \hb{3}\\
+Chen et al.~\citep{chen2026tsagentsurvey} & \textit{Time series Agents}; task family, then architecture, tools, and memory & System & \hb{2} & \hb{3} & \hb{0} & \hb{3} & \hb{2}\\
+Xu et al.~\citep{xu2026forecastagentsurvey} & \textit{Forecasting Agents}; architecture type, training, and evaluation & System & \hb{4} & \hb{3} & \hb{4} & \hb{4} & \hb{1}\\
 \midrule
-\textbf{Ours} & LLMs, harness, evaluation & Scope of module reuse: general, temporal, task-specific & Module & \hb{4} & \hb{4} & \hb{3} & \hb{4} & \hb{4}\\
+\rowcolor{surveyBlue!8}\textbf{Ours} & \textit{LLMs, harness architectures, and evaluation}; scope of module reuse (general, temporal, task-specific) & Harness module & \hb{4} & \hb{4} & \hb{4} & \hb{4} & \hb{4}\\
 \bottomrule
 \end{tabularx}
-\caption{Comparison with related time series Agent surveys. Focus, organizing basis, and unit follow each survey's stated structure; the unit is the object that receives a category. Coverage: \hb{4} treated systematically and completely, organizing the review or coded for every work; \hb{3} treated systematically but covering only part of the dimension; \hb{2} discussed without systematic treatment; \hb{1} mentioned in passing; \hb{0} absent. \emph{LLM}: adaptation of the model or its temporal interface. \emph{Runtime}: planning, tools, memory, and self-refinement. \emph{Temporal validity}: information availability, look-ahead leakage, and knowledge cut-off. \emph{Evaluation}: benchmarks and protocols linked to tasks or components. \emph{Records} applies the same levels to documentation depth: \hb{1} representative examples, \hb{2} per-work annotations in the paper, \hb{3} a maintained repository with per-work codes, \hb{4} per-work records linked to source passages.}
+\caption{Comparison with related time series Agent surveys. The second column gives each survey's focus (italic) and organizing basis, following its stated structure. The unit is the object that receives a category; here each Harness module of a work is assigned to one layer, and LLM-side contributions are recorded as a separate component. Coverage: \hb{4} treated systematically and completely, organizing the review or coded for every work; \hb{3} treated systematically but covering only part of the dimension; \hb{2} discussed without systematic treatment; \hb{1} mentioned in passing; \hb{0} absent. \emph{LLM}: adaptation of the model or its temporal interface. \emph{Runtime}: planning, tools, memory, and self-refinement. \emph{Temporal validity}: information availability, look-ahead leakage, and knowledge cut-off. \emph{Evaluation}: benchmarks and protocols linked to tasks or components. \emph{Records} applies the same levels to documentation depth: \hb{1} representative examples, \hb{2} per-work annotations in the paper, \hb{3} a maintained repository with per-work codes, \hb{4} per-work records linked to source passages.}
 \label{tab:direct-prior-comparison}
 \end{table}
 
@@ -846,32 +847,32 @@ TimeSage-MT \citep{timesagemt2026} examines multi-turn analytical continuity. It
 
 TimeSage-EV \citep{timesageev2026} adds a second timescale: the analysis recurs as new evidence becomes available. The reported snapshot contains 60 scenarios across six domains and 1,485 scenario-period instances spanning February 2023 to May 2026. At each period the Agent receives the permitted evidence and produces structured answers and reports, while the next target release is withheld for evaluation. The benchmark measures keypoint accuracy and coverage together with report faithfulness and quality, and compares independent with sequential contexts. A system intended for recurring economic or operational monitoring can thus be tested for its use of accumulated context as well as its current answer.
 
-Contextual forecasting benchmarks isolate the value of external information. Dr-CiK \citep{drcik2026} provides 240 forecasting tasks and 8,849 documents with supporting evidence, multi-hop dependencies, and distractors. Its evaluation separates research and evidence recovery from forecast quality, allowing a designer to investigate whether a failure occurred during retrieval or after the relevant context was found. TemporalBench \citep{temporalbench2026} varies historical and future partitions and the availability of contextual or event information across four temporal understanding and forecasting settings. These controlled conditions help test when context changes a numerical or language-facing prediction.
+Contextual forecasting benchmarks isolate the value of external information. Dr-CiK \citep{drcik2026} provides 240 forecasting tasks and 8,849 documents with supporting evidence, multi-hop dependencies, and distractors, and it shifts dates and anonymizes entities so that the targets are not covered by current model training cut-offs. Its evaluation separates research and evidence recovery from forecast quality, allowing a designer to investigate whether a failure occurred during retrieval or after the relevant context was found. TemporalBench \citep{temporalbench2026} varies historical and future partitions and the availability of contextual or event information across four temporal understanding and forecasting settings. These controlled conditions help test when context changes a numerical or language-facing prediction.
 
 TFRBench \citep{tfrbench2026} evaluates forecasting explanations as well as numerical forecasts on ten datasets across five domains. Its reference construction uses future events and outcomes to select explanatory trajectories; test-time systems receive historical inputs. An LLM judge compares candidate reasoning with those references along domain relevance, forecasting correctness, event relevance, and logic-to-number consistency, alongside numerical metrics such as MAE and MASE. The resulting signal measures agreement with outcome-conditioned reference reasoning. For deployment-oriented evaluation, that signal can be paired with an audit of the information actually available when the forecast was issued.
 
 TraceBench \citep{tracebench2026} studies root-cause attribution through controlled dynamical-system interventions. An Agent identifies which simulator parameter changed, with conditions varying noise, domain context, support examples, and direct versus programmatic submission. A submitted program can also be evaluated on held-out samples. The benchmark records accuracy together with tokens, cost, elapsed time, tool use, Python execution, and plotting behavior. It therefore exposes the trade-off between exploratory analysis and diagnostic generalization. TSQBench \citep{tsqbench2026} addresses a different prerequisite: selecting trustworthy temporal data. Controlled pairs are derived from a common template and degraded along specified quality dimensions, enabling comparisons of quality identification, pairwise judgment, and downstream data-selection utility.
 
-Table~\ref{tab:benchmark-families} condenses these differences into the output the Agent must produce and the evidence the evaluator observes. The rows support concrete selection decisions: engineering artifacts call for an execution environment; multi-turn analysis calls for continuity checks; contextual forecasts call for evidence controls; and diagnosis calls for interventions with known causes.
+Table~\ref{tab:benchmark-families} condenses these differences into the output the Agent must produce, the evidence the evaluator observes, and the temporal control that bounds admissible information. The rows support concrete selection decisions: engineering artifacts call for an execution environment; multi-turn analysis calls for continuity checks; contextual forecasts call for evidence controls; and diagnosis calls for interventions with known causes.
 
 \begin{table}[htbp]
 \centering\scriptsize
 \setlength{\tabcolsep}{3pt}
-\begin{tabularx}{\textwidth}{@{}L{0.19\textwidth}L{0.25\textwidth}X@{}}
+\begin{tabularx}{\textwidth}{@{}L{0.16\textwidth}L{0.19\textwidth}XL{0.25\textwidth}@{}}
 \toprule
-\textbf{Resource} & \textbf{Output} & \textbf{Evidence}\\
+\textbf{Resource} & \textbf{Output} & \textbf{Evidence} & \textbf{Temporal control}\\
 \midrule
-TimeSeriesGym \citep{timeseriesgym2025} & Runnable ML artifacts & Submission validity, task score, execution budget.\\
-TimeSage-MT \citep{timesagemt2026} & Multi-turn analytical results & Numerical outcomes, intermediate capabilities, reference trajectories.\\
-TimeSage-EV \citep{timesageev2026} & Recurring answers and reports & Release cutoffs, accumulated context, keypoints and report quality.\\
-Dr-CiK \citep{drcik2026} & Context-informed forecasts & Supporting-document recovery, multi-hop evidence, forecast quality.\\
-TemporalBench \citep{temporalbench2026} & Temporal answers and forecasts & Historical/future partitions and controlled contextual information.\\
-TFRBench \citep{tfrbench2026} & Forecasts with reasoning & Numerical error and outcome-conditioned reference reasoning.\\
-TraceBench \citep{tracebench2026} & Root causes or diagnostic code & Known simulator interventions, held-out accuracy, exploration cost.\\
-TSQBench \citep{tsqbench2026} & Data-quality judgments & Controlled degradations, dimension-wise comparison, selection utility.\\
+TimeSeriesGym \citep{timeseriesgym2025} & Runnable ML artifacts & Submission validity, task score, execution budget. & NR\\
+TimeSage-MT \citep{timesagemt2026} & Multi-turn analytical results & Numerical outcomes, intermediate capabilities, reference trajectories. & Chronological visible/held-out split; leakage guard\\
+TimeSage-EV \citep{timesageev2026} & Recurring answers and reports & Accumulated context, keypoints, and report quality. & Per-period release cutoff; target release withheld; live updates\\
+Dr-CiK \citep{drcik2026} & Context-informed forecasts & Supporting-document recovery, multi-hop evidence, forecast quality. & Time-shifted dates and anonymized entities\\
+TemporalBench \citep{temporalbench2026} & Temporal answers and forecasts & Controlled contextual information and forecast quality. & Event-defined historical/future split\\
+TFRBench \citep{tfrbench2026} & Forecasts with reasoning & Numerical error and outcome-conditioned reference reasoning. & History-only inputs at test time\\
+TraceBench \citep{tracebench2026} & Root causes or diagnostic code & Known simulator interventions, held-out accuracy, exploration cost. & Not time-relative; simulated interventions\\
+TSQBench \citep{tsqbench2026} & Data-quality judgments & Controlled degradations, dimension-wise comparison, selection utility. & NR\\
 \bottomrule
 \end{tabularx}
-\caption{Benchmark selection by required output and observable evidence. Each resource tests a particular part of the Agent workflow; the surrounding text describes its protocol and interpretation.}
+\caption{Benchmark selection by required output, observable evidence, and temporal control. Each resource tests a particular part of the Agent workflow; the surrounding text describes its protocol and interpretation. Temporal control states how the benchmark constrains the information available relative to time; NR denotes not reported in the source.}
 \label{tab:benchmark-families}
 \end{table}
 
