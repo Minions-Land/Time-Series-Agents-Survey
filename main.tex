@@ -66,8 +66,8 @@
 \newcommand{\typeBench}{\textsf{Benchmark}}
 \newcommand{\typeSMshort}{\textsf{S--M}}
 \newcommand{\typeBenchshort}{\textsf{Bench}}
-\newcommand{\yes}{\textcolor{surveyGreen}{\ensuremath{\checkmark}}}
-\newcommand{\no}{\textcolor{surveyGold}{\ensuremath{\times}}}
+% Harvey ball with #1 filled quarters (0--4).
+\DeclareRobustCommand{\hb}[1]{\tikz[baseline=-0.6ex]{\draw[line width=0.45pt] (0,0) circle (0.8ex);\ifnum#1>0 \fill (0,0) -- (90:0.8ex) arc[start angle=90, delta angle=-#1*90, radius=0.8ex] -- cycle;\fi}}
 \newcommand{\selfclaim}{\textsuperscript{\dag}}
 \newcommand{\RepoMoirai}{\textsuperscript{a}}
 \newcommand{\RepoLLMTSFD}{\textsuperscript{b}}
@@ -127,24 +127,25 @@ Recent surveys of LLM-driven time series analysis organize the literature throug
 
 These surveys establish complementary views of model capabilities, reasoning, and applications. Task-oriented organization brings together methods that address similar outputs \citep{chen2026tsagentsurvey}, while model- and mechanism-oriented organization reveals shared technical choices \citep{promptstoagents2026,changsurvey2026}. System construction additionally requires tracing how those choices depend on temporal semantics and task objectives. Our taxonomy uses the scope of module reuse to connect these perspectives: it distinguishes the runtime mechanisms that can be carried across domains, the temporal capabilities shared across tasks, and the procedures whose objectives and feedback are task-bound. This distinction provides the organizing basis for comparing and selecting components throughout the survey.
 
-Table~\ref{tab:direct-prior-comparison} compares explicit organizing dimensions in the closest time series surveys. \emph{Adaptation} distinguishes ways of changing the model or its temporal interface; \emph{Tasks} organizes several temporal task families; \emph{Lifecycle} connects system construction, learning or updating, evaluation, and operational use. The comparison shows complementary organizing choices: our construction view connects the model, runtime, temporal mechanisms, and output contract so that a practitioner can decide which components to retain or change.
+Table~\ref{tab:direct-prior-comparison} grades the closest time series Agent surveys on six dimensions, according to the depth with which each dimension organizes the review. Prior surveys provide strong coverage of model adaptation \citep{promptstoagents2026}, multiple task families \citep{promptstoagents2026,changsurvey2026,chen2026tsagentsurvey}, and evaluation \citep{chen2026tsagentsurvey,xu2026forecastagentsurvey}, and two maintain per-paper taxonomies in public repositories \citep{promptstoagents2026,changsurvey2026}. The distinctive dimension of this survey is the module-level classification by scope of reuse, which organizes Sections~4--6 and the contribution ledger. It reflects a different organizing principle rather than an omission in prior work. Information admissibility and leakage receive a more systematic treatment in the prediction-focused survey \citep{xu2026forecastagentsurvey} than in ours; Section~\ref{sec:temporal-validation} addresses the same concern at the module level.
 
 \begin{table}[htbp]
 \centering\small
 \setlength{\tabcolsep}{4pt}
-\begin{tabularx}{\linewidth}{@{}Xccc@{}}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{@{}Xcccccc@{}}
 \toprule
-\textbf{Survey} & \textbf{Adaptation} & \textbf{Tasks} & \textbf{Lifecycle}\\
+\textbf{Survey} & \textbf{Adaptation} & \textbf{Tasks} & \textbf{Runtime} & \textbf{Reuse scope} & \textbf{Evaluation} & \textbf{Resources}\\
 \midrule
-\textit{From Prompts to Agents: A Comprehensive Survey of LLM-Driven Time Series Analysis} \citep{promptstoagents2026} & \yes & \yes & \no\\
-\textit{A Survey of Reasoning and Agentic Systems in Time Series with Large Language Models} \citep{changsurvey2026} & \yes & \yes & \no\\
-\textit{LLM Agents for Time-Series: A Survey} \citep{chen2026tsagentsurvey} & \no & \yes & \no\\
-\textit{LLM-based Agents for Forecasting and Prediction: Methods, Training, Evaluation, and Applications} \citep{xu2026forecastagentsurvey} & \yes & \no & \yes\\
+Zhang et al.~\citep{promptstoagents2026} & \hb{4} & \hb{4} & \hb{3} & \hb{0} & \hb{2} & \hb{3}\\
+Chang et al.~\citep{changsurvey2026} & \hb{3} & \hb{4} & \hb{3} & \hb{0} & \hb{2} & \hb{3}\\
+Chen et al.~\citep{chen2026tsagentsurvey} & \hb{1} & \hb{4} & \hb{3} & \hb{1} & \hb{3} & \hb{2}\\
+Xu et al.~\citep{xu2026forecastagentsurvey} & \hb{3} & \hb{1} & \hb{3} & \hb{0} & \hb{4} & \hb{1}\\
 \midrule
-\textbf{Ours} & \yes & \yes & \yes\\
+\textbf{Ours} & \hb{3} & \hb{4} & \hb{4} & \hb{4} & \hb{4} & \hb{4}\\
 \bottomrule
 \end{tabularx}
-\caption{Organizing dimensions in related time series surveys. A checkmark denotes an author-stated organizing axis or an explicit part of the review structure; a cross denotes that the dimension is not used in that role. Adaptation covers model or interface adaptation; Tasks separates multiple temporal task families beyond prediction; Lifecycle links construction, training or updating, evaluation, and operational use.}
+\caption{Comparison with related time series Agent surveys. Grades follow each survey's stated organizing axes and section structure: \hb{0} not addressed; \hb{1} mentioned in passing; \hb{2} dedicated discussion that does not organize the review; \hb{3} organizing axis for part of the review, or systematic but incomplete coverage; \hb{4} organizing axis with systematic coverage. \emph{Adaptation}: changes to the LLM or its temporal interface. \emph{Tasks}: temporal task families beyond prediction. \emph{Runtime}: Agent mechanisms such as memory, tools, planning, and coordination. \emph{Reuse scope}: classification of modules by the scope across which they can be reused. \emph{Evaluation}: links from components or tasks to benchmarks, protocols, and infrastructure. \emph{Resources}: \hb{1} representative tables, \hb{2} per-paper annotations in the paper, \hb{3} a maintained repository with per-paper codes, \hb{4} machine-readable records with source-evidence locators.}
 \label{tab:direct-prior-comparison}
 \end{table}
 
@@ -184,7 +185,7 @@ Figure~\ref{fig:contribution-trend} shows how the reviewed module contributions 
 The paper follows this construction order: Section~2 defines the Agent and its notation; Section~3 reviews LLM-side interventions; Sections~4--6 organize reusable runtime, temporal, and task-specific mechanisms; Section~7 connects these choices to infrastructure and benchmarks; and Section~8 derives open problems and focused comparisons. To support inspection and continued use of the taxonomy, we organize module contributions, source passages, and official resources into Paper Cards and a structured GitHub repository.\footnote{Survey and companion resources: \url{https://github.com/Minions-Land/Time-Series-Agents-Survey}.} The survey explains the classification and its implications for human readers; the repository provides machine-readable descriptions and resource links for retrieval and agent-assisted development. Our contributions are:
 \begin{itemize}
   \item \textbf{A module-level taxonomy from general to specific.} We distinguish three Harness layers by their scope of reuse and connect them through shared mechanism dimensions and task requirements, providing a unified account of how Time Series Agents are composed and specialized.
-  \item \textbf{A taxonomy-driven comparative synthesis.} We analyze representative methods through their mechanisms, assumptions, feedback conditions, and design trade-offs, explaining the boundaries of module reuse and the changes required for a target scenario.
+  \item \textbf{A taxonomy-driven comparative synthesis.} We analyze representative methods through their mechanisms, assumptions, feedback conditions, and design trade-offs, and compare eleven systems across adaptation, workflow control, tools, memory, temporal validity, and feedback (Table~\ref{tab:representative-systems}), explaining the boundaries of module reuse and the changes required for a target scenario.
   \item \textbf{Connections between classification, development, and evaluation.} We map module responsibilities and task requirements to infrastructure and benchmarks, guiding system construction and deriving open problems from cross-method comparisons.
   \item \textbf{Structured resources grounded in the taxonomy.} Our Paper Cards and GitHub repository link module classifications, original evidence, and official implementations for human navigation and agent-assisted development. Appendix~\ref{app:full-ledger} presents the schema, corpus statistics, and complete profiles.
 \end{itemize}
@@ -741,6 +742,67 @@ For complex coordination, the LLM analyzes current traffic, predicts neighboring
 Here $D$ supplies the control instructions. Simpler situations omit some reasoning stages according to the number of critical neighboring lanes; simulation-derived data support policy fine-tuning. The resulting action changes future traffic observations, so evaluation measures policy outcomes in the control environment. Portfolio and traffic applications both require reasoning about future outcomes; each instantiates its own state, feasible actions, feedback timing, and utility. A decision-support Harness must connect these quantities to an executable policy and measure the consequences of that policy over time.
 
 A new decision-support Agent should specify these quantities before choosing its reasoning workflow. The numerical or language prediction supplies evidence; the action contract determines how that evidence becomes a position, a control signal, or a recommendation. Section~\ref{sec:evaluation} connects each resulting artifact to an appropriate evaluation protocol.
+\subsection{Cross-task comparison of representative systems}
+\label{sec:task-comparison}
+
+Table~\ref{tab:representative-systems} compares eleven representative systems across the four task families and the main design routes, and Table~\ref{tab:representative-conditions} records the conditions and limitations stated in each source. Entries marked NR are not reported in the source paper; they do not imply that a capability is absent. Performance figures are not pooled because datasets, budgets, and metrics differ across the papers.
+
+\begin{table}[!t]
+\centering\scriptsize
+\setlength{\tabcolsep}{2.5pt}\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}*{7}{>{\raggedright\arraybackslash}X}@{}}
+\toprule
+\textbf{System} & \textbf{Task} & \textbf{Adaptation} & \textbf{Workflow} & \textbf{Tools/numerics} & \textbf{Memory} & \textbf{Temporal validity} & \textbf{Feedback}\\
+\midrule
+\multicolumn{8}{@{}l}{\textit{Forecasting and prediction}}\\
+TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} & Univariate numerical forecasting & Frozen (GPT-4o) & Fixed role pipeline & Model library; LLM selects, ensembles & NR & Ensemble fixed before test & Validation MAPE (labels)\\
+FLAIRR-TS \citep{flairr2025} & Numerical forecasting & Frozen; prompt refinement & Conditional loop, early stop & LLM emits values; analog retrieval & Within-run prompt--error history & Test after LLM cut-off & MAE on resolved window (delayed)\\
+CastFSR \citep{castfsr2026} & Context-aware forecasting & Frozen (Zero); SFT+RL (R1) & Dynamic fast--slow--reflect policy & Forecaster tools give prior; LLM revises & Within-episode state & SFT traces filtered for leakage, timestamps & Self-checks; RL reward on targets\\
+TimeClaw-Harness \citep{timeclaw2026harness} & Contextual forecasting, temporal QA & Frozen (GPT-5-nano) & Dynamic, observation-conditioned actions & Runtime-native tools on workspace & Cross-episode traces; promoted tools & NR & Tool observations; held-out tool success\\
+AIA Forecaster \citep{aiaforecaster2025} & Binary event probability & Frozen (o3); Platt calibration & Adaptive search; supervisor reconciliation & Search; LLM probabilities; Platt scaling & NR & Date-bounded search; leakage judge & Resolved outcomes (Brier), delayed\\
+\midrule
+\multicolumn{8}{@{}l}{\textit{Data augmentation and synthesis}}\\
+MERIT \citep{merit2025} & Positive views, contrastive learning & Frozen (LLaMA3.1-8B) & Conditional review--retrieve loop & Augmentation library; trained encoder & Approved-view memory bank & NR & LLM review; labels only downstream\\
+MetaCaster \citep{metacaster2026} & Few-shot training-series generation & Frozen (GPT-5.4); harness optimized & Offline harness search; fixed deployment & Generated series; lightweight forecaster training & Learned prompts, skills reused & Chronological splits; disjoint sources & Forecast-error gap vs.\ authentic data\\
+\midrule
+\multicolumn{8}{@{}l}{\textit{Anomaly detection and diagnosis}}\\
+AnomaMind \citep{anomamind2026} & Interval anomaly detection & Frozen orchestrator; SFT+RL detector & Coarse-to-fine iterative refinement & Numerical diagnostic tools & Knowledge memory from labeled training & NR & Labels: F1, false positives, parsing\\
+ARGOS \citep{argos2025} & Executable anomaly rules & Frozen (GPT-4o, GPT-4-32k) & Propose--repair--review; revert on regression & Generated Python rules; base detector & NR & NR & Execution errors; validation labels\\
+\midrule
+\multicolumn{8}{@{}l}{\textit{Decision support}}\\
+FinCon \citep{fincon2024} & Trading, portfolio allocation & Frozen (GPT-4-Turbo); prompt updates & Fixed hierarchy; CVaR-triggered adjustment & Mean--variance solver; risk metrics & Cross-episode beliefs, same assets & Chronological train/test periods & Daily PnL, CVaR (delayed)\\
+CoLLMLight \citep{collmllight2026} & Traffic signal control & SFT on simulator-selected chains & Complexity-gated reasoning depth & LLM predicts neighbor states & Recent observation--action window & NR & CityFlow queue length (simulator)\\
+\bottomrule
+\end{tabularx}
+\caption{Representative Time Series Agents compared by design route. NR: not reported in the source paper, which does not imply absence. ``Delayed'' marks feedback that exists only after the target is realized.}
+\label{tab:representative-systems}
+\end{table}
+
+\begin{table}[!t]
+\centering\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.22\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{System} & \textbf{Conditions (data, supervision, compute)} & \textbf{Limitations or unverified capability}\\
+\midrule
+TimeSeriesScientist \citep{timeseriesscientist2025} & GPT-4o API; univariate input; model library & Evaluated on 25 slices because of budget\\
+FLAIRR-TS \citep{flairr2025} & Similar historical segments; recent ground truth & Needs analogs; numeric fidelity; many calls\\
+CastFSR \citep{castfsr2026} & Context histories; teacher trajectories; RL compute & Energy-domain benchmarks only\\
+TimeClaw-Harness \citep{timeclaw2026harness} & Labeled training split for memory & Cross-benchmark memory transfer NR\\
+AIA Forecaster \citep{aiaforecaster2025} & Dated news corpus; many ensemble runs & Binary events only; leakage judge imprecise\\
+MERIT \citep{merit2025} & LLM call per view; GPU encoder training & Larger LLMs give limited gains\\
+MetaCaster \citep{metacaster2026} & K-shot support set; 46M-token harness optimization & Unreliable without reference examples\\
+AnomaMind \citep{anomamind2026} & Interval labels; two LLMs; 4$\times$A800 & Four offline benchmarks; fixed windows\\
+ARGOS \citep{argos2025} & Labeled chunks; existing base detector & Two public datasets and one internal dataset\\
+FinCon \citep{fincon2024} & Multi-source market data; training episodes & One test window; cut-off overlap NR\\
+CoLLMLight \citep{collmllight2026} & CityFlow simulator; GPT-4o-synthesized chains & Simulation-only evaluation\\
+\bottomrule
+\end{tabularx}
+\caption{Conditions and limitations of the systems in Table~\ref{tab:representative-systems}. NR: not reported.}
+\label{tab:representative-conditions}
+\end{table}
+
+The comparison yields five observations. First, fixed pipelines are reported where the candidate operations and acceptance criterion are known before execution, as in model-library forecasting, deployment-time series generation, and trading role hierarchies; feedback-driven control appears where the required evidence emerges during analysis, as in interval refinement, context-dependent forecast revision, and event search. Second, execution errors, parse checks, held-out labels, and simulator rollouts are available while a system is constructed (ARGOS, AnomaMind, TimeClaw-Harness, CoLLMLight), whereas FLAIRR-TS, AIA Forecaster, and FinCon depend on errors, resolutions, or returns that exist only after the target is realized, which limits how often they can revise in deployment. Third, evidence for memory is largely within distribution: TimeClaw-Harness and AnomaMind build memory from training splits of the evaluated benchmarks, FinCon updates beliefs across episodes on the same assets, and among these systems only MetaCaster evaluates reused learned artifacts on out-of-domain datasets. Fourth, system gains are rarely separable from model scale, tool access, and compute. Several comparisons set a tool-equipped Agent against a prompted LLM without tools, and backbone sweeps change the model without fixing tools or token budget. In the matched GPT-5-nano comparison of TimeClaw-Harness, TimeSeriesScientist and ReAct reach similar average accuracy (40.5\% and 40.8\%), so the margin of TimeClaw-Harness co-varies with its native tools and memory rather than isolating dynamic control. Fifth, results are comparable only within shared protocols such as ETT forecasting or the KPI and Yahoo anomaly benchmarks; even there, slicing, windowing, metric variants such as point-adjusted event F1, and the position of the LLM knowledge cut-off relative to the test period differ across papers.
+
 \section{Infrastructure and Benchmarks for Time Series Agents}
 \label{sec:evaluation}
 
