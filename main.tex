@@ -80,22 +80,21 @@
 % \Title{From General to Specific: A Survey of Time-Series Agent Systems}
 \Title{Time Series Agents: A Survey of LLMs, Harness Architectures, and Evaluation}
 \Author{Jiaming~Ma~$^{1}$,
-Shu~Wan~$^{3,4}$,
-Hou~Zhu~$^{4}$,
-Rui~Zhu~$^{4}$,
-Ruichu~Xia~$^{5}$,
-Jiyuan~Tan~$^{5}$,
-Haofeng~Ma~$^{6}$,
-Stephen~Wang~$^{4}$, and Qingsong~Wen~$^{7,8,*}$}
-\AuthorNames{Jiaming Ma, Yanjun Zhao, Shu Wan, Hou Zhu, Rui Zhu, Ruichu Xia, Jiyuan Tan, Haofeng Ma, Stephen Wang, Jingrui He, Qingsong Wen}
+Shu~Wan~$^{2,3}$,
+Hou~Zhu~$^{3}$,
+Rui~Zhu~$^{3}$,
+Ruichu~Xia~$^{4}$,
+Jiyuan~Tan~$^{4}$,
+Haofeng~Ma~$^{5}$,
+Stephen~Wang~$^{3}$, and Qingsong~Wen~$^{6,7,*}$}
+\AuthorNames{Jiaming Ma, Shu Wan, Hou Zhu, Rui Zhu, Ruichu Xia, Jiyuan Tan, Haofeng Ma, Stephen Wang, Qingsong Wen}
 \address{\quad $^{1}$ \quad University of Science and Technology of China\\
-\quad $^{2}$ \quad University of Illinois Urbana-Champaign\\
-\quad $^{3}$ \quad Arizona State University\\
-\quad $^{4}$ \quad Abel AI Lab\\
-\quad $^{5}$ \quad Stanford University\\
-\quad $^{6}$ \quad University of Nottingham\\
-\quad $^{7}$ \quad Squirrel AI Learning\\
-\quad $^{8}$ \quad University of Oxford
+\quad $^{2}$ \quad Arizona State University\\
+\quad $^{3}$ \quad Abel AI Lab\\
+\quad $^{4}$ \quad Stanford University\\
+\quad $^{5}$ \quad University of Nottingham\\
+\quad $^{6}$ \quad Squirrel AI Learning\\
+\quad $^{7}$ \quad University of Oxford
 }
 \corres{Correspondence: \href{mailto:qingsongedu@gmail.com}{qingsongedu@gmail.com}}
 \abstract{Time series analysis supports forecasting, diagnosis, and decisions in changing environments. Time Series Agents are emerging to connect language-model reasoning, numerical analysis, and tool execution within the workflows that produce these outcomes. Building one for a new scenario raises a construction problem: a general Agent runtime can often be reused, while temporal state, information availability, and task objectives determine which mechanisms require adaptation or redesign. Existing surveys organize the field by model adaptation, reasoning mechanisms, or application tasks; these views describe important parts of the literature but do not show how a developer should assemble a system for a particular scenario. We organize the literature around a \emph{from-general-to-specific} taxonomy based on the scope of module reuse. The taxonomy separates LLM-side contributions from General Harness, General Time Series Harness, and Task-Specific Harness layers, and relates each layer to mechanism functions, temporal requirements, and task contracts. We compare representative systems by the operations they perform, the assumptions they require, the feedback they consume, and the evidence used to evaluate them. The resulting map connects scenario requirements to module selection, system composition, and benchmark choice, and identifies open problems in temporal grounding, experience transfer, and downstream decision evaluation. Structured source-linked records support continued inspection and extension of the taxonomy.}
@@ -165,19 +164,16 @@ Figure~\ref{fig:survey-organization} maps the survey onto the construction proce
 \end{figure}
 
 
-The taxonomy also structures our comparative synthesis and resource analysis. We examine representative mechanisms and their formulations to explain how methods acquire evidence, maintain state, execute tools, and use feedback, and when these choices fit a new scenario. Infrastructure and benchmarks are related to the responsibilities they support or measure. Available resources include numerical forecasting libraries,\footnote{\label{fn:moderntsf}ModernTSF repository: \url{https://github.com/Diaugeia/ModernTSF}.} environments that evaluate executable analytical artifacts \citep{timeseriesgym2025}, and benchmarks for evidence retrieval and contextual forecasting \citep{drcik2026}. Connecting such resources to module and task requirements guides the path from scenario definition to component selection, system composition, and evaluation. The resulting comparisons also identify open problems in shared temporal mechanisms, experience transfer, and system-level assessment.
+The taxonomy also structures our comparative synthesis and resource analysis. We examine representative mechanisms and their formulations to explain how methods acquire evidence, maintain state, execute tools, and use feedback, and when these choices fit a new scenario. Infrastructure and benchmarks are related to the responsibilities they support or measure. Available resources include numerical forecasting libraries, environments that evaluate executable analytical artifacts, and benchmarks for evidence retrieval and contextual forecasting (Section~\ref{sec:evaluation}). Connecting such resources to module and task requirements guides the path from scenario definition to component selection, system composition, and evaluation. The resulting comparisons also identify open problems in shared temporal mechanisms, experience transfer, and system-level assessment.
 
 Figure~\ref{fig:overview} provides the landscape view of this survey. Start at the center with Time Series Agent Systems, move outward through General Harness, General Time Series Harness, and Task-Specific Harness modules, and then read the outer tags for representative works and resources. The radial sectors expose the mechanism and task dimensions used throughout the survey. This landscape view complements Figure~\ref{fig:survey-organization}: the former maps the literature, while the latter gives the reading order. Section~\ref{sec:general-harness} synthesizes the mechanisms into five runtime functions, with control, verification, and coordination discussed within planning and orchestration. The subsequent temporal and task-specific sections examine how these functions acquire domain and task requirements.
 
-% Keep the published labels: the overview is Figure 3 and the trend plot is Figure 2.
-\setcounter{figure}{2}
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/paper_figures/Overvieww.pdf}
 \caption{Landscape of Time Series Agent Systems. The concentric layers organize the literature from the system core through General Harness, General Time Series Harness, and Task-Specific Harness modules. Radial sectors identify the mechanism and task dimensions used in the survey, while the outer tags place representative works in these coordinates. The landscape provides a visual map of the literature; module-level assignments are recorded in the Paper Cards and discussed in the subsequent sections.}
 \label{fig:overview}
 \end{figure}
-\setcounter{figure}{1}
 
 Figure~\ref{fig:contribution-trend} shows how the reviewed module contributions accumulate across the independent LLM side and the three Harness layers. Task-specific procedures account for the largest number of annotations in the coded corpus, alongside contributions to shared temporal capabilities and general execution. Each module is counted once at its assigned layer, while distinct modules from one paper may appear on different curves. This distribution motivates examining the reusable mechanisms within task-oriented systems and comparing their specialization requirements. The coding procedure and complete profiles appear in Appendix~\ref{app:full-ledger}.
 
@@ -200,7 +196,6 @@ The paper follows this construction order: Section~2 defines the Agent and its n
 \caption{Cumulative source-reviewed module annotations across 134 dated records, covering methods, model training, training data, infrastructure, and evaluation. Each module counts once at its assigned layer. Dates follow the first public version, with year-only dates placed in January; the undated repository record is omitted. The logarithmic axis separates the four curves; dashed lines and hollow markers identify General Harness.}
 \label{fig:contribution-trend}
 \end{figure}
-\setcounter{figure}{3}
 
 \section{What Is a Time Series Agent?}
 
@@ -238,6 +233,27 @@ We describe each contribution using one set of coordinates: its LLM or Harness l
 
 Task, function, and scope answer different design questions. The task specifies the required result; the function identifies the problem a module solves; and the scope records the assumptions that constrain its reuse. The four temporal functions used in Section~\ref{sec:general-ts-harness} group concrete applications of these mechanism dimensions. A temporal-data interface, for example, combines interface and state mechanisms, while a temporal validator combines control, feedback, and executable checks. A module retains its scope when another task calls it; a new task-specific objective can instead motivate a distinct specialized module.
 
+\paragraph{Scope of inclusion.} Inclusion in the corpus does not imply that every reviewed work is a complete Agent. We distinguish three roles. \emph{Model-side supporting techniques} supply temporal encoding, understanding, reasoning, or prediction, as in Time-LLM \citep{jin2024timellm} and ChatTS \citep{chatts2025}; they are reviewed for the capabilities they provide to the LLM side. \emph{Fixed workflows} execute a predetermined sequence of model and tool calls; they serve as components of larger systems and as reference points for adaptive control. \emph{Feedback-driven Agents} select or revise subsequent actions according to observations returned by tools or environments, as in Eq.~\eqref{eq:agent-loop}. Multiple roles, tool calls, or reasoning chains are not sufficient on their own for the third role; the defining condition is that returned feedback changes later actions.
+
+\paragraph{Layer assignment.} Table~\ref{tab:layer-rules} states the assignment rule. The tests are applied from the most specific layer to the most general, and each module receives the first layer whose condition it meets. A layer describes the scope implied by a module's inputs, state, and assumptions. Demonstrated cross-task reuse is a separate claim that requires evaluation on more than one task or domain. Accordingly, a module is not task-specific merely because it first appears in a forecasting paper, and a generic interface does not by itself establish transfer.
+
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\linewidth}{@{}p{0.13\linewidth}p{0.42\linewidth}X@{}}
+\toprule
+\textbf{Layer} & \textbf{Assignment condition} & \textbf{Boundary example}\\
+\midrule
+TSK & The core logic embeds the output requirement, objective, or validation criterion of a task family. & Selecting a forecasting model by validation error over the declared horizon.\\
+GTS & The module depends on temporal order, windows, frequency, units, or information availability, without binding to one task. & Timestamp alignment, data versioning, and information cut-off checks.\\
+GH & The module manages execution, scheduling, or state without temporal semantics or a task objective. & General task scheduling and error recovery.\\
+\bottomrule
+\end{tabularx}
+\caption{Layer assignment rules, applied from top to bottom. GH denotes General Harness, GTS General Time Series Harness, and TSK Task-Specific Harness.}
+\label{tab:layer-rules}
+\end{table}
+
 Figure~\ref{fig:task-function-grid} provides two routes through the literature. Reading a row compares a temporal need across tasks; reading a column identifies functions to combine for one task. Concrete examples help interpret these requirements: TimeSeriesScientist's Curator \citep{timeseriesscientist2025} and SAGE-AD's dual representation \citep{sagead2026} supply shared temporal functions, while MERIT's positive-view procedure \citep{merit2025} and FinMem's financial memory \citep{finmem2023} depend on their task objectives. A task column can therefore contain both GTS and TSK modules. The functions are many-to-many annotations of the same module records, and contribution counts continue to use unique module identifiers.
 
 \begin{figure}[!t]
@@ -247,7 +263,7 @@ Figure~\ref{fig:task-function-grid} provides two routes through the literature. 
 \label{fig:task-function-grid}
 \end{figure}
 
-The lower panel illustrates how to use the grid. A demand-planning Agent first needs an execution environment, aligned historical observations, and context available at the forecast origin. It then selects or revises a forecast and passes that result to an inventory procedure with explicit costs and action constraints. ModernTSF\footnotemark[\getrefnumber{fn:moderntsf}] can supply numerical forecasting components, Dr-CiK \citep{drcik2026} can test research with external context, and TimeSeriesGym \citep{timeseriesgym2025} can test the production of executable analytical artifacts. Inventory outcomes require a scenario environment with the relevant demand, lead-time, cost, and stock constraints. Section~\ref{sec:evaluation} develops this matching of requirements to resources.
+The lower panel illustrates how to use the grid. A demand-planning Agent first needs an execution environment, aligned historical observations, and context available at the forecast origin. It then selects or revises a forecast and passes that result to an inventory procedure with explicit costs and action constraints. ModernTSF\footnote{\label{fn:moderntsf}ModernTSF repository: \url{https://github.com/Diaugeia/ModernTSF}.} can supply numerical forecasting components, Dr-CiK \citep{drcik2026} can test research with external context, and TimeSeriesGym \citep{timeseriesgym2025} can test the production of executable analytical artifacts. Inventory outcomes require a scenario environment with the relevant demand, lead-time, cost, and stock constraints. Section~\ref{sec:evaluation} develops this matching of requirements to resources.
 
 \begin{enumerate}
   \item \textbf{Specify the scenario.} State the data sources, event and availability times, channels, units, missingness policy, and the decision or analysis that follows the output.

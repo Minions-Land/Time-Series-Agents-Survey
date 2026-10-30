@@ -37,8 +37,8 @@ def contribution_counts(record: dict) -> dict[str, int]:
     if "modules" in module and module.get("review_status") in {"paper_verified", "repository_verified"}:
         counts = Counter(m["layer"] for m in module["modules"])
         return {"LLM-side": counts["LLM"], "General Harness": counts["GH"],
-                "General Time-Series Harness": counts["GTS"], "Task-Specific Harness": counts["TSK"]}
-    return {name: 0 for name in ("LLM-side", "General Harness", "General Time-Series Harness", "Task-Specific Harness")}
+                "General Time Series Harness": counts["GTS"], "Task-Specific Harness": counts["TSK"]}
+    return {name: 0 for name in ("LLM-side", "General Harness", "General Time Series Harness", "Task-Specific Harness")}
 
 
 def main() -> None:
@@ -89,7 +89,7 @@ def main() -> None:
     dates = [datetime.strptime(month, "%Y-%m") for month in months]
     colors = {
         "General Harness": "#1f4e79",
-        "General Time-Series Harness": "#c88719",
+        "General Time Series Harness": "#c88719",
         "Task-Specific Harness": "#2f7d5c",
         "LLM-side": "#7851a9",
     }
@@ -103,7 +103,7 @@ def main() -> None:
     # Keep all four module-level series in one plot. Curves can share a
     # cumulative value because different module sets may have the same size;
     # each concrete module has already been assigned to its deepest layer.
-    ax.plot(dates, cumulative["General Time-Series Harness"], lw=2.5, label="General Time-Series Harness", color=colors["General Time-Series Harness"], zorder=2)
+    ax.plot(dates, cumulative["General Time Series Harness"], lw=2.5, label="General Time Series Harness", color=colors["General Time Series Harness"], zorder=2)
     ax.plot(dates, cumulative["Task-Specific Harness"], lw=2.5, label="Task-Specific Harness", color=colors["Task-Specific Harness"], zorder=3)
     ax.plot(dates, cumulative["LLM-side"], lw=2.5, label="LLM-side", color=colors["LLM-side"], zorder=4)
     ax.plot(
