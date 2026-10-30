@@ -97,14 +97,14 @@ def main() -> None:
     plot_timeline(months, cumulative)
 
 
-# Layer order follows the taxonomy (LLM side, then general to specific). Hues
-# follow the manuscript figures (navy runtime, ochre temporal, terracotta task)
-# and passed the dataviz palette validator on all pairs (worst CVD dE 11.2).
+# Layer order follows the taxonomy (LLM side, then general to specific). Navy,
+# teal, and red follow the Nature Publishing Group palette with a gold accent;
+# the set passed the dataviz palette validator on all pairs (worst CVD dE 11.6).
 LAYERS = ["LLM-side", "General Harness", "General Time Series Harness", "Task-Specific Harness"]
-COLORS = dict(zip(LAYERS, ["#2a9d8f", "#33689f", "#e0a23b", "#c4553a"]))
-LABEL_INK = {"LLM-side": "white", "General Harness": "white",
-             "General Time Series Harness": "#2b2b2b", "Task-Specific Harness": "white"}
-INK, MUTED, GRID = "#222222", "#666666", "#e4e2dc"
+COLORS = dict(zip(LAYERS, ["#E8A033", "#3A5398", "#00A087", "#E64B35"]))
+LABEL_INK = {"LLM-side": "#2b2b2b", "General Harness": "white",
+             "General Time Series Harness": "white", "Task-Specific Harness": "white"}
+INK, MUTED = "#222222", "#5c5c5c"
 PERIODS = [("2023\u201324 H1", "2024-06"), ("2024 H2", "2024-12"), ("2025 H1", "2025-06"),
            ("2025 H2", "2025-12"), ("2026 H1", "2026-06"), ("2026 Q3", "2026-09")]
 ORIGIN = datetime(2023, 8, 1)
@@ -139,7 +139,8 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
     plt.rcParams.update({
         "font.family": "serif", "font.serif": ["Times New Roman", "Times", "DejaVu Serif"],
         "mathtext.fontset": "stix", "font.size": 8.5, "axes.labelsize": 8.5,
-        "xtick.labelsize": 8, "ytick.labelsize": 8, "axes.edgecolor": MUTED,
+        "xtick.labelsize": 8, "ytick.labelsize": 8, "axes.edgecolor": INK, "axes.linewidth": 0.6,
+        "xtick.direction": "out", "ytick.direction": "out",
         "axes.labelcolor": INK, "xtick.color": MUTED, "ytick.color": MUTED, "pdf.fonttype": 42,
     })
     dates = [datetime.strptime(month, "%Y-%m") for month in months]
@@ -160,9 +161,9 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
         sd = np.std(y - exponential(t, a, b), ddof=2)
         fit = exponential(grid_t, a, b)
         color = COLORS[name]
-        ax.fill_between(grid_dates, np.clip(fit - sd, 0, None), fit + sd, color=color, alpha=0.16, lw=0, zorder=1)
-        ax.scatter(dates, y, s=13, color=color, alpha=0.38, lw=0, zorder=2)
-        ax.plot(grid_dates, fit, color=color, lw=1.7, zorder=3)
+        ax.fill_between(grid_dates, np.clip(fit - sd, 0, None), fit + sd, color=color, alpha=0.13, lw=0, zorder=1)
+        ax.scatter(dates, y, s=11, color=color, alpha=0.5, lw=0, zorder=2)
+        ax.plot(grid_dates, fit, color=color, lw=1.4, zorder=3)
         legend_labels.append(f"{name} (doubling {np.log(2) / b:.1f} mo)")
     # End values, nudged apart so that close series stay legible.
     placed = []
@@ -179,7 +180,7 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
         if i is None:
             continue
         point = (dates[i], cumulative[leader][i])
-        ax.plot(*point, "o", ms=6.5, mfc="white", mec=INK, mew=0.9, zorder=5)
+        ax.plot(*point, "o", ms=6, mfc="white", mec=INK, mew=0.8, zorder=5)
         ax.annotate(f"{text}\n({dates[i]:%b %Y})", point, xytext=offset, textcoords="offset points",
                     fontsize=7.6, color=INK, ha="left", va="bottom",
                     arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6, shrinkA=0, shrinkB=4))
@@ -188,10 +189,10 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
     ax.set_xlim(dates[0] - timedelta(days=20), datetime(2026, 12, 15))
     ax.xaxis.set_major_locator(mdates.YearLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
-    ax.grid(axis="y", color=GRID, lw=0.6)
     ax.spines[["top", "right"]].set_visible(False)
-    ax.tick_params(length=2.5, width=0.6)
-    ax.set_title("(a) Cumulative module contributions", loc="left", fontsize=9, color=INK, fontweight="bold")
+    ax.tick_params(length=3, width=0.6)
+    ax.set_title("Cumulative module contributions", loc="left", fontsize=8.8, color=INK)
+    ax.text(-0.12, 1.07, "a", transform=ax.transAxes, fontsize=11, fontweight="bold", color=INK)
 
     # (b) Share of newly published modules per period, every segment labelled.
     previous = {name: 0 for name in LAYERS}
@@ -202,10 +203,10 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
         bottom = 0.0
         for name in LAYERS:
             share = 100 * new[name] / total
-            bx.bar(x, share, bottom=bottom, width=0.74, color=COLORS[name], edgecolor="white", linewidth=0.9, zorder=3)
+            bx.bar(x, share, bottom=bottom, width=0.72, color=COLORS[name], edgecolor="white", linewidth=0.8, zorder=3)
             if share >= 4:
                 bx.text(x, bottom + share / 2, f"{share:.0f}%", ha="center", va="center",
-                        fontsize=7.2, color=LABEL_INK[name], fontweight="bold")
+                        fontsize=7, color=LABEL_INK[name])
             bottom += share
         bx.text(x, 101.5, f"n={total}", ha="center", va="bottom", fontsize=7.4, color=MUTED)
         previous = current
@@ -214,8 +215,9 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
     bx.set_yticks([0, 25, 50, 75, 100], ["0", "25", "50", "75", "100%"])
     bx.set_ylabel("Share of new modules")
     bx.spines[["top", "right"]].set_visible(False)
-    bx.tick_params(length=2.5, width=0.6)
-    bx.set_title("(b) Share of new modules by period", loc="left", fontsize=9, color=INK, fontweight="bold")
+    bx.tick_params(length=3, width=0.6)
+    bx.set_title("Share of new modules by period", loc="left", fontsize=8.8, color=INK)
+    bx.text(-0.2, 1.07, "b", transform=bx.transAxes, fontsize=11, fontweight="bold", color=INK)
 
     handles = [plt.Line2D([], [], color=COLORS[n], lw=2.2, marker="o", ms=4, mfc=COLORS[n], mec="none") for n in LAYERS]
     fig.legend(handles, legend_labels, loc="upper center", ncol=2, frameon=False, fontsize=8.2,
