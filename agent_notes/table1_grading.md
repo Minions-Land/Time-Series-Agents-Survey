@@ -1,22 +1,23 @@
-# Table 1 grading evidence (2026-10-30)
+# Table 1 grading evidence (revised 2026-10-30)
 
-Scale 0–4 (Harvey balls): 0 not addressed; 1 mentioned in passing; 2 dedicated discussion, not organizing; 3 organizing axis for part of the review or systematic but incomplete; 4 organizing axis with systematic coverage.
-Resources: 1 representative tables; 2 per-paper annotations in paper; 3 maintained repo with per-paper codes; 4 machine-readable records with source-evidence locators.
+Scale (3 levels): ● treated systematically in a dedicated part of the review; ◐ discussed without systematic treatment; ○ absent or mentioned only in passing.
+Records: ● per-work records linked to source passages; ◐ per-work codes or annotations without such links; ○ neither.
+Borderline cells for prior surveys were given the higher grade.
 
-| Survey | Adapt | Tasks | Runtime | Reuse | Eval | Res | (Leakage, not in table) |
-|---|---|---|---|---|---|---|---|
-| Zhang (promptstoagents2026) | 4 | 4 | 3? | 0? | 2? | 3 | ? |
-| Chang (changsurvey2026) | 3 | 4 | 3 | 0 | 2 | 3 | 1 |
-| Chen (chen2026tsagentsurvey) | 1 | 4 | 3 | 1 | 3 | 2 | 0 |
-| Xu (xu2026forecastagentsurvey) | 3 | 1 | 3 | 0 | 4 | 1 | 4 |
-| Ours | 3 | 4 | 4 | 4 | 4 | 4 | 3 |
+| Survey | Unit | LLM | Runtime | Temporal validity | Evaluation | Records |
+|---|---|---|---|---|---|---|
+| Zhang (promptstoagents2026) | Paper | ● | ● | ○ | ● | ◐ |
+| Chang (changsurvey2026) | Paper | ● | ● | ◐ | ◐ | ◐ |
+| Chen (chen2026tsagentsurvey) | System | ◐ | ● | ○ | ● | ◐ |
+| Xu (xu2026forecastagentsurvey) | System | ● | ● | ● | ● | ○ |
+| Ours | Module | ● | ● | ● | ● | ● |
 
-Zhang: SSRN full text returned 403; grades come from the author repo CoderPowerBeyond/Agent-Prompt-TS-Survey (README, data/coded_papers.csv with A1–A4 codes, provenance/search_log.csv). "?" = uncertain. Re-check if the PDF becomes available.
+Zhang full text: Zenodo record 17492801 v2 (2025-10-31), 36 pages. Earlier repo-only grades were wrong on Runtime (memory and self-refinement are §5.3–5.4).
 
-- Zhang: A1 Representation + A2 Model Adaptation coded per paper (D1=4); A4 forecasting/anomaly/classification/imputation (D2=4); A3 Workflow Autonomy L1–L4, no memory/self-improvement axis visible (D3=3?); no reuse-scope axis (D4=0?); README promises workflow-level evaluation, depth unknown (D6=2?); maintained repo with coded CSV, no locators (D7=3).
-- Chang: §2.5.4 adaptation regimes tagged per paper (D1=3); §2.4 Primary Objective × §3–5 topologies, 11 tasks (D2=4); §2.5.1–2.5.3 control flow, actors, knowledge access (D3=3); attributes are cross-cutting, not reuse scope (D4=0); leakage only in §6.1/§6.3 (D5=1); §6.1 datasets + Table 1 reporting requirements (D6=2); repo per-paper tag tables + App. Tables 3–5 (D7=3).
-- Chen: training only in §2 and §6 Online Adaptation (D1=1); §4.1–4.4 four families organize the survey (D2=4); §3 Architecture/Tools/Memory applied in Tables 3–4 (D3=3); shared dimensions but no module reuse classification (D4=1); no look-ahead treatment (D5=0); §5 Resources, Tables 5–7, §6 benchmarking workflows (D6=3); Table 3 annotates 47 systems, no repo found (D7=2).
-- Xu: §3.1 serialization/tokenization + §4 training incl. RL (D1=3); scope forecasting/prediction only §2.1 (D2=1); §3.2–3.5 orchestration/tools/evidence/hybrid (D3=3); grouping by LLM coupling, not reuse scope (D4=0); §2.3 admissibility, §5.2 contamination/leakage incl. revisions, Table 4 leakage column (D5=4); §5.1–5.5 + Table 5 + §4.3 ablations (D6=4); "living snapshot" mentioned without URL (D7=1).
-- Ours: §3 LLM-side, not organizing elsewhere (D1=3); §6 four families + §7 temporal QA (D2=4); §4 five mechanism dims reused across layers (D3=4); module unit + §4–6 + ledger appendix (D4=4); §5.4 temporal validation, availability equation, §7 evaluation contract, but benchmarks not graded by leakage control (D5=3); §7 evaluation contract, benchmark families, infrastructure, benchmark selection (D6=4); Paper Card schema + JSON ledger with locator/quote/source_path (D7=4).
+- Zhang: §2.6 LLMs for TS, §4 Prompts (4.1 direct prompts, 4.2 instruction tuning) → LLM ●; §5 Agents (5.1 planning and reasoning, 5.2 tool use, 5.3 memory, 5.4 self-refinement) → Runtime ●; zero matches for leak/look-ahead/cut-off/contamination in the full text → Temporal validity ○; §7 Benchmarks and Evaluation (7.1 datasets, 7.2 comparative analysis) + §8.4 evaluation gap → Evaluation ●; GitHub repo with coded CSV (A1–A4) but no source locators → Records ◐.
+- Chang: §2.5.4 adaptation regimes tagged per paper → LLM ●; §2.5.1–2.5.3 control flow, actors, knowledge access → Runtime ●; leakage raised about six times as an evaluation pitfall in §6 (lines on leakage-aware splits, explicit leakage checks), no dedicated treatment → ◐; §6.1 datasets and benchmarks + Table 1 reporting requirements → Evaluation ◐; repo per-paper tag tables + appendix Tables 3–5 → Records ◐.
+- Chen: training mentioned in §2 and the §6 online-adaptation paragraph (5 lines on fine-tuning/SFT/RL) → LLM ◐ (borderline, graded up); §3 architecture/tools/memory applied to every family in Tables 3–4 → Runtime ●; one line on contamination → Temporal validity ○; §5 resources by problem type, Tables 5–7, §6 benchmarking agent workflows → Evaluation ●; Table 3 annotates 47 systems, no repo → Records ◐.
+- Xu: §3.1 serialization/tokenization + §4 training and adaptation incl. RL → LLM ●; §3.2–3.5 orchestration, tools, live evidence, hybrid → Runtime ●; §2.3 admissibility, §5.2 contamination and leakage incl. revisions, Table 4 leakage column → Temporal validity ●; §5.1–5.5 + Table 5 + §4.3 ablations → Evaluation ●; "living snapshot" mentioned without URL → Records ○. Table 6 is component-level but catalogs failure modes, not a classification of works.
+- Ours: §3 LLM-side contributions → ●; §4 five mechanism dimensions → ●; §5.4 temporal validation, availability equation, §7 evaluation contract → ●; §7 benchmarks, infrastructure, benchmark selection → ●; Paper Card schema + JSON ledger with locator/quote/source_path → Records ●.
 
-D5 (leakage) was left out of the table only because Zhang cannot be verified; the main text credits Xu's stronger treatment. Swap in D5 if the Zhang PDF is obtained.
+Distinctive, non-circular differences: unit of analysis (module, one paper can span layers) and source-linked records. Shared strengths are shown as ties; Xu matches ours on four of five graded columns.
