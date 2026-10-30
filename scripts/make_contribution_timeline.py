@@ -106,7 +106,8 @@ LABEL_INK = {"LLM-side": "white", "General Harness": "white",
              "General Time Series Harness": "#2b2b2b", "Task-Specific Harness": "white"}
 INK, MUTED, GRID = "#222222", "#666666", "#e4e2dc"
 PERIODS = [("2023\u201324 H1", "2024-06"), ("2024 H2", "2024-12"), ("2025 H1", "2025-06"),
-           ("2025 H2", "2025-12"), ("2026 H1", "2026-06"), ("2026 Q3", "2026-09")]
+           ("2025 H2", "2025-12"), ("2026 H1", "2026-06"), ("2026 Q3", "2026-09"),
+           ("2026 Q4", "2026-12")]
 ORIGIN = datetime(2023, 8, 1)
 
 
@@ -148,7 +149,7 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
     grid_dates = [ORIGIN + timedelta(days=float(x) * 30.44) for x in grid_t]
 
     fig = plt.figure(figsize=(7.0, 3.15))
-    gs = fig.add_gridspec(1, 2, width_ratios=[1.5, 1], wspace=0.27, left=0.075, right=0.985, top=0.77, bottom=0.13)
+    gs = fig.add_gridspec(1, 2, width_ratios=[1.4, 1.1], wspace=0.25, left=0.075, right=0.985, top=0.77, bottom=0.13)
     ax, bx = fig.add_subplot(gs[0]), fig.add_subplot(gs[1])
 
     # (a) Observed cumulative counts as light points; least-squares exponential
@@ -184,7 +185,7 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
                     fontsize=7.6, color=INK, ha="left", va="bottom",
                     arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6, shrinkA=0, shrinkB=4))
     ax.set_ylabel("Cumulative modules")
-    ax.set_ylim(0, 165)
+    ax.set_ylim(0, 210)
     ax.set_xlim(dates[0] - timedelta(days=20), datetime(2026, 12, 15))
     ax.xaxis.set_major_locator(mdates.YearLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
@@ -209,7 +210,7 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
             bottom += share
         bx.text(x, 101.5, f"n={total}", ha="center", va="bottom", fontsize=7.4, color=MUTED)
         previous = current
-    bx.set_xticks(range(len(PERIODS)), [label.replace(" ", "\n", 1) for label, _ in PERIODS])
+    bx.set_xticks(range(len(PERIODS)), [label.replace(" ", "\n", 1) for label, _ in PERIODS], fontsize=7.3)
     bx.set_ylim(0, 108)
     bx.set_yticks([0, 25, 50, 75, 100], ["0", "25", "50", "75", "100%"])
     bx.set_ylabel("Share of new modules")
