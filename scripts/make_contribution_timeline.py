@@ -10,7 +10,10 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-from datetime import datetime
+from datetime import datetime, timedelta
+
+import numpy as np
+from scipy.optimize import curve_fit
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -94,15 +97,25 @@ def main() -> None:
     plot_timeline(months, cumulative)
 
 
-# Layer order follows the taxonomy (LLM side, then general to specific). Colors
-# passed the dataviz palette validator (all pairs, light surface); the
-# red/aqua pair sits in the 6-8 deutan band, so lines carry end labels and bars
-# carry surface gaps as secondary encoding.
+# Layer order follows the taxonomy (LLM side, then general to specific). Hues
+# follow the manuscript figures (navy runtime, ochre temporal, terracotta task)
+# and passed the dataviz palette validator on all pairs (worst CVD dE 11.2).
 LAYERS = ["LLM-side", "General Harness", "General Time Series Harness", "Task-Specific Harness"]
-COLORS = dict(zip(LAYERS, ["#e34948", "#2a78d6", "#eda100", "#1baf7a"]))
-INK, MUTED, GRID = "#1a1a1a", "#5f5e5a", "#e6e4df"
+COLORS = dict(zip(LAYERS, ["#2a9d8f", "#33689f", "#e0a23b", "#c4553a"]))
+LABEL_INK = {"LLM-side": "white", "General Harness": "white",
+             "General Time Series Harness": "#2b2b2b", "Task-Specific Harness": "white"}
+INK, MUTED, GRID = "#222222", "#666666", "#e4e2dc"
 PERIODS = [("2023\u201324 H1", "2024-06"), ("2024 H2", "2024-12"), ("2025 H1", "2025-06"),
            ("2025 H2", "2025-12"), ("2026 H1", "2026-06"), ("2026 Q3", "2026-09")]
+ORIGIN = datetime(2023, 8, 1)
+
+
+def months_since_origin(dates):
+    return np.array([(d - ORIGIN).days / 30.44 for d in dates])
+
+
+def exponential(t, a, b):
+    return a * np.exp(b * t)
 
 
 def value_at(months: list[str], series: list[int], month: str) -> int:
@@ -114,9 +127,9 @@ def value_at(months: list[str], series: list[int], month: str) -> int:
     return value
 
 
-def first_lasting_lead(months, leader, other):
-    """First month from which ``leader`` stays strictly above ``other``."""
-    for i, month in enumerate(months):
+def first_lasting_lead(leader, other):
+    """First index from which ``leader`` stays strictly above ``other``."""
+    for i in range(len(leader)):
         if all(a > b for a, b in zip(leader[i:], other[i:])):
             return i
     return None
@@ -124,44 +137,63 @@ def first_lasting_lead(months, leader, other):
 
 def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
     plt.rcParams.update({
-        "font.family": "sans-serif", "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
-        "font.size": 8, "axes.labelsize": 8, "xtick.labelsize": 7.5, "ytick.labelsize": 7.5,
-        "axes.edgecolor": MUTED, "axes.labelcolor": INK, "xtick.color": MUTED, "ytick.color": MUTED,
-        "pdf.fonttype": 42,
+        "font.family": "serif", "font.serif": ["Times New Roman", "Times", "DejaVu Serif"],
+        "mathtext.fontset": "stix", "font.size": 8.5, "axes.labelsize": 8.5,
+        "xtick.labelsize": 8, "ytick.labelsize": 8, "axes.edgecolor": MUTED,
+        "axes.labelcolor": INK, "xtick.color": MUTED, "ytick.color": MUTED, "pdf.fonttype": 42,
     })
     dates = [datetime.strptime(month, "%Y-%m") for month in months]
-    fig = plt.figure(figsize=(7.0, 3.0))
-    grid = fig.add_gridspec(1, 2, width_ratios=[1.55, 1], wspace=0.28, left=0.07, right=0.985, top=0.80, bottom=0.12)
-    ax, bx = fig.add_subplot(grid[0]), fig.add_subplot(grid[1])
+    t = months_since_origin(dates)
+    grid_t = np.linspace(t[0], t[-1], 200)
+    grid_dates = [ORIGIN + timedelta(days=float(x) * 30.44) for x in grid_t]
 
-    # (a) Cumulative modules: step lines, because counts change only when a work appears.
+    fig = plt.figure(figsize=(7.0, 3.15))
+    gs = fig.add_gridspec(1, 2, width_ratios=[1.5, 1], wspace=0.27, left=0.075, right=0.985, top=0.77, bottom=0.13)
+    ax, bx = fig.add_subplot(gs[0]), fig.add_subplot(gs[1])
+
+    # (a) Observed cumulative counts as light points; least-squares exponential
+    # fit as the expectation, with a band of one residual standard deviation.
+    legend_labels = []
     for name in LAYERS:
-        ax.step(dates, cumulative[name], where="post", color=COLORS[name], lw=1.6, label=name, zorder=3)
-        ax.plot(dates[-1], cumulative[name][-1], "o", ms=3.6, color=COLORS[name], zorder=4)
-        ax.annotate(str(cumulative[name][-1]), (dates[-1], cumulative[name][-1]), xytext=(4, 0),
-                    textcoords="offset points", va="center", fontsize=7.5, color=INK)
-    callouts = [("Task-Specific Harness", "LLM-side", "Task-Specific stays ahead\nof LLM-side", (-62, 26)),
-                ("General Harness", "LLM-side", "General Harness passes\nLLM-side", (-168, 50))]
-    for leader, other, text, offset in callouts:
-        i = first_lasting_lead(months, cumulative[leader], cumulative[other])
+        y = np.asarray(cumulative[name], dtype=float)
+        (a, b), _ = curve_fit(exponential, t, y, p0=(2.0, 0.1), maxfev=20000)
+        sd = np.std(y - exponential(t, a, b), ddof=2)
+        fit = exponential(grid_t, a, b)
+        color = COLORS[name]
+        ax.fill_between(grid_dates, np.clip(fit - sd, 0, None), fit + sd, color=color, alpha=0.16, lw=0, zorder=1)
+        ax.scatter(dates, y, s=13, color=color, alpha=0.38, lw=0, zorder=2)
+        ax.plot(grid_dates, fit, color=color, lw=1.7, zorder=3)
+        legend_labels.append(f"{name} (doubling {np.log(2) / b:.1f} mo)")
+    # End values, nudged apart so that close series stay legible.
+    placed = []
+    for name in sorted(LAYERS, key=lambda n: cumulative[n][-1]):
+        value = cumulative[name][-1]
+        y_text = max(value, placed[-1] + 9) if placed else value
+        placed.append(y_text)
+        ax.annotate(f"{value}", (dates[-1], value), xytext=(dates[-1] + timedelta(days=14), y_text),
+                    va="center", fontsize=8, color=INK)
+    callouts = [("Task-Specific Harness", "Task-Specific leads LLM-side", (-70, 34)),
+                ("General Harness", "General Harness passes LLM-side", (-150, 44))]
+    for leader, text, offset in callouts:
+        i = first_lasting_lead(cumulative[leader], cumulative["LLM-side"])
         if i is None:
             continue
         point = (dates[i], cumulative[leader][i])
-        ax.plot(*point, "o", ms=6, mfc="white", mec=INK, mew=0.9, zorder=5)
-        ax.annotate(f"{text} ({dates[i]:%b %Y})", point, xytext=offset, textcoords="offset points",
-                    fontsize=7, color=INK, ha="left", va="bottom",
-                    arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.7, shrinkA=0, shrinkB=4))
+        ax.plot(*point, "o", ms=6.5, mfc="white", mec=INK, mew=0.9, zorder=5)
+        ax.annotate(f"{text}\n({dates[i]:%b %Y})", point, xytext=offset, textcoords="offset points",
+                    fontsize=7.6, color=INK, ha="left", va="bottom",
+                    arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6, shrinkA=0, shrinkB=4))
     ax.set_ylabel("Cumulative modules")
-    ax.set_ylim(0, 160)
-    ax.set_xlim(dates[0], datetime(2026, 12, 1))
+    ax.set_ylim(0, 165)
+    ax.set_xlim(dates[0] - timedelta(days=20), datetime(2026, 12, 15))
     ax.xaxis.set_major_locator(mdates.YearLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
     ax.grid(axis="y", color=GRID, lw=0.6)
     ax.spines[["top", "right"]].set_visible(False)
     ax.tick_params(length=2.5, width=0.6)
-    ax.set_title("(a) Cumulative module contributions", loc="left", fontsize=8.5, color=INK, fontweight="bold")
+    ax.set_title("(a) Cumulative module contributions", loc="left", fontsize=9, color=INK, fontweight="bold")
 
-    # (b) Share of newly published modules per period (part-to-whole over time).
+    # (b) Share of newly published modules per period, every segment labelled.
     previous = {name: 0 for name in LAYERS}
     for x, (label, end) in enumerate(PERIODS):
         current = {name: value_at(months, cumulative[name], end) for name in LAYERS}
@@ -170,11 +202,12 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
         bottom = 0.0
         for name in LAYERS:
             share = 100 * new[name] / total
-            bx.bar(x, share, bottom=bottom, width=0.72, color=COLORS[name], edgecolor="white", linewidth=1.0, zorder=3)
-            if name == "LLM-side" and share >= 8:
-                bx.text(x, bottom + share / 2, f"{share:.0f}%", ha="center", va="center", fontsize=6.8, color="white", fontweight="bold")
+            bx.bar(x, share, bottom=bottom, width=0.74, color=COLORS[name], edgecolor="white", linewidth=0.9, zorder=3)
+            if share >= 4:
+                bx.text(x, bottom + share / 2, f"{share:.0f}%", ha="center", va="center",
+                        fontsize=7.2, color=LABEL_INK[name], fontweight="bold")
             bottom += share
-        bx.text(x, 101.5, f"n={total}", ha="center", va="bottom", fontsize=6.8, color=MUTED)
+        bx.text(x, 101.5, f"n={total}", ha="center", va="bottom", fontsize=7.4, color=MUTED)
         previous = current
     bx.set_xticks(range(len(PERIODS)), [label.replace(" ", "\n", 1) for label, _ in PERIODS])
     bx.set_ylim(0, 108)
@@ -182,11 +215,11 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
     bx.set_ylabel("Share of new modules")
     bx.spines[["top", "right"]].set_visible(False)
     bx.tick_params(length=2.5, width=0.6)
-    bx.set_title("(b) Share of new modules by period", loc="left", fontsize=8.5, color=INK, fontweight="bold")
+    bx.set_title("(b) Share of new modules by period", loc="left", fontsize=9, color=INK, fontweight="bold")
 
-    handles = [plt.Line2D([], [], color=COLORS[n], lw=2.2) for n in LAYERS]
-    fig.legend(handles, LAYERS, loc="upper center", ncol=4, frameon=False, fontsize=7.8,
-               bbox_to_anchor=(0.5, 1.0), handlelength=1.6, columnspacing=1.6)
+    handles = [plt.Line2D([], [], color=COLORS[n], lw=2.2, marker="o", ms=4, mfc=COLORS[n], mec="none") for n in LAYERS]
+    fig.legend(handles, legend_labels, loc="upper center", ncol=2, frameon=False, fontsize=8.2,
+               bbox_to_anchor=(0.5, 1.0), handlelength=1.8, columnspacing=2.4, labelspacing=0.35)
     fig.savefig(OUT_PNG, dpi=300)
     fig.savefig(OUT_PDF)
     plt.close(fig)
