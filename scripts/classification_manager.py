@@ -684,8 +684,9 @@ def sync(_: argparse.Namespace) -> None:
             row["public_month"] = official_date[:7]
             row["publication_date_precision"] = "day"
         row["bib_sync_status"] = "matched" if entry and ref else "review"
+        # Keep the record's own key order, as in the adjudicated module reviews.
         row["module_level_contributions_json"] = json.dumps(
-            module_contribution_record(row), ensure_ascii=False, sort_keys=True
+            module_contribution_record(row), ensure_ascii=False
         )
         row["taxonomy_schema_version"] = SCHEMA_VERSION
     write_csv(rows)
