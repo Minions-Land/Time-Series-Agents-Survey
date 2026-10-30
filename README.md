@@ -39,9 +39,9 @@ The comparison unit is a concrete module. A paper can contribute several modules
 
 ## Evidence-linked Paper Cards
 
-Cards connect a paper's identity and claims to concrete modules, task assumptions, evaluation evidence, and source passages. Follow the paper links in the cards and the resource links cited in the manuscript to explore the original works. The [official resource index](docs/official-resources.md) provides 100 author-attributed links across 76 works, with source locations and availability status.
+Cards connect a paper's identity and claims to concrete modules, task assumptions, evaluation evidence, and source passages. Follow the paper links in the cards and the resource links cited in the manuscript to explore the original works. The [official resource index](docs/official-resources.md) provides 117 author-attributed links across 91 works, with source locations and availability status.
 
-The ledger snapshot contains **138 examined records**, **135 retained works and resources**, and **290 module entries**. These are curation counts, not a count of independently reproduced systems. Field definitions and review states are documented in the [card schema](references/reports/paper-card-schema.md).
+The ledger snapshot contains **166 examined records**, **163 retained works and resources**, and **357 module entries**. These are curation counts, not a count of independently reproduced systems. Field definitions and review states are documented in the [card schema](references/reports/paper-card-schema.md).
 
 | Resource | Role |
 |---|---|
