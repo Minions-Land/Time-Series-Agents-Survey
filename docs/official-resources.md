@@ -1,6 +1,6 @@
 # Official resource index
 
-100 author-attributed links across 76 works. Links lead to the original resources; this repository does not repackage implementations. Availability was checked on 2026-10-16. Full attribution and fetch results are retained in the JSON cards.
+117 author-attributed links across 91 works. Links lead to the original resources; this repository does not repackage implementations. Availability was checked on 2026-10-16 and 2026-10-31. Full attribution and fetch results are retained in the JSON cards.
 
 | Work | Resource | Availability | Source |
 |---|---|---|---|
@@ -104,6 +104,23 @@
 | OpenForecaster | [repository](https://github.com/OpenForecaster/scaling-forecasting-training) | reachable | PDF p.1; author release statement or embedded hyperlink |
 | OpenForecaster | [model](https://huggingface.co/collections/nikhilchandak/openforecaster) | reachable | PDF p.1; author release statement or embedded hyperlink |
 | WorldReasoner | [repository](https://github.com/cyzus/worldreasoner/) | http_error | PDF p.1 hyperlink annotation |
+| LLM-Written Anomaly Detectors | [repository](https://anonymous.4open.science/r/TS-AD_submission-7E42/README.md) | reachable | PDF p.3; author release statement or embedded hyperlink |
+| LineupRL | [repository](https://github.com/HaochenZhang717/LineupRL-official-repo) | reachable | PDF p.1; author release statement or embedded hyperlink |
+| TradeGrad | [repository](https://github.com/transcend-0/TradeGrad) | reachable | PDF p.1; author release statement or embedded hyperlink |
+| SEER | [repository](https://github.com/BennyTMT/SEER) | reachable | PDF p.1; author release statement or embedded hyperlink |
+| EvoCast | [repository](https://github.com/18e0-x/EvoCast) | reachable | PDF p.1; author release statement or embedded hyperlink |
+| SciExam for ENSO | [project](https://enso.aisexam.com/) | reachable | PDF p.1; embedded hyperlink [Website] in author header |
+| SciExam for ENSO | [repository](https://github.com/ylzhang2447/SciExam-ENSO-code) | reachable | PDF p.1; embedded hyperlink [Code] in author header |
+| Lapras | [repository](https://github.com/yuc0805/Lapras) | reachable | PDF p.1; author release statement or embedded hyperlink |
+| Lapras | [model](https://huggingface.co/leochen085/Lapras) | reachable | PDF p.1; author release statement or embedded hyperlink |
+| World2TS | [project](https://world2ts.github.io/) | reachable | PDF p.1; author release statement or embedded hyperlink |
+| Agentic4PDM | [project](https://david-nguyen-s16.github.io/agentic4pdm_homepage/) | reachable | PDF p.1; author release statement or embedded hyperlink |
+| GIFT-Eval-CTX | [leaderboard](https://huggingface.co/spaces/Salesforce/GIFT-Eval-CTX) | reachable | PDF p.1; author release statement or embedded hyperlink |
+| TimeRSI | [repository](https://github.com/haoxin1998/TimeRSI) | reachable | PDF p.1; author release statement or embedded hyperlink |
+| Quant-Arena | [leaderboard](https://lab.einsia.ai/quant-arena) | reachable | PDF p.1; author release statement (HomePage) |
+| Steward | [repository](https://github.com/yebof/quant-agent) | reachable | PDF p.5; author release statement or embedded hyperlink |
+| Vendster | [repository](https://github.com/amazon-science/Vendster) | http_error | PDF p.1; author release statement in abstract |
+| EpiCoach | [repository](https://github.com/Bmoradi93/epicoach-agent) | reachable | PDF p.12; author release statement or embedded hyperlink |
 
 ## Sources without a located author resource
 
@@ -171,3 +188,16 @@ The following records have no author-attributed external resource located in the
 - AIA Forecaster (`aiaforecaster2025`)
 - Can Language Models Learn to Forecast Stock Prices (`auraforecaster2026`)
 - STRIDE (`stride2026`)
+- EpiWorld (`epiworld2026`)
+- TSHarness (`tsharness2026`)
+- SOTA (`sotaoptions2026`)
+- SwingGuard (`swingguard2026`)
+- OntoAR-HAR (`ontoarhar2026`)
+- CHEAR (`chear2026`)
+- NeuroAct (`neuroact2026`)
+- Zephyrus-R1 (`zephyrusr12026`)
+- ACE-Trader (`acetrader2026`)
+- Prompt Evolution for Forecasting (`promptevolutionforecast2026`)
+- FairAMO (`fairamo2026`)
+- Agri-SCHOLAR (`agrischolar2026`)
+- WxCrop (`wxcrop2026`)

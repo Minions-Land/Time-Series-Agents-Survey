@@ -11,7 +11,7 @@ for record in records:
 path=ROOT/'references/official_resources.csv'
 with path.open('w',newline='') as f:
  writer=csv.DictWriter(f,fieldnames=list(rows[0]),lineterminator='\n');writer.writeheader();writer.writerows(rows)
-lines=['# Official resource index','',f"{len(rows)} author-attributed links across {sum(bool(r['official_resources']) for r in records)} works. Links lead to the original resources; this repository does not repackage implementations. Availability was checked on 2026-10-16. Full attribution and fetch results are retained in the JSON cards.",'','| Work | Resource | Availability | Source |','|---|---|---|---|']
+lines=['# Official resource index','',f"{len(rows)} author-attributed links across {sum(bool(r['official_resources']) for r in records)} works. Links lead to the original resources; this repository does not repackage implementations. Availability was checked on {' and '.join(sorted({r['checked_at'] for r in rows}))}. Full attribution and fetch results are retained in the JSON cards.",'','| Work | Resource | Availability | Source |','|---|---|---|---|']
 for r in rows:
  lines.append(f"| {r['work'].replace('|','/')} | [{r['kind']}]({r['url']}) | {r['availability']} | {r['source_locator'].replace('|','/')} |")
 lines+=['','## Sources without a located author resource','','The following records have no author-attributed external resource located in the inspected paper text and PDF hyperlinks. Their paper and bibliographic links remain in the ledger.','']
