@@ -29,6 +29,10 @@ def check(rows, records):
                 errors.append(f'{module["id"]}: stale function applicability')
             if not set(module.get('tasks',[])+module.get('other_tasks',[]))<=set(record['tasks']['axes']+record['tasks']['other_labels']):
                 errors.append(f'{module["id"]}: task absent from work memberships')
+            reuse=module.get('reuse_evidence',{})
+            expected={'demonstrated','inferred'} if module['layer'] in {'GH','GTS'} else {'not_applicable'}
+            if reuse.get('level') not in expected or (reuse.get('level')=='demonstrated' and len(reuse.get('tasks',[]))<2):
+                errors.append(f'{module["id"]}: invalid reuse evidence')
             if any(i<0 or i>=len(module['evidence']) for i in view.get('evidence_indices',[])):
                 errors.append(f'{module["id"]}: invalid evidence index')
         for value in record['tasks']['axes']+record['tasks']['other_labels']:

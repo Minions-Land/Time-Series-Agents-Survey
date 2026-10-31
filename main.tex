@@ -238,7 +238,7 @@ Task, function, and scope answer different design questions. The task specifies 
 
 \paragraph{Scope of inclusion.} The reviewed works play three roles. \emph{Model-side supporting techniques} supply temporal encoding, understanding, reasoning, or prediction, as in Time-LLM \citep{jin2024timellm} and ChatTS \citep{chatts2025}; they are reviewed for the capabilities they provide to the LLM side. \emph{Fixed workflows} execute a predetermined sequence of model and tool calls; they serve as components of larger systems and as reference points for adaptive control. \emph{Feedback-driven Agents} select or revise subsequent actions according to observations returned by tools or environments, as in Eq.~\eqref{eq:agent-loop}. The defining condition of the third role is that returned feedback changes later actions.
 
-\paragraph{Layer assignment.} Table~\ref{tab:layer-rules} states the assignment rule. The tests are applied from the most specific layer to the most general, and each module receives the first layer whose condition it meets. A layer describes the scope implied by a module's inputs, state, and assumptions; demonstrated cross-task reuse additionally requires evaluation on more than one task or domain.
+\paragraph{Layer assignment.} Table~\ref{tab:layer-rules} states the assignment rule. The tests are applied from the most specific layer to the most general, and each module receives the first layer whose condition it meets. A layer describes the scope implied by a module's inputs, state, and assumptions. Whether that scope has been shown in practice is recorded separately: a General Harness or General Time Series Harness module has demonstrated reuse when its source applies it to at least two task families, and inferred reuse otherwise. Of the 116 such modules, 67 have demonstrated reuse and 49 are inferred from their interfaces.
 
 \begin{table}[H]
 \centering\small
@@ -1014,6 +1014,7 @@ Identity & Authors, year, landing page, BibTeX key, PDF, and source status.\\
 Claim & The central claim and concrete contribution stated by the work.\\
 Evidence & Page or section locator, quotation, figure or table, and verification status.\\
 Modules & LLM-side capability, General Harness, General Time Series Harness, and Task-Specific Harness entries.\\
+Reuse evidence & For General Harness and General Time Series Harness modules, whether the source applies the module to two or more task families (demonstrated) or to one (inferred).\\
 Task contract & Forecasting, augmentation, anomaly diagnosis, decision support, or another supported task family.\\
 Evaluation & Process validity, temporal-contract checks, task metrics, and deployment or decision evidence.
 \end{tabularx}

@@ -20,6 +20,14 @@ class MigrationTests(unittest.TestCase):
   self.assertEqual(migrated[0]['task_axis_other'],'temporal_question_answering; time_series_classification')
   self.assertEqual(json.loads(migrated[0]['task_aliases_source_json'])['other'],rows[0]['task_axis_other'])
   self.assertEqual(json.loads(migrated[0]['reviewed_modules_json'])[0]['evidence'],module['evidence'])
+ def test_reuse_evidence_distinguishes_demonstrated_and_inferred(self):
+  row={'task_axis_other':'','task_axis_forecasting_reasoning':'Yes','task_axis_anomaly_detection_diagnosis':'Yes'}
+  gts={'id':'paper:align','layer':'GTS','tasks':['forecasting_prediction'],'evidence':[{'quote':'q'}]}
+  gh={'id':'paper:runtime','layer':'GH','tasks':[],'evidence':[{'quote':'q'}]}
+  tsk={'id':'paper:forecast','layer':'TSK','tasks':[],'evidence':[{'quote':'q'}]}
+  modules=json.loads(migrate([dict(row,reviewed_modules_json=json.dumps([gts,gh,tsk]))])[0]['reviewed_modules_json'])
+  self.assertEqual([m['reuse_evidence']['level'] for m in modules],['inferred','demonstrated','not_applicable'])
+  self.assertEqual(modules[1]['reuse_evidence']['basis'],'work')
  def test_resource_without_attribution_fails(self):
   rows=manager.read_csv(manager.LEDGER)[:1]
   records=json.loads(manager.JSON_LEDGER.read_text())[:1]

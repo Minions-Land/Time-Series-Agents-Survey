@@ -4,7 +4,7 @@
 
 ## Version and labels
 
-`references/taxonomy_schema.json` is the version authority for record fields and controlled vocabulary. Version 2.5 adds attributed external resources, boundary-review records and original task values. Work-level and module-level public task labels use the same canonical names. Legacy CSV boolean column names remain storage keys; export maps them to the canonical task vocabulary. Original prose labels and pre-migration aliases are retained. Historical review files are immutable evidence, not the current taxonomy authority.
+`references/taxonomy_schema.json` is the version authority for record fields and controlled vocabulary. Version 2.5 adds attributed external resources, boundary-review records and original task values. Version 2.6 adds module-level `reuse_evidence`: a GH or GTS module is `demonstrated` when its source applies it to two or more task families (module tasks, else work tasks) and `inferred` otherwise; LLM-side and TSK modules are `not_applicable`. The migration fills the field only when it is absent, so a reviewed value survives later runs. Work-level and module-level public task labels use the same canonical names. Legacy CSV boolean column names remain storage keys; export maps them to the canonical task vocabulary. Original prose labels and pre-migration aliases are retained. Historical review files are immutable evidence, not the current taxonomy authority.
 
 ## Resources
 
