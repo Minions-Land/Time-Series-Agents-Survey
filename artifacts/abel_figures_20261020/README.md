@@ -14,3 +14,5 @@ The General Harness view follows the five-function revision present on Overleaf 
 Line icons are adapted from [Lucide](https://github.com/lucide-icons/lucide/tree/main/icons), under the ISC license. They are native editable paths, not raster images. See LUCIDE_LICENSE for the license and attribution. Existing contributor figures supply the compositions and temporal examples.
 
 Validated: one slide per PPTX, native groups, no raster figures, package and geometry checks, Artifact Tool import, PDF rendering, manuscript compilation. The revised task figure was also opened and ungrouped in Microsoft PowerPoint. Original conversion files had separately passed PowerPoint checks.
+
+`drafts/` holds the contributors' first drafts and reference screenshots shared on 20 October 2026 (`llm-side-figure.pptx`, `task_harness_overview_polished.pptx`, and three `img_v3_*` images). They precede `final/` and are kept for provenance.
