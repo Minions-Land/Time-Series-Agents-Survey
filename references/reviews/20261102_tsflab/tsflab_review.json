@@ -1,0 +1,206 @@
+[
+ {
+  "citation_key": "tsflab2026",
+  "arxiv_id": "2610.40901",
+  "work": "TSFLab",
+  "title_checked": "TSFLab: A Self-Improving Agent-Agnostic Workbench for Time Series Forecasting Research",
+  "decision": "INCLUDE",
+  "decision_reason": "The paper equips coding agents with shared forecasting resources, tools, and a self-maintaining workflow and evaluates agent research tasks; it extends the repository record previously cited as ModernTSF.",
+  "work_type": "System-Method",
+  "claimed_as_agent": "Yes",
+  "agent_claim_evidence": "Abstract and Section 1 frame TSFLab as a workbench that equips compatible coding agents and supports agent-driven research.",
+  "status": "paper_verified",
+  "claim_summary": "TSFLab is an agent-agnostic workbench for time series forecasting research: compatible coding agents share a forecasting research guide, layered knowledge cards for 323 methods, 93 datasets and 71 reusable units, a declarative experiment runner under shared protocols, and a recursive improver that verifies and merges new resources.",
+  "task_family_original": "Forecasting and prediction",
+  "task_memberships": [
+   "forecasting_prediction"
+  ],
+  "other_tasks": [],
+  "evaluation_summary": "Paper reproduction (four papers x three attempts) and benchmarking on new data (eight methods x two datasets x three attempts) with Codex CLI against no workbench, TSLib, and TFB, repeated with Claude Code and a second Codex model; module ablations; and a method-development pilot on ETTh1 and Weather. Reported gains: 20-163% higher completion and 11-66% fewer fresh tokens per completed task; the pilot uses 32.8-73.6% fewer fresh tokens and 9.2-68.8% less development time.",
+  "corrections": [
+   "Gains are relative to coding agents without a workbench or with TSLib/TFB under the authors' prompts, budgets, and review criteria.",
+   "The method-development pilot covers two datasets and is reported as a pilot study."
+  ],
+  "pages_inspected": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "notes": "Identity and method/evaluation passages checked against the arXiv v1 PDF; not an independent reproduction.",
+  "modules": [
+   {
+    "id": "tsflab2026:agent-agnostic-workbench",
+    "name": "Agent-agnostic research workbench",
+    "layer": "GH",
+    "dimensions": [
+     "Interface and Interaction"
+    ],
+    "tasks": [],
+    "other_tasks": [],
+    "scope_reason": "Shared resources and tools are placed outside the agent and exposed to any compatible coding agent without altering it; the mechanism does not depend on temporal semantics or on a task objective.",
+    "role": "method",
+    "evidence": [
+     {
+      "locator_type": "page_section",
+      "locator": "PDF p.2; passage beginning \"In contrast, a workbench is plug-and-pla\"",
+      "quote": "In contrast, a workbench is plug-and-play infrastructure for any compatible agent, such as Claude Code (Anthropic, 2026), Codex (OpenAI, 2026), and Pi (Earendil Works, 2026), benefiting from their continuously improving capabilities.",
+      "source_path": "references/pdfs/tsflab2026.pdf"
+     },
+     {
+      "locator_type": "page_section",
+      "locator": "PDF p.1; passage beginning \"we propose TSFLab, a self-improving agen\"",
+      "quote": "we propose TSFLab, a self-improving agent-agnostic “workbench” that equips compatible coding agents with shared resources and tools for low-cost TSF research and continuous maintenance of research resources.",
+      "source_path": "references/pdfs/tsflab2026.pdf"
+     }
+    ]
+   },
+   {
+    "id": "tsflab2026:domain-guide",
+    "name": "Forecasting research guide with task-specific skills",
+    "layer": "TSK",
+    "dimensions": [
+     "Memory and Context",
+     "Planning and Workflow"
+    ],
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "scope_reason": "Entry instructions and skills encode forecasting workflows, evaluation settings, and pitfalls such as the forecast target and metric choice, so the guidance is bound to the forecasting task contract.",
+    "role": "method",
+    "evidence": [
+     {
+      "locator_type": "page_section",
+      "locator": "PDF p.4; passage beginning \"TSF-Domain Guide connects this knowledge\"",
+      "quote": "TSF-Domain Guide connects this knowledge to workbench procedures: entry instructions introduce conventions and module interactions, while 17 task-specific skills provide steps, checks, and pitfalls as needed.",
+      "source_path": "references/pdfs/tsflab2026.pdf"
+     },
+     {
+      "locator_type": "page_section",
+      "locator": "PDF p.4; passage beginning \"The skill also requires checking whether\"",
+      "quote": "The skill also requires checking whether forecasts are evaluated on one target or all variables, keeping metrics consistent across methods.",
+      "source_path": "references/pdfs/tsflab2026.pdf"
+     }
+    ]
+   },
+   {
+    "id": "tsflab2026:knowledge-cards",
+    "name": "Layered knowledge cards and shared model units",
+    "layer": "TSK",
+    "dimensions": [
+     "Memory and Context",
+     "Tools and Execution"
+    ],
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "scope_reason": "Method and unit cards describe forecasting models, their configurations, and reusable forecasting blocks such as RevIN, so the knowledge structure is organized around forecasting methods.",
+    "role": "method",
+    "evidence": [
+     {
+      "locator_type": "page_section",
+      "locator": "PDF p.4; passage beginning \"It provides a knowledge card for each me\"",
+      "quote": "It provides a knowledge card for each method, dataset, and unit, organized into summary, card, and source levels.",
+      "source_path": "references/pdfs/tsflab2026.pdf"
+     },
+     {
+      "locator_type": "page_section",
+      "locator": "PDF p.5; passage beginning \"Knowledge Structurer also extracts commo\"",
+      "quote": "Knowledge Structurer also extracts common blocks, such as RevIN, series decomposition, and attention variants, into shared units that methods import, enabling shared maintenance; 263 methods reuse at least one unit.",
+      "source_path": "references/pdfs/tsflab2026.pdf"
+     }
+    ]
+   },
+   {
+    "id": "tsflab2026:shared-data-protocol",
+    "name": "Shared temporal data registration and leakage-safe splitting",
+    "layer": "GTS",
+    "dimensions": [
+     "Tools and Execution",
+     "Control, Verification, and Feedback"
+    ],
+    "tasks": [],
+    "other_tasks": [],
+    "scope_reason": "Dataset cards and shared routines record time fields, sampling frequency, splits, and scaling, and fit scaling on training data only; these temporal data operations are reusable beyond one forecasting method.",
+    "role": "method",
+    "evidence": [
+     {
+      "locator_type": "page_section",
+      "locator": "PDF p.5; passage beginning \"Dataset cards record data characteristic\"",
+      "quote": "Dataset cards record data characteristics and split, scaling, and evaluation protocols.",
+      "source_path": "references/pdfs/tsflab2026.pdf"
+     },
+     {
+      "locator_type": "page_section",
+      "locator": "PDF p.5; passage beginning \"Shared routines split data as configured\"",
+      "quote": "Shared routines split data as configured, fit scaling on training data only, select checkpoints on validation data, and compute metrics consistently.",
+      "source_path": "references/pdfs/tsflab2026.pdf"
+     }
+    ]
+   },
+   {
+    "id": "tsflab2026:experiment-workflower",
+    "name": "Declarative experiment runner under shared protocols",
+    "layer": "TSK",
+    "dimensions": [
+     "Tools and Execution",
+     "Planning and Workflow",
+     "Control, Verification, and Feedback"
+    ],
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "other_tasks": [],
+    "scope_reason": "Agents declare experiments with lookback, horizon, and training budget, and results are compared only under the same forecasting protocol, which binds the runner to the forecasting evaluation contract.",
+    "role": "method",
+    "evidence": [
+     {
+      "locator_type": "page_section",
+      "locator": "PDF p.5; passage beginning \"For new-data benchmarking, an agent comb\"",
+      "quote": "For new-data benchmarking, an agent combines dataset and method presets, fixes the lookback, horizon, and training budget, and sweeps methods and seeds.",
+      "source_path": "references/pdfs/tsflab2026.pdf"
+     },
+     {
+      "locator_type": "page_section",
+      "locator": "PDF p.5; passage beginning \"Result summaries compare methods only un\"",
+      "quote": "Result summaries compare methods only under the same data processing, training, and evaluation protocol, reporting seed coverage and variation.",
+      "source_path": "references/pdfs/tsflab2026.pdf"
+     }
+    ]
+   },
+   {
+    "id": "tsflab2026:recursive-improver",
+    "name": "Verified self-maintenance of shared resources",
+    "layer": "GH",
+    "dimensions": [
+     "Optimization and Evolution",
+     "Control, Verification, and Feedback"
+    ],
+    "tasks": [],
+    "other_tasks": [],
+    "scope_reason": "Verified outputs and fixes from any session are merged into the shared workbench after usability, complexity, and consistency checks; the improvement mechanism is domain-independent.",
+    "role": "method",
+    "evidence": [
+     {
+      "locator_type": "page_section",
+      "locator": "PDF p.5; passage beginning \"Here, self-improvement means incorporati\"",
+      "quote": "Here, self-improvement means incorporating verified research outputs and fixes into the workbench’s shared resources and workflows so later agents can reuse them.",
+      "source_path": "references/pdfs/tsflab2026.pdf"
+     },
+     {
+      "locator_type": "page_section",
+      "locator": "PDF p.5; passage beginning \"Recursive Improver brings external resou\"",
+      "quote": "Recursive Improver brings external resources and agent-produced outcomes back into the shared workbench through checks for usability, complexity, and consistency (Fig. 2d).",
+      "source_path": "references/pdfs/tsflab2026.pdf"
+     }
+    ]
+   }
+  ]
+ }
+]

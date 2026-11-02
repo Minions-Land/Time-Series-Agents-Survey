@@ -1,0 +1,5 @@
+# TSFLab addition (2 November 2026)
+
+TSFLab (arXiv 2610.40901 v1, 29 October 2026) is the paper version of the repository earlier cited as ModernTSF; `Diaugeia/ModernTSF` now redirects to `D2I-Group/TSFLab`. The arXiv v1 PDF was read and coded with the October intake conventions. `tsflab_review.json` holds the record: decision, claim, task membership, evaluation summary, cautions, inspected pages, and six source-located modules (GH: agent-agnostic workbench, verified self-maintenance; GTS: shared temporal data registration and leakage-safe splitting; TSK: forecasting research guide, knowledge cards and shared units, declarative experiment runner). All twelve module quotations match their declared PDF pages under `scripts/audit_review_evidence.py`.
+
+No other workbench appears in the reviewed corpus, which supports describing TSFLab as the first workbench for time series forecasting research among the works reviewed. The manuscript replaces the four ModernTSF mentions with TSFLab and adds it to Sections 1 and 2.
