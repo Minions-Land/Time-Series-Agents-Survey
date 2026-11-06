@@ -10,7 +10,7 @@ from pptx.oxml.ns import qn
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEDIA = os.path.join(ROOT, 'logos')          # institution logos taken from the Figure 2 PPTX
-ICONS = {'pixel': os.path.join(ROOT, 'icons', 'pixel'), 'clay': os.path.join(ROOT, 'icons', 'clay')}
+ICONS = {'pixel': os.path.join(ROOT, 'icons', 'pixel'), 'clay': os.path.join(ROOT, 'icons', 'clay_print')}   # print-size copies; masters in icons/clay
 
 # Palette follows Figure 1 of the manuscript.
 C = dict(llm='F0A030', gh='3B5BA5', gts='2A9D8F', tsk='E05A47', ev='5B5F97',

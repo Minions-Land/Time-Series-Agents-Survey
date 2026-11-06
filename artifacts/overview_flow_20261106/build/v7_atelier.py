@@ -19,7 +19,7 @@ D = (0.6, -0.5)        # depth vector of the oblique projection
 T = 0.4                # plate thickness
 CX = 6.72              # centre of the build zone
 PLATES = dict(gh=(3.67, 6.2, 5.5), gts=(3.87, 4.75, 5.1), tsk=(4.07, 3.3, 4.7))   # front-left x, front y, width
-VERBS = dict(gh=('REUSE', 'General Harness'), gts=('ADAPT', 'General Time-Series Harness'),
+VERBS = dict(gh=('REUSE', 'General Harness'), gts=('ADAPT', 'General Time Series Harness'),
              tsk=('REDESIGN', 'Task-Specific Harness'))
 GLYPHS = dict(
     # captions follow the subsection headings of Sections 4-6
@@ -145,7 +145,8 @@ def mini_forecast(sh, x, y, w, h, cut=0.62):
     t0 = xs[kc]
     arrow(sh, t0, y - 0.06, t0, y + h + 0.02, color=HUE['gts'][0], lw=1.4, dash=MSO_LINE.DASH, head=None)
     pill = box(sh, t0 - 0.22, y + h + 0.02, 0.44, 0.24, fill=HUE['gts'][0], radius=0.5)
-    runs(pill, [('t', 'FFFFFF', True, False), ('0', 'FFFFFF', True, True)], 12)
+    runs(pill, [('τ', 'FFFFFF', True, False)], 15)
+    r = pill.text_frame.paragraphs[0].runs[0]; r.font.name = 'Times New Roman'; r.font.italic = True   # matches $\tau$ in the text
 
 
 def inputs(slide):
