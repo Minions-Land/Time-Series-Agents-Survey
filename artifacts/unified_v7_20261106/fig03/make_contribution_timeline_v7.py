@@ -31,6 +31,9 @@ OUT_PNG = HERE / "Figure03_V7.png"
 OUT_PDF = HERE / "Figure03_V7.pdf"
 OUT_CSV = HERE / "module_contribution_timeline.csv"
 OUT_COVERAGE = HERE / "module_contribution_timeline_coverage.json"
+OUT_TEMPORAL = HERE / "temporal_function_placement.csv"     # panel (c) counts, quoted in the text
+TEMPORAL: list[tuple[str, str, str, str]] = []                # (month, temporal function, layer, reuse level)
+FUNCTIONS = ["data_management", "processing", "context_memory", "validation"]
 
 
 def count_module_labels(value: dict) -> int:
@@ -80,6 +83,10 @@ def main() -> None:
             continue
         dated_records.append(record["citation"]["key"])
         monthly.setdefault(month, Counter()).update(counts)
+        for module in record["module_level_contributions"]["modules"]:
+            if module["layer"] in ("GTS", "TSK"):
+                for function in (module.get("function_view") or {}).get("functions") or []:
+                    TEMPORAL.append((month, function, module["layer"], module["reuse_evidence"]["level"]))
 
     months = sorted(monthly)
     running = Counter()
@@ -104,6 +111,15 @@ def main() -> None:
         'plotted_modules': dict(running), 'counting_unit': 'unique reviewed module ID',
         'year_only_placement': 'January; date precision retained in ledger'
     }, indent=2)+'\n')
+    with OUT_TEMPORAL.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle, lineterminator="\n")
+        writer.writerow(["function", "General Time Series Harness", "Task-Specific Harness",
+                         "GTS demonstrated reuse", "GTS inferred reuse"])
+        for function in FUNCTIONS:
+            rows_f = [t for t in TEMPORAL if t[1] == function]
+            writer.writerow([function, sum(t[2] == "GTS" for t in rows_f), sum(t[2] == "TSK" for t in rows_f),
+                             sum(t[2] == "GTS" and t[3] == "demonstrated" for t in rows_f),
+                             sum(t[2] == "GTS" and t[3] == "inferred" for t in rows_f)])
     plot_timeline(months, cumulative)
 
 
@@ -150,10 +166,13 @@ def first_lasting_lead(leader, other):
     return None
 
 
-FIG_W, FIG_H = 13.333, 6.45        # inches; the kit canvas width
-ZONES = {"a": (0.12, 0.10, 6.88, 5.10), "b": (7.16, 0.10, 6.05, 5.10)}   # x, y, w, h in inches from bottom-left
-AXES = {"a": (1.02, 0.80, 5.36, 3.98), "b": (8.16, 1.12, 4.92, 3.48)}
-TITLES = {"a": "(a)  Cumulative Module Contributions", "b": "(b)  Share of New Modules by Period"}
+FIG_W, CH = 13.333, 6.15            # inches; the kit canvas width, height of panel (c)
+FIG_H = 6.45 + CH + 0.35
+OY = CH + 0.35                       # the top row sits above panel (c)
+ZONES = {"a": (0.12, OY + 0.10, 6.88, 5.10), "b": (7.16, OY + 0.10, 6.05, 5.10), "c": (0.12, 0.10, 13.09, CH - 0.1)}
+AXES = {"a": (1.02, OY + 0.80, 5.36, 3.98), "b": (8.16, OY + 1.12, 4.92, 3.48)}
+TITLES = {"a": "(a)  Cumulative Module Contributions", "b": "(b)  Share of New Modules by Period",
+          "c": "(c)  Where Temporal Functions Are Implemented"}
 
 
 def zone_panel(fig, key):
@@ -263,10 +282,112 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
 
     handles = [plt.Line2D([], [], color=COLORS[n], lw=3.2, marker="o", ms=7.5, mfc=COLORS[n], mec="none") for n in LAYERS]
     fig.legend(handles, legend_labels, loc="center", ncol=2, frameon=False, fontsize=14,
-               bbox_to_anchor=(0.5, 5.92 / FIG_H), handlelength=2.0, columnspacing=3.0, labelspacing=0.45)
+               bbox_to_anchor=(0.5, (OY + 5.92) / FIG_H), handlelength=2.0, columnspacing=3.0, labelspacing=0.45)
+    parallel_paths(fig, months)
     fig.savefig(OUT_PNG, dpi=110)
     fig.savefig(OUT_PDF)
     plt.close(fig)
+
+
+# ---- (c) parallel paths: one path per (module, temporal function) assignment -------------------------------------
+FUNC_LABEL = {"data_management": "Temporal Data\nManagement", "processing": "Temporal\nProcessing",
+              "context_memory": "Temporal Context\nand Memory", "validation": "Temporal\nValidation"}
+NODE_FILL, NODE_EDGE = "#FFFFFF", "#D9DBE8"
+
+
+def parallel_paths(fig, months):
+    """Period -> temporal function -> layer -> reuse evidence. Colour: shared module (General Time Series Harness,
+    sea teal; darker when its reuse across task families is demonstrated) or task procedure (terracotta)."""
+    from matplotlib.patches import FancyBboxPatch as Box
+    from matplotlib.path import Path as MPath
+    from matplotlib.patches import PathPatch
+    x0, y0, w, h = ZONES["c"]
+    cx = fig.add_axes((x0 / FIG_W, y0 / FIG_H, w / FIG_W, h / FIG_H)); cx.set_xlim(0, w); cx.set_ylim(0, h); cx.axis("off")
+    period_of = lambda m: next(label for label, end in PERIODS if m <= end)
+    items = [(period_of(m), f, layer, reuse) for m, f, layer, reuse in TEMPORAL]
+    axes = [
+        ("Period", [p for p, _ in PERIODS], lambda it: it[0], lambda k: k),
+        ("Temporal Function", FUNCTIONS, lambda it: it[1], lambda k: FUNC_LABEL[k]),
+        ("Implemented In", ["GTS", "TSK"], lambda it: it[2],
+         lambda k: {"GTS": "General Time Series\nHarness", "TSK": "Task-Specific\nHarness"}[k]),
+        ("Reuse Evidence", ["demonstrated", "inferred", "not_applicable"], lambda it: "demonstrated" if it[3] == "demonstrated"
+         else ("inferred" if it[3] == "inferred" else "not_applicable"),
+         lambda k: {"demonstrated": "Demonstrated\n(≥2 Task Families)", "inferred": "Inferred\nfrom Interface",
+                    "not_applicable": "Task-Bound"}[k]),
+    ]
+    XS, BWS = [0.45, 3.75, 7.3, 10.75], [1.5, 2.05, 2.05, 2.05]   # left edge and width of each axis' boxes
+    MINH, GAPS = [0.46, 0.86, 0.6, 0.6], [0.1, 0.12, 0.14, 0.14]   # near-equal function boxes, as in parallel sets
+    top, bottom = h - 1.05, 0.62
+    boxes = {}
+    for a, (title, keys, key_of, label) in enumerate(axes):
+        BW, gap, minh = BWS[a], GAPS[a], MINH[a]
+        cx.text(XS[a] + BW / 2, h - 0.62, title, ha="center", va="center", fontsize=14.5, fontweight="bold", color=INK)
+        counts = Counter(key_of(it) for it in items)
+        span = top - bottom - gap * (len(keys) - 1)
+        free = span - minh * len(keys)
+        y = top
+        for k in keys:
+            hh = minh + free * counts[k] / len(items)
+            boxes[(a, k)] = (y - hh, hh)
+            y -= hh + gap
+    # slot positions: on each side of a box, order paths by the node they come from / go to (fewer crossings)
+    order = {a: {k: i for i, k in enumerate(axes[a][1])} for a in range(4)}
+    keyed = [[axes[a][2](it) for a in range(4)] for it in items]
+    slots = {}
+    for a in range(4):
+        for side, nb in (("L", a - 1), ("R", a + 1)):
+            if nb < 0 or nb > 3: continue
+            for k in axes[a][1]:
+                idx = [i for i, kk in enumerate(keyed) if kk[a] == k]
+                idx.sort(key=lambda i: (order[nb][keyed[i][nb]], order[max(0, a - 1)][keyed[i][max(0, a - 1)]],
+                                        order[min(3, a + 1)][keyed[i][min(3, a + 1)]]))
+                yb, hh = boxes[(a, k)]
+                for j, i in enumerate(idx):
+                    slots[(i, a, side)] = yb + hh - hh * (j + 1) / (len(idx) + 1)
+    style = {("GTS", "demonstrated"): (COLORS["General Time Series Harness"], 1.9, 0.9),
+             ("GTS", "inferred"): ("#7FB7B1", 1.4, 0.75),
+             ("TSK", "not_applicable"): (COLORS["Task-Specific Harness"], 1.1, 0.42)}
+    draw = sorted(range(len(items)), key=lambda i: (items[i][2] == "GTS", items[i][3] == "demonstrated"))   # strong on top
+    for i in draw:
+        col, lw, al = style[(items[i][2], keyed[i][3])]
+        for a in range(3):
+            xa, xb = XS[a] + BWS[a], XS[a + 1]
+            ya, yb = slots[(i, a, "R")], slots[(i, a + 1, "L")]
+            xm = (xa + xb) / 2
+            p = MPath([(xa, ya), (xm, ya), (xm, yb), (xb, yb)], [MPath.MOVETO, MPath.CURVE4, MPath.CURVE4, MPath.CURVE4])
+            cx.add_patch(PathPatch(p, fc="none", ec=col, lw=lw, alpha=al, zorder=2, capstyle="round"))
+    # boxes with counts; the function boxes carry the shared share, the key quantity of the panel
+    for (a, k), (yb, hh) in boxes.items():
+        title, keys, key_of, label = axes[a]
+        BW = BWS[a]
+        n = sum(1 for kk in keyed if kk[a] == k)
+        edge, lwb, subcol, subw = NODE_EDGE, 1.1, MUTED, "normal"
+        sub = f"n = {n}"
+        if a == 1:
+            g = sum(1 for kk in keyed if kk[1] == k and kk[2] == "GTS")
+            sub = f"{g} shared · {n - g} in tasks"
+            if g / n < 0.2:
+                edge, lwb, subcol, subw = COLORS["Task-Specific Harness"], 2.0, COLORS["Task-Specific Harness"], "bold"
+        if a == 3 and k == "demonstrated": edge, lwb = COLORS["General Time Series Harness"], 2.0
+        cx.add_patch(Box((XS[a], yb), BW, hh, boxstyle="round,pad=0,rounding_size=0.07", fc=NODE_FILL, ec=edge, lw=lwb, zorder=3))
+        lines = label(k).split("\n")
+        mid = yb + hh / 2
+        line_h = 0.22                                     # inches per 12.5 pt line
+        block = line_h * len(lines) + 0.24                # title lines + count line
+        t_y = mid + block / 2 - line_h * len(lines) / 2   # centre of the title block
+        cx.text(XS[a] + BW / 2, t_y, "\n".join(lines), ha="center", va="center", fontsize=12.5,
+                fontweight="bold", color=INK, zorder=4, linespacing=1.0)
+        cx.text(XS[a] + BW / 2, mid - block / 2 + 0.1, sub, ha="center", va="center", fontsize=11.5,
+                color=subcol, fontweight=subw, zorder=4)
+    # legend
+    ly = 0.24
+    for j, (lab, (col, lw, al)) in enumerate([("Shared Module, Reuse Demonstrated", style[("GTS", "demonstrated")]),
+                                              ("Shared Module, Reuse Inferred", style[("GTS", "inferred")]),
+                                              ("Inside a Task Procedure", style[("TSK", "not_applicable")])]):
+        xl = 0.9 + j * 4.15
+        cx.plot([xl, xl + 0.55], [ly, ly], color=col, lw=lw + 1.2, alpha=min(1, al + 0.15), solid_capstyle="round")
+        cx.text(xl + 0.7, ly, lab, va="center", fontsize=12.5, color=INK)
+
 
 if __name__ == "__main__":
     main()
