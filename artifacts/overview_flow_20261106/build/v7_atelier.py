@@ -11,10 +11,9 @@ from pptx.enum.dml import MSO_LINE
 
 F = 'Comic Sans MS'
 W, H = 13.333, 7.0
-INK, MUTE = '1F2A44', '5E6472'
-HUE = dict(  # (dark, mid, light) per component
-    llm=('C9861A', 'F3C977', 'FDF2DC'), gh=('3B5BA5', '9FB3E1', 'E4EBF8'), gts=('23887C', '8ACDC4', 'DDF2EF'),
-    tsk=('C9503F', 'EFA396', 'FCE6E1'), ev=('5B5F97', 'B3B6D6', 'ECEDF6'))
+import sys as _sys
+_sys.path.insert(0, os.path.join(ROOT, '..', 'unified_v7_20261106', 'kit'))
+from v7kit import HUE, INK, MUTE, ZONE_FILL, PAPER_LINE   # one palette for every figure
 D = (0.6, -0.5)        # depth vector of the oblique projection
 T = 0.4                # plate thickness
 CX = 6.72              # centre of the build zone
@@ -54,10 +53,10 @@ def runs(shape, parts, size, align=PP_ALIGN.CENTER):
     return shape
 
 
-def zone(slide, x, y, w, h, fill, line, title, tfill, bw):
+def zone(slide, x, y, w, h, key, title, bw):
     g = group(slide); sh = g.shapes
-    box(sh, x, y, w, h, fill=fill, line=line, lw=1.0, radius=0.035, dash=MSO_LINE.DASH)
-    b = box(sh, x + w / 2 - bw / 2, y - 0.25, bw, 0.5, fill=tfill, radius=0.5); shadow(b)
+    box(sh, x, y, w, h, fill=ZONE_FILL[key], radius=0.035)          # tint only, no frame
+    b = box(sh, x + w / 2 - bw / 2, y - 0.25, bw, 0.5, fill=HUE[key][0], radius=0.5); shadow(b)
     label_in(b, title, size=19, font=F)
     return g
 
@@ -65,7 +64,7 @@ def zone(slide, x, y, w, h, fill, line, title, tfill, bw):
 def paper(sh, x, y, w, h, line, n=3):
     """A stack of n sheets, offset up-right, with a drop shadow."""
     for k in range(n - 1, -1, -1):
-        s = box(sh, x + 0.07 * k, y - 0.07 * k, w, h, fill='FFFFFF', line=line, lw=1.3 if k == 0 else 0.9,
+        s = box(sh, x + 0.07 * k, y - 0.07 * k, w, h, fill='FFFFFF', line=PAPER_LINE, lw=1.0 if k == 0 else 0.75,
                 shape=MSO_SHAPE.RECTANGLE)
         sketchy(s)
         if k == n - 1: shadow(s)
@@ -156,7 +155,7 @@ def inputs(slide):
     paper(sh, x, 1.0, w, 1.5, 'B9A98A')
     ic(sh, 'request', x + 0.08, 1.03, 0.66)
     tx(sh, x + 0.8, 1.1, 1.6, 0.4, 'Task', size=17, bold=True, align='l')
-    b = box(sh, x + 0.13, 1.8, w - 0.26, 0.6, fill='FFF6E3', line='D9C49A', lw=0.8, radius=0.3)
+    b = box(sh, x + 0.13, 1.8, w - 0.26, 0.6, fill=HUE['data'][2], radius=0.3)
     label_in(b, ['“Forecast next week,', 'flag risks, advise action”'], size=12.5, bold=False, color=INK, font=F)
     for p in b.text_frame.paragraphs: p.runs[0].font.italic = True
     # context
@@ -172,9 +171,9 @@ def inputs(slide):
     for k, (col, ph, a) in enumerate([(INK, 0.0, 1.0), (HUE['gts'][0], 0.23, 0.8), (HUE['gh'][0], 0.51, 0.7)]):
         series(sh, x + 0.15, 5.26 + k * 0.38, w - 0.3, 0.4, col, ph, a, lw=1.5)
     # bracket: data goes to the harness, the request goes to the LLM
-    poly(sh, [(3.04, 2.95), (3.12, 2.95), (3.12, 6.5), (3.04, 6.5)], 'A49A86', lw=1.3)
-    arrow(sh, 3.14, 4.72, 3.85, 4.98, color='A49A86', lw=2.4)
-    arrow(sh, 2.99, 1.72, 3.42, 1.72, color='A49A86', lw=2.4)
+    poly(sh, [(3.04, 2.95), (3.12, 2.95), (3.12, 6.5), (3.04, 6.5)], HUE['data'][1], lw=1.3)
+    arrow(sh, 3.14, 4.72, 3.85, 4.98, color=HUE['data'][0], lw=2.4)
+    arrow(sh, 2.99, 1.72, 3.42, 1.72, color=HUE['data'][0], lw=2.4)
     return g
 
 
@@ -187,7 +186,7 @@ def llm_block(slide):
         cx = 3.85 + k * 0.74
         ic(sh, nm, cx - 0.26, 1.03, 0.52)
         tx(sh, cx - 0.45, 1.64, 0.9, 0.26, cap, size=13, color=dk, bold=True)
-    halo = box(sh, CX - 0.95, 0.62, 1.9, 1.75, fill='FFF1CC', shape=MSO_SHAPE.OVAL); alpha_fill(halo, 55)
+    halo = box(sh, CX - 0.95, 0.62, 1.9, 1.75, fill=HUE['llm'][2], shape=MSO_SHAPE.OVAL); alpha_fill(halo, 90)
     pedestal(sh, CX - 0.6, 1.98, 1.2, 0.34, 'llm')
     ic(sh, 'robot', CX - 0.75, 0.7, 1.5)
     return g
@@ -201,7 +200,7 @@ def stack(slide):
     for up, lo in (('gts', 'gh'), ('tsk', 'gts')):
         ux, uy, uw = PLATES[up]; ly = PLATES[lo][1]
         for px in (ux, ux + uw):
-            arrow(sh, px, uy + T, px, ly - 0.12, color='8C93A3', lw=1.0, dash=MSO_LINE.ROUND_DOT, head=None)
+            arrow(sh, px, uy + T, px, ly - 0.12, color=HUE['ink'][1], lw=1.0, dash=MSO_LINE.ROUND_DOT, head=None)
     # action down / observation up through every layer
     gaps = [(2.36, 3.0), (3.3 + T + 0.03, 4.4)]   # the five-module base plate keeps its centre
     for y0, y1 in gaps:
@@ -224,7 +223,7 @@ def funnel(slide):
     cx, y0, h, gap, top, bot = 11.71, 1.0, 0.58, 0.06, 2.72, 1.62
     rows = [('process', 'Process'), ('time_check', 'Temporal'), ('benchmark', 'Task'), ('utility', 'Decision')]
     second = ['Validity', 'Validity', 'Performance', 'Utility']   # evaluation criteria named in Sections 2 and 9
-    fills = ['F1F1F8', 'E2E3F1', 'D2D4EA', 'C2C5E2']
+    fills = ['F3F4FA', 'E6E7F3', 'D8DAEC', 'CACDE5']   # light -> mid of the evaluation hue
     span = 4 * h + 3 * gap
     for k, (nm, lab) in enumerate(rows):
         ya, yb = y0 + k * (h + gap), y0 + k * (h + gap) + h
@@ -263,9 +262,9 @@ def flows(slide):
 def build(out):
     p, slide = new_pres(W, H)
     box(slide.shapes, 0, 0, W, H, fill='FFFFFF', shape=MSO_SHAPE.RECTANGLE)
-    zone(slide, 0.2, 0.42, 2.95, 6.4, 'FAF7F0', 'D8CDB5', 'Scenario & Data', '8A7A5C', 2.6)
-    zone(slide, 3.27, 0.42, 6.9, 6.4, 'F5F7FB', 'C9D2E3', 'Build a Time Series Agent', INK, 4.4)
-    zone(slide, 10.29, 0.42, 2.84, 6.4, 'F6F5FA', 'CFCFE3', 'Evaluation', HUE['ev'][0], 2.2)
+    zone(slide, 0.2, 0.42, 2.95, 6.4, 'data', 'Scenario & Data', 2.6)
+    zone(slide, 3.27, 0.42, 6.9, 6.4, 'ink', 'Build a Time Series Agent', 4.4)
+    zone(slide, 10.29, 0.42, 2.84, 6.4, 'ev', 'Evaluation', 2.2)
     inputs(slide)
     stack(slide)
     llm_block(slide)

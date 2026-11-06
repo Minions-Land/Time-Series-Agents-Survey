@@ -9,8 +9,10 @@ STYLE RULES (every figure must follow them so the paper reads as one set)
   labels and icon captions 12.5-14 pt; nothing below 11.5 pt. Short labels use Title Case ("Observed Series").
   Uppercase only for verb stamps (REUSE / ADAPT / REDESIGN).
 - Wording: take labels from the manuscript (headings, captions, body text). Do not invent claims, verbs or names.
-- Palette (HUE): one semantic hue per survey component, each with (dark, mid, light):
-  llm amber, gh blue, gts teal, tsk red, ev indigo; plus 'data' sand for inputs/scenarios and 'ink' neutral.
+- Palette (HUE): muted, blue-violet as the main colour; one semantic hue per survey component (dark, mid, light):
+  llm ochre, gh steel blue, gts sea teal, tsk soft terracotta, ev blue-violet; 'data' warm grey for inputs;
+  'ink' blue-violet for frames and banners; 'alert' muted brick only for small error / failure marks.
+  No large red areas. Zones are tinted without frames; cards have shadows without outlines.
   Dark = text, outlines, arrows, banner fills; mid = side faces / secondary fills; light = surfaces.
 - Layout grammar:
   * zone(): pale tinted rounded panel with a dashed outline and a dark pill banner centred on its top edge.
@@ -40,12 +42,21 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ICON_DIR = os.path.abspath(os.path.join(HERE, '..', '..', 'overview_flow_20261106', 'icons', 'clay'))
 F = 'Comic Sans MS'
 W = 13.333
-INK, MUTE = '1F2A44', '5E6472'
+INK, MUTE = '262A4D', '666A84'
+# Muted palette, blue-violet as the main colour (2026-11-06). Red is not a component colour any more:
+# it is reserved for small error / warning marks (key 'alert').
 HUE = dict(  # (dark, mid, light)
-    llm=('C9861A', 'F3C977', 'FDF2DC'), gh=('3B5BA5', '9FB3E1', 'E4EBF8'), gts=('23887C', '8ACDC4', 'DDF2EF'),
-    tsk=('C9503F', 'EFA396', 'FCE6E1'), ev=('5B5F97', 'B3B6D6', 'ECEDF6'), data=('8A7A5C', 'D8CDB5', 'FAF7F0'),
-    ink=('1F2A44', 'C9D2E3', 'F5F7FB'))
-ZONE_FILL = dict(llm='FFF9EE', gh='F4F7FC', gts='F2FAF8', tsk='FEF6F4', ev='F6F5FA', data='FAF7F0', ink='F5F7FB')
+    llm=('B0852F', 'E5CD9B', 'FBF6EA'),    # LLM side: ochre
+    gh=('44689F', 'AFC1DE', 'EEF2F9'),     # General Harness: steel blue
+    gts=('37807A', 'A3CCC8', 'ECF5F4'),    # General Time Series Harness: sea teal
+    tsk=('BC6E52', 'E8B8A5', 'FBF0EB'),    # Task-Specific Harness: soft terracotta (chosen 2026-11-06)
+    ev=('4B4F96', 'B5B8DA', 'F0F1F8'),     # Evaluation: the main blue-violet
+    data=('857A68', 'D9D2C4', 'FAF8F3'),   # scenario / inputs: warm grey
+    ink=('4B4F96', 'B5B8DA', 'F0F1F8'),    # frames and banners: the main blue-violet
+    alert=('B5574B', 'E6B1AA', 'FAEDEB'))  # errors, failures, late data only
+ZONE_FILL = dict(llm='FDFAF3', gh='F5F8FC', gts='F4F9F8', tsk='FDF7F4', ev='F6F7FB', data='FBFAF6', ink='F6F7FB',
+                 alert='FDF6F5')
+PAPER_LINE = 'CDD0E0'
 
 
 def rgb(h):
@@ -210,24 +221,24 @@ def zone(slide, x, y, w, h, title, key='ink', bw=None, size=19):
     """Tinted dashed panel with a dark pill banner on its top edge. bw: banner width (default from title length)."""
     g = group(slide); sh = g.shapes
     dk, md, lt = HUE[key]
-    box(sh, x, y, w, h, fill=ZONE_FILL[key], line=md, lw=1.0, radius=min(0.035, 0.25 / max(h, 1)), dash=MSO_LINE.DASH)
+    box(sh, x, y, w, h, fill=ZONE_FILL[key], radius=min(0.035, 0.25 / max(h, 1)))   # tint only, no frame
     if title:
         bw = bw or min(w - 0.3, 0.155 * len(title) * size / 19 + 0.6)
-        banner(sh, x + w / 2, y - 0.25, bw, title, dk if key != 'ink' else INK, size=size)
+        banner(sh, x + w / 2, y - 0.25, bw, title, dk, size=size)   # banner in the zone's (muted) component colour
     return g
 
 
 def pill(sh, x, y, w, h, t, key='ink', size=14, light=False):
     """Rounded tag. light=True gives a pale tag with dark text; otherwise a dark tag with white text."""
     dk, md, lt = HUE[key]
-    b = box(sh, x, y, w, h, fill=lt if light else dk, line=md if light else None, lw=1.0, radius=0.5)
+    b = box(sh, x, y, w, h, fill=lt if light else dk, radius=0.5)
     return label_in(b, t, size=size, color=dk if light else 'FFFFFF')
 
 
 def paper(sh, x, y, w, h, line='B9A98A', n=3):
     """A stack of n sheets, offset up-right, with a drop shadow. Returns the front sheet."""
     for k in range(n - 1, -1, -1):
-        s = box(sh, x + 0.07 * k, y - 0.07 * k, w, h, fill='FFFFFF', line=line, lw=1.3 if k == 0 else 0.9,
+        s = box(sh, x + 0.07 * k, y - 0.07 * k, w, h, fill='FFFFFF', line=PAPER_LINE, lw=1.0 if k == 0 else 0.75,
                 shape=MSO_SHAPE.RECTANGLE)
         sketchy(s)
         if k == n - 1: shadow(s)
@@ -235,7 +246,7 @@ def paper(sh, x, y, w, h, line='B9A98A', n=3):
 
 
 def card(sh, x, y, w, h, key='ink', fill='FFFFFF', lw=1.3, radius=0.08):
-    s = box(sh, x, y, w, h, fill=fill, line=HUE[key][1] if key != 'ink' else 'B8C0D0', lw=lw, radius=radius)
+    s = box(sh, x, y, w, h, fill=fill, radius=radius)   # no outline: the shadow separates the card
     shadow(s)
     return s
 

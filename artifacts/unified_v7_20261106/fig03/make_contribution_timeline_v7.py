@@ -108,16 +108,16 @@ def main() -> None:
 
 
 # Layer order follows the taxonomy (LLM side, then general to specific). Colours are the V7 kit's HUE dark
-# shades (llm amber, gh blue, gts teal, tsk red); `MID` and `LIGHT` are the matching kit mid and light shades.
+# shades (llm ochre, gh steel blue, gts sea teal, tsk soft terracotta); `MID` and `LIGHT` are the matching kit mid and light shades.
 LAYERS = ["LLM-side", "General Harness", "General Time Series Harness", "Task-Specific Harness"]
-COLORS = dict(zip(LAYERS, ["#C9861A", "#3B5BA5", "#23887C", "#C9503F"]))
-MID = dict(zip(LAYERS, ["#F3C977", "#9FB3E1", "#8ACDC4", "#EFA396"]))
+COLORS = dict(zip(LAYERS, ["#B0852F", "#44689F", "#37807A", "#BC6E52"]))
+MID = dict(zip(LAYERS, ["#E5CD9B", "#AFC1DE", "#A3CCC8", "#E8B8A5"]))
 LABEL_INK = {name: "white" for name in LAYERS}
 DISPLAY = {"LLM-side": "LLM-Side", "General Harness": "General Harness",
            "General Time Series Harness": "General Time Series Harness",
            "Task-Specific Harness": "Task-Specific Harness"}   # Title Case labels; data keys stay unchanged
-INK, MUTED = "#1F2A44", "#5E6472"
-ZONE_FILL, ZONE_LINE, GRID = "#F5F7FB", "#C9D2E3", "#DCE2EC"
+INK, MUTED, BANNER = "#262A4D", "#666A84", "#4B4F96"
+ZONE_FILL, ZONE_LINE, GRID = "#F6F7FB", "none", "#E1E3EE"
 FONT = "Comic Sans MS"
 PERIODS = [("2023\u201324 H1", "2024-06"), ("2024 H2", "2024-12"), ("2025 H1", "2025-06"),
            ("2025 H2", "2025-12"), ("2026 H1", "2026-06"), ("2026 Q3", "2026-09"),
@@ -157,14 +157,13 @@ TITLES = {"a": "(a)  Cumulative Module Contributions", "b": "(b)  Share of New M
 
 
 def zone_panel(fig, key):
-    """Pale tinted panel with a dashed outline and a dark pill title on its top edge (as kit zone())."""
+    """Pale tinted panel without a frame and a blue-violet pill title on its top edge (as kit zone())."""
     x, y, w, h = ZONES[key]
     fig.patches.append(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0,rounding_size=0.16",
-                                      transform=fig.dpi_scale_trans, fc=ZONE_FILL, ec=ZONE_LINE, lw=1.1,
-                                      ls=(0, (5, 3)), zorder=-5))
+                                      transform=fig.dpi_scale_trans, fc=ZONE_FILL, ec="none", zorder=-5))   # tint only, no frame
     t = fig.text(x + w / 2, y + h, f"  {TITLES[key]}  ", transform=fig.dpi_scale_trans, ha="center", va="center",
                  fontsize=16.5, fontweight="bold", color="white", zorder=5,
-                 bbox=dict(boxstyle="round,pad=0.42,rounding_size=0.86", fc=INK, ec="none"))
+                 bbox=dict(boxstyle="round,pad=0.42,rounding_size=0.86", fc=BANNER, ec="none"))
     t.get_bbox_patch().set_path_effects([pe.SimplePatchShadow(offset=(1.6, -2.2), shadow_rgbFace="#3A3020", alpha=0.3),
                                          pe.Normal()])
 
