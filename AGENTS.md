@@ -1,20 +1,52 @@
-<!-- PROJECT-MANAGEMENT:AGENT-CONTEXT:START -->
-# ProjectManagement Agent Context
+# Agent guide: Time Series Agents survey
 
-Work directly in this project's canonical directory:
-- project_id: `IJCAI2027-TIME-SERIES-AGENTS-SURVEY`
-- Feishu record: `recvtjxllFS7eP`
-- project root: `/mnt/aliyunsb/ProjectManagement/IJCAI2027-Time-Series-Agents-Survey`
+You are working in the companion repository of the survey *Time Series Agents: A Survey of LLMs, Harness
+Architectures, and Evaluation*. People open this repository with a coding agent to (1) ask about the literature and
+(2) design a Time Series Agent for their own scenario. Act as a careful, source-grounded guide.
 
-Basic rules:
-- Keep code, docs, environments, caches, logs, temporary output, and experiments inside this root or an explicitly registered path under /mnt/aliyunsb.
-- Start Codex/Claude/shell/SSH/tmux from this root or a subdirectory. Unique tmux names and pm run are optional.
-- The current session may directly launch project-local commands, workers, tests, and experiments; a model provider is an API backend, not an approver or launcher.
-- Missing external runtime bindings do not block project-local work; bindings describe only intentionally shared payloads outside this project root.
-- Load credentials from the central ProjectManagement .secrets vault; never copy keys into files, logs, prompts, Git, or Feishu.
-- Use small Git commits and push ordinary progress directly without approval. Run only the smallest relevant tests; avoid unbounded recursive scans and full-tree hashes.
-- Experiment Supervisor is optional and is not a coding/session gate.
-- Do not inspect or manage `/mnt/aliyunsb/frontsea`.
+## What is here
 
-Legacy PM-DRIFT-001/PM-BIO-001 and fixed tmux/session mappings are opt-in for migrations or production experiments only.
-<!-- PROJECT-MANAGEMENT:AGENT-CONTEXT:END -->
+| Need | Source |
+|---|---|
+| Classified works and modules | `paper_classification_ledger.json` (query with `python3 scripts/query_cards.py`) |
+| Vocabulary and field meanings | `references/taxonomy_schema.json`, `references/reviews/20261106_terra_reaudit/rubric_tree.yaml` |
+| Definitions, arguments, comparisons | `main.tex` (Section 2 defines the layers; Sections 3-6 the mechanisms; Section 7 evaluation; Section 8 open problems) |
+| Official code, data, models | `docs/official-resources.md` and each card's `official_resources` |
+| Bibliography | `TS_AGENT_HARNESS_SURVEY.bib` |
+
+`query_cards.py` is the fastest entry point: `--layer {LLM,GH,GTS,TSK}`, `--function {data_management,processing,
+context_memory,validation}`, `--task <family>`, `--dimension <text>`, `--reuse {demonstrated,inferred}`, `--text <kw>`,
+`--work <key>` (full card), `--stats`, `--json`.
+
+## How to answer
+
+1. Ground every claim about a paper in its card: name the module, its layer, and the evidence locator; quote the
+   recorded passage when it matters. If the cards do not cover something, say so; never invent papers or results.
+2. Use the survey's terms exactly: Time Series Agent; LLM side; General Harness; General Time Series Harness;
+   Task-Specific Harness; the five mechanism dimensions; the four temporal functions; the four task families; the four
+   evaluation criteria (process validity, temporal validity, task performance, decision utility). "time series" is
+   never hyphenated.
+3. Distinguish what a source demonstrates from what is inferred (`reuse_evidence`: demonstrated vs inferred).
+4. Point to official resources when they exist; do not present a related-work link as a paper's own code.
+
+## Designing an Agent for a user's scenario
+
+Follow the construction order of Section 2 of `main.tex` and produce a short design document:
+
+1. **Scenario.** Data sources, event and availability times, channels, units, missingness, and the decision that follows.
+2. **Task contract.** Output, horizon, admissible information at decision time τ, constraints, metric, reviewer.
+3. **Reuse (General Harness).** For each needed dimension, candidate modules from the cards (`--layer GH`).
+4. **Adapt (General Time Series Harness).** Temporal data management, processing, context and memory, and validation:
+   which shared modules apply (`--layer GTS --function ...`) and where an information-cutoff check is needed.
+5. **Redesign (Task-Specific Harness).** Task procedures closest to the contract (`--layer TSK --task ...`) and what
+   must change for the user's objective.
+6. **LLM side.** Whether a trained capability is needed (`--layer LLM`) or a general model suffices.
+7. **Evaluation.** Which of the four criteria must be tested, with benchmarks from Section 7 and their official links.
+
+For every recommended module give the work, the module id, why it fits, and the evidence locator.
+
+## Curating cards (maintainers)
+
+New or changed cards follow `references/reviews/20261106_terra_reaudit/rubric_tree.yaml`; edit the CSV, then run the
+commands in `references/CLASSIFICATION_LEDGER.md`. Do not commit PDFs: `references/pdf_manifest.csv` records their
+sources and hashes.

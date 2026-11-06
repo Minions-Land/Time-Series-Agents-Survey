@@ -1,78 +1,172 @@
-# From General to Specific: A Survey of Time-Series Agent Systems
-
-**Build a time-series agent for your scenario: identify the capabilities you need, compare reusable modules, and find the original methods, repositories, and evaluation resources.**
+<h1 align="center">Time Series Agents</h1>
+<p align="center"><strong>A Survey of LLMs, Harness Architectures, and Evaluation</strong></p>
 
 <p align="center">
-  <a href="main.tex">Manuscript</a> ·
-  <a href="paper_classification_ledger.json">Paper Cards</a> ·
-  <a href="TS_AGENT_HARNESS_SURVEY.bib">Bibliography</a> ·
-  <a href="references/CLASSIFICATION_LEDGER.md">Curation Guide</a> ·
-  <a href="figures/editable/README.md">Editable Figures</a>
+  <img alt="Works reviewed" src="https://img.shields.io/badge/works-164-4B4F96">
+  <img alt="Source-located modules" src="https://img.shields.io/badge/modules-363-37807A">
+  <img alt="Official resource links" src="https://img.shields.io/badge/official%20links-117-44689F">
+  <img alt="Agent ready" src="https://img.shields.io/badge/Claude%20Code%20%7C%20Codex-ready-BC6E52">
+  <img alt="Updated" src="https://img.shields.io/badge/updated-Nov%202026-B0852F">
 </p>
 
-## Start with your question
+<p align="center">
+  <a href="#-talk-to-the-survey">Talk to the survey</a> ·
+  <a href="#-how-a-time-series-agent-is-built">Taxonomy</a> ·
+  <a href="#-paper-cards">Paper Cards</a> ·
+  <a href="#-what-the-records-show">Findings</a> ·
+  <a href="main.tex">Manuscript</a> ·
+  <a href="#-contribute">Contribute</a> ·
+  <a href="#-citation">Citation</a>
+</p>
 
-| Your question | Start here |
+<p align="center">
+  <img src="docs/assets/overview.png" width="92%" alt="How a Time Series Agent is built: scenario and data on the left; in the centre an LLM on top of three Harness layers, General Harness (reuse), General Time Series Harness (adapt) and Task-Specific Harness (redesign); on the right an evaluation funnel from process validity to decision utility that returns failed candidates for revision.">
+</p>
+
+> **Build a Time Series Agent for your scenario.** This repository is the survey *and* a machine-readable map of the
+> field: every reviewed work is a Paper Card whose modules are classified, quoted from the source, and linked to
+> official code and data. Clone it, open a coding agent, and ask.
+
+## 💬 Talk to the survey
+
+The repository is set up to be read by coding agents. [`AGENTS.md`](AGENTS.md) tells the agent how to answer from the
+Paper Cards (with page-level evidence) and how to walk you through designing an Agent for your own data.
+
+```bash
+git clone https://github.com/Minions-Land/Time-Series-Agents-Survey.git
+cd Time-Series-Agents-Survey
+claude        # or: codex
+```
+
+Then ask, for example:
+
+| Goal | Ask |
 |---|---|
-| How do I develop an agent for my time-series scenario? | [Survey manuscript](main.tex): system definition, LLM capabilities, and three Harness scopes |
-| Which mechanisms could address my temporal data or workflow problem? | [Module records](paper_classification_ledger.json): function, scope, task, and source evidence |
-| What exactly does a paper contribute? | [Paper Card structure](references/reports/paper-card-schema.md) and [maintained records](paper_classification_ledger.csv) |
-| Where can I develop or evaluate the system? | Infrastructure and Benchmarks in the [manuscript](main.tex), with original resource links |
-| Where are the references and figure sources? | [BibTeX](TS_AGENT_HARNESS_SURVEY.bib) and [PowerPoint collection](figures/editable/README.md) |
+| Find mechanisms | *"Which shared modules handle information cutoff or look-ahead leakage? Quote the evidence."* |
+| Understand one paper | *"What does AION contribute at each layer, and which parts could I reuse?"* |
+| Compare | *"Compare how forecasting Agents implement temporal memory. Which are task-bound?"* |
+| **Design an Agent** | *"I forecast hourly electricity load and must flag anomalies for operators. Design a Time Series Agent: what to reuse, adapt and redesign, and how to evaluate it."* |
+| Find resources | *"Which benchmarks test temporal validity, and where is their official code?"* |
 
-## From general to specific
+> [!TIP]
+> Without an agent, the same lookups run from the command line:
+> `python3 scripts/query_cards.py --layer GTS --function context_memory` lists shared temporal memory modules;
+> `--work aion2026` prints one full card; `--stats` gives counts by layer, function and task.
 
-**Time-Series Agent ≈ LLM + General Harness + Time-Series Harness Module**
+## 🧱 How a Time Series Agent is built
 
-The survey connects four kinds of contribution:
+$$\textbf{Time Series Agent} \approx \text{LLM} + \text{General Harness} + \text{Time Series Harness}$$
 
-| Contribution | Design question |
+Each concrete module a paper contributes is assigned to the **most specific** layer whose condition it meets:
+
+```mermaid
+flowchart LR
+    M["Module contributed by a paper"] --> Q0{"Changes the model itself?"}
+    Q0 -- yes --> LLM["LLM side<br/>align · reason · operate"]
+    Q0 -- no --> Q1{"Embeds a task's output,<br/>objective or validator?"}
+    Q1 -- yes --> TSK["Task-Specific Harness<br/>REDESIGN"]
+    Q1 -- no --> Q2{"Depends on time order, windows,<br/>units or information availability?"}
+    Q2 -- yes --> GTS["General Time Series Harness<br/>ADAPT"]
+    Q2 -- no --> GH["General Harness<br/>REUSE"]
+```
+
+| Part | Vocabulary used across the survey |
 |---|---|
-| **LLM side** | How does the model interpret observations, select tools, and respond to feedback? Which learned temporal capabilities help the workflow? |
-| **General Harness** | How are interaction, memory, tools, execution, planning, feedback, and coordination organized? |
-| **General Time-Series Harness** | How are temporal data, operations, context, memory, and validation handled across tasks? |
-| **Task-Specific Harness** | How are those capabilities specialized for the required output and objective? |
+| **LLM side** | Temporal representation and alignment · temporal instruction and reasoning · learning to operate temporal workflows |
+| **General Harness** | Interface and Interaction · Memory and Context · Tools and Execution · Planning and Orchestration · Optimization and Evolution |
+| **General Time Series Harness** | Temporal Data Management · Temporal Processing · Temporal Context and Memory · Temporal Validation |
+| **Task-Specific Harness** | Forecasting and Prediction · Data Augmentation and Synthesis · Anomaly Detection and Diagnosis · Decision Support |
+| **Evaluation** | Process Validity · Temporal Validity · Task Performance · Decision Utility |
 
-Task-specific methods cover **forecasting and prediction**, **augmentation and synthesis**, **anomaly detection and diagnosis**, and **decision support**. The temporal-function view connects a reader's problem to the module records. The [classification guide](references/CLASSIFICATION_LEDGER.md) explains the shared mechanism vocabulary and reuse criteria.
+<p align="center">
+  <img src="docs/assets/landscape.png" width="96%" alt="Landscape fan chart: the LLM side and the three Harness sectors, their wedges, and representative works as outer tags.">
+</p>
 
-The comparison unit is a concrete module. A paper can contribute several modules; each module is counted at its most specific applicable scope. LLM-side contributions are recorded independently.
+## 🗂️ Paper Cards
 
-## Evidence-linked Paper Cards
-
-Cards connect a paper's identity and claims to concrete modules, task assumptions, evaluation evidence, and source passages. Follow the paper links in the cards and the resource links cited in the manuscript to explore the original works. The [official resource index](docs/official-resources.md) provides 117 author-attributed links across 91 works, with source locations and availability status.
-
-The ledger snapshot contains **166 examined records**, **163 retained works and resources**, and **357 module entries**. These are curation counts, not a count of independently reproduced systems. Field definitions and review states are documented in the [card schema](references/reports/paper-card-schema.md).
-
-| Resource | Role |
-|---|---|
-| [CSV ledger](paper_classification_ledger.csv) | Maintained source for paper and module annotations |
-| [JSON ledger](paper_classification_ledger.json) | Generated structured view for search, analysis, and downstream interfaces |
-| [BibTeX](TS_AGENT_HARNESS_SURVEY.bib) | Manuscript citation records |
-| [Official resources](docs/official-resources.md) | Original repositories, data, models, and evaluation resources |
-| [Maintenance workflow](docs/ledger-maintenance.md) | Schema migration, boundary review, and read-only checks |
-| [Taxonomy schema](references/taxonomy_schema.json) | Classification vocabulary |
-| [Curation guide](references/CLASSIFICATION_LEDGER.md) | Evidence requirements, aggregation rules, and maintenance commands |
-
-## Comparative perspective
-
-The survey asks what differs across methods, which assumptions shape their use, and what evidence supports each choice. Section-level synthesis connects those comparisons to system design and evaluation. Open problems bring together questions that recur across tasks, including temporal validity, reusable procedures, evolving context, and decision utility.
-
-Our resource direction is a **searchable, conversational guide to papers and modules**, with source-grounded explanations and links to official repositories, documentation, datasets, and benchmarks. See the [revision and resource-hub proposal](docs/editorial-and-resource-hub-proposal.md) for the planned interface and editorial changes. The linked ledger and manuscript are available now; the conversational interface is planned.
-
-## Contribute a paper or correction
-
-[Open an issue](https://github.com/Minions-Land/Time-Series-Agents-Survey/issues) with the paper title and official URL, the proposed module or correction, a page/section locator, and the relevant official repository or benchmark link. For implementation details, identify the relevant documentation page or code location. Curation follows the documented evidence and scope criteria.
+A Paper Card records what a work contributes, module by module, with the passage that supports each decision.
 
 <details>
-<summary><strong>For maintainers: update and validate the ledger</strong></summary>
+<summary><strong>Example card (abridged)</strong></summary>
 
-Edit the CSV source, then regenerate and validate its structured view:
+```json
+{
+  "citation": {"key": "timeclaw2026harness", "title": "Harnessing Generalist Agents for Contextualized Time Series", "arxiv_id": "2606.05404"},
+  "module_level_contributions": {
+    "review_status": "paper_verified",
+    "modules": [{
+      "id": "timeclaw2026harness:memory",
+      "name": "Signal-text episodic retrieval",
+      "layer": "GTS",
+      "dimensions": ["Memory and Context"],
+      "function_view": {"functions": ["context_memory"]},
+      "reuse_evidence": {"level": "demonstrated", "tasks": ["forecasting_prediction", "temporal_question_answering"], "basis": "work"},
+      "scope_reason": "Retrieval keys jointly represent temporal signal structure and text context, beyond an ordinary dialogue buffer.",
+      "evidence": [{"locator": "PDF p.4; Section 3.4, Episodic Multimodal Memory", "quote": "..."}]
+    }]
+  }
+}
+```
+
+</details>
+
+| File | What it is |
+|---|---|
+| [`paper_classification_ledger.json`](paper_classification_ledger.json) | All cards, generated view used by agents and scripts |
+| [`paper_classification_ledger.csv`](paper_classification_ledger.csv) | Maintained source of the cards |
+| [`references/taxonomy_schema.json`](references/taxonomy_schema.json) | Controlled vocabulary and field definitions |
+| [`references/reviews/20261106_terra_reaudit/rubric_tree.yaml`](references/reviews/20261106_terra_reaudit/rubric_tree.yaml) | Decision tree used to classify every module |
+| [`docs/official-resources.md`](docs/official-resources.md) | 117 author-attributed code, data and model links across 91 works |
+| [`references/pdf_manifest.csv`](references/pdf_manifest.csv) | Source URL and SHA-256 of every reviewed PDF ([`scripts/fetch_pdfs.py`](scripts/fetch_pdfs.py) refetches them) |
+| [`TS_AGENT_HARNESS_SURVEY.bib`](TS_AGENT_HARNESS_SURVEY.bib) | Bibliography of the manuscript |
+
+> [!NOTE]
+> Counts are curation counts of a reviewed corpus, not of independently reproduced systems. In November 2026 every
+> card is being re-audited against the rubric tree, one model run per paper, with verbatim-quote checks; changes are
+> adjudicated before they enter the ledger.
+
+## 📈 What the records show
+
+<p align="center">
+  <img src="docs/assets/trends.png" width="88%" alt="Module contributions over time: cumulative counts and doubling times by layer, share of new modules by period, and paths showing where temporal functions are implemented.">
+</p>
+
+- **Effort is moving from the model to the runtime.** The LLM side supplied 37% of new modules in late 2024 and
+  5–16% in each later period.
+- **Temporal functionality is still rebuilt inside tasks,** about four task-specific modules for each shared temporal
+  one, but shared temporal modules grow fastest (doubling every ~5 months) and 30 of 49 are reused across task families.
+- **Temporal context and memory is the clearest gap:** implemented inside task procedures 43 times and as a shared
+  module only 5 times.
+
+## 🤝 Contribute
+
+[Open an issue](https://github.com/Minions-Land/Time-Series-Agents-Survey/issues) with the paper title and official
+URL, the proposed module or correction, a page or section locator, and any official repository or benchmark link.
+New works are classified with the same [rubric tree](references/reviews/20261106_terra_reaudit/rubric_tree.yaml).
+
+<details>
+<summary><strong>For maintainers: update and check the cards</strong></summary>
 
 ```bash
 uv run scripts/classification_manager.py sync
-uv run scripts/classification_manager.py validate
+uv run --with bibtexparser==1.4.3 python scripts/check_ledger_consistency.py
+python3 scripts/sync_reviewed_manuscript.py
+latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
 
-See the [maintenance documentation](references/CLASSIFICATION_LEDGER.md) for the source files and generated reports. Manuscript compilation uses the existing LaTeX project; editable PowerPoint figures are maintained separately from their manuscript exports.
+See the [curation guide](references/CLASSIFICATION_LEDGER.md) and [maintenance notes](docs/ledger-maintenance.md).
+Figure sources (editable PowerPoint and build scripts) are under [`artifacts/unified_v7_20261106/`](artifacts/unified_v7_20261106/).
 
 </details>
+
+## 📝 Citation
+
+```bibtex
+@article{ma2026timeseriesagents,
+  title   = {Time Series Agents: A Survey of LLMs, Harness Architectures, and Evaluation},
+  author  = {Ma, Jiaming and Wan, Shu and Zhu, Hou and Zhu, Rui and Xia, Ruichu and Tan, Jiyuan and
+             Ma, Haofeng and Wang, Stephen and Wen, Qingsong},
+  year    = {2026},
+  note    = {Manuscript and resources: https://github.com/Minions-Land/Time-Series-Agents-Survey}
+}
+```
