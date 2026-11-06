@@ -38,8 +38,12 @@ python3 - "$1" "$W/out" "$LAST" <<'PY'
 import json, re, sys
 key, outdir, last = sys.argv[1], sys.argv[2], sys.argv[3]
 txt = open(last + '/' + key + '.last.txt').read().strip()
-m = re.search(r'```(?:json)?\s*(\{.*\})\s*```', txt, re.S)
-obj = json.loads(m.group(1) if m else txt[txt.index('{'):txt.rindex('}') + 1])
+obj, dec = None, json.JSONDecoder()
+for i in [j for j, c in enumerate(txt) if c == '{'][:50]:   # raw_decode ignores trailing text, e.g. one extra '}'
+    try: cand, _ = dec.raw_decode(txt[i:])
+    except ValueError: continue
+    if isinstance(cand, dict) and 'blind' in cand and 'final' in cand: obj = cand; break
+if obj is None: raise SystemExit('no {"blind","final"} object in final message')
 for name, part in (('blind', obj['blind']), ('final', obj['final'])):
     path = outdir + '/' + key + ('.blind.json' if name == 'blind' else '.json')
     with open(path, 'w') as f: json.dump(part, f, ensure_ascii=False, indent=1)
@@ -57,8 +61,9 @@ job() {
     rc=$?
     [ -s "$LAST/$k.last.txt" ] && cp "$LAST/$k.last.txt" "$W/logs/" && split_last "$k" 2>> "$W/logs/$k.log"
     python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$out" 2>/dev/null && break
+    [ -s "$LAST/$k.last.txt" ] && cp "$LAST/$k.last.txt" "$W/logs/$k.fail$try.txt"
     if [ -s "$LAST/$k.last.txt" ]; then [ "$try" -lt 3 ] && { echo "$(date +%H:%M:%S) $k unparsable final message, rerun"; continue; }; break; fi
-    grep -q -E "503 Service Unavailable|无可用渠道|at capacity" "$W/logs/$k.log" || break
+    grep -q -E "503 Service Unavailable|无可用渠道|at capacity|429 Too Many Requests|rate limit" "$W/logs/$k.log" || break
     echo "$(date +%H:%M:%S) $k provider unavailable, retry $try in 600s"; sleep 600
   done
   local ok=no
