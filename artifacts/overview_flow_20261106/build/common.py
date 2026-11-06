@@ -16,34 +16,37 @@ ICONS = {'pixel': os.path.join(ROOT, 'icons', 'pixel'), 'clay': os.path.join(ROO
 C = dict(llm='F0A030', gh='3B5BA5', gts='2A9D8F', tsk='E05A47', ev='5B5F97',
          ink='1F2A44', mute='6B7280', cream='FBF3E4', white='FFFFFF', navy='16213E')
 
+# Content states the survey's construction claims; no paper names, institutions or section numbers.
 STAGES = [
-    dict(key='llm', sec='§3', name='LLM Side', short='LLM',
-         role='interprets temporal evidence and selects actions', icon='llm',
-         items=['Representation alignment', 'Temporal instruction & reasoning', 'Workflow policy learning'],
-         works=[('ChatTS', 'image17.png'), ('Time-LLM', None), ('TimeRLM', 'image19.png')]),
-    dict(key='gh', sec='§4', name='General Harness', short='GH',
-         role='executes actions, keeps state, coordinates roles', icon='runtime',
-         items=['Interface & Interaction', 'Memory & Context', 'Tools & Execution', 'Planning & Orchestration', 'Optimization & Evolution'],
-         works=[('TimeClaw-Harness', 'image10.png'), ('AION', 'image2.png'), ('TS-Agent', 'image1.png'), ('TradingAgents', 'image3.png')]),
-    dict(key='gts', sec='§5', name='General Time Series Harness', short='GTS',
-         role='supplies temporal data, tools and time constraints', icon='timeline',
-         items=['Temporal Data Management', 'Temporal Processing', 'Temporal Context & Memory', 'Temporal Validation'],
-         works=[('TimeSage-EV', 'image29.png'), ('OpenForecaster', 'image30.png'), ('TSQAgent', 'image13.png'), ('TS-Reasoner', 'image26.png')]),
-    dict(key='tsk', sec='§6', name='Task-Specific Harness', short='TSK',
-         role='organizes outputs around task objectives', icon='forecast',
-         items=['Forecasting & Prediction', 'Data Augmentation & Synthesis', 'Anomaly Detection & Diagnosis', 'Decision Support'],
-         works=[('FLAIRR-TS', 'image6.png'), ('MetaCaster', 'image5.png'), ('Argos', 'image12.png'), ('FinCon', 'image7.png')]),
-    dict(key='ev', sec='§7', name='Validation & Evaluation', short='EVAL',
-         role='checks process, temporal validity, task and decision utility', icon='validate',
-         items=['Execution checks', 'Information-cutoff checks', 'Task metrics', 'Downstream utility'],
-         works=[('TimeSeriesGym', 'image25.png'), ('Dr-CiK', 'image39.png'), ('TraceBench', 'image19.png'), ('TSFLab', None)]),
+    dict(key='llm', name='LLM', short='LLM', verb='ALIGN', icon='llm',
+         role='interprets temporal evidence and selects actions',
+         claim='Not enough alone: it acts through the harness',
+         items=['Represent numbers for the language model', 'Reason over temporal evidence', 'Learn which workflow action to take']),
+    dict(key='gh', name='General Harness', short='GH', verb='REUSE', icon='runtime',
+         role='domain-independent runtime',
+         claim='Carry it over from general Agents',
+         items=['Interaction & memory', 'Tools & execution', 'Planning & coordination', 'Feedback & self-improvement']),
+    dict(key='gts', name='General Time Series Harness', short='GTS', verb='ADAPT', icon='timeline',
+         role='temporal semantics shared across tasks',
+         claim='Add time where a generic runtime is ambiguous',
+         items=['Timestamps, units, missingness', 'Windows, resampling, decomposition', 'Only information available at t₀', 'Chronology guards & validators']),
+    dict(key='tsk', name='Task-Specific Harness', short='TSK', verb='REBUILD', icon='forecast',
+         role='procedures bound to one task contract',
+         claim='Rebuild around output, objective and actions',
+         items=['Forecasting', 'Synthesis & augmentation', 'Anomaly diagnosis', 'Decision support']),
+    dict(key='ev', name='Evaluation', short='EVAL', verb='VERIFY', icon='validate',
+         role='tests the complete workflow',
+         claim='Valid run ≠ accurate result ≠ useful decision',
+         items=['Process validity', 'Temporal validity', 'Task performance', 'Decision utility']),
 ]
 S = {s['key']: s for s in STAGES}
-INPUT = dict(name='Time series & context', sub='observations · events · task request', icon='timeseries')
-OUTPUT = dict(name='Forecast · diagnosis · decision', sub='accepted output', icon='decision')
+INPUT = dict(name='Scenario & data', sub='series · context · task request', icon='timeseries')
+OUTPUT = dict(name='Accepted output', sub='forecast · diagnosis · decision', icon='decision')
 FLOW = dict(act='action', obs='observation', ops='temporal operations', cap='shared temporal capabilities',
             cand='candidate output', fb='feedback: revise', stop='accept / terminate', axis='scope of reuse: general → specific')
-TITLE = 'Time Series Agent: Components and Information Flow'
+TITLE = 'How to Build a Time Series Agent'
+MOTTO = 'Reuse what is general  ·  adapt what is temporal  ·  rebuild what is task-bound'
+KEY = 'Align model capability, harness responsibility and evaluation'
 
 
 def rgb(h):

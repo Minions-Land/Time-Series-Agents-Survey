@@ -1,4 +1,4 @@
-"""V4 Sketch Notebook: sticky notes on grid paper, hand-drawn outlines, cycle around the agent."""
+"""V4 Sketch Notebook: sticky notes on plain paper, hand-drawn outlines, cycle around the agent."""
 from common import *
 
 ST, F = 'pixel', 'Comic Sans MS'
@@ -12,12 +12,12 @@ def note(slide, st, x, y, w, h, rot):
     tape = box(sh, x + w / 2 - 0.35, y - 0.1, 0.7, 0.2, fill='F2F2E6', line='BDBDB0', lw=0.5, shape=MSO_SHAPE.RECTANGLE)
     tape.rotation = rot - 3
     text(sh, x + 0.12, y + 0.08, w - 0.8, 0.3, st['name'], size=11 if len(st['name']) < 20 else 9.6, bold=True, color=C[st['key']], font=F, align='l')
-    text(sh, x + 0.12, y + 0.36, w - 0.8, 0.2, st['sec'], size=8, color='555555', font=F, align='l')
+    tag = box(sh, x + 0.12, y + 0.38, 0.85, 0.22, fill='FFFFFF', line=C[st['key']], lw=1.2, radius=0.5); sketchy(tag)
+    label_in(tag, st['verb'], size=7.8, color=C[st['key']], font=F)
     icon(sh, ST, st['icon'], x + w - 0.68, y + 0.06, 0.6)
     text(sh, x + 0.12, y + 0.62, w - 0.2, 0.32, st['role'], size=7.8, italic=True, color='333333', font=F, align='l', anchor='t')
     text(sh, x + 0.12, y + 0.95, w - 0.2, h - 1.25, ['– ' + i for i in st['items']], size=7.3, color='222222', font=F, align='l', anchor='t')
-    ex = 'e.g. ' + ', '.join(n for n, _ in st['works'][:3])
-    text(sh, x + 0.12, y + h - 0.28, w - 0.2, 0.22, ex, size=6.8, italic=True, color='666666', font=F, align='l')
+    text(sh, x + 0.12, y + h - 0.3, w - 0.2, 0.24, '→ ' + st['claim'], size=7.6, bold=True, color=C[st['key']], font=F, align='l')
     return g
 
 
@@ -31,15 +31,10 @@ def hand_arrow(sh, x1, y1, x2, y2, color='333333', lw=2, label=None, lx=None, ly
 def build(out):
     p, slide = new_pres()
     box(slide.shapes, 0, 0, 13.333, 6.4, fill='FFFEF9', shape=MSO_SHAPE.RECTANGLE)
-    gg = group(slide)
-    for k in range(1, 54):
-        arrow(gg.shapes, k * 0.25, 0, k * 0.25, 6.4, color='E3EEF8', lw=0.5, head=None)
-    for k in range(1, 26):
-        arrow(gg.shapes, 0, k * 0.25, 13.333, k * 0.25, color='E3EEF8', lw=0.5, head=None)
-    margin = arrow(slide.shapes, 0.95, 0, 0.95, 6.4, color='F5B5B5', lw=1, head=None)
     tg = group(slide)
     text(tg.shapes, 1.2, 0.08, 11, 0.5, TITLE, size=21, bold=True, color='2B2B2B', font=F, align='l')
-    ul = arrow(tg.shapes, 1.25, 0.6, 7.6, 0.6, color=C['llm'], lw=3, head=None); sketchy(ul)
+    ul = arrow(tg.shapes, 1.25, 0.58, 5.6, 0.58, color=C['llm'], lw=3, head=None); sketchy(ul)
+    text(tg.shapes, 5.9, 0.2, 7.2, 0.3, MOTTO, size=9.5, bold=True, italic=True, color=C['gh'], font=F, align='r')
     w, h = 2.65, 1.95
     pos = dict(llm=(5.35, 0.85, -1.5), gh=(9.35, 1.25, 1.5), gts=(9.35, 3.75, -1), tsk=(5.35, 4.3, 1), ev=(1.4, 2.6, -1.5))
     for k, (x, y, r) in pos.items():
@@ -60,7 +55,7 @@ def build(out):
     bub = slide.shapes.add_shape(MSO_SHAPE.CLOUD_CALLOUT, Inches(7.3), Inches(2.85), Inches(1.75), Inches(0.85))
     bub.fill.solid(); bub.fill.fore_color.rgb = rgb('FFFFFF'); bub.line.color.rgb = rgb('333333'); bub.line.width = Pt(1.2)
     bub.adjustments[0], bub.adjustments[1] = -0.62, 0.35
-    label_in(bub, 'plan, act, check, revise', size=8, color='333333', font=F, bold=False)
+    label_in(bub, 'reuse, adapt, rebuild, verify', size=8, color='333333', font=F, bold=False)
     # input / output index cards
     ig = group(slide); i = ig.shapes
     ic = box(i, 1.25, 0.85, 2.3, 1.2, fill='FFFFFF', line='333333', lw=1.2, shape=MSO_SHAPE.RECTANGLE); sketchy(ic); ic.rotation = 2
@@ -74,7 +69,7 @@ def build(out):
     text(i, 1.35, 5.72, 2.15, 0.3, FLOW['stop'], size=7.2, italic=True, color='555555', font=F, align='l')
     oa = hand_arrow(i, 2.4, 4.6, 2.4, 4.98, color=C['ev'], curve=False); sketchy(oa)
     # reuse note
-    text(slide.shapes, 9.2, 5.95, 3.9, 0.3, 'blue → green → red notes: ' + FLOW['axis'], size=7.6, italic=True, color='555555', font=F, align='r')
+    text(slide.shapes, 6.0, 6.08, 7.1, 0.26, 'Key claim: ' + KEY, size=8.4, bold=True, color='333333', font=F, align='r')
     p.save(out)
 
 

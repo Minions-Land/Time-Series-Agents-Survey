@@ -22,15 +22,12 @@ def stage_card(slide, st, x, y, w, h):
     pill = box(sh, x + 0.12, y + 0.1, w - 0.24, 0.42, fill=C[st['key']], radius=0.5)
     label_in(pill, st['name'], size=9.5 if len(st['name']) < 20 else 8.2, font=F)
     icon(sh, ST, st['icon'], x + w / 2 - 0.5, y + 0.58, 1.0)
-    text(sh, x + 0.1, y + 1.6, w - 0.2, 0.2, st['sec'], size=9, bold=True, color=C[st['key']], font=F)
-    text(sh, x + 0.1, y + 1.8, w - 0.2, 0.42, st['role'], size=7.6, italic=True, color=C['mute'], font=F)
-    text(sh, x + 0.12, y + 2.26, w - 0.2, 1.0, ['• ' + i for i in st['items']], size=7.4, color=C['ink'], font=F, align='l', anchor='t')
-    # logos row
-    n = len(st['works']); cw = (w - 0.2) / 2
-    for k, (name, lg) in enumerate(st['works'][:4]):
-        cx = x + 0.1 + (k % 2) * cw; cy = y + h - 0.5 + (k // 2) * 0.22
-        if lg: logo(sh, lg, cx, cy + 0.02, 0.16)
-        text(sh, cx + 0.19, cy, cw - 0.2, 0.2, name, size=6.4 if len(name) < 12 else 5.6, bold=True, color=C['ink'], font='Avenir Next', align='l')
+    tag = box(sh, x + w / 2 - 0.5, y + 1.6, 1.0, 0.26, fill='FFFFFF', line=C[st['key']], lw=1.6, radius=0.5)
+    label_in(tag, st['verb'], size=9, color=C[st['key']], font=F)
+    text(sh, x + 0.1, y + 1.9, w - 0.2, 0.36, st['role'], size=7.6, italic=True, color=C['mute'], font=F)
+    text(sh, x + 0.12, y + 2.3, w - 0.2, 0.8, ['• ' + i for i in st['items']], size=7.3, color=C['ink'], font=F, align='l', anchor='t')
+    cl = box(sh, x + 0.1, y + h - 0.62, w - 0.2, 0.52, fill=C[st['key']], radius=0.25)
+    label_in(cl, st['claim'], size=7.6, font=F)
     return g
 
 
@@ -69,15 +66,14 @@ def build(out):
     label_in(fl, '↺  feedback from validation: revise the plan, or terminate', size=8.6, font=F)
     # reuse axis above GH..TSK
     arrow(fs, xs[1] + 0.2, 0.85, xs[3] + w - 0.2, 0.85, color=C['mute'], lw=1.4)
-    text(fs, xs[1] + 0.2, 0.62, xs[3] + w - xs[1] - 0.4, 0.22, 'scope of reuse:  general  →  temporal  →  task-specific', size=7.6, italic=True, color=C['mute'], font=F)
+    text(fs, xs[0], 0.6, xs[4] + w - xs[0], 0.22, MOTTO, size=8.4, bold=True, italic=True, color=C['gh'], font=F)
     # mascot
     icon(slide.shapes, ST, 'robot', 0.25, 4.45, 1.2)
     bub = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGULAR_CALLOUT, Inches(0.12), Inches(5.7), Inches(1.45), Inches(0.5))
     bub.fill.solid(); bub.fill.fore_color.rgb = rgb('FFFFFF'); bub.line.color.rgb = rgb(C['ink']); bub.line.width = Pt(1)
     bub.adjustments[0], bub.adjustments[1] = 0.15, -0.95
-    label_in(bub, 'act, observe, check, revise', size=7, color=C['ink'], font=F, bold=False)
-    text(slide.shapes, 9.0, 5.75, 4.2, 0.4, 'Solid: execution flow   ·   dashed: returned observation   ·   purple loop: validation feedback',
-         size=7, italic=True, color=C['mute'], font=F, align='r')
+    label_in(bub, 'reuse, adapt, rebuild, verify', size=7, color=C['ink'], font=F, bold=False)
+    text(slide.shapes, 5.6, 5.8, 7.6, 0.4, 'Key claim: ' + KEY, size=8.4, bold=True, color=C['ink'], font=F, align='r')
     p.save(out)
 
 
