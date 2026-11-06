@@ -1,0 +1,120 @@
+{
+ "citation_key": "competitionagents2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "The work introduces a feedback-driven competition and reflection workflow that revises news-selection logic for news-driven time-series forecasting using opponent strategies and forecast-performance feedback.",
+ "claim_evidence": [
+  {
+   "line": 51,
+   "quote": "this study embeds a competition mechanism within the multi-agent discussion to enhance agents’ capability of generating innovative thoughts. Furthermore, to bolster the model’s proficiency in identifying misleading information, we incorporate a fine-tuned small-scale LLM model within the reflective stage"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "competitionagents2025:competitive-news-selection",
+   "name": "Competitive news-selection evolution",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the mechanism evaluates agents with forecasting error and eliminates agents by cumulative forecast performance; changing task family requires redesigning these objective-specific scores and selection criteria. Under the counterfactual, this is not GTS because competition and agent scheduling do not depend on temporal semantics apart from the embedded forecasting objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast metrics and cumulative scores determine agent updates and elimination"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "task-specific procedure"
+   },
+   "evidence": [
+    {
+     "line": 238,
+     "quote": "The advantage of MIE lies in its ability to allow the agent to intuitively perceive the losses incurred from competition, thereby stimulating the agent to explore more diverse thoughts."
+    },
+    {
+     "line": 290,
+     "quote": "After every E rounds of competitions, The SF is invoked where certain agents are eliminated. The SF is designed to guarantee that the good agents can advance to the ultimate stage of group decisionmaking."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "competitionagents2025:multi-stage-reflection",
+   "name": "Forecast-tested multi-stage reflection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the procedure tests proposed news-selection logic by the forecasting error it causes and applies temporal trends in deciding whether to retain updates; changing task family requires redesigning those validators and the target forecast procedure. Its temporal checking is embedded in this task procedure, so the counterfactual is not a standalone GTS validation module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - evaluates updates using forecast MAPE and temporal trends"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "task-specific procedure"
+   },
+   "evidence": [
+    {
+     "line": 351,
+     "quote": "whether it is a \"good\" or \"bad\" logic by testing it on a set of randomly selected K time series."
+    },
+    {
+     "line": 359,
+     "quote": "In the third stage, We retain all updated parts marked as \"good\" in Li, and re-evaluate those marked as \"bad\" in conjunction with temporal trends to finally determine whether to keep them."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 735,
+   "quote": "The experimental results on four datasets are shown in Table 1. Compared with the best baseline, the average improvements are 31.03%, 36.31%,2.48% and 18.14% in terms of MAE, MSE, RMSE and MAPE."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The forecast LLM fine-tuning follows the prior Wang et al. (2024b) setup and is described as an experimental component, not a distinct contribution. The paper's evaluated outputs are forecast metrics; investment-style prompts do not establish downstream decision utility."
+}

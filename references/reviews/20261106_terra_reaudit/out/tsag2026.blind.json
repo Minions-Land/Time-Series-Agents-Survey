@@ -1,0 +1,178 @@
+{
+ "citation_key": "tsag2026",
+ "status": "paper_verified",
+ "role_of_work": "resource",
+ "claim_summary": "TSAG contributes an evaluation framework and benchmark for measuring LLM agents' financial time-series query parsing, tool selection, parameter extraction, and grounded responses, implemented on a fixed tool-augmented workflow.",
+ "claim_evidence": [
+  {
+   "line": 59,
+   "quote": "• A novel evaluation methodology and benchmark for isolating and measuring an LLM agent’s core reasoning skills (parsing, tool selection, parameter extraction) for financial Q&A, independent of live data noise."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "temporal_question_answering",
+  "temporal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "tsag2026:temporal-tool-interface",
+   "name": "Specialized financial temporal tools",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_analysis",
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "TSK: the tools embed task-specific analytical outputs such as prediction, anomaly/pattern detection, volatility, and correlation; changing the task family changes the tool semantics. Counterfactual: a different task requires different tools/objectives, so the procedure must be redesigned.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - specialized functions embed task-specific analytical outputs and objectives",
+    "R4:Tools and Execution",
+    "R5:processing"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 163,
+     "quote": "• Price and Volatility Analysis: Tools (price, volatility) retrieving current data or calculating historical metrics (e.g., Parkinson volatility (Parkinson 1980)) along with respective prediction tools (predict_price, predict_volatility)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsag2026:orchestration-workflow",
+   "name": "LLM-orchestrated tool workflow",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "GH: the procedure controls the execution sequence without temporal semantics or an embedded task-family objective. Counterfactual: changing the task changes selected tools, but the general parse-execute-synthesize-response control flow remains the same.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - workflow sequence is not a task objective",
+    "R3_2_GTS:no - sequence control has no temporal-semantic state",
+    "R3_3_GH:yes - manages execution and workflow",
+    "R4:Planning and Orchestration",
+    "R5:general_runtime"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 128,
+     "quote": "Given a natural language query (NLQ), TSAG proceeds via LLM-orchestrated steps to obtain a natural language response (NLR):"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsag2026:stub-evaluation",
+   "name": "Financial time-series tool-use benchmark and evaluation",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "temporal_analysis"
+   ],
+   "role": "evaluation",
+   "scope_reason": "GH: evaluation verifies execution/tool orchestration across benchmark queries and does not itself perform temporal data operations or embody one task procedure. Counterfactual: its checks would still assess tool routing and response behavior if query categories changed.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - benchmark evaluates reasoning across query types rather than implementing one task procedure",
+    "R3_2_GTS:no - evaluator has no temporal data state or availability logic",
+    "R3_3_GH:yes - checks execution and orchestration",
+    "R4:Planning and Orchestration",
+    "R5:resource_level"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 225,
+     "quote": "• Match Accuracy (MA): This metric programmatically validates the agent’s reasoning by checking if the generated tool name and all extracted parameters are an exact match with a ground-truth object."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 222,
+   "quote": "• Return Rate (RR): For each of the benchmark items end-to-end execution success indicator, set to 1.0 if any non-empty text result is returned by the TSAG framework in response to the benchmark NLQ, and 0.0 otherwise."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 230,
+   "quote": "• LLM-accessed Accuracy (LA): For each of the benchmark items - measure of accuracy comparing the expected NLR from benchmark against the actual NLR, assessed by DeepEval (Confident AI 2023) in the range between 0.0 and 1.0."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The benchmark deliberately uses hard-coded tool stubs to isolate agent reasoning. The experiments report no chronology, leakage, or information-availability validation."
+}

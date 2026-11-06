@@ -1,0 +1,209 @@
+{
+ "citation_key": "tradetonottrade2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "The work contributes a feedback-driven SDE discovery loop for synthesizing financial time series, a symbolic-model evaluator, and a workflow that uses model-derived risk and news context for trading decisions.",
+ "claim_evidence": [
+  {
+   "line": 77,
+   "quote": "We structure this process of model discovery as the generation\nof a stochastic differential equation (SDE) that reproduces the statistics of a historical price path."
+  },
+  {
+   "line": 87,
+   "quote": "These risk metrics are then passed to a trader who can decide to buy or sell depending\non these statistics as well as recent information about the stock, as outlined in Figure 1."
+  }
+ ],
+ "task_memberships": [
+  "data_augmentation_synthesis",
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "tradetonottrade2025:sde-discovery",
+   "name": "Builder-critic SDE discovery",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution",
+    "Memory and Context"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies: candidate SDEs are implemented, calibrated and selected to reproduce historical paths and distributional statistics. Changing from synthesis to another task requires redesigning the output objective and critic; temporal numerical inputs alone do not make this GTS.",
+   "rubric_path": [
+    "R1:contributed - SDE implementation, calibration and feedback-based candidate discovery",
+    "R2:Harness - prompts, code execution and context; no model training",
+    "R3_1_TSK:yes - synthetic-path fidelity determines calibration and model selection",
+    "R4:Planning and Orchestration; Tools and Execution; Memory and Context",
+    "R5:processing",
+    "R6:not_applicable",
+    "R7:data_augmentation_synthesis",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 225,
+     "quote": "The process of model discovery follows a typical builder -critic feedback, where one set of tasks\nrelates to the implementation of the data-generating model, with the aim that the model output is to\nbe representative of historical observations."
+    },
+    {
+     "line": 255,
+     "quote": "2. Simulating: Given the simulator, Fn (t; θ) and initial estimates for parameters, θ0 , we then calibrate the model using the historical data, as outlined in Section 2.1.1, to determine parameters, θ,"
+    },
+    {
+     "line": 263,
+     "quote": "where St,n is the set of Monte Carlo realisations of the price paths generated from the simulator; cn\nis the current agent context, which involves all previously tested models and their evaluation metrics,"
+    },
+    {
+     "line": 339,
+     "quote": "3. Suggesting: Given the list of proposed models M, their calibration loss, L(θ), evaluation metrics,\ne, and novelty score, K, an LLM is then tasked with generating new candidate models that are\nexpected to improve on previous iterations."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tradetonottrade2025:symbolic-evaluation",
+   "name": "Symbolic SDE similarity and diversity evaluator",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK applies: drift/diffusion symbolic trees and graph kernels evaluate recovery and diversity of the stochastic generator. A different task output or verifier requires redesign; this is a synthesis-specific evaluator, not task-independent temporal validation.",
+   "rubric_path": [
+    "R1:contributed - symbolic similarity, diversity and complexity evaluation procedure",
+    "R2:Harness - external symbolic graph calculations",
+    "R3_1_TSK:yes - verifier targets mathematical stochastic-generator structure",
+    "R4:Tools and Execution",
+    "R5:no temporal function - operates on symbolic graphs",
+    "R6:not_applicable",
+    "R7:data_augmentation_synthesis",
+    "R8:not_applicable",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 354,
+     "quote": "In order to quantify the degree to which our model discovery loop is able to correctly identify a mathematical model, we construct a symbolic similarity score, Ksimilarity ."
+    },
+    {
+     "line": 366,
+     "quote": "in which G is the symbolic graph generated from the proposed and tested model, m, and KWL is\nthe WL graph kernel calculated from WL graph hashes. The diversity of the proposed stochastic\nmodels, discovered by our risk analyst agents, Kdiversity , is calculated as one minus the average pairwise"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tradetonottrade2025:risk-informed-trading",
+   "name": "Risk-informed daily trading workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution",
+    "Memory and Context",
+    "Interface and Interaction"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies: monthly SDE selection and daily recalibration feed risk/trend metrics and recent investment news into buy/sell/hold decisions and portfolio updates. Changing task family requires replacing the financial risk semantics, action space and portfolio objective.",
+   "rubric_path": [
+    "R1:contributed - integration of discovered SDE risk metrics, investment news analysis and trading actions",
+    "R2:Harness - inference-time tools, analyst prompts and trading workflow",
+    "R3_1_TSK:yes - financial risk objective and buy/sell/hold action semantics",
+    "R4:Planning and Orchestration; Tools and Execution; Memory and Context; Interface and Interaction",
+    "R5:processing; context_memory",
+    "R6:not_applicable",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 517,
+     "quote": "approach to trading decisions. To do so, we pass the calculated risk and trend metrics (VaR, CVaR,\nMDD, EVT metrics, RSI and Drift Polarity) to an LLM that is instructed to make trading decisions."
+    },
+    {
+     "line": 529,
+     "quote": "For each day of the month, we then recalibrate the SDE model to the price path of the last hundred\ntrading days."
+    },
+    {
+     "line": 579,
+     "quote": "with trading decisions made daily. Given this, we use news context from the last five days."
+    },
+    {
+     "line": 659,
+     "quote": "The news analyst agent determines the pros and cons to investing in this particular asset, according\nto the list of news items, and provides a summary of context-specific insights."
+    },
+    {
+     "line": 534,
+     "quote": "The trader generates a trade signal, Tt , which can take one of three values: buy, sell, or hold. Based\non this signal, the portfolio position, Pt , at time t is updated according to the following rules:"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1291,
+   "quote": "we tried to agentically debug each of these LLMs three times before marking this SDE as a failure. A\nloop failure is recorded when all fifteen SDE models selected during the model discovery process fail,"
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1014,
+   "quote": "evaluate this trading ability from 17th September 2024 to 24th April 2025. This was chosen to ensure\nthat the trading period is outside of the LLMs training data [59]."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 893,
+   "quote": "We find that the majority of LLMs are able to identify candidate models that can recreate the\ntarget path generated by each of the above SDEs."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 1036,
+   "quote": "Table 2 shows our results for the tested LLMs. We see an average SR of 0.88 when trading with\njust the news context. When including the model discovery loop to generate the risk and trend metrics,\nthis average SR increases to 1.40."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "No LLM parameters are trained. Simulator calibration, candidate memory and critic scoring form one discovery mechanism; financial risk calculations and investment-news analysis are retained within the trading integration rather than counted as unchanged standalone tools. Simudyne Horizon, DSPy, diffrax and optax are used resources, not independently contributed modules. No forecasting label: the evaluated generative output reproduces historical stochastic dynamics. Temporal-validity evidence establishes an evaluation cutoff design, not a verified runtime leakage guard; synthetic-context backtesting adds a pretraining-bias stress test. The packet inconsistently specifies six months versus 100 trading days of price history and two weeks versus five days of news context; the record follows the detailed daily procedure."
+}

@@ -1,0 +1,144 @@
+{
+ "citation_key": "gruver2023llmtime",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "The work contributes model-aware numerical time-series encoding and continuous-density conversion of autoregressive token probabilities for zero-shot probabilistic forecasting.",
+ "claim_evidence": [
+  {
+   "line": 13,
+   "quote": "By encoding time series as a string of numerical digits, we can frame time series forecasting as next-token prediction in text."
+  },
+  {
+   "line": 17,
+   "quote": "this performance, we propose procedures for effectively tokenizing time series data and converting discrete distributions over tokens into highly flexible densities over continuous values."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "gruver2023llmtime:decimal-representation",
+   "name": "Decimal time-series encoding and rescaling",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R2 places this on the LLM side because it changes model-facing numerical input representation. Counterfactually, as Harness logic it would involve temporal numerical data (GTS), without embedding a task-family objective (not TSK); its actual locus is model representation.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R3:LLM-side (Harness layer tests not applicable)",
+    "R5:model_side",
+    "R6:representation_alignment",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "LLM-side module"
+   },
+   "evidence": [
+    {
+     "line": 176,
+     "quote": "Tokenization is particularly important because it directly influences how patterns form within tokenized sequences and the types of operations that language models can learn."
+    },
+    {
+     "line": 194,
+     "quote": "Rescaling To avoid wasting tokens when the inputs are very large, we scale values down so that the α-percentile of rescaled time series values is 1."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "gruver2023llmtime:continuous-density-adaptation",
+   "name": "Continuous density adaptation from token probabilities",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R2 places this on the LLM side because it transforms the model's discrete numerical-token output distribution into a continuous forecast density. Counterfactually, as Harness logic it would involve temporal numerical data (GTS), without embedding a task-family objective (not TSK); its actual locus is model output representation.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R3:LLM-side (Harness layer tests not applicable)",
+    "R5:model_side",
+    "R6:representation_alignment",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "LLM-side module"
+   },
+   "evidence": [
+    {
+     "line": 241,
+     "quote": "Autoregressive models over sequences of digits act like hierarchical softmax distributions over the corresponding numbers. When combined with uniform distributions in each discrete bucket, distributions over strings can become expressive distributions over continuous domains."
+    },
+    {
+     "line": 247,
+     "quote": "continuous density by placing a uniform distribution in each bin."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1343,
+   "quote": "We show predictions on the synthetic benchmarks (from Figure 6) in Figure 15. As one can observe, GPT-4 is considerably better performing on these synthetic benchmarks, although numerical decoding of the model sometimes fails before the full output."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 953,
+   "quote": "For each time series, we reserve the last 30 observations as test data and perform hyperparameter tuning for each method over the same grid as in Appendix C.1."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 377,
+   "quote": "Evaluated on log likelihood and CRPS, LLMT IME considerably outperforms the baselines in aggregate and on almost every individual dataset"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "gruver2023llmtime:decimal-representation",
+   "decision": "split",
+   "new_ids": [
+    "gruver2023llmtime:decimal-representation",
+    "gruver2023llmtime:continuous-density-adaptation"
+   ],
+   "changes": [
+    "split decimal encoding/rescaling from continuous-density adaptation"
+   ],
+   "reason": "The card combines two independently reusable procedures that the packet describes separately: model-aware numerical tokenization/rescaling and converting discrete token distributions into continuous densities. The existing id remains with encoding/rescaling, and a new id captures density adaptation."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The paper's function-identification experiment probes pretrained LLM temporal reasoning; it does not add another reusable module or task capability beyond the forecasting method."
+}

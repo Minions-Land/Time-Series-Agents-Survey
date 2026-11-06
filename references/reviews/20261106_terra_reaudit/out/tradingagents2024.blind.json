@@ -1,0 +1,121 @@
+{
+ "citation_key": "tradingagents2024",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TradingAgents contributes a role-specialized, feedback-driven LLM workflow for financial decision support, combining structured reports, debate, trading decisions, and risk review.",
+ "claim_evidence": [
+  {
+   "line": 58,
+   "quote": "In this work, we address these key limitations of existing models by introducing a system that overcomes these challenges. First, our framework bridges the gap by simulating the multi-agent decision-making processes typical of professional trading teams."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "tradingagents2024:structured-report-state",
+   "name": "Structured report-based shared communication",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK is no: this shared state/report protocol does not itself encode an investment objective or validation criterion, and its state/action semantics need not be redesigned for a different task. R3_2 GTS is no: it manages agent communication state without temporal-order, window, frequency, unit, or information-availability assumptions. R3_3 GH is yes: it organizes execution state and communication.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - state/report communication does not encode a task objective or criterion",
+    "R3_2_GTS:no - no temporal semantics in the communication mechanism",
+    "R3_3_GH:yes - manages shared execution state",
+    "R4:Memory and Context; Planning and Orchestration",
+    "R5:general_runtime",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 355,
+     "quote": "Our model introduces a structured communication protocol to govern agent interactions. By clearly defining each agent’s state, we ensure that each role only extracts or queries the necessary information, processes it, and returns a completed report."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tradingagents2024:investment-debate",
+   "name": "Role-specialized investment workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK is yes: the workflow produces buy/sell/hold decisions and applies investment and portfolio-risk criteria. Counterfactual: changing task family changes the temporal state, action space, trader role, and risk criteria, so these must be redesigned. R3_2 GTS is not selected because TSK is the first matching layer.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - investment decision objective and risk criteria are embedded",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 384,
+     "quote": "Two researchers represent opposing perspectives: one bullish and one bearish. They engage in natural language dialogue for n rounds, as determined by the debate facilitator agent. At the conclusion, the facilitator reviews the debate history, selects the prevailing perspective, and records it as a structured entry in the communication protocol."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 427,
+   "quote": "Agents make decisions based solely on data available up to each trading day, ensuring no future data is used (eliminating look-ahead bias)."
+  },
+  "task_performance": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 432,
+   "quote": "Cumulative Return (CR), Annualized Return (AR), Sharpe Ratio (SR), and Maximum Drawdown (MDD) (formulations in Appendix S1.2)."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper evaluates financial decision utility through returns and risk metrics; it does not report a separate task-output accuracy measure or runtime operation/failure validity check."
+}

@@ -1,0 +1,182 @@
+{
+ "citation_key": "lapras2026",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "Lapras post-trains time series language models for continuous latent reasoning through teacher-student self-distillation and constructs reference reasoning traces for sensor diagnosis, classification, and consequence-oriented temporal QA.",
+ "claim_evidence": [
+  {
+   "line": 89,
+   "quote": "we propose Lapras, which adapts teacher-student self-distillation to post-train"
+  },
+  {
+   "line": 644,
+   "quote": "To support explicit CoT post-training, we construct reference reasoning traces for each task."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis",
+  "decision_support"
+ ],
+ "other_tasks": [
+  "time_series_classification",
+  "temporal_question_answering"
+ ],
+ "modules": [
+  {
+   "id": "lapras2026:latent-reasoning",
+   "name": "Latent reasoning self-distillation",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "time_series_classification",
+    "temporal_question_answering"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 selects LLM: joint finetuning aligns student and teacher answer-position hidden states and learns a projection for continuous reasoning. R3 Harness tests do not apply; inherited sensor encoders and fusion components are unchanged.",
+   "rubric_path": [
+    "R1:contributed - adapted latent-reasoning post-training recipe with learned projection and answer-anchor distillation",
+    "R2:LLM - changes model parameters and analytical reasoning",
+    "R3:not_applicable - LLM-side module",
+    "R4:not_applicable - no Harness dimensions",
+    "R5:model_side",
+    "R6:instruction_reasoning",
+    "R7:anomaly_detection_diagnosis,decision_support,time_series_classification,temporal_question_answering",
+    "R8:not_applicable",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 237,
+     "quote": "latent reasoning, we align the hidden states used to predict the first answer token."
+    },
+    {
+     "line": 271,
+     "quote": "where π is a learned projection from the last hidden state back into the input embedding space and"
+    },
+    {
+     "line": 282,
+     "quote": "Training & Inference. Student and teacher are trained jointly, and the distillation couples them at the anchor,"
+    },
+    {
+     "line": 1469,
+     "quote": "batch size of 128. In all settings, the TSLM is fully finetuned. The Lapras runs use the default configuration"
+    },
+    {
+     "line": 641,
+     "quote": "(cardiological diagnosis), Engine (Wang et al., 2025b) (aero-engine fault diagnosis), HAR (Langer et al., 2026)"
+    },
+    {
+     "line": 665,
+     "quote": "question answering datasets, where each task is formulated as multiple-choice classification over sensor time"
+    },
+    {
+     "line": 1154,
+     "quote": "Given a signal, the model must predict a real-world consequence or judgment whose correct answer flips with"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "lapras2026:reference-traces",
+   "name": "Reference reasoning training traces",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "time_series_classification",
+    "temporal_question_answering"
+   ],
+   "role": "training_data",
+   "scope_reason": "R2 explicitly assigns data built to train the model to LLM. The authors construct deterministic diagnosis traces and synthetic segment-grounded rationales for post-training; their segment-selection calls are supervision rather than an inference-time Harness. R3 does not apply.",
+   "rubric_path": [
+    "R1:contributed - constructed reference reasoning traces rather than unchanged benchmark datasets",
+    "R2:LLM - training data shapes temporal analytical responses",
+    "R3:not_applicable - LLM-side training data",
+    "R4:not_applicable - no Harness dimensions",
+    "R5:model_side",
+    "R6:instruction_reasoning",
+    "R7:anomaly_detection_diagnosis,decision_support,time_series_classification,temporal_question_answering",
+    "R8:not_applicable",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 644,
+     "quote": "To support explicit CoT post-training, we construct reference reasoning traces for each task."
+    },
+    {
+     "line": 645,
+     "quote": "Engine, we construct traces using predefined templates populated with their original annotated step labels"
+    },
+    {
+     "line": 646,
+     "quote": "and short answers. For HAR, Sleep, and TSR, we generate reference traces using Qwen3.5-27B, following"
+    },
+    {
+     "line": 1144,
+     "quote": "distillation pipeline. We prompt Qwen3.5-27B to answer each question while conditioning it on rendered"
+    },
+    {
+     "line": 1150,
+     "quote": "traces that interleave natural language reasoning with explicit segment-selection calls, then post-process them"
+    },
+    {
+     "line": 1130,
+     "quote": "from a teacher model. In all cases the trace is used only to shape training and is never emitted at inference."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 669,
+   "quote": "CoT, Lapras improves F1 by 5.53% on average across the 20 backbone-dataset configurations, with the largest"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "TSR consequence/judgment QA supports decision_support, while ECG and Engine support diagnosis and HAR/Sleep support classification. No numerical forecasting or synthesis is demonstrated. Accuracy/F1 and latency are reported, but there is no runtime execution-validity evaluation, chronological split or availability audit, or realized downstream utility. The no-test-set checkpoint-selection statement at lines 1650-1652 is general evaluation hygiene, not temporal validity. Standard decoding/logit-lens analyses, unchanged backbone components, baselines, and future adaptive-computation RL are not separate contributed modules."
+}

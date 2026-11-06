@@ -1,0 +1,255 @@
+{
+ "citation_key": "timeart2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TimeART contributes a feedback-driven ReAct tool runtime, temporal-analysis tools, a tool-use trajectory corpus, and four-stage workflow training for LLM time-series question answering.",
+ "claim_evidence": [
+  {
+   "line": 10,
+   "quote": "TimeART, a framework fusing the analytical capability of strong out-of-the-box tools and the reasoning capability of Large Language Models (LLMs), which serves as a fully agentic data scientist for Time Series Question Answering (TSQA)."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "temporal_question_answering",
+  "temporal_analysis",
+  "time_series_classification",
+  "imputation"
+ ],
+ "modules": [
+  {
+   "id": "timeart2026:react-runtime",
+   "name": "Thought-action-observation tool loop",
+   "layer": "GH",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:no - the loop does not embed one task family's objective; R3_2_GTS:no - its state and execution control have no temporal semantics; R3_3_GH:yes - it manages runtime interaction and tool execution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task objective",
+    "R3_2_GTS:no - no temporal semantics",
+    "R3_3_GH:yes - execution/state management"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "temporal_question_answering"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 193,
+     "quote": "the reasoning process is strictly organized as five states: Query (Q), Thought (T), Action (A), Observation (O) and Final Answer (F). Among them, Thought, Action and Observation are intermediate states, which can be repeated multiple times until the Final Answer is given."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeart2026:atomic-time-tools",
+   "name": "Atomic temporal analysis toolkit",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "temporal_analysis",
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:no - shared operators do not embed one task family's objective; R3_2_GTS:yes - they operate on temporal series and computations reusable across task families; R3_3_GH is bypassed by temporal semantics.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - shared temporal operators",
+    "R3_2_GTS:yes - temporal data operations",
+    "R5:function:processing"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 275,
+     "quote": "all the tools follow atomic designs, where only the basic computing needs are implemented without adding redundant functions."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeart2026:task-tool-integration",
+   "name": "Task-specific forecasting and anomaly tool integration",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:yes - the integrated forecaster and anomaly detector embed forecasting and anomaly-detection objectives; changing task family requires changing tool semantics. R3_2_GTS is not selected because this module is task-bound.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific output objectives",
+    "R5:view:task_procedure",
+    "R5:function:processing"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 280,
+     "quote": "the forecasting and anomaly detection tools are two recently advanced lightweight time series foundation models, i.e., LightGTS (Wang et al., 2025c) and DADA (Shentu et al., 2024), which ensure both the efficiency and accuracy."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "timeart2026:timetoolbench",
+   "name": "TimeToolBench tool-use trajectory corpus",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "temporal_analysis",
+    "time_series_classification"
+   ],
+   "role": "training_data",
+   "scope_reason": "R2:LLM - the corpus trains temporal workflow and tool-use capability in the language model.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:workflow_learning",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 170,
+     "quote": "we propose TimeToolBench, a comprehensive corpus for agentic time series reasoning, containing 100k ReAct-style (Yao et al., 2022) tool-use trajectories from multiple real-world domains, collected with GPT-4o and valiated through a strict scheme."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeart2026:tool-reasoner-training",
+   "name": "Experience- and reflection-supervised tool-use training",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning",
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "temporal_analysis",
+    "time_series_classification"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2:LLM - the four-stage objectives update TSRM parameters to predict tool outcomes, actions, and self-reflection explanations.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:workflow_learning",
+    "R6:instruction_reasoning",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 540,
+     "quote": "Stage 4: Teach TSRMs to use which tools and the reasons. We then train the TSRM pθ to jointly predict the explanation Cjk and the expert action Ak conditioned on the current state:"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 519,
+   "quote": "Since part of the TimeToolBench is also constructed on source data in MTBench or TimeMQA, we remove them from the training set to avoid data leakage."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 856,
+   "quote": "Compared with baselines, TimeART achieves large improvements in Stock Price Forecasting and Temperature Forecasting. Considering the MAE metric, TimeART achieves 9% – 68% reduction across all settings."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": true,
+ "notes": "The toolkit is split at the rubric boundary: shared temporal operators remain GTS, while the integrated forecaster and anomaly detector are task-specific TSK procedures. The paper describes those models as out-of-the-box, so confidence on the integration's TSK locus is medium."
+}

@@ -1,0 +1,265 @@
+{
+ "citation_key": "kairosagent2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "KairosAgent contributes a tool-using temporal reasoner, a trajectory corpus and turn-level training, and a morphology-conditioned forecasting procedure that feeds qualitative reasoning into a TSFM.",
+ "claim_evidence": [
+  {
+   "line": 158,
+   "quote": "We propose K AIROS AGENT, an agentic multimodal time series forecasting framework that bridges semantic reasoning and numerical forecasting by deducing future morphology and integrating it into the forecasting pipeline."
+  },
+  {
+   "line": 160,
+   "quote": "We curate T-STAR, a 40k-trajectory time series reasoning corpus with tool augmentation, and introduce turn-level credit assignment for RL to provide fine-grained supervision beyond sparse outcome-level rewards."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "kairosagent2026:reasoner-training",
+   "name": "Tool-grounded morphology reasoner training",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning",
+    "workflow_learning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places SFT and RL parameter updates on the LLM side because they train morphology responses and tool/action selection.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning and workflow_learning",
+    "R7:forecasting_prediction",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 479,
+     "quote": "We warm up the reasoner via SFT on T-STAR trajectories, formatting each as a multi-turn chat containing system instructions, user queries, tool interactions, and the morphology description."
+    },
+    {
+     "line": 543,
+     "quote": "To enhance reasoning quality, we refine the reasoner using Group Relative Policy Optimization (GRPO) (Shao et al., 2024), employing the frozen Stage II forecaster as a reward module."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "kairosagent2026:statistical-tools",
+   "name": "Windowed statistical analysis tool suite",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is no: generic statistics do not embed a task-family output criterion. R3_2_GTS is yes: the tools operate on temporal history windows and compute temporal statistics; they are task-agnostic.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - general windowed statistics do not encode a task criterion",
+    "R3_2_GTS:yes - tools process temporal windows",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:forecasting_prediction",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1960,
+     "quote": "The agent is equipped with 23 statistical analysis tools adapted from tsfresh (Christ et al., 2018). All tools operate on a user-specified window [left, right) of the history, allowing the agent to inspect both global and local temporal structures."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "kairosagent2026:morphology-fusion",
+   "name": "Morphology-conditioned forecasting bridge",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is yes: this procedure fuses morphology into a numerical forecasting model; changing the task changes its forecast objective and output head.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - conditions a numerical forecasting output on morphology",
+    "R4:Tools and Execution",
+    "R5:task_procedure with processing",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 438,
+     "quote": "We introduce a lightweight fusion operator that integrates the semantic prior into the decoder of Kairos."
+    },
+    {
+     "line": 461,
+     "quote": "We retain its encoder-decoder backbone and prediction head, but augment it with a text adapter"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "kairosagent2026:tstar-corpus",
+   "name": "T-STAR tool-use trajectory corpus",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning",
+    "workflow_learning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R2 places this trajectory corpus on the LLM side because it is built to train morphology responses and tool-calling behavior.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM training data",
+    "R6:instruction_reasoning and workflow_learning",
+    "R7:forecasting_prediction",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 526,
+     "quote": "We construct T-STAR, a tool-augmented corpus comprising over 40k validated examples drawn from 29 datasets across nine domains."
+    },
+    {
+     "line": 530,
+     "quote": "each T-STAR example records the full reasoning trajectory of a tool-calling agent, including multi-turn tool calls, tool responses, and a natural-language morphology forecast"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 2132,
+   "quote": "Samples failing any check are retried up to 3 times. Samples that remain invalid after all retries are discarded. This pipeline ensures that retained trajectories exhibit correct tool usage, grounded reasoning, and morphologically accurate forecasts."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 2275,
+   "quote": "and the train/validation/test partitions are chronological 60%/20%/20% splits."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 637,
+   "quote": "For reasoning evaluation, we report Accuracy as judged by the LLM-as-a-judge protocol."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "kairosagent2026:reasoner-training",
+   "decision": "change",
+   "new_ids": [
+    "kairosagent2026:reasoner-training"
+   ],
+   "changes": [
+    "name and evidence fields updated",
+    "llm_route: add instruction_reasoning and workflow_learning"
+   ],
+   "reason": "Same trained reasoner mechanism, so retain its id; the current card lacks explicit routes and the required evidence structure."
+  },
+  {
+   "existing_id": "kairosagent2026:morphology-fusion",
+   "decision": "change",
+   "new_ids": [
+    "kairosagent2026:morphology-fusion"
+   ],
+   "changes": [
+    "scope_reason: apply R3_1_TSK test explicitly",
+    "functions: add processing"
+   ],
+   "reason": "The same task-bound forecast conditioning mechanism remains. The source shows it fuses a semantic prior into the forecasting TSFM."
+  },
+  {
+   "existing_id": "none",
+   "decision": "keep",
+   "new_ids": [
+    "kairosagent2026:statistical-tools"
+   ],
+   "changes": [
+    "add GTS module"
+   ],
+   "reason": "The paper equips the agent with 23 windowed time-series analysis tools, a distinct temporal-processing harness component."
+  },
+  {
+   "existing_id": "none",
+   "decision": "keep",
+   "new_ids": [
+    "kairosagent2026:tstar-corpus"
+   ],
+   "changes": [
+    "add LLM training_data module"
+   ],
+   "reason": "T-STAR is a separate corpus of tool-use and morphology trajectories used to train the reasoner."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The statistical tool suite is separate from the task-bound forecasting bridge: its temporal-window inputs and statistics are reusable in principle, while the source applies the system only to forecasting. The card omitted both the tool suite and the T-STAR training corpus."
+}

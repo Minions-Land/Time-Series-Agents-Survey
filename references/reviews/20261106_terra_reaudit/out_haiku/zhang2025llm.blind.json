@@ -1,0 +1,200 @@
+{
+ "citation_key": "zhang2025llm",
+ "status": "repository_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "An LLM-driven pandas analysis runtime for industrial time series fault diagnosis that generates, sandboxes and error-corrects Python code over a DataFrame, with time series labeling and cleaning prompts.",
+ "claim_evidence": [
+  {
+   "line": 22,
+   "quote": "If you are a time series analyst,you are provided with a pandas dataframe (df) with {num_rows} rows and {num_columns} columns."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "data_quality"
+ ],
+ "modules": [
+  {
+   "id": "zhang2025llm:sandboxed-code-execution",
+   "name": "Sandboxed DataFrame code execution",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3 tests: R3_1_TSK no, since the execution sandbox carries no fault-diagnosis objective; R3_2_GTS no, since it has no temporal order, window or availability semantics; R3_3_GH yes, it manages code execution with import whitelisting and restricted builtins.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task objective in the execution sandbox",
+    "R3_2_GTS:no - no temporal semantics",
+    "R3_3_GH:yes - manages execution with import whitelist and restricted builtins",
+    "R4:Tools and Execution"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 172,
+     "quote": "Remove non-whitelisted imports from the code to prevent malicious code execution"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "zhang2025llm:error-correction-retry",
+   "name": "Execution-error correction retry",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3 tests: R3_1_TSK no, the retry carries no task objective; R3_2_GTS no, no temporal semantics; R3_3_GH yes, it controls execution within an episode by regenerating code from the error returned.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task objective",
+    "R3_2_GTS:no - no temporal semantics",
+    "R3_3_GH:yes - execution control and checking within an episode",
+    "R4:Planning and Orchestration"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 69,
+     "quote": "Correct the python code and return a new python code (do not import anything) that fixes the above mentioned error. Do not generate the same code again."
+    },
+    {
+     "line": 67,
+     "quote": "It fails with the following error:"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "zhang2025llm:labeling-cleaning-procedure",
+   "name": "Time series labeling and cleaning procedure",
+   "layer": "TSK",
+   "dimensions": [],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "data_quality"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK yes: the labeling step asks for abnormal relationships to be marked and explained for diagnosis; counterfactual: the rules and labels change when the diagnosis objective changes. The cleaning steps are task-procedure processing.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - labeling embeds the anomaly diagnosis objective; counterfactual: rules change with objective",
+    "R3_2_GTS:not reached (first match wins)"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 30,
+     "quote": "Step2: If the user asks without a rule prompt, please look for the correlation between the data, mark the abnormal relationship, and explain the reason."
+    },
+    {
+     "line": 33,
+     "quote": "Step1: If there is a missing value in the data, fill in the missing value according to the average value."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "zhang2025llm:privacy-aware-context",
+   "name": "Privacy-aware data head for the prompt",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_3_GH: it controls how much of the data head reaches the LLM without temporal semantics or a task objective; a small conditional, so weak.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no",
+    "R3_2_GTS:no",
+    "R3_3_GH:yes",
+    "R4:Memory and Context"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 125,
+     "quote": "rows_to_display = 0 if self._enforce_privacy else 5"
+    }
+   ],
+   "confidence": "low"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": true,
+ "notes": "The packet is the source file llm-tsfd/__init__.py only; it has no method, setup or experiment text, so no evaluation evidence and no paper-level verification. The TSK versus GTS choice for the cleaning steps is ambiguous (mean fill and normalization are generic), so the labeling module was classed TSK under R3_1 with low-to-medium confidence. Helper modules (anonymizer, Notebook, constants, LLM base) are imported but not in the packet and were not counted."
+}

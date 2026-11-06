@@ -1,0 +1,439 @@
+{
+ "citation_key": "mosaic2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "MOSAIC contributes a memory-grounded financial time-series workflow that profiles data, retrieves prior cases and code, synthesizes and verifies task-adapted models, and refines them with failure-aware offline RL.",
+ "claim_evidence": [
+  {
+   "line": 89,
+   "quote": "• We introduce a blueprint-based, repository-grounded synthesis framework that retrieves prior cases and source-code modules, extracts reusable components, composes them into executable workflow blueprints, and generates task-adapted implementations."
+  },
+  {
+   "line": 92,
+   "quote": "• We formulate model refinement as a failure-aware offline reinforcement learning problem, where execution feedback, rollback, trajectory branching, and invalid-action masking are used to learn long-horizon refinement policies for LLM-mediated code editing."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "data_augmentation_synthesis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "mosaic2026:temporal-semantic-eda",
+   "name": "Semantic-aware time-series profiling",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is no: profiling does not embed a forecast or generation objective. R3_2_GTS is yes: it computes time-series statistics and temporal plots; changing task family leaves the temporal profiling need intact, whereas a non-temporal runtime would not preserve these semantics.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-family output objective",
+    "R3_2_GTS:yes - temporal profiling",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:forecasting_prediction,data_augmentation_synthesis",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "data_augmentation_synthesis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1854,
+     "quote": "To bridge the gap between raw numerical data and LLM reasoning, the MOSAIC pipeline begins with a semantic-aware EDA module that maps continuous statistical properties into discrete, text-based semantic anchors."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "mosaic2026:case-retrieval",
+   "name": "Profile-conditioned prior-case retrieval",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is no: retrieval serves both task families without implementing either output criterion. R3_2_GTS is yes: the query uses the temporal data profile; changing task family preserves this retrieval interface, while removing temporal profile evidence changes what the case match means.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - not bound to one task output",
+    "R3_2_GTS:yes - profile-conditioned temporal context retrieval",
+    "R4:Memory and Context",
+    "R5:context_memory",
+    "R7:forecasting_prediction,data_augmentation_synthesis",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "data_augmentation_synthesis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 260,
+     "quote": "It is used to query the case bank Ecase and retrieve prior tasks with similar data characteristics, objectives, and evaluation requirements."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "mosaic2026:blueprint-composition",
+   "name": "Repository-grounded blueprint model synthesis",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is yes: the composition procedure produces a model satisfying a forecasting or generation output contract. Switching between horizon prediction and synthetic sequence generation requires different model families, interfaces, and evaluation objectives; the TSK procedure is therefore more specific than GTS or GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific model output and evaluation",
+    "R4:Planning and Orchestration,Tools and Execution",
+    "R5:task_procedure",
+    "R7:forecasting_prediction,data_augmentation_synthesis",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1874,
+     "quote": "Beyond selecting from a fixed model bank, the model generation module balances retrieval and innovation: it identifies relevant existing models while using LLMs to recombine their components into new executable architectures"
+    },
+    {
+     "line": 1891,
+     "quote": "Given the module representations and the composition strategy determined above, the system constructs a structured blueprint by jointly considering the task profile, upstream data analysis results, and retrieved prior cases."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "mosaic2026:candidate-verification",
+   "name": "Candidate execution verification and repair",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is no: this checks executable output shape and numerical stability rather than task quality. R3_2_GTS is no: it has no temporal-order, window, or information-cutoff check. R3_3_GH is yes: it executes candidates, diagnoses failures, and schedules bounded correction.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-performance criterion",
+    "R3_2_GTS:no - no temporal validity criterion",
+    "R3_3_GH:yes - execution verification and recovery",
+    "R4:Tools and Execution,Planning and Orchestration",
+    "R5:general_runtime",
+    "R7:forecasting_prediction,data_augmentation_synthesis",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "data_augmentation_synthesis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1901,
+     "quote": "Each generated candidate undergoes execution based validation. The system dynamically loads the generated code, instantiates the model with appropriate task dimensions, and performs a forward pass to verify output shape consistency and numerical stability."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "mosaic2026:task-generation-data",
+   "name": "Task-generation data for refinement training",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R2 places this training-data construction on the model side because its diverse tasks are explicitly created to produce trajectories for training the workflow-refinement policy; R3 applies to Harness modules, not this data contribution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM-side training data",
+    "R6:workflow_learning",
+    "R7:forecasting_prediction,data_augmentation_synthesis",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1753,
+     "quote": "We employ an automated task-generation module to construct diverse, executable time-series forecasting and generation tasks, forming a scalable corpus of tasks that can be converted to trajectory data for offline RL of refinement policies."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "mosaic2026:failure-aware-trajectories",
+   "name": "Failure-aware refinement trajectory construction",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R2 places the branched trajectories and negative failure supervision on the model side because they form offline training data for the learned workflow policy; R3 does not apply to this training-data module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM-side training data",
+    "R6:workflow_learning",
+    "R7:forecasting_prediction,data_augmentation_synthesis",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 379,
+     "quote": "The failure branch is retained as negative supervision, while the continuation branch records the subsequent valid search from the restored checkpoint."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "mosaic2026:failure-aware-refinement",
+   "name": "Failure-aware offline refinement policy",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 classifies the trained policy that selects refinement actions from execution and validation feedback on the model side; the LLM executor is separate. This learned policy is trained for the two task-specific losses, while R3 applies only to Harness mechanisms.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:trained action policy",
+    "R6:workflow_learning",
+    "R7:forecasting_prediction,data_augmentation_synthesis",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 385,
+     "quote": "train a refinement policy on this dataset using offline RL"
+    },
+    {
+     "line": 389,
+     "quote": "At deployment, the learned policy is frozen. For a new task, MOSAIC observes the current state st = (mt , Mt ) and selects the best available refinement action under a dynamic valid-action mask:"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "mosaic2026:online-refinement-loop",
+   "name": "Online refinement execution and recovery loop",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is no: the harness executes the selected edit and reports diagnostics, while the task-specific loss and action policy determine the objective. R3_2_GTS is no: its recovery logic does not depend on temporal ordering or information availability. R3_3_GH is yes: it coordinates execution, rollback, masking, and the next policy query.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness around trained policy",
+    "R3_1_TSK:no - task objective is outside the execution loop",
+    "R3_2_GTS:no - no temporal semantics in recovery logic",
+    "R3_3_GH:yes - execution control and recovery",
+    "R4:Planning and Orchestration,Tools and Execution",
+    "R5:general_runtime",
+    "R7:forecasting_prediction,data_augmentation_synthesis",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "data_augmentation_synthesis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 395,
+     "quote": "The selected action is realised by the LLM executor, the resulting code is executed, and the diagnostics are updated. If the edit triggers a hard failure or soft revert, MOSAIC restores the last valid checkpoint, adds the failed action to the dynamic mask, and queries the policy again."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 2426,
+   "quote": "MOSAIC maintains a 100% success rate across all configurations, whereas DS-Agent drops to 60% on multiple datasets."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1982,
+   "quote": "We evaluate on three financial datasets spanning different asset classes, frequencies, and data regimes. All datasets are split chronologically (70%/15%/15%) to prevent look-ahead bias."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 421,
+   "quote": "We follow prior work [9] and report standard forecasting metrics, including RMSE, MAE, MAPE, and sMAPE, as well as generation metrics, including Marginal, Correlation, Autocorrelation, and Covariance distances."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 423,
+   "quote": "We also report ∆VaR and ∆ES on Crypto, ∆Sharpe for forecasting, and system-level Success Rate."
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "mosaic2026:blueprint-composition",
+   "decision": "split",
+   "new_ids": [
+    "mosaic2026:blueprint-composition",
+    "mosaic2026:case-retrieval",
+    "mosaic2026:candidate-verification"
+   ],
+   "changes": [
+    "layer GH->TSK for task-adapted model synthesis",
+    "dimensions updated to Planning and Orchestration and Tools and Execution",
+    "view_status general_runtime->task_procedure",
+    "separated profile-conditioned retrieval and candidate verification"
+   ],
+   "reason": "The packet describes task-profiled prior-case retrieval, blueprint-based model synthesis, and a distinct execution-based verification and repair loop. The existing ID stays with blueprint synthesis; the other mechanisms can be reused as separate components."
+  },
+  {
+   "existing_id": "mosaic2026:failure-aware-refinement",
+   "decision": "split",
+   "new_ids": [
+    "mosaic2026:failure-aware-refinement",
+    "mosaic2026:task-generation-data",
+    "mosaic2026:failure-aware-trajectories",
+    "mosaic2026:online-refinement-loop"
+   ],
+   "changes": [
+    "learned action policy moved to LLM with workflow_learning route",
+    "role updated to model_training",
+    "separated task and trajectory training data from policy learning",
+    "separated online execution, rollback, and action masking into GH"
+   ],
+   "reason": "The paper separates offline task and trajectory construction, a trained IQL action policy, and deployment-time code execution with feedback and recovery. R2 places the learned policy and its training data on the model side; the surrounding runtime remains Harness."
+  },
+  {
+   "existing_id": "mosaic2026:temporal-semantic-eda",
+   "decision": "change",
+   "new_ids": [
+    "mosaic2026:temporal-semantic-eda"
+   ],
+   "changes": [
+    "dimensions updated to current five-dimension vocabulary",
+    "retained GTS processing function and mapped status",
+    "evidence updated to Appendix C profiling description"
+   ],
+   "reason": "The packet directly describes temporal statistics, semantic anchors, and analytical time-series plots used to enrich both forecasting and generation workflows; this remains a GTS processing module."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The task generator in Appendix A feeds the refinement-policy training corpus, and Appendix E's failure branches provide negative supervision. These training-data components and the deployment-time loop are separated from the learned policy under R2."
+}

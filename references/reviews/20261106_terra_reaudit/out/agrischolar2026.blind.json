@@ -1,0 +1,241 @@
+{
+ "citation_key": "agrischolar2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "Agri-SCHOLAR contributes a feedback-driven, weekly agricultural decision-support workflow that combines cutoff-aware weather trajectories, LLM-generated feasible action bounds, and simulator-scored optimization.",
+ "claim_evidence": [
+  {
+   "line": 71,
+   "quote": "This division of labor allows the LLM to perform semantic, context-dependent reasoning about which actions are appropriate for a given farm, while the simulator and optimizer quantitatively evaluate and compare those actions within the feasible decision space."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "agrischolar2026:asof-weather-trajectory",
+   "name": "As-of weather trajectory with analog-year tail",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing",
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK: no—the weather constructor does not encode a crop-action objective or task output criterion. R3_2 GTS: yes—it assembles ordered observations, a forecast window, an analog tail, and enforces the decision-date information cutoff. If the task family changed, temporal assembly and availability checks would still apply, so GTS is more specific than GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task objective or task-specific validation criterion",
+    "R3_2_GTS:yes - ordered weather segments and information cutoff",
+    "R4:Memory and Context; Tools and Execution",
+    "R5:data_management; processing; context_memory; validation",
+    "R7:decision_support",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 347,
+     "quote": "To emulate the information available to an operational advisory system, we construct the weather as follows: weather up to current date, a noisy seven-day forecast, and an analog-based estimate for the remainder of the season."
+    },
+    {
+     "line": 359,
+     "quote": "All other segments rely strictly on data available on the decision date, preventing the model from seeing any seasonal information beyond the seven-day horizon."
+    },
+    {
+     "line": 421,
+     "quote": "The analog is selected using only information available up to the decision date."
+    },
+    {
+     "line": 421,
+     "quote": "For a target season in year y, the candidate pool is Hy = {1980, . . . , y − 1}: the target year and all later years are excluded, so neither the realized weather of the season nor any subsequent record can enter the analog tail."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agrischolar2026:context-retrieval-agent",
+   "name": "Agronomic context retrieval",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK: no—the retriever supplies knowledge but does not encode an action objective or validation criterion. R3_2 GTS: no—the query uses current features and literature retrieval, without temporal ordering, window, or cutoff logic. R3_3 GH: yes—it manages retrieval around the model. The same retrieval runtime could serve another task if its knowledge base and query fields were configured; temporal weather construction is a separate module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task objective or task-specific validation criterion",
+    "R3_2_GTS:no - no temporal ordering, window, or cutoff operation",
+    "R3_3_GH:yes - retrieval around the model",
+    "R4:Memory and Context; Tools and Execution",
+    "R5:general_runtime",
+    "R7:decision_support",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 155,
+     "quote": "The CRA converts numerical weather, soil, and crop-stage features into a natural-language query. It then runs hybrid (sparse and dense) retrieval over a vector database of agronomic literature and regional guidance."
+    },
+    {
+     "line": 156,
+     "quote": "Its output is a compact natural-language context bundle that the downstream agents reason over."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "agrischolar2026:preseason-agent",
+   "name": "Rainfall-onset pre-season crop setup",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK: yes—the rainfall threshold selects a crop sowing date and initializes crop actions, so another task family would require a different objective and procedure. R3_2 GTS: the sliding rainfall window is temporal, but it implements the crop-specific sowing decision; the TSK task criterion is the first match.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - crop sowing decision and initial actions",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure; processing",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 164,
+     "quote": "The PSA sets the week-0 plan: the sowing date, mulch, and basal Di-Ammonium Phosphate (DAP) application."
+    },
+    {
+     "line": 165,
+     "quote": "The sowing date is chosen by a rainfall-onset rule. The rule scans the period from June 1 to July 15 using a sliding three-day window and selects the first window with cumulative rainfall of at least 20 mm."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agrischolar2026:llm-bounded-optimization",
+   "name": "LLM-bounded simulator-scored weekly optimization",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK: yes—the crop-profit and environmental objective, fertilizer/irrigation actions, crop-stage bounds, and APSIM response define the output requirement, so another task needs different actions, rewards, and verification. R3_2 GTS: temporal weather conditions the loop, but the task-specific objective is the more specific match; the weather trajectory is separately classified as GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - crop actions, objective, and APSIM validation",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 87,
+     "quote": "The key component of Agri-SCHOLAR is a novel LLM-bound optimization mechanism that assigns complementary roles to language agents and numerical optimization. LLMs define agronomically feasible action bounds, while the optimizer searches within those bounds using APSIM as an evaluation oracle."
+    },
+    {
+     "line": 330,
+     "quote": "The VFA translates each candidate action into APSIM tool calls and runs the simulation on the constructed weather file for the current cycle. It returns the resulting metrics (grain yield, soil water status, nitrogen balance, drainage, and leaching) to the OA, which computes the reward."
+    },
+    {
+     "line": 332,
+     "quote": "It also returns them to the ABA, so that bounds can be tightened or relaxed if they repeatedly yield infeasible or dominated candidates."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 489,
+   "quote": "Each advisory is chosen using only the constructed weather Wt of that week (Eq. 17), never the future observed weather."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 505,
+   "quote": "Agri-SCHOLAR outperforms the PoP in every season of the study in both regions. In the irrigated region, it raises mean yield by 15.18%, with per-season gains ranging from 6.57% to 29.45%. In the rainfed region, the mean improvement is 22.43%, with per-season gains ranging from 15.14% to 27.72%."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 518,
+   "quote": "Agri-SCHOLAR earns a higher net profit than the PoP in every season in both regions, and it increases mean net profit by 17.2% in the irrigated region and by 22.8% in the rainfed region."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Reported performance is simulator-based; field validation and prospective farmer pilots are future work (L754-L756)."
+}

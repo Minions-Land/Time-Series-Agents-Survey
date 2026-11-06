@@ -1,0 +1,102 @@
+{
+ "citation_key": "joshi2025using",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "The work proposes a prompt-guided workflow for refining interest-rate models and curating GAN/VAE synthetic rates, evaluating LLM query relevance and real-versus-generated data.",
+ "claim_evidence": [
+  {
+   "line": 158,
+   "quote": "We developed content to serve as queries for a backend system that integrates a prototype\nproprietary interest rate model alongside outputs from GAN and VAE."
+  },
+  {
+   "line": 401,
+   "quote": "Language Models (LLMs) can generate relevant queries when provided with appropriate prompts\nand used the outputs for fine tuning interest rate modelling."
+  }
+ ],
+ "task_memberships": [
+  "data_augmentation_synthesis",
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "joshi2025using:prompt-guided-rate-synthesis",
+   "name": "Prompt-guided interest-rate modeling and synthesis",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "data_augmentation_synthesis",
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies: the prompts request forecast-parameter refinements and the backend generates and compares synthetic interest rates. Changing to anomaly diagnosis would require redesigning the prompt outputs, backend action semantics and synthetic-data objective; this is not task-independent temporal context handling.",
+   "rubric_path": [
+    "R1:contributed - prompt/query integration with interest-rate modeling and synthetic-data backends",
+    "R2:Harness - prompting and workflow around unchanged public LLMs; no LLM parameter training",
+    "R3_1_TSK:yes - forecast refinement and synthetic-rate generation embed task outputs",
+    "R4:Interface and Interaction; Tools and Execution; Planning and Orchestration",
+    "R5:task_procedure - no separate general temporal function established",
+    "R6:not_applicable",
+    "R7:data_augmentation_synthesis; forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 158,
+     "quote": "We developed content to serve as queries for a backend system that integrates a prototype\nproprietary interest rate model alongside outputs from GAN and VAE."
+    },
+    {
+     "line": 181,
+     "quote": "\"Can ChatGPT suggest adjustments or refinements to the parameters of my model to improve its\nprojections? Please provide 50 example prompts that I can use to query my model with external\ninputs and insights, and how can these inputs help refine my model's forecasts?\""
+    },
+    {
+     "line": 184,
+     "quote": "Once the prompt runs, after the final prompts we get output which we save as csv / tab separated\nformat."
+    },
+    {
+     "line": 283,
+     "quote": "We generated artificial data for 10 years treasury rates that were extracted from Yahoo API."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 322,
+   "quote": "Another important validation can be confirmed by drawing time series data of means from the\ngenerated data vs real data. We find that we can scale generated data without compromising the\naccuracy of the model."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The demonstrated pieces are prompt generation/relevance review and GAN/VAE outputs; automatic execution of query-driven parameter changes and feedback-dependent action selection are not established. Forecast refinement is an explicit prompt objective, but forecast-error evaluation is not reported. Backtesting denotes plotted real/generated comparisons, not documented chronological splits or leakage controls. GAN/VAE training is not LLM training; unchanged models and hypothetical VaR extensions are not separate modules."
+}

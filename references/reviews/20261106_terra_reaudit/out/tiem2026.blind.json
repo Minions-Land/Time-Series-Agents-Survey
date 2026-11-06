@@ -1,0 +1,293 @@
+{
+ "citation_key": "tiem2026",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "TIEM contributes timestamp-gated event-evidence retrieval, outcome-informed forecast skill memory, joint evidence-experience fusion, an optional skill-conditioned forecasting procedure, and a name-date contamination probe for financial return-direction forecasting.",
+ "claim_evidence": [
+  {
+   "line": 139,
+   "quote": "First, EEH organizes atomic\nevent facts and higher-level records with explicit\ntemporal extents for timestamp-filtered multi-tier\nretrieval."
+  },
+  {
+   "line": 1218,
+   "quote": "In addition, we introduce CIP, FinPURE, and a permodel Name-Date Probe for contamination inspection."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "tiem2026:eeh",
+   "name": "Event-Evidence Hypergraph",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "data_management",
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not match: indexing and admitting timestamped facts, bounded Episodes, and Themes do not use the forecast label or horizon objective. R3_2_GTS matches temporal extents and decision-time gates; a different task can reuse this evidence interface without redesigning its temporal state or admission rules.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - evidence organization and retrieval do not embed forecast output or loss",
+    "R3_2_GTS:yes - time-windowed evidence and information-availability gates",
+    "R4:Memory and Context; Tools and Execution; Planning and Orchestration",
+    "R5:data_management; context_memory; validation",
+    "R7:forecasting_prediction",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 252,
+     "quote": "EEH organizes timestamped evidence into\ntimestamp-filtered Day, Episode, and Theme tiers."
+    },
+    {
+     "line": 367,
+     "quote": "where U (c) contains up to nU same-stock decisionday facts available by T ; k2 , k3 budget same-stock\nEpisodes and stock-containing Themes; Hc and\nretrieved Episode/Theme records precede T , while\nΦ(c) may occur at T under the focal gate."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tiem2026:csm",
+   "name": "Case-based Skill Memory",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches because skill acquisition compares predicted and realized return directions and distils forecast rules with outcome-derived advantage. Changing task family requires redesigning the verdict and outcome-feedback semantics, even though vector storage and ancestry filtering are reusable.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast-verdict skill acquisition and outcome-sensitive retrieval",
+    "R4:Memory and Context; Optimization and Evolution",
+    "R5:context_memory; validation",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 2015,
+     "quote": "// Stage 3: Training-time outcome-revealed CSM acquisition\nif training-time acquisition is enabled and c has resolved then\nCompare ŷ(c) with y(c) and distil reusable case-derived skills from the event, reasoning, and verdict;"
+    },
+    {
+     "line": 1890,
+     "quote": "CSM acquisition processes training catalysts chronologically. Every acquired skill stores\nits source ancestry, which is unioned across automatic and explicit merges."
+    },
+    {
+     "line": 1891,
+     "quote": "A skill is unavailable\nunless every ancestor has a verifiable resolve time\nbefore T ; missing, invalid, or late ancestry therefore fails closed."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tiem2026:hefr",
+   "name": "Heterogeneous Evidence-Experience Fusion Reasoning",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches: the named evidence streams and joint inference prompt explicitly forecast stock return direction over the declared trading-day horizon. A different task requires redesigning that output contract and reasoning objective; prompt-only inference is Harness under R2.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - horizon-specific return-direction fusion prompt",
+    "R4:Memory and Context; Planning and Orchestration",
+    "R5:context_memory",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1843,
+     "quote": "As shown in Figure 9, HEFR performs one joint\ninference per catalyst over five timestamp-gated\nstreams: the focal event, prior events on the same\nstock, recent event episodes, cross-stock themes,\nand retrieved case-derived skills."
+    },
+    {
+     "line": 1919,
+     "quote": "the company's stock RETURN over the NEXT {horizon} TRADING DAYS will be POSITIVE (up) or NEGATIVE (down)."
+    },
+    {
+     "line": 2010,
+     "quote": "Allocate Bchar to (F, Exp, E, R, P ) in HEFR priority order and redistribute unused capacity;"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tiem2026:scmr",
+   "name": "Optional skill-conditioned multi-path reasoning",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches: skill hypotheses specify forecast direction, control evidence retrieval, and undergo direction-support validation and aggregation. Changing task family requires redesigning hypothesis outputs, verifier semantics, and the direction vote.",
+   "rubric_path": [
+    "R1:contributed - optional but concretely specified in prompts and algorithm",
+    "R2:Harness",
+    "R3_1_TSK:yes - direction-hypothesis validation and weighted forecast aggregation",
+    "R4:Tools and Execution; Planning and Orchestration",
+    "R5:context_memory",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1857,
+     "quote": "As shown in Figure 10, optional SCMR first converts each selected retrieved case-derived skill into\na falsifiable IF–THEN predicate, identifies the evidence types needed to test it, and specifies its expected direction."
+    },
+    {
+     "line": 2006,
+     "quote": "Extract hypothesis πσ = (φσ , Vσ , dσ ) and retrieve only evidence types Vσ ;\nObtain (ŷσ , wσ , rσ ) and discard invalid or abstaining paths;"
+    },
+    {
+     "line": 2304,
+     "quote": "CSM, and HEFR joint fusion; stability diagnosis,\nstability reweighting, and SCMR are optional and\ndisabled in the reported experiments."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tiem2026:ndp",
+   "name": "Name-Date Probe",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK matches: nested identifier/context/event inputs are assessed by return-direction accuracy and content gain. Changing task family requires replacing the forecast target and accuracy-based diagnostic contract; this is an evaluation procedure around the LLM, not parameter training.",
+   "rubric_path": [
+    "R1:contributed - named evaluation probe",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast-accuracy diagnostic under nested input conditions",
+    "R4:Interface and Interaction; Planning and Orchestration",
+    "R5:no temporal function - identifier ablation does not itself check chronology",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 226,
+     "quote": "NDP compares nested inputs End ⊂ Enc ⊂ Efull containing, respectively, security/date, those fields plus\nrecent statistics and prior headlines, and those inputs plus focal-event text."
+    },
+    {
+     "line": 1030,
+     "quote": "MemBase does not exceed the base rate under the reported CIs on either dataset, showing that names\nand dates alone provide no reliable forecasting advantage."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 2325,
+   "quote": "CSM skills contain 16,301 verifiable provenance\nancestors, all of which resolve strictly before their\ncorresponding decision times."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 847,
+   "quote": "TIEM achieves\nthe strongest average performance on both backbones, showing that its evidence and memory integration transfers across model choices."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Forecasting predicts the sign of a three- or five-trading-day numerical return, not a trading action. The reported evaluation uses frozen read-only CSM and one HEFR call, so the work is classified as fixed_workflow despite outcome-feedback memory acquisition during preparation. Optional SCMR is a specified contribution, but its effectiveness and stability diagnosis are not evaluated. FinPURE is excluded as an evaluation dataset of a method paper under R1; CIP gates are represented within EEH and CSM rather than counted twice. Cross-market, cross-time, and cross-backbone tests remain one task family. The temporal audit is counted as temporal validity; no separate runtime execution-validity evaluation or trading utility is reported."
+}

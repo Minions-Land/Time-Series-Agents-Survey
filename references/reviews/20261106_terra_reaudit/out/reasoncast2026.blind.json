@@ -1,0 +1,238 @@
+{
+ "citation_key": "reasoncast2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "ReasonCast contributes a forecast-specific route-reason-intervene framework that conditionally uses structured event semantics to improve demand forecasts while preserving the no-text numerical forecast when intervention is skipped.",
+ "claim_evidence": [
+  {
+   "line": 116,
+   "quote": "We introduce ReasonCast, an agentic demand forecasting framework following a route–reason–intervene–forecast paradigm. Given event context, the no-text forecast, and its entropy, the agent selects Skip, low-cost Basic semantics, or tool-augmented Tool semantics; holidays and mega-sales rule out Skip."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "reasoncast2026:reasoner-posttraining",
+   "name": "Structured semantic reasoner post-training",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places schema SFT and semantic-field RL on the LLM side because they train the reasoner to produce and calibrate analytical semantic fields; this is a parameter-updating model capability rather than an execution harness.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning",
+    "R7:forecasting_prediction",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "LLM-side module"
+   },
+   "evidence": [
+    {
+     "line": 250,
+     "quote": "ReasonCast is trained with a three-phase curriculum. First, schema SFT establishes valid structured outputs, after which semantic-field RL calibrates forecast-derived direction, temporal shape, amplitude, and peak fields."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "reasoncast2026:route-policy-training",
+   "name": "Forecast-utility route-policy training",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places forecast-utility RL on the LLM side because it trains the policy that selects workflow actions from forecast feedback; the learned route policy is distinct from the surrounding tool and fusion execution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:workflow_learning",
+    "R7:forecasting_prediction",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "LLM-side module"
+   },
+   "evidence": [
+    {
+     "line": 250,
+     "quote": "Third, the trained forecaster is frozen and reused as a stable downstream evaluator for forecast-utility RL, which jointly optimizes routing and semantic outputs without updating the numerical model."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "reasoncast2026:structured-reasoning-data",
+   "name": "Distilled structured-reasoning corpus",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R2 treats the purpose-built teacher and compressed SFT examples as LLM-side training data because the corpus directly supervises structured forecast reasoning rather than running in the harness.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning",
+    "R7:forecasting_prediction",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "LLM-side module"
+   },
+   "evidence": [
+    {
+     "line": 2241,
+     "quote": "We construct the initial SFT pool by stratifying 40,000 item–window examples across upward (40%), downward (22%), flat (33%), and noisy (5%) demand regimes. Claude Opus 4.6 serves as the teacher and receives only the Basic semantic interpreter prompt, without agent routing or tool interaction."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "reasoncast2026:selective-fusion",
+   "name": "Forecast-specific selective semantic intervention",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the module embeds the forecasting objective: event components query semantic tokens and additive/multiplicative corrections alter the forecast representation and output. If the task family changed, the forecast head, correction targets, and utility criterion would need redesign; it is therefore not a task-agnostic GTS runtime.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast-specific intervention and correction objective",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 292,
+     "quote": "The interface is applied to the Chronos-2 future-token representation before the prediction head. Thus, only the event component queries text; because the attention output is not reprojected, we make no stronger claim that the semantic update itself remains in the event component."
+    },
+    {
+     "line": 443,
+     "quote": "Latent residuals are well suited to fine-grained temporal pattern changes but may have limited authority over large level shifts. We therefore introduce a complementary multiplicative correction:"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "reasoncast2026:route-control",
+   "name": "Forecast-specific Skip/Basic/Tool route control",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because route selection is tied to the forecasting objective and forecast uncertainty: it decides whether to abstain, reason, or pay for tools for a demand forecast, with event-specific mandatory activation. A different task would require a different objective and route criteria.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast-specific route objective",
+    "R4:Planning and Orchestration",
+    "R4:Tools and Execution",
+    "R5:task_procedure",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 263,
+     "quote": "Skip terminates semantic processing, Basic uses available context, and Tool retrieves evidence or invokes temporal-statistics tools for ambiguous or high-entropy cases. Hard-triggered holidays and mega-sales use at least Basic."
+    },
+    {
+     "line": 118,
+     "quote": "Given event context, the no-text forecast, and its entropy, the agent selects Skip, low-cost Basic semantics, or tool-augmented Tool semantics; holidays and mega-sales rule out Skip."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 546,
+   "quote": "To prevent temporal leakage, all textual descriptions and event information are restricted to records available before the corresponding forecast origin."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 595,
+   "quote": "ReasonCast obtains the lowest WMAPE on all six proprietary event slices and on M5 event windows, with the largest margins during holidays."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The existing card combines routing and fusion, omits the purpose-built reasoning corpus, and uses retired Planning and Workflow vocabulary. The packet explicitly separates the semantic interpreter from the agent policy, supporting the split into distinct LLM training modules and task-specific harness procedures."
+}

@@ -1,0 +1,167 @@
+{
+ "citation_key": "oilwellagent2026",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "The work adds a structured sensor-metric and class-profile pipeline with a prompted LLM procedure that explains, validates, and names oil-well anomaly outputs.",
+ "claim_evidence": [
+  {
+   "line": 658,
+   "quote": "can serve as an effective explainability and validation companion to an established Open-World Learning pipeline for oil well anomaly detection. The agent achieves 89.7% novelty detection with physically-grounded naming, 91% precision in validating upstream classifications, and generates sensor-specific justifications"
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "oilwellagent2026:temporal-metric-computation",
+   "name": "Baseline-event sensor metric computation",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The module transforms baseline and event windows into numerical and categorical sensor features. R3_1_TSK is no because the same window-based feature operation does not embed an anomaly output objective; counterfactually changing task objectives does not require redesigning the temporal transformation. R3_2_GTS is yes because it explicitly depends on baseline/event windows and computes temporal statistics.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - temporal feature computation is not bound to an output objective",
+    "R3_2_GTS:yes - uses baseline and event windows and computes temporal features"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 130,
+     "quote": "A critical design decision is that the LLM receives structured numerical metrics, not raw time series. For each event segment, a shared metrics module computes per-sensor and cross-sensor features from the preprocessed data"
+    },
+    {
+     "line": 135,
+     "quote": "Given a preprocessed event segment with baseline window b (timesteps before event onset) and event window e (timesteps during the event), the following metrics are computed for each of the four sensors:"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "oilwellagent2026:metric-profile-diagnosis",
+   "name": "Data-driven anomaly class profiles",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The profiles organize temporal sensor statistics and domain knowledge around nine anomaly classes. R3_1_TSK is yes because the profile schema embeds anomaly-class diagnostic criteria; changing task family would require redesigning the profiles. GTS is not selected because the module's controlling scope is the anomaly diagnosis objective rather than a task-agnostic temporal service.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - class-specific anomaly profiles embed the diagnosis objective"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 192,
+     "quote": "For each of the nine known anomaly classes, a knowledge profile is built by aggregating per-sensor metrics across all available training segments."
+    },
+    {
+     "line": 198,
+     "quote": "Each profile additionally includes: • Macro behavior per sensor: change type, noise level, consistency across files, dominant pattern."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "oilwellagent2026:llm-diagnosis-procedure",
+   "name": "Prompted anomaly explanation and validation procedure",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The procedure requests ranked anomaly candidates, sensor-grounded explanations, validity judgments, and novelty names. R3_1_TSK is yes because these output and validation criteria are explicitly bound to anomaly diagnosis; changing task family requires changing the prompt and output schema. GTS is not selected because temporal order is input evidence, not the procedure's controlling objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - ranked diagnosis, validation, and novelty naming are task objectives"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 218,
+     "quote": "Input: For each segment, the single-segment metrics (Section 3.2) alongside all visible class profiles (Section 3.3)."
+    },
+    {
+     "line": 220,
+     "quote": "The agent receives observed metrics, known class profiles with per-sensor statistics and distinguishing features, and task-specific instructions requesting ranked JSON output with justifications."
+    },
+    {
+     "line": 223,
+     "quote": "Output: JSON with top-3 ranked candidates, per-candidate justification citing sensor evidence, confidence label (High/Medium/Low), and for novelty cases a novel_name plus novel_description."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 462,
+   "quote": "Headline: 611 segments. Overall detection = 89.7% (548/611)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The upstream OWL detector/classifier is inherited from cited prior work and is not counted as a contribution. The source describes a fixed prompt-driven workflow; it does not say returned outputs alter subsequent actions."
+}

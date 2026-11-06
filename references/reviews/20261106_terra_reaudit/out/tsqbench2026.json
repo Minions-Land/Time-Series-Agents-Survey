@@ -1,0 +1,360 @@
+{
+ "citation_key": "tsqbench2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TSQAgent combines a trained quality-dimension selector with tool-grounded inspection and reflective adjudication, alongside TSQBench and preference-based scoring for quality-aware time series data selection.",
+ "claim_evidence": [
+  {
+   "line": 167,
+   "quote": "TSQAgent is a multi-agent framework for pairwise time series quality assessment, designed to\ndetermine which of two time series exhibits higher overall quality through structured reasoning\nand tool-grounded analysis."
+  },
+  {
+   "line": 252,
+   "quote": "The reflection directive distinguishes two types of refinement. A recheck(Drecheck ) signal is generated when the evidence for certain dimensions is insufficient or internally conflicting, where"
+  },
+  {
+   "line": 112,
+   "quote": "benchmark, named TSQBench, based on pairwise comparison. TSQBench is designed to assess two"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "data_quality",
+  "time_series_classification"
+ ],
+ "modules": [
+  {
+   "id": "tsqbench2026:quality-benchmark",
+   "name": "TSQBench controlled quality benchmark",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "data_quality"
+   ],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK: controlled defects, target dimensions and unperturbed-series preference labels encode the data-quality assessment objective; changing task family requires redesigning labels and evaluation criteria.",
+   "rubric_path": [
+    "R1:contributed benchmark",
+    "R2:Harness",
+    "R3_1_TSK:yes - data-quality labels and comparison criteria",
+    "R4:Interface and Interaction",
+    "R5:resource_level; processing",
+    "R7:other_tasks=data_quality",
+    "R8:not_applicable",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 117,
+     "quote": "Benchmark Design. TSQBench is built on a controlled synthetic generation pipeline (details in\nAppendix B), where paired time series are derived from a shared template and then injected with\ndimension-specific degradations."
+    },
+    {
+     "line": 944,
+     "quote": "is provided with the ground-truth active dimension and asked to determine which series exhibits\nhigher quality under the specified dimension, where the ground-truth preference corresponds to\nthe unperturbed series during defect injection. Performance is measured via Precision, Recall for"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsqbench2026:perceiver-training",
+   "name": "GRPO-trained quality dimension selector",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "data_quality",
+    "time_series_classification"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2: GRPO updates the Perceiver's LoRA parameters to select quality dimensions. This is analytical supervision, not a policy trained to choose tool actions from returned workflow feedback; R3 Harness tests do not apply.",
+   "rubric_path": [
+    "R1:contributed trained Perceiver",
+    "R2:LLM - parameter updates",
+    "R3:not_applicable",
+    "R4:not_applicable",
+    "R5:model_side",
+    "R6:instruction_reasoning",
+    "R7:forecasting_prediction; data_quality; time_series_classification",
+    "R8:not_applicable",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 950,
+     "quote": "Training Target and Policy Parameterization. We fine-tune Qwen3-4B as the Perceiver policy\nusing the TRL implementation of GRPO. The trained policy is parameterized with LoRA rather"
+    },
+    {
+     "line": 957,
+     "quote": "list-valued planned_dimensions field. Only the planned_dimensions field is used by the GRPO\nreward. Thus, the implemented RL objective optimizes dimension selection and output validity, not\nthe Inspector’s later tool-use decision."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsqbench2026:quality-assessment",
+   "name": "Tool-grounded inspection and reflective adjudication",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "data_quality",
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK: dimension-wise quality winners and confidence-based adjudication determine recheck/replan actions and the final higher-quality series; changing task family requires redesigning the state, queries and verifier. Inspector and Adjudicator form one assessment/refinement procedure.",
+   "rubric_path": [
+    "R1:contributed quality assessment workflow",
+    "R2:Harness",
+    "R3_1_TSK:yes - quality comparison objective and evidence sufficiency checks",
+    "R4:Tools and Execution; Planning and Orchestration",
+    "R5:task_procedure; processing",
+    "R7:forecasting_prediction; data_quality; time_series_classification",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 235,
+     "quote": "shifts, periodic structures, or rare behaviors. When internal reasoning is insufficient to resolve subtle\ndifferences, the Inspector invokes external analytical tools to obtain quantitative evidence (Qian et al.,"
+    },
+    {
+     "line": 253,
+     "quote": "Drecheck ⊆ Dplan specifies the subset of dimensions to be re-evaluated by the Inspector. Alternatively, a replan signal is issued when the current dimension set Dplan is incomplete with respect\nto important aspects of data quality, requiring the Perceiver to introduce additional dimensions for"
+    },
+    {
+     "line": 262,
+     "quote": "across agents (Shinn et al., 2023). To ensure stable execution, reflection steps are explicitly bounded."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsqbench2026:analytical-tool-library",
+   "name": "Structured temporal measurement tool library",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "data_quality",
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:no - the separately callable tools return numerical measurements rather than a quality winner or selection objective; the same rolling, spectral and structural measurements survive a change of task. R3_2_GTS:yes - their computations depend on temporal order, lags and windows.",
+   "rubric_path": [
+    "R1:contributed unified analytical tool library",
+    "R2:Harness",
+    "R3_1_TSK:no - task-neutral numerical measurements",
+    "R3_2_GTS:yes - temporal windows, lags and structure",
+    "R4:Tools and Execution",
+    "R5:processing; mapped",
+    "R7:forecasting_prediction; data_quality; time_series_classification",
+    "R8:demonstrated - downstream forecasting and classification",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "time_series_classification"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 1095,
+     "quote": "This section provides the implementation details of the analytical tool library used in our TSqualityAgent system. The library is designed to extract interpretable quantitative signals from raw time series,"
+    },
+    {
+     "line": 1098,
+     "quote": "one candidate series, specified by series_name ∈ {A, B}, and returns a structured dictionary that is\ninjected back into the reasoning context as quantitative evidence."
+    },
+    {
+     "line": 1249,
+     "quote": "(15) Rolling Amplitude. The rolling_amplitude tool computes local amplitude as the range\nwithin a sliding window:"
+    },
+    {
+     "line": 305,
+     "quote": "three task categories. For long-term forecasting, we use Electricity (Trindade, 2015), ExchangeRate (Lai et al., 2018), Traffic (tra), and Weather (wea). For short-term forecasting, we adopt the M4"
+    },
+    {
+     "line": 306,
+     "quote": "dataset (Makridakis et al., 2018), including its Yearly, Monthly, and Daily subsets. For classification,\nwe use four datasets from the UCR/UEA archive (Ismail Fawaz et al., 2019; ucr): MedicalImages,"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsqbench2026:quality-scoring-selection",
+   "name": "Preference-trained quality scoring and selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "data_quality",
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R2: this non-LLM MOMENT/MLP scorer is an external capability in the rating pipeline. R3_1_TSK: agent-derived quality preferences define its ranking objective and top-quality subset selection; changing task family requires changing the target preference and selection criterion.",
+   "rubric_path": [
+    "R1:contributed agent-preference rating and meta-calibration procedure",
+    "R2:Harness - external non-LLM scoring model",
+    "R3_1_TSK:yes - data-quality scoring and selection objective",
+    "R4:Tools and Execution",
+    "R5:task_procedure",
+    "R7:forecasting_prediction; data_quality; time_series_classification",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 184,
+     "quote": "We then train a lightweight rating model on these comparisons to assign a scalar quality score to\neach sample via Bradley–Terry optimization, thereby enabling global ranking and quality-aware data\nselection. More details are provided in Appendix E.1."
+    },
+    {
+     "line": 1306,
+     "quote": "To enable consistent quality scoring across heterogeneous datasets, we further train the rating model\nusing a meta-learning strategy."
+    },
+    {
+     "line": 315,
+     "quote": "sample is assigned a quality score by different methods, and we select the top 50% of samples to\ntrain downstream models (e.g., CNN, PatchTST (Nie et al., 2023)). The trained models are then"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 293,
+   "quote": "accuracy across all evaluated models, raising performance from approximately 55%–61% to over\n78%–84%. The improvements are observed for both open-source and proprietary models, suggesting"
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 580,
+   "quote": "Table 3 shows that our method consistently outperforms random selection across all datasets under\nboth 50% and 75% data budgets, achieving lower RMSE with the same amount of training data."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The key names TSQBench, but the packet covers the full TSQAgent paper. Data quality is the direct output task; forecasting and classification measure downstream selection effects. The benchmark also supplies Perceiver training pairs. No separate module is counted for unchanged MOMENT, forecasting baselines, LoRA tooling, or the tool-output cache. Reported split ratios do not establish chronology or leakage control. Decision utility is measured for the training-data subset action, not deployment profit or risk. Added the separately described preference-trained rating/meta-calibration procedure (lines 182-186 and Appendix E), which the current card omitted.",
+ "reconciliation": [
+  {
+   "existing_id": "tsqbench2026:quality-assessment",
+   "decision": "split",
+   "new_ids": [
+    "tsqbench2026:quality-assessment",
+    "tsqbench2026:analytical-tool-library"
+   ],
+   "changes": [
+    "Preserve the workflow ID; separate the independently callable numerical tool library.",
+    "Workflow layer GTS -> TSK; numerical library remains GTS.",
+    "Replace retired feedback and coordination labels with Planning and Orchestration; retain Tools and Execution.",
+    "Workflow functions validation -> processing; view_status mapped -> task_procedure.",
+    "Record tool-library processing and work-level demonstrated application to forecasting and classification.",
+    "Normalize data_quality_assessment to data_quality; add source-supported downstream task memberships."
+   ],
+   "reason": "Sections 3.3-3.4 (lines 219-271) bind inspection, rechecking, replanning and aggregation to a higher-quality-series objective, satisfying R3_1_TSK. Appendix D (lines 1095-1269) supplies separately reusable numerical tools whose temporal computations satisfy R3_2_GTS. Quality judgment is not chronology/leakage validation."
+  },
+  {
+   "existing_id": "tsqbench2026:perceiver-training",
+   "decision": "change",
+   "new_ids": [
+    "tsqbench2026:perceiver-training"
+   ],
+   "changes": [
+    "Retain LLM layer and model_training role; remove Harness dimension Optimization and Evolution.",
+    "Add llm_route instruction_reasoning.",
+    "Complete not_applicable reuse schema and replace page locators with packet quotes.",
+    "Normalize data_quality_assessment to data_quality; add source-supported downstream task memberships."
+   ],
+   "reason": "Appendix C (lines 950-961) explicitly describes LoRA/GRPO parameter updates and limits the reward to dimension selection and output validity. It excludes the Inspector's tool-use decision, supporting instruction_reasoning rather than learning tool selection from returned workflow feedback."
+  },
+  {
+   "existing_id": "tsqbench2026:quality-benchmark",
+   "decision": "change",
+   "new_ids": [
+    "tsqbench2026:quality-benchmark"
+   ],
+   "changes": [
+    "Layer GTS -> TSK.",
+    "Retired Control, Verification, and Feedback -> Interface and Interaction.",
+    "Functions validation -> processing; view_status mapped -> resource_level.",
+    "Reuse inferred -> not_applicable.",
+    "Normalize data_quality_assessment to data_quality."
+   ],
+   "reason": "Sections 2 and B define controlled quality defects, active dimension labels and unperturbed-series preference targets (lines 117-125, 938-947). Changing the task requires changing these targets and evaluation criteria; downstream independence does not satisfy task neutrality."
+  }
+ ]
+}

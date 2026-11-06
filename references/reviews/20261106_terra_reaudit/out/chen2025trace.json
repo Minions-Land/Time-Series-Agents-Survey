@@ -1,0 +1,243 @@
+{
+ "citation_key": "chen2025trace",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TRACE combines DER-specific CoT instruction fine-tuning with multi-agent feedback refinement and factuality-checked summaries for time-series forecasting, and evaluates the framework on imputation.",
+ "claim_evidence": [
+  {
+   "line": 120,
+   "quote": "An instruction fine-tuning method based on CoT reasoning is designed to address the unique characteristics of DERs time series. Through chain-of-thought (CoT) reasoning, the prior knowledge embedded in pretrained LLMs is traced and aligned with the requirements of DERs power time series forecasting tasks."
+  },
+  {
+   "line": 412,
+   "quote": "In this context, this article proposes MaC framework designed to implement a thought refinement and correction process for LLMs through cooperative reasoning."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "imputation"
+ ],
+ "modules": [
+  {
+   "id": "chen2025trace:cot-instruction-tuning",
+   "name": "DER-specific CoT instruction fine-tuning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "imputation"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 places instruction fine-tuning that shapes model reasoning on the LLM side; it changes model behavior through training rather than only surrounding execution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM - instruction fine-tuning shapes model reasoning",
+    "R3:not applicable - LLM-side module"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 120,
+     "quote": "An instruction fine-tuning method based on CoT reasoning is designed to address the unique characteristics of DERs time series."
+    },
+    {
+     "line": 1347,
+     "quote": "no additional retraining was performed on LLMs with accessible data, only instruction fine-tuning was applied."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "chen2025trace:der-cot",
+   "name": "DER-specific CoT relevance selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "imputation"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 applies because the selector chooses reasoning steps by their contribution to the given forecasting task; changing to a different task objective requires redesigning the selected reasoning criteria. It is not GTS because its core input is the task objective and CoT relevance, rather than temporal state or information availability by themselves.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness - runtime prompt selection",
+    "R3_1_TSK:yes - selector is explicitly for the task objective",
+    "R3_2_GTS:no - no task-independent temporal-state mechanism"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 315,
+     "quote": "For a given task, only a limited subset of CoT processes may be relevant. Therefore, the specific CoT elements required for a given task are determined by a relevance selector"
+    },
+    {
+     "line": 1579,
+     "quote": "imputation capability. No modifications were made to the CoT or MaC structures, only “task description” was altered (e.g., “...please impute the missing data”)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "chen2025trace:forecast-consensus",
+   "name": "Multi-agent forecast feedback refinement",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "imputation"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 applies because predictors revise numerical forecasts from summaries of other agents' predictions and the Judge outputs a final prediction; another task objective changes what agents predict and what the Judge aggregates. It is not GTS because this is not a task-independent temporal data management or validation mechanism.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness - multi-agent execution and feedback",
+    "R3_1_TSK:yes - feedback and final output are tied to forecasting",
+    "R3_2_GTS:no - no task-independent temporal-state mechanism"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 417,
+     "quote": "These summaries are then fed back to the respective predictor agents, allowing each agent to observe the statistical mean of the other agents’ predictions. Based on this feedback, each agent refines its predictions and generates a new output."
+    },
+    {
+     "line": 1579,
+     "quote": "imputation capability. No modifications were made to the CoT or MaC structures, only “task description” was altered (e.g., “...please impute the missing data”)."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "chen2025trace:factuality-verification",
+   "name": "Judge-summary factuality verification",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "imputation"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 does not apply: the check scores whether a Judge summary is supported by agents' reasoning, rather than embedding a forecasting objective or task-family output criterion. R3_2 does not apply because it does not check chronology or temporal information availability. R3_3 applies as an execution verification checkpoint; the same summary-grounding check is used when the task description changes.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness - summary verification around model calls",
+    "R3_1_TSK:no - generic summary factuality criterion",
+    "R3_2_GTS:no - no temporal-order or availability check",
+    "R3_3_GH:yes - execution verification checkpoint"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 426,
+     "quote": "In the MaC framework, we further integrated a Factuality Verification module. Following the methodology proposed by Feng et al. [27], a scoring metric Scorefact was introduced to assess the factual accuracy of the generated summaries"
+    },
+    {
+     "line": 439,
+     "quote": "We consider three metrics: lexical overlap, semantic consistency, and factual consistency"
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1590,
+   "quote": "The imputation MAE for all models is presented in Table V, all results are averaged over missing ratio of 5%, 10%, 15%, and 20%. As shown, TRACE achieves SOTA imputation performance due to its exceptional FSL capabilities."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "chen2025trace:der-cot",
+   "decision": "change",
+   "new_ids": [
+    "chen2025trace:der-cot"
+   ],
+   "changes": [
+    "layer remains TSK; remove retired dimension Planning and Workflow",
+    "name clarified as DER-specific CoT relevance selection",
+    "add imputation task evidence"
+   ],
+   "reason": "The existing mechanism is the runtime task-conditioned selector described at lines 315-322. The card's legacy dimension does not apply to TSK and must be removed; its task-specific selector remains a TSK procedure."
+  },
+  {
+   "existing_id": "chen2025trace:forecast-consensus",
+   "decision": "split",
+   "new_ids": [
+    "chen2025trace:forecast-consensus",
+    "chen2025trace:factuality-verification"
+   ],
+   "changes": [
+    "retain TSK feedback-refinement loop under existing id",
+    "split Judge-summary factuality verification into a GH Planning and Orchestration module",
+    "remove retired Control, Verification, and Feedback and Coordination and Scaling dimensions"
+   ],
+   "reason": "The iterative agent-feedback loop and the factuality scoring checkpoint are separately described mechanisms (lines 412-425 and 426-447). The former is tied to task output; the latter checks summary support against agent reasoning and is not temporally or task-bound."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The paper explicitly reuses the unchanged CoT and MaC structures for imputation by altering the task description. The evaluation reports task errors and dataset-contamination checks, but no temporal split or information-availability validation. The current card omitted the instruction fine-tuning contribution, added legacy harness dimensions to TSK modules, and combined the feedback loop with factuality verification. The instruction fine-tuning module is newly identified and has no existing card module to reconcile."
+}

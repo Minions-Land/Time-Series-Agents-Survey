@@ -1,0 +1,195 @@
+{
+ "citation_key": "feta2025",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "FETA contributes a fixed multi-agent time-series classification workflow combining channel selection, DTW exemplar retrieval, prompted per-channel reasoning, and confidence-weighted decision aggregation.",
+ "claim_evidence": [
+  {
+   "line": 12,
+   "quote": "FETA, a multi-agent framework for trainingfree TSC via exemplar-based in-context reasoning. FETA decomposes a multivariate series into channel-wise subproblems, retrieves a few structurally similar labeled examples for each channel"
+  }
+ ],
+ "task_memberships": [],
+ "other_tasks": [
+  "time_series_classification"
+ ],
+ "modules": [
+  {
+   "id": "feta2025:channel-decomposer",
+   "name": "Task-driven channel selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 applies because channel ranking optimizes class separation and nearest-neighbor classification; changing task family changes the selection objective. Its channel-wise temporal preprocessing is embedded in this classifier, so it is not a task-independent GTS module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - relevance score uses class separation and classification accuracy",
+    "R5:task_procedure",
+    "R7:time_series_classification",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 316,
+     "quote": "Channels are then ranked by Sc, and the top-M are selected for downstream reasoning."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "feta2025:example-retriever",
+   "name": "DTW exemplar retrieval",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 applies because retrieval selects labeled examples to support classification; another task family would require a different retrieval objective and label use. DTW alignment and retrieving time-series precedents are temporal operations within this task procedure, not an independent task-agnostic GTS module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - retrieves labeled neighbors for classification",
+    "R5:task_procedure",
+    "R7:time_series_classification",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 388,
+     "quote": "For each selected channel c ∈ S and a test sequence X∗(c), the Example Retriever searches for its Kr most similar training sequences using Dynamic Time Warping (DTW)"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "feta2025:channel-reasoner",
+   "name": "Exemplar-grounded channel reasoning",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R2 places the prompt and in-context procedure in the Harness because model parameters are unchanged. R3_1 applies because the reasoner adjudicates class labels for this classification task; changing tasks changes its required output and prompt. It does not provide task-independent temporal processing as a separate GTS module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness - prompt/in-context procedure, no parameter updates",
+    "R3_1_TSK:yes - outputs a channel-level class decision",
+    "R5:task_procedure",
+    "R7:time_series_classification",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 445,
+     "quote": "The Channel Reasoner therefore leverages a reasoning LLM to perform in-context comparison of temporal patterns"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "feta2025:decision-aggregator",
+   "name": "Confidence-weighted class aggregation",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 applies because the aggregator combines class labels and confidence values to produce the classification output; a different task requires a different output space and aggregation rule. It does not meet GTS because the mechanism is task-objective-specific rather than generally managing temporal state.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - fuses class predictions into the final classification",
+    "R5:task_procedure",
+    "R7:time_series_classification",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 456,
+     "quote": "The final stage aggregates channel-level predictions into a single decision. Because different channels may provide complementary or conflicting evidence, the aggregator combines labels {ŷc}c∈S and confidences {wc}c∈S into a robust consensus via confidence-weighted fusion."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 509,
+   "quote": "We adopt the official train/test splits and report classification accuracy."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper reports classification accuracy and ablations, but not runtime execution validity, temporal leakage or information-availability checks, or downstream decision utility."
+}

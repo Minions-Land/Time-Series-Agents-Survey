@@ -1,0 +1,147 @@
+{
+ "citation_key": "chear2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "CHEAR constructs a validated activity-confusion hierarchy and pairwise sensor-feature evidence offline, then uses retrieval-conditioned LLM decisions to retain candidates and select a human activity label online.",
+ "claim_evidence": [
+  {
+   "line": 62,
+   "quote": "We propose confusionhierarchy evidence-aware reasoning (CHEAR), which moves part of this knowledge organization"
+  }
+ ],
+ "task_memberships": [],
+ "other_tasks": [
+  "time_series_classification"
+ ],
+ "modules": [
+  {
+   "id": "chear2026:offline-confusion-hierarchy",
+   "name": "Validated activity-confusion hierarchy construction",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the hierarchy groups activity labels using HAR classification errors; changing the task family changes the label objective and hierarchy. It has no task-independent temporal state or availability semantics (R3_2_GTS counterfactual), and is not generic execution state (R3_3_GH).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - hierarchy is built from activity classification confusions"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 539,
+     "quote": "The independent source validation set may select only candidates on these paths whose gain over the all-singleton partition is strictly positive; it cannot introduce a structure absent from construction."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "chear2026:hierarchical-retention",
+   "name": "Confusion-hierarchy variable-size candidate retention",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the LLM retains activity-label candidates to produce one HAR class; another task objective would require different candidate units and output selection. Retrieval evidence is not temporal state management independent of that objective (R3_2_GTS counterfactual), and this is more specific than generic runtime control (R3_3_GH).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - retention selects among activity classification labels"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 347,
+     "quote": "target dataset’s position-specific reference stores. Inference starts from root candidate units. Given the current candidates and retrieval evidence, the LLM retains a variablesize subset."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "chear2026:pair-feature-knowledge",
+   "name": "On-demand activity-pair feature knowledge",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because each report compares registered activity-label endpoints and informs class selection; changing task families changes the endpoints and validation objective. Although the report computes temporal features, it has no task-independent temporal scope (R3_2_GTS counterfactual); it is not generic harness state (R3_3_GH).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - pair reports compare activity classification endpoints"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 562,
+     "quote": "source statistics, and frozen reliability. During online inference, the corresponding report is loaded only if both"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 193,
+   "quote": "Target test labels are not used for hierarchy construction,"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 811,
+   "quote": "CHEAR with Gemini reaches 86.79% and 86.89%, exceeding those tabulated values by 5.19 and 5.49 percentage"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper supplies its own text. The hierarchy construction and online LLM retention are distinct mechanisms; the former is frozen before query-time inference."
+}

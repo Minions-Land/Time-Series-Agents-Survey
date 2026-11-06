@@ -1,0 +1,196 @@
+{
+ "citation_key": "timer12025",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "Time-R1 trains LLMs for reasoning-based forecasting through synthetic-CoT warmup and multi-objective reinforcement fine-tuning with GRIP, using a structured forecasting template.",
+ "claim_evidence": [
+  {
+   "line": 55,
+   "quote": "In this paper, we propose TimeR1, a reinforcement fine-tuning framework designed to enhance\nthe multi-step reasoning ability of LLMs for time series forecasting."
+  },
+  {
+   "line": 57,
+   "quote": "Training starts with supervised fine-tuning for warmup adaptation, followed by reinforcement learning that improves the model’s\ngeneralization ability via reward-driven reasoning optimization."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "timer12025:forecast-template",
+   "name": "Structured forecasting prompt",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [
+    "data_management"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R2 makes the parameter-free prompt Harness. R3_1_TSK matches because its task definition and output format require a complete future forecast over a specified horizon; changing task family requires redesigning those requirements, so temporal input formatting does not make the whole template GTS.",
+   "rubric_path": [
+    "R1:contributed structured template",
+    "R2:Harness - prompt does not update parameters",
+    "R3_1_TSK:yes - forecast objective and horizon-specific output",
+    "R4:Interface and Interaction",
+    "R5:data_management - timestamps and channel semantics",
+    "R6:not_applicable",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 320,
+     "quote": "Our training template standardizes inputs and encodes task-specific\nknowledge through five carefully designed components:"
+    },
+    {
+     "line": 323,
+     "quote": "Description specifying temporal characteristics and application scenarios; (3) Channel Information which delineates the types and\nsemantic meanings of input signals; (4) Testing Data providing\ntimestamps and historical series;"
+    },
+    {
+     "line": 312,
+     "quote": "the past 96 recorded dates, and please help me forecast the data for\nthe next 96 recorded dates accurately."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timer12025:synthetic-cot",
+   "name": "Label-conditioned synthetic reasoning data",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R2 explicitly places data built to train the model on the LLM side. Candidate forecasts are selected by MSE and reasoning is revised using true labels to construct forecasting supervision; this is not runtime memory or a GTS validator.",
+   "rubric_path": [
+    "R1:contributed synthetic CoT construction",
+    "R2:LLM - training data for temporal reasoning",
+    "R3:not_applicable - LLM side",
+    "R4:not_applicable",
+    "R5:model_side",
+    "R6:instruction_reasoning",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 335,
+     "quote": "Our SFT data construction involves three steps. First, we leverage\nDeepSeek-R1 to generate time-series predictions on the training\nset by feeding historical time series data with strict formatting\nguidelines."
+    },
+    {
+     "line": 339,
+     "quote": "Next, to derive reasoning aligned with ground-truth\nlabels, we inject both the true prediction value and the high-quality\nCoT generated in the previous step into DeepSeek-R1 as prompts,\nguiding it to synthesize a revised CoT that logically culminates\nin the correct prediction."
+    },
+    {
+     "line": 343,
+     "quote": "Finally, we concatenate the refined CoT\nwith the true prediction value, demarcating the final answer using\n‘<answer>‘ tags to create structured SFT data."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timer12025:reasoning-rft",
+   "name": "SFT and GRIP reinforcement fine-tuning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 assigns SFT and RL parameter optimization to LLM. The warmup, forecasting-specific rewards, and GRIP trajectory sampling and weighting constitute the contributed training recipe; no observation-conditioned tool policy is trained, so workflow_learning does not apply.",
+   "rubric_path": [
+    "R1:contributed RFT recipe with multi-objective rewards and GRIP",
+    "R2:LLM - SFT and RL change model parameters",
+    "R3:not_applicable - LLM side",
+    "R4:not_applicable",
+    "R5:model_side",
+    "R6:instruction_reasoning",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 347,
+     "quote": "After constructing the training data, we perform single-epoch\nfine-tuning."
+    },
+    {
+     "line": 353,
+     "quote": "After warmup SFT, we further fine-tune the LLM with RL to improve reasoning generalization and enable slow-thinking for time\nseries forecasting."
+    },
+    {
+     "line": 357,
+     "quote": "proposed slow-thinking time series forecasting, we introduce several fine-grained and multi-objective reward functions specifically\ndesigned to enhance forecasting performance and slow thinking\nbehavior."
+    },
+    {
+     "line": 475,
+     "quote": "The GRIP objective function, formalized in Equation 8, combines\na non-uniform sampling strategy with adaptive trajectory weighting within a policy gradient framework."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 755,
+   "quote": "For Time-R1, we keep the model-facing time-series values in the\noriginal numerical scale as both inputs and outputs, allowing the\nLLM to access physically meaningful magnitudes during reasoning."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1157,
+   "quote": "We present the main results using the MAE evaluation metric here\nin Table 6. Compared to both traditional methods and LLM-based\napproaches, Time-R1 achieves competitive improvements."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The supplied packet is the 2026 v4 paper despite the citation key ending in 2025. Temporal-validity evidence is limited to retaining numerical meaning through original-scale inputs/outputs and inverse transformation for evaluation; no explicit chronological split or leakage audit is reported. Format rewards and reasoning interventions are not runtime execution-validity measurements. Synthetic CoT is label-conditioned training supervision, not evidence of inference-time access to future labels. Training rewards and GRIP are included in the LLM training module rather than counted again as runtime Harness mechanisms."
+}

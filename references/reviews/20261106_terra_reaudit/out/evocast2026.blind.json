@@ -1,0 +1,265 @@
+{
+ "citation_key": "evocast2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "EvoCast contributes a feedback-driven autonomous research loop that grounds forecasting architecture changes in executed diagnostics and prior outcomes while separating LLM generation from deterministic evaluation and promotion.",
+ "claim_evidence": [
+  {
+   "line": 93,
+   "quote": "This paper presents EvoCast, a fully autonomous research-agent system for task-specific forecasting architecture evolution."
+  },
+  {
+   "line": 102,
+   "quote": "state updates. Successful improvements, scientific negative results, and engineering failures are written into the evidence state, reducing repeated trial-and-error and grounding later rounds in auditable facts."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "evocast2026:authority-chain",
+   "name": "Cognition-authority separated execution loop",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is no: source boundaries and role permissions manage execution without a forecasting objective; R3_2_GTS is no because this layer has no temporal semantics; R3_3_GH is yes.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - generic execution authority",
+    "R3_2_GTS:no - no temporal semantics",
+    "R3_3_GH:yes - manages execution",
+    "R4:Planning and Orchestration",
+    "R4:Tools and Execution",
+    "R5:view_status:general_runtime"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1545,
+     "quote": "Program authorities control source boundary checking, candidate materialization, canonical evaluation, promotion gate decisions, result semantics, and persistent state update."
+    },
+    {
+     "line": 1547,
+     "quote": "This separation defines three permissions. LLM agents can generate research intent and code changes. Builder edits must remain inside the fixed editable boundary."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "evocast2026:promotion-gate",
+   "name": "Canonical evaluation and promotion gate",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is yes: canonical forecasting metrics, comparison and multi-seed promotion define the accepted result; changing task family changes the objective metric and admissibility gate.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - embeds forecasting metric and promotion criterion",
+    "R4:Planning and Orchestration",
+    "R4:Tools and Execution",
+    "R5:view_status:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 1841,
+     "quote": "Candidate source code first passes source compliance and artifact construction, then runs through the fixed evaluator to generate canonical metrics, and finally enters the Promotion Gate."
+    },
+    {
+     "line": 461,
+     "quote": "Model-state promotion is triggered only when the candidate passes boundary validation, produces valid canonical metrics, and satisfies the fixed multi-seed comparison rule against the current incumbent."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "evocast2026:evidence-ledger",
+   "name": "Outcome-typed research evidence and failure memory",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is no: the state store records generic round outcomes; R3_2_GTS is no because it does not depend on temporal semantics; R3_3_GH is yes, with feedback updating runtime state across rounds.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - generic outcome state",
+    "R3_2_GTS:no - no temporal semantics",
+    "R3_3_GH:yes - stores runtime state",
+    "R4:Memory and Context",
+    "R4:Optimization and Evolution",
+    "R5:view_status:general_runtime"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1991,
+     "quote": "The next Research Planner reads the full updated research state, including accepted candidates, negative results, unstable improvements, repair history, failure memory, and baseline diagnosis."
+    },
+    {
+     "line": 494,
+     "quote": "evidence state accumulates valid improvements, negatives, unstable gains, and failure records, allowing subsequent planning to use the full research trajectory."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "evocast2026:protocol-grounding",
+   "name": "Forecasting task protocol grounding",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is yes: the procedure freezes forecasting target, windows, mode and metric as the task contract; changing task family changes those requirements. Dataset characterization performs temporal-series processing.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - freezes forecasting requirements",
+    "R4:Planning and Orchestration",
+    "R5:processing",
+    "R5:view_status:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 1593,
+     "quote": "Before research begins, the system fixes the dataset, target, lookback, horizon, forecasting mode, metric, training budget, research-round budget, and repair budget."
+    },
+    {
+     "line": 1614,
+     "quote": "Task grounding also converts the raw dataset into planner-readable evidence."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "evocast2026:baseline-diagnosis",
+   "name": "Executed baseline mechanism diagnosis",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is yes: active forecasting mechanisms are ablated and judged by the forecasting protocol; changing task family changes the objective and diagnostic criterion.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - ablation judgment embeds forecasting objective",
+    "R4:Planning and Orchestration",
+    "R4:Tools and Execution",
+    "R5:view_status:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 358,
+     "quote": "The selected baseline identifies which executable model is currently strongest, and baseline diagnosis identifies why that model works on the current task."
+    },
+    {
+     "line": 360,
+     "quote": "EvoCast analyzes the active prediction path of 𝑏 ★, extracts ablatable mechanisms, and turns them into executable diagnosis targets tied to concrete source regions and input-output preservation contracts."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 539,
+   "quote": "Table 1: Overall method-level RQ1 results. Success is the proportion of tasks that pass the canonical validation pipeline; Fidelity is the proportion of evaluated implementations that realize the given idea without semantic mismatch; Repair is computed only over repair-eligible tasks."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 2336,
+   "quote": "All tasks follow the same experimental protocol: the data are split by chronological order with a 7:1:2 ratio for training, validation, and testing; no split is shuffled;"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 636,
+   "quote": "Table 3 reports the final formal forecasting results on the three real cases. EvoCast reduces the selected-baseline error on all three tasks."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet supports five modules under the current rubric: generic authority runtime, task-specific promotion gate, evidence state, protocol grounding, and baseline diagnosis."
+}

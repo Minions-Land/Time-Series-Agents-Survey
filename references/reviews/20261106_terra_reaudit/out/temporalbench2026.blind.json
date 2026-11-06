@@ -1,0 +1,162 @@
+{
+ "citation_key": "temporalbench2026",
+ "status": "paper_verified",
+ "role_of_work": "resource",
+ "claim_summary": "TemporalBench contributes a multi-domain temporal-agent benchmark that controls historical/future and contextual/event information, and a tested feature-and-visualization input augmentation for AgentScope.",
+ "claim_evidence": [
+  {
+   "line": 118,
+   "quote": "We introduce TemporalBench, a multi-domain benchmark for evaluating agent and LLM performance on time-series tasks under contextual and event-informed settings."
+  },
+  {
+   "line": 958,
+   "quote": "temporal tasks, we design a lightweight feature extraction and visualization module and integrate it into a representative general agent, AgentScope with gpt-4o as the backbone."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "temporal_analysis",
+  "temporal_question_answering"
+ ],
+ "modules": [
+  {
+   "id": "temporalbench2026:event-conditioned-evaluation",
+   "name": "Event-boundary temporal evaluation pipeline",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [
+    "data_management",
+    "processing",
+    "validation"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_analysis",
+    "temporal_question_answering"
+   ],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK no: this shared benchmark construction supports historical analysis, contextual reasoning, and forecasting rather than embedding one task family's procedure. R3_2_GTS yes: its event boundaries, historical/future windows, temporal labels, and leakage controls depend on temporal order and information availability. If temporal ordering and windows were removed, the benchmark's core evaluation would fail.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - shared benchmark covers multiple task types, not one task procedure",
+    "R3_2_GTS:yes - event boundaries and historical/future windows are temporal",
+    "R4:Interface and Interaction",
+    "R5:data_management, processing, validation",
+    "R7:forecasting_prediction; temporal_analysis; temporal_question_answering",
+    "R8:inferred",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 118,
+     "quote": "We introduce TemporalBench, a multi-domain benchmark for evaluating agent and LLM performance on time-series tasks under contextual and event-informed settings."
+    },
+    {
+     "line": 373,
+     "quote": "We construct TemporalBench through a unified dataset transformation pipeline designed to ensure methodological consistency, reproducibility, and comparability across heterogeneous time-series domains."
+    },
+    {
+     "line": 416,
+     "quote": "any labeling rule. This design prevents information leakage from event injection or detection and ensures that models cannot succeed by exploiting prompt structure rather than temporal evidence."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "temporalbench2026:temporal-representation-augmentation",
+   "name": "Temporal feature and visualization augmentation",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Interface and Interaction"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_analysis",
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK no: the augmentation extracts general temporal features and plots, without embedding one task family's output criterion, and is evaluated across T1-T4. R3_2_GTS yes: feature extraction summarizes temporal dynamics and exposes time-series structure; without ordered numerical observations and temporal patterns, it has no function.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - general representation augmentation spans T1-T4",
+    "R3_2_GTS:yes - extracts and presents temporal structure",
+    "R4:Tools and Execution; Interface and Interaction",
+    "R5:processing",
+    "R7:forecasting_prediction; temporal_analysis; temporal_question_answering",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 958,
+     "quote": "temporal tasks, we design a lightweight feature extraction and visualization module and integrate it into a representative general agent, AgentScope with gpt-4o as the backbone."
+    },
+    {
+     "line": 966,
+     "quote": "The proposed module augments raw time-series input with two complementary representations. First, we extract a compact set of structured numerical features summarizing global statistics and multi-scale temporal dynamics."
+    },
+    {
+     "line": 973,
+     "quote": "Second, we generate a visualization of the time series as an additional modality, exposing relative changes, peaks, and structural patterns that are difficult to infer from raw numeric tokens alone."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1422,
+   "quote": "A majority of its failures stem from producing outputs that either do not conform to the required format or do not match the expected horizon length."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 416,
+   "quote": "any labeling rule. This design prevents information leakage from event injection or detection and ensures that models cannot succeed by exploiting prompt structure rather than temporal evidence."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 765,
+   "quote": "For numerical forecasting tasks in T2 and T4, we evaluate prediction quality using error-based metrics computed between predicted and ground-truth future values over the valid forecast horizon."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The current card omits the paper's separately designed and evaluated temporal feature/visualization augmentation. The benchmark module remains a resource-level GTS contribution; its shared pipeline is not a task-specific agent procedure."
+}

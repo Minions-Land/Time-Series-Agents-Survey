@@ -1,0 +1,183 @@
+{
+ "citation_key": "wang2025agentic",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "LLMTraveler is an LLM-based route-choice agent that uses profile-conditioned prompts and experience memory to adapt day-to-day decisions to congestion feedback.",
+ "claim_evidence": [
+  {
+   "line": 28,
+   "quote": "This agent integrates an LLM as its core, equipped with a memory system that learns from past experiences and makes decisions by balancing retrieved data and personality traits."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "wang2025agentic:route-cost-memory",
+   "name": "EWMATT route-experience memory",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The memory stores route-specific travel costs and chosen counts for the route-choice objective; changing the task family would change the remembered quantities and decision criterion.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - route-choice objective is embedded",
+    "R4:Memory and Context",
+    "R5:task_procedure; context_memory",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 151,
+     "quote": "At the end of day i, each LLMTraveler receives travel cost information for the chosen route or all available routes. The agent updates its memory with this information, storing travel cost data along with other relevant details such as traffic conditions and route-specific costs."
+    },
+    {
+     "line": 155,
+     "quote": "For the experiments, this reflection involves calculating the Exponential Weighted Moving Average Travel Time (EWMATT) for each route to prioritize recent experiences while still considering historically experienced data."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "wang2025agentic:route-simulation",
+   "name": "Day-to-day congestion feedback loop",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The loop embeds route selection, network loading, travel-time calculation, and re-planning for the route-choice objective; changing task family changes the action space, environment semantics, and cost objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - route-choice objective is embedded",
+    "R4:Interface and Interaction; Tools and Execution; Planning and Orchestration",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 224,
+     "quote": "The simulation loop operates over a predefined number of days, representing the iterative nature of travelers’ route choice decisions."
+    },
+    {
+     "line": 228,
+     "quote": "After all LLMTravelers have chosen their routes, the network is loaded with these selected routes. This step involves calculating the travel times for each link using the performance function for the day."
+    },
+    {
+     "line": 232,
+     "quote": "Following the network loading, each LLMTraveler updates their experiences based on the travel cost of the day. This includes storing the travel times and relevant information, which will influence their future route choices."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "wang2025agentic:route-choice-prompt",
+   "name": "Profile-conditioned route-choice prompt",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The prompt embeds the route-choice task, route options, travel data, and structured route decision output; changing the task family changes the objective, options, and output schema.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - route-choice objective is embedded",
+    "R4:Interface and Interaction",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 170,
+     "quote": "The context-inclusive prompts, which integrate the traveler profile, task description, travel experiences, thinking guidance, output format, and reasoning, are shown in Figure 2."
+    },
+    {
+     "line": 181,
+     "quote": "The task is to simulate route choice behavior. Each day, the agent needs to decide on a route based on historical travel experiences."
+    },
+    {
+     "line": 193,
+     "quote": "It specifies that the agent’s response should be in JSON format, including both the selected route and the reasoning behind the choice."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1235,
+   "quote": "In this section, travel time and Day Switching Rate (DSR) are used for evaluation."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The work models route choice in a day-to-day congestion environment; route choice is recorded under decision_support, with no additional survey task family."
+}

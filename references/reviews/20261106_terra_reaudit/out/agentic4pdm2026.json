@@ -1,0 +1,165 @@
+{
+ "citation_key": "agentic4pdm2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "Agentic4PDM contributes a feedback-driven multi-agent fault-diagnosis workflow in which role-separated agents build class-balanced evidence and a deterministic Host adaptively gates tool requests, evidence influence, and final class admission.",
+ "claim_evidence": [
+  {
+   "line": 73,
+   "quote": "To address these concerns, we propose Agentic4PDM, a multi-agent framework for industrial fault diagnosis."
+  },
+  {
+   "line": 81,
+   "quote": "The Host enforces two gates, followed by a finalization check on the proposed class."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "agentic4pdm2026:evidence-construction",
+   "name": "Query-adaptive comparative evidence construction",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "TSK because the procedure constructs and preserves candidate fault classes for the diagnosis output; changing the task family would require redesigning the class references, comparative reports, and candidate set.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - candidate fault-class output is embedded",
+    "R4:Tools and Execution; Planning and Orchestration",
+    "R5:task_procedure",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 246,
+     "quote": "As illustrated in Figure 1, Agentic4PDM consists of two main phases. (1) In evidence construction"
+    },
+    {
+     "line": 318,
+     "quote": "First, the Host retrieves the reference bank R⋆ (x⋆ ) by Eq. 1. Next, the SAgent picks a smoothing family for each channel, and the Host marks the stable and deviant regions of each smoothed"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agentic4pdm2026:ccga",
+   "name": "Contract-checked gated adjudication",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "TSK because request admission, evidence influence, and finalization are defined over candidate fault classes and the diagnosis admission criterion; changing the task family would require redesigning the action checks and verifier.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - gates validate and admit the fault-class diagnosis",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:task_procedure",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 81,
+     "quote": "The Host enforces two gates, followed by a finalization check on the proposed class."
+    },
+    {
+     "line": 86,
+     "quote": "The packet and influence gate then determines how each tool result may influence the diagnosis."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 371,
+   "quote": "The Host checks all three conditions before execution."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 462,
+   "quote": "All signals are segmented into non-overlapping windows of T =2048 observations, with 50 training samples retained per class."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 481,
+   "quote": "Performance is measured using multiclass accuracy and macro F1 (F1-M)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "agentic4pdm2026:ccga",
+   "decision": "change",
+   "new_ids": [
+    "agentic4pdm2026:ccga"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration",
+    "dimensions: Planning and Workflow -> Planning and Orchestration",
+    "added Tools and Execution",
+    "functions: validation -> []",
+    "view_status: mapped -> task_procedure"
+   ],
+   "reason": "The packet defines CCGA as a task-bound diagnosis admission protocol. Its gates orchestrate tool execution and evidence influence, but the reference preflight validates diagnostic support rather than temporal chronology or information availability."
+  },
+  {
+   "existing_id": "agentic4pdm2026:evidence-construction",
+   "decision": "change",
+   "new_ids": [
+    "agentic4pdm2026:evidence-construction"
+   ],
+   "changes": [
+    "dimensions: Memory and Context plus Coordination and Scaling -> Tools and Execution plus Planning and Orchestration",
+    "view_status: mapped -> task_procedure"
+   ],
+   "reason": "The evidence phase retrieves references, smooths and segments the query, prioritizes channels, and builds candidate fault-class reports, so its core logic is tied to the diagnosis task. Its temporal operation is processing; it is not a general temporal module."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Both existing mechanisms are retained with their ids. The current card used retired dimensions and treated task-bound procedures as mapped GTS modules; the packet supports TSK task_procedure modules under the current rubric."
+}

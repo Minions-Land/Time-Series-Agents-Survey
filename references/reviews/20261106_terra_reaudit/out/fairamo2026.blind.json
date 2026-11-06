@@ -1,0 +1,131 @@
+{
+ "citation_key": "fairamo2026",
+ "status": "paper_verified",
+ "role_of_work": "resource",
+ "claim_summary": "FairAMO contributes a controlled evaluation protocol that compares time-series model orchestrators on identical frozen candidate forecasts and permitted historical evidence before test labels are revealed.",
+ "claim_evidence": [
+  {
+   "line": 95,
+   "quote": "We introduce FairAMO, a controlled protocol for comparing orchestration methods under identical candidate forecasts, evidence, and evaluation metrics for TSF."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "fairamo2026:frozen-bank-protocol",
+   "name": "Frozen forecast bank protocol",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "data_management",
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "TSK applies because the protocol commits model selection or combination weights and evaluates forecast outputs against forecasting criteria; changing the task family would require redesigning the candidate forecast state, decision output and scoring objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - embeds forecasting output and evaluation criteria",
+    "R4:Memory and Context; Planning and Orchestration",
+    "R5:task_procedure - data_management, context_memory, validation",
+    "R7:forecasting_prediction",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 121,
+     "quote": "Frozen Forecast Bank. All M candidate TSFMs are run once on GIFT-Eval and are never retrained or fine-tuned afterwards. Their outputs are cached in a forecast bank indexed by (dataset, term, series, window, candidate, quantile)."
+    },
+    {
+     "line": 223,
+     "quote": "Using only this evidence, it produces an orchestration strategy, either a model selection or a set of combination weights, which is then committed and frozen for the test period."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "fairamo2026:headroom-realization",
+   "name": "Pool headroom and realization metrics",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "TSK applies because headroom, gain and realization are computed from forecast losses of candidate models, an oracle and an orchestrator; changing the task family would require changing the output loss and validation criterion.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - embeds forecasting loss and validation criteria",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure - no temporal function embedded",
+    "R7:forecasting_prediction",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 474,
+     "quote": "Gain G = Lbest (P ) − Lmethod (P ) is what a method actually recovers relative to the baseline."
+    },
+    {
+     "line": 477,
+     "quote": "Realization HR = G/H(P ) is the fraction of the available headroom that the method converts into accuracy."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 226,
+   "quote": "No rerun, reweighting, or inspection of test scores is permitted after commitment."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 257,
+   "quote": "The strongest deployable orchestrator, TSOrchestra SLSQP, reaches 0.658 MASE, a gain of 0.039 or 5.6% over the best single TSFM, TiRex2, at 0.697."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet evaluates and reimplements prior orchestrators, but those are not new modules contributed by this work. The two retained modules are the controlled forecast-bank protocol and its separate headroom/gain/realization evaluation measures."
+}

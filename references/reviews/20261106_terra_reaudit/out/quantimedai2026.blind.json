@@ -1,0 +1,150 @@
+{
+ "citation_key": "quantimedai2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "QuanTiMedAI contributes a feedback-driven LLM feature-selection procedure with a clinical severity channel and a modified five-VQC QLSTM predictor for cardiac-arrest mortality time series.",
+ "claim_evidence": [
+  {
+   "line": 98,
+   "quote": "We introduce an agentic LLM-guided feature selection pipeline that iteratively refines clinical feature subsets through performance-guided feedback, incorporating clinical domain knowledge via an engineered severity score channel."
+  },
+  {
+   "line": 100,
+   "quote": "We propose a modified five-VQC QLSTM architecture with an input re-injection skip connection that improves AUROC by about 2% over a parameter-matched classical LSTM"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "time_series_classification"
+ ],
+ "modules": [
+  {
+   "id": "quantimedai2026:clinical-feature-loop",
+   "name": "Outcome-guided clinical feature and severity selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Optimization and Evolution",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "TSK: the loop optimizes feature subsets and severity weights using mortality-prediction cross-validation feedback; changing the task family changes the objective, validation criterion, and selected features. Its temporal input summaries and feature processing are embedded in that task procedure.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - feature selection is optimized against cardiac-arrest mortality prediction performance",
+    "R4:Planning and Orchestration; Optimization and Evolution; Tools and Execution",
+    "R5:task_procedure; processing",
+    "R7:forecasting_prediction; time_series_classification",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 356,
+     "quote": "Feature selection was performed using an agentic framework driven by a large language model"
+    },
+    {
+     "line": 527,
+     "quote": "Following initial selection, the feature set undergoes up to R rounds of iterative refinement."
+    },
+    {
+     "line": 529,
+     "quote": "performance feedback comprising fold-mean AUROC, AUPRC, cross-entropy loss, and per-feature permutation importance scores."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "quantimedai2026:quantum-qlstm",
+   "name": "Five-VQC QLSTM with input re-injection",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "TSK: the recurrent architecture is the task-specific mortality predictor and its state transition/readout must be redesigned for a different prediction objective. It is not a general runtime or temporal data-management component.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - architecture directly implements the mortality-prediction output",
+    "R4:Tools and Execution",
+    "R5:task_procedure; processing",
+    "R7:forecasting_prediction; time_series_classification",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 572,
+     "quote": "The proposed QuanTiMedAI replaces each classical gate with a hybrid quantum-classical block"
+    },
+    {
+     "line": 577,
+     "quote": "The output-stage VQC present in the original six-VQC specification [7] is omitted, reducing the cell to five VQCs."
+    },
+    {
+     "line": 578,
+     "quote": "A residual skip connection reinjects the raw input xt directly into the hidden-refinement VQC5, preserving clinical signal that would otherwise be lost through the quantum bottleneck."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 637,
+   "quote": "Failed responses, defined as incorrect JSON schema, wrong K, duplicate features, or all-zero severity weights, triggered retries at temperature min(Tbase + 0.15 × attempt, 1.20), with"
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 347,
+   "quote": "where µi and σi denote the mean and standard deviation of feature i computed exclusively from the training partition and applied to the validation and test sets to prevent data leakage."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 41,
+   "quote": "AUROC of 0.852 using only 605 parameters, an improvement of approximately 2.9% over a current state-of-the-art baseline for this task."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper's LLM loop is clearly feedback-driven because inner cross-validation metrics change later feature proposals. The QLSTM is included as a separate task-specific predictor because it is a substantive architectural contribution, while the existing card omitted it."
+}

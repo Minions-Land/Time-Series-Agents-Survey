@@ -1,0 +1,127 @@
+{
+ "citation_key": "timeseriesgym2025",
+ "status": "paper_verified",
+ "role_of_work": "resource",
+ "claim_summary": "TimeSeriesGym contributes a scalable, agent-agnostic benchmark environment with diverse time-series ML engineering challenges and artifact-specific evaluation.",
+ "claim_evidence": [
+  {
+   "line": 96,
+   "quote": "We propose TimeSeriesGym, the first open source benchmark environment for evaluating AI agents on time series ML engineering tasks (Fig. 1)."
+  },
+  {
+   "line": 100,
+   "quote": "TimeSeriesGym provides a comprehensive framework that evaluates multimodal agent outputs (e.g., prediction files, models, code) across specific ML skills"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "time_series_classification",
+  "imputation",
+  "temporal_question_answering"
+ ],
+ "modules": [
+  {
+   "id": "timeseriesgym2025:challenge-environment",
+   "name": "Time-series challenge benchmark and artifact grading",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "time_series_classification",
+    "imputation",
+    "temporal_question_answering"
+   ],
+   "role": "evaluation",
+   "scope_reason": "The contribution packages challenges, resources and graders around agents. R3_1_TSK is no because it does not provide a single task-family procedure; changing challenge family changes the challenge-specific grader, not the benchmark runtime. R3_2_GTS is no because the environment itself does not implement shared temporal-order, window, frequency or availability logic. R3_3_GH applies to the general execution/evaluation environment.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - challenge platform covers multiple objectives; per-challenge criteria are not a reusable task procedure",
+    "R3_2_GTS:no - no shared temporal semantics in the platform mechanism",
+    "R3_3_GH:yes - environment packages resources, execution and grading"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 268,
+     "quote": "Each challenge in TimeSeriesGym is organized with a consistent structure: (1) resources including datasets, code repositories, related paper(s) and documentation relevant to the challenge; (2) a description file that outlines the challenge parameters, available resources, and provides specific instructions and hints for successful completion; and (3) challenge-specific grading functions to evaluate agent submissions."
+    },
+    {
+     "line": 324,
+     "quote": "Our evaluation methodology deliberately combines multiple assessment approaches: quantitative metrics (accuracy, mean absolute error), programmatic analysis (regular expression matching, code inspection), and qualitative evaluation (LLM-as-a-judge) (see Appendix E)."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 445,
+   "quote": "the percentage of challenges where the agent made a (1) valid, and (2) reasonable submission. A submission is valid if the grader returns any non-null score."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 442,
+   "quote": "We report the raw scores achieved by each agent on every challenge (Tab 3)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "timeseriesgym2025:challenge-environment",
+   "decision": "change",
+   "new_ids": [
+    "timeseriesgym2025:challenge-environment"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Tools and Execution",
+    "name and scope updated",
+    "tasks and functions populated from packet evidence"
+   ],
+   "reason": "The packet describes a resource-and-grading benchmark mechanism, not temporal validation or execution control. The existing module id remains for the benchmark environment."
+  },
+  {
+   "existing_id": "timeseriesgym2025:temporal-challenges",
+   "decision": "merge",
+   "new_ids": [
+    "timeseriesgym2025:challenge-environment"
+   ],
+   "changes": [
+    "merged into challenge-environment",
+    "layer GTS -> GH",
+    "removed retired dimension and unsupported GTS function mapping"
+   ],
+   "reason": "The challenge collection is benchmark content, not a separable mechanism that performs temporal processing or validation; it forms one environment with the resources, descriptions and challenge-specific grading."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The packet supports time-series understanding and imputation challenges, in addition to forecasting, anomaly detection and classification. Temporal question answering is used as the schema's closest task label for the time-series understanding challenge; the paper does not claim a dedicated QA module."
+}

@@ -1,0 +1,143 @@
+{
+ "citation_key": "timeomni2026",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "TimeOmni-1 contributes a time-series reasoning dataset with hierarchical CoT annotations and a two-stage SFT/GRPO training method that teaches an LLM temporal reasoning across four tasks.",
+ "claim_evidence": [
+  {
+   "line": 456,
+   "quote": "we construct Time Series Reasoning Suite (TSR-S UITE), the first unified dataset suite tailored for time series reasoning."
+  },
+  {
+   "line": 557,
+   "quote": "we propose a two-stage training paradigm: (1) injecting temporal priors to anchor the model in a temporal knowledge space, and (2) refining these priors for robust reasoning through task-grounded rewards"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "decision_support"
+ ],
+ "other_tasks": [
+  "causal_discovery",
+  "temporal_question_answering",
+  "temporal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "timeomni2026:temporal-reasoning-training",
+   "name": "Temporal-prior SFT and task-grounded RL",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "causal_discovery",
+    "temporal_question_answering",
+    "temporal_analysis"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 places the trained SFT/RL procedure on the LLM side because it updates model parameters to produce temporal reasoning. R3 does not apply to an LLM module; its rewards are training signals, not a Harness task procedure, and no GTS runtime state or tool semantics are contributed.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R3:not_applicable_to_LLM",
+    "R6:instruction_reasoning",
+    "R7:four_reasoning_tasks",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 620,
+     "quote": "Stage 2 employs RL through group relative policy optimization (Shao et al., 2024) to turn mimicking priors into stable and generalizable reasoning behaviors"
+    },
+    {
+     "line": 637,
+     "quote": "For Tasks 1, 2, and 4, Rdiscrete ∈ {0, 1} denotes exact-match accuracy (1 if correct, 0 otherwise). For Task 3, we add a counting bonus"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeomni2026:tsr-suite",
+   "name": "TSR-Suite with hierarchical CoT annotation",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "causal_discovery",
+    "temporal_question_answering",
+    "temporal_analysis"
+   ],
+   "role": "training_data",
+   "scope_reason": "R2 classifies TSR-Suite as LLM-side training data because its curated examples are made to train time-series reasoning models. R3 does not apply to this data contribution; the task-specific datasets and annotation templates do not contribute a Harness runtime, and no GTS temporal state or tool semantics are implemented as a module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM_training_data",
+    "R3:not_applicable_to_LLM",
+    "R6:instruction_reasoning",
+    "R7:four_reasoning_tasks",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 458,
+     "quote": "TSR-S UITE is built as a training-and-evaluation suite that supports TSRMs development."
+    },
+    {
+     "line": 473,
+     "quote": "we design a hierarchical annotation pipeline involving an LLM Analyzer, Human Reviewers, and an LLM Rewriter"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 751,
+   "quote": "We report the Success Rate (SR), which is the proportion of model outputs that yield a valid and extractable answer. All subsequent evaluation metrics are computed only on these valid cases"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper's four benchmark tasks support scenario understanding (temporal_analysis), causal discovery, event-aware forecasting, and decision making; it does not describe an agent runtime with tool feedback. The task-grounded reward for decision making is a training metric, not a measured downstream utility outcome."
+}

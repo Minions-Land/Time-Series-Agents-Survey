@@ -1,0 +1,186 @@
+{
+ "citation_key": "ontoarhar2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "OntoAR-HAR contributes a training-free, feedback-driven HAR classifier that follows a confusion-guided activity hierarchy, grounds child choices in population and gated user-memory examples, and uses offline-refined executable sensor features.",
+ "claim_evidence": [
+  {
+   "line": 68,
+   "quote": "We propose OntoAR-HAR, an ontology-guided agentic RAG framework for HAR that combines a static population knowledge store with a personalized knowledge store."
+  },
+  {
+   "line": 71,
+   "quote": "ontology represents inclusion and sibling relations among activity labels and turns one global retrieval problem into a sequence of local decisions."
+  },
+  {
+   "line": 291,
+   "quote": "At each ambiguous node, an LLM proposes a structured list of feature names, physical interpretations, and calculations from the child labels and sensor metadata."
+  },
+  {
+   "line": 844,
+   "quote": "After prediction, a prompt-based gate decides whether (xq , ŷ) enters Dp . The gate checks agreement between static population retrieval, personal retrieval when available, and the node feature ranges; ambiguous or contradictory cases are not inserted."
+  }
+ ],
+ "task_memberships": [],
+ "other_tasks": [
+  "time_series_classification"
+ ],
+ "modules": [
+  {
+   "id": "ontoarhar2026:ontology-traversal",
+   "name": "Ontology-guided node-constrained retrieval and traversal",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3.1 TSK: the activity ontology, retrieval mask, and sibling choices directly define the classification output; changing task families would require redesigning the hierarchy, masks, and child-selection objective. The input windows are temporal, but the operative rule is bound to HAR labels, so R3.2 GTS is less specific.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - ontology and sibling candidate decisions define the classification output",
+    "R4:Planning and Orchestration; Memory and Context; Tools and Execution",
+    "R5:task_procedure - no temporal function"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 71,
+     "quote": "ontology represents inclusion and sibling relations among activity labels and turns one global retrieval problem into a sequence of local decisions."
+    },
+    {
+     "line": 416,
+     "quote": "For each sensor view, the static population store Dg contains source embeddings and labels. A logical mask restricts retrieval at node v to examples whose labels occur below v:"
+    },
+    {
+     "line": 841,
+     "quote": "The agent moves to ĉv until reaching a leaf ŷ. This coarseto-fine path directly represents cases such as activity → locomotion → walking direction, so a feature is evaluated only where it distinguishes siblings."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "ontoarhar2026:personal-memory",
+   "name": "Gated personalized episodic memory",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3.1 TSK: the memory gate admits windows as accepted activity labels and checks population and personal retrieval plus node feature ranges; a different task family would require different memory keys and admission criteria. The state uses earlier windows, but temporal availability is subordinate to this classification-specific validator, so R3.2 GTS does not decide the layer.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - the admission criterion depends on activity labels and classification evidence",
+    "R4:Memory and Context; Planning and Orchestration",
+    "R5:task_procedure; context_memory"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 423,
+     "quote": "The personalized store Dp has the same representation but is initialized empty for each inference user. It contains previously observed query windows paired with accepted predictions."
+    },
+    {
+     "line": 844,
+     "quote": "After prediction, a prompt-based gate decides whether (xq , ŷ) enters Dp . The gate checks agreement between static population retrieval, personal retrieval when available, and the node feature ranges; ambiguous or contradictory cases are not inserted."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "ontoarhar2026:feature-construction",
+   "name": "LLM iterative executable feature construction",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3.1 TSK: features are proposed for child activity labels and scored by separation of confused activity classes; changing task families would change the objective and feature set. Although the calculations operate on time-series windows (R3.2 GTS signal), the task objective is the more specific first match.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - feature proposals and scoring use activity-class distinctions",
+    "R4:Optimization and Evolution; Tools and Execution",
+    "R5:task_procedure; processing"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 291,
+     "quote": "At each ambiguous node, an LLM proposes a structured list of feature names, physical interpretations, and calculations from the child labels and sensor metadata."
+    },
+    {
+     "line": 294,
+     "quote": "On examples misclassified by retrievalonly inference, we test execution and measure separation by mean standardized feature distance to retrieved activity references. Errors and remaining misclassifications inform the next prompt."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 294,
+   "quote": "On examples misclassified by retrievalonly inference, we test execution and measure separation by mean standardized feature distance to retrieved activity references."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 844,
+   "quote": "After prediction, a prompt-based gate decides whether (xq , ŷ) enters Dp . The gate checks agreement between static population retrieval, personal retrieval when available, and the node feature ranges; ambiguous or contradictory cases are not inserted."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1248,
+   "quote": "Figure 3 isolates the two structural components with Gemini 2.5 Flash. Average accuracy rises from 84.0 with singlelevel retrieval to 87.2 with hierarchy and 89.0 after adding personalized memory."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The online path is feedback-driven because each selected child determines the next ontology node. The packet reports no downstream decision-utility experiment."
+}

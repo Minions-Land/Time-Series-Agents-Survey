@@ -1,0 +1,139 @@
+{
+ "citation_key": "quantarena2026",
+ "status": "paper_verified",
+ "role_of_work": "resource",
+ "claim_summary": "Quant-Arena contributes a benchmark for LLMs to construct and revise stock-scoring strategies from A-share data and assess frozen strategies on a sealed period under shared trading rules.",
+ "claim_evidence": [
+  {
+   "line": 13,
+   "quote": "We introduce Quant-Arena, a benchmark and public leaderboard for end-to-end quantitative research"
+  },
+  {
+   "line": 14,
+   "quote": "on real A-share market data. A model constructs features and stock-scoring code, receives feedback"
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "quantarena2026:date-scoped-data-interface",
+   "name": "Date-scoped market data interface",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "The interface gates temporal observations by decision date, so its assumptions concern data availability over time and apply beyond trading; if the task changed, the date-scoped data access could remain, while trading portfolio rules and objectives would need redesign.",
+   "rubric_path": [
+    "R1:contributed - the work introduces a controlled data interface",
+    "R2:Harness - the interface executes around the model",
+    "R3_1_TSK:no - the date/instrument/field access is not bound to a task objective",
+    "R3_2_GTS:yes - access is date-scoped and tied to temporal availability",
+    "R4:Tools and Execution",
+    "R5:data_management, validation"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 92,
+     "quote": "The data interface restricts access by date, instrument, and field."
+    },
+    {
+     "line": 93,
+     "quote": "At each decision date, the strategy can access authorized historical observations, including permitted warmup history."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "quantarena2026:sealed-research-protocol",
+   "name": "Bounded research and sealed strategy assessment",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "The procedure binds candidate feedback, the frozen stock-scoring program, portfolio construction, and cash-account evaluation to a trading-strategy output contract; if the task changed, the temporal state and evaluator's portfolio rules/objective would need redesign, so it is TSK rather than a general temporal harness.",
+   "rubric_path": [
+    "R1:contributed - the work defines the research and assessment procedure",
+    "R2:Harness - the evaluation workflow surrounds model calls",
+    "R3_1_TSK:yes - the objective and validation criteria are quantitative trading strategy outcomes",
+    "R5:validation",
+    "R7:decision_support",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 109,
+     "quote": "Models may evaluate candidate strategies on the research period and revise their code using aggregate return, signal-quality and coverage statistics, and execution errors."
+    },
+    {
+     "line": 113,
+     "quote": "At the end of research, one strategy’s source code, execution environment, and declared features are frozen."
+    },
+    {
+     "line": 114,
+     "quote": "The evaluator applies this strategy once to the sealed out-of-sample period."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 110,
+   "quote": "Each run may evaluate at most five candidates on the research period."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 113,
+   "quote": "At the end of research, one strategy’s source code, execution environment, and declared features are frozen."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 125,
+   "quote": "Signal metrics include mean daily RankIC, its annualized information ratio (A), long–short Sharpe (SRLS ) between the highest- and lowest-scored deciles, and turnover, the average daily replacement fraction of the portfolio."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 123,
+   "quote": "We report out-of-sample annualized return and excess return over a full-market equal-weight reference aligned to the same trading days."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The work evaluates participant models and agent harnesses but does not contribute a general-purpose agent runtime; the task-specific protocol is counted as a benchmark procedure."
+}

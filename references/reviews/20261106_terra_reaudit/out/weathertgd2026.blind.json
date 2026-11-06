@@ -1,0 +1,127 @@
+{
+ "citation_key": "weathertgd2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "WeatherTGD contributes a task-specific, feedback-driven multi-agent workflow that generates and iteratively refines weather time-series captions using specialist textual gradients and consensus-aware fusion.",
+ "claim_evidence": [
+  {
+   "line": 14,
+   "quote": "We introduce WeatherTGD, a training-free multi-agent framework that reinterprets collaborative caption refinement through the lens of Text Gradient Descent (TGD)."
+  }
+ ],
+ "task_memberships": [],
+ "other_tasks": [
+  "time_series_captioning"
+ ],
+ "modules": [
+  {
+   "id": "weathertgd2026:caption-feedback",
+   "name": "Specialist weather-caption refinement",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_captioning"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the specialists and iterative updates are built around weather-caption output requirements; if the task changed, the meteorological roles, prompts, and caption criteria would need redesign. This procedure computes statistics over weather observations, but it is not a task-independent temporal service, so R3_2_GTS does not apply; it coordinates one episode, so R3_3_GH is less specific.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - weather-caption requirements define the core procedure",
+    "R4:Planning and Orchestration",
+    "R5:processing",
+    "R7:other task time_series_captioning",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 186,
+     "quote": "The Statistical Analyst Agent generates textual gradients focusing on quantitative data characteristics including trend analysis that identifies monotonic increases, decreases, periodic fluctuations, and stationary states; distribution characteristics that detect normal, skewed, or multimodal distributions in the observed variables; and key metrics extraction that computes mean, variance, extreme values, and anomaly points."
+    },
+    {
+     "line": 242,
+     "quote": "The refinement loop applies fused gradients to update captions iteratively following Eq. 1, with careful attention to practical constraints including caption length and convergence behavior."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "weathertgd2026:consensus-fusion",
+   "name": "Consensus and unique-feedback fusion",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not apply because the fusion rule compares semantic similarity among input fragments and does not itself encode the caption output requirement or a task-specific validation criterion. R3_2_GTS does not apply because it uses no temporal order, windows, frequency, units, or availability state. R3_3_GH applies: it organizes and fuses agent outputs within the workflow.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - fusion does not embed the task objective",
+    "R3_2_GTS:no - semantic similarity fusion has no temporal semantics",
+    "R3_3_GH:yes - coordinates gradient information",
+    "R4:Planning and Orchestration",
+    "R5:general_runtime",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 211,
+     "quote": "In the consensus extraction stage, we identify information fragments with high semantic similarity across agent gradients using embeddingbased similarity computation:"
+    },
+    {
+     "line": 232,
+     "quote": "where A = {stat, phys, met} and τunique = 0.6 is a uniqueness threshold. The final fused gradient combines consensus and unique components through a fusion LLM:"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 363,
+   "quote": "On average across backbones, WeatherTGD achieves an LLM judge overall quality score of 8.50/10, representing a +1.49 improvement over the best baseline (AgentVerse at 7.01) and a +2.96 improvement over vanilla singleagent generation."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The source separately specifies the caption refinement procedure and the semantic-similarity fusion mechanism; their IDs are retained as separable contributions. The authors describe caption content as operationally useful, but experiments report caption-quality scores rather than downstream decision utility."
+}

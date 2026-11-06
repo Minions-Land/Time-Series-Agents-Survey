@@ -1,0 +1,274 @@
+{
+ "citation_key": "chatad2026",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "ChatAD contributes multi-agent time-series instruction evolution and its training data, reasoning-focused SFT and TKTO model optimization, and an anomaly-detection evaluation benchmark with cross-task tests.",
+ "claim_evidence": [
+  {
+   "line": 116,
+   "quote": "We propose TSEvol, an LLM-driven agentbased time series evolution algorithm for SFT instruction synthesis."
+  },
+  {
+   "line": 126,
+   "quote": "We develop TKTO (Time Series Kahneman-Tversky Optimization), a reinforcement learning approach designed to refine ChatAD."
+  },
+  {
+   "line": 131,
+   "quote": "We establish LLADBench to evaluate the ChatAD against nine state-of-the-art baselines."
+  }
+ ],
+ "task_memberships": [
+  "data_augmentation_synthesis",
+  "anomaly_detection_diagnosis",
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "time_series_classification",
+  "imputation",
+  "temporal_question_answering"
+ ],
+ "modules": [
+  {
+   "id": "chatad2026:tsevol",
+   "name": "Multi-agent temporal instruction evolution",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "data_augmentation_synthesis",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R2 places this on the LLM side because the multi-agent procedure synthesizes time-series instruction supervision for SFT rather than serving as an inference harness. R3 does not apply to this model-side module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM-side training data",
+    "R3:not a Harness module",
+    "R6:instruction_reasoning",
+    "R7:data synthesis and anomaly detection",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 251,
+     "quote": "TSEvol consists of (a) TS Instruction Evolution Pool, (b) Cognitive Reasoning Layer, and (c) Interactive Feedback-driven Layer."
+    },
+    {
+     "line": 329,
+     "quote": "The Supervisor evaluates the quality of each evolution loop (a complete Q&A pair) and provides implicit feedback to guide subsequent question generation."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "chatad2026:tsedata",
+   "name": "TSEData-20K dialogue and reasoning dataset",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "data_augmentation_synthesis",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R2 places this contributed dataset on the LLM side because it supplies multi-turn anomaly-detection instruction data used to train ChatAD. R3 does not apply to this model-side module.",
+   "rubric_path": [
+    "R1:contributed dataset built for the LLM",
+    "R2:LLM-side training data",
+    "R3:not a Harness module",
+    "R6:instruction_reasoning",
+    "R7:data synthesis and anomaly detection",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 120,
+     "quote": "We present the first LAD reasoning and multiturn dialogue dataset TSEData-20K using TSEvol, comprising 10011 high-quality anomaly detection dialogues"
+    },
+    {
+     "line": 428,
+     "quote": "we propose a two-stage training paradigm for ChatAD: initial SFT for AD task using TSEData, followed by TKTO optimization"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "chatad2026:training",
+   "name": "LoRA supervised fine-tuning for anomaly detection",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places LoRA SFT on the LLM side because it updates the model adapter to produce anomaly-detection responses. R3 does not apply to this model-side module.",
+   "rubric_path": [
+    "R1:contributed training procedure",
+    "R2:LLM parameter training",
+    "R3:not a Harness module",
+    "R6:instruction_reasoning",
+    "R7:anomaly detection",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 433,
+     "quote": "We adopt LoRA (Low-Rank Adaptation) (Hu et al., 2022)-based SFT to train the adapter."
+    },
+    {
+     "line": 435,
+     "quote": "we contribute three models using TSED-20K as shown in Table 1"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "chatad2026:tkto",
+   "name": "Time-series Kahneman-Tversky preference optimization",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_classification",
+    "imputation",
+    "temporal_question_answering"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 places TKTO on the LLM side because it optimizes ChatAD model parameters using scored outputs. R3 does not apply to this model-side module.",
+   "rubric_path": [
+    "R1:contributed training optimization",
+    "R2:LLM parameter training",
+    "R3:not a Harness module",
+    "R6:instruction_reasoning",
+    "R7:cross-task time-series analysis",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 460,
+     "quote": "We propose TKTO, which leverages TS features to boost ChatAD’s cross-task generalization performance."
+    },
+    {
+     "line": 463,
+     "quote": "To quantify the quality of each pair, we define a preference vector d = [d0 , d1 , d2 , d3 ]"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "chatad2026:lladbench",
+   "name": "LLADBench task evaluation benchmark",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_classification",
+    "imputation",
+    "temporal_question_answering"
+   ],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK applies because the benchmark's core logic embeds task-specific output parsing and metrics for anomaly detection, forecasting, imputation, classification, and reasoning; its evaluators and criteria must be redesigned when those task semantics change. The temporal data being evaluated does not make this a GTS mechanism because the module is bound to task objectives, and it is not GH because it is an evaluation resource rather than task-independent execution management.",
+   "rubric_path": [
+    "R1:contributed benchmark",
+    "R2:Harness/resource",
+    "R3_1_TSK:yes - task outputs and criteria are embedded; changing task semantics requires redesign",
+    "R4:Tools and Execution",
+    "R5:resource_level",
+    "R7:anomaly detection, forecasting, classification, imputation, and QA",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 603,
+     "quote": "LLADBench consists of four tasks. To evaluate single-turn and multi-turn dialogue capability, we employ Accuracy (Acc), F1 score, and False Positive Rate (FPR)."
+    },
+    {
+     "line": 1624,
+     "quote": "The proposed LLADBench includes a series of automated result analysis scripts."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 781,
+   "quote": "For the forecasting and imputation tasks, the numerical prediction performance consistently outperforms the benchmarks."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper separately contributes TSEvol, its TSEData-20K output dataset, ChatAD SFT, TKTO, and LLADBench. Task-performance evidence includes anomaly detection, reasoning, and cross-task results; the packet does not report explicit chronology/leakage validity or measured downstream decision utility."
+}

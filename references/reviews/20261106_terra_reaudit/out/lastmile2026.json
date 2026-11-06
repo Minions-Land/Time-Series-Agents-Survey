@@ -1,0 +1,209 @@
+{
+ "citation_key": "lastmile2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "The work contributes a feedback-driven LLM agent that revises a baseline forecast through constrained workspace actions, event-window decomposition, and outcome-grounded reflection memory.",
+ "claim_evidence": [
+  {
+   "line": 89,
+   "quote": "To study this problem, we present an LLM-agent framework that sits on top of a forecasting backbone. Our contributions are threefold. First, we formulate last-mile forecasting as a distinct systems problem between baseline generation and business-ready forecast consumption. Second, we propose an action-centric agent framework that converts contextual reasoning into constrained actions on a shared forecast workspace."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "lastmile2026:forecast-workspace",
+   "name": "Constrained forecast workspace and revision actions",
+   "layer": "TSK",
+   "dimensions": [],
+   "functions": [
+    "data_management"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3.1 TSK: the immutable baseline, editable forecast, and permitted actions encode forecast revision outputs and validators; changing the task changes the state and action semantics. Counterfactual: this workspace must be redesigned for a non-forecasting task. It is not GTS because it binds the temporal state to baseline-to-final forecast edits.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast-specific state and revision constraints",
+    "R3_2_GTS:no - temporal state is bound to forecasting",
+    "R3_3_GH:no - not task-agnostic runtime state"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 173,
+     "quote": "The central abstraction is a unified forecast workspace. Rather than asking the agent to regenerate a forecast sequence, the workspace represents last-mile forecasting as sequential revision over a shared state. It keeps historical observations, the immutable baseline forecast, and the editable forecast in the same aligned time index"
+    },
+    {
+     "line": 285,
+     "quote": "Validation enforces the basic invariants of the workspace. Historical observations cannot be edited, baseline values remain fixed, revisions must lie inside the forecast horizon, and repeated or conflicting edits may be rejected."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "lastmile2026:revision-memory",
+   "name": "Outcome-grounded forecast revision memory",
+   "layer": "TSK",
+   "dimensions": [],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3.1 TSK: the memory stores realized forecast outcomes and adjustment calibration to guide subsequent forecast revisions. Counterfactual: its data schema and update/retrieval policy are defined around forecast error and must change for another task. It is not GTS because it is bound to forecast revision, although it uses temporal context.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - memory is calibrated to forecast outcomes",
+    "R3_2_GTS:no - it is bound to forecasting",
+    "R3_3_GH:no - it has temporal/task semantics"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 318,
+     "quote": "Once actual values become available for a previously forecast window, the framework compares the realized outcomes against both the baseline and the revised forecast. This comparison drives a post-hoc reflection step that writes structured experience into a persistent memory bank."
+    },
+    {
+     "line": 328,
+     "quote": "In subsequent forecasting sessions, the agent queries this memory bank before making revision decisions. Retrieved memories serve as empirical priors on event magnitude and revision strategy"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "lastmile2026:event-mapreduce",
+   "name": "Event-window map-reduce revision planning",
+   "layer": "TSK",
+   "dimensions": [],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3.1 TSK: decomposition identifies event windows for local forecast reasoners and aggregates their forecast revisions. Counterfactual: the windows, proposals, and action semantics must be redesigned when the output task changes. It is not GTS because this is task-specific horizon decomposition, not a reusable temporal operation independent of task objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - plans forecast revisions for event windows",
+    "R3_2_GTS:no - decomposition is bound to forecasting",
+    "R3_3_GH:no - task-specific rather than generic orchestration"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 278,
+     "quote": "Long-horizon revision is harder because relevant events may be spread across many future periods. A single reasoning pass over the full horizon can miss local context or mix unrelated events. To keep the revision process focused, the framework decomposes a long horizon into identified event windows."
+    },
+    {
+     "line": 291,
+     "quote": "For each event window, a local reasoner examines the evidence relevant to that interval and proposes a structured list of revision actions. These event-level plans are then collected and applied to the shared workspace through the same constrained action interface used for direct edits."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 875,
+   "quote": "The Section 5.3 run produced two accepted revisions, both grounded in the same-period window in the previous Spring Festival."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 339,
+   "quote": "In each case study, all methods are evaluated from the same forecast origin over the same target horizon."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 353,
+   "quote": "For each comparative case study we report MAE and MAPE on the full forecast horizon and on the event windows defined in the setup."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "lastmile2026:forecast-workspace",
+   "decision": "change",
+   "new_ids": [
+    "lastmile2026:forecast-workspace"
+   ],
+   "changes": [
+    "layer remains TSK",
+    "retired dimensions removed; TSK has no harness dimensions",
+    "functions: data_management retained",
+    "view_status: mapped -> task_procedure",
+    "scope reason and rubric path added"
+   ],
+   "reason": "The forecast state, immutable baseline, and valid edit operators encode forecast-specific output requirements, so R3 assigns TSK. The task procedure manages timestamp-aligned numerical forecast state."
+  },
+  {
+   "existing_id": "lastmile2026:revision-memory",
+   "decision": "change",
+   "new_ids": [
+    "lastmile2026:revision-memory"
+   ],
+   "changes": [
+    "layer remains TSK",
+    "retired dimensions removed; TSK has no harness dimensions",
+    "functions: context_memory retained",
+    "view_status: mapped -> task_procedure",
+    "scope reason and rubric path added"
+   ],
+   "reason": "The memory updates and retrieves calibration from realized forecast outcomes to guide later forecast revisions, so its objective and schema are task-specific under R3.1."
+  },
+  {
+   "existing_id": "lastmile2026:event-mapreduce",
+   "decision": "change",
+   "new_ids": [
+    "lastmile2026:event-mapreduce"
+   ],
+   "changes": [
+    "layer remains TSK",
+    "dimensions: Planning and Workflow and Coordination and Scaling -> none",
+    "functions: context_memory -> processing",
+    "view_status: mapped -> task_procedure",
+    "scope reason and rubric path added"
+   ],
+   "reason": "The mechanism decomposes a forecast horizon into event windows and returns forecast revision actions. That is task-specific planning, and horizon decomposition is processing rather than context memory."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The paper evaluates forecasting accuracy and reports recorded accepted revisions, but does not evaluate downstream planning or resource-allocation utility. The task-specific workspace, memory, and event-window planner are classified as TSK because their state, updates, and actions are defined around forecast revision."
+}

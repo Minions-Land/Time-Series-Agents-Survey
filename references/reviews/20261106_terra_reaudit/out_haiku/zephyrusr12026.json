@@ -1,0 +1,249 @@
+{
+ "citation_key": "zephyrusr12026",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "Trains small tool-using vision-language weather agents with a two-stage curriculum, RL on verifiable weather-analysis questions and then RL on forecast-discussion reports scored by a rubric, bidirectional claim entailment and an evidence-grounding gate.",
+ "claim_evidence": [
+  {
+   "line": 16,
+   "quote": "To address this, we develop Zephyrus-R1, a practical"
+  }
+ ],
+ "task_memberships": [],
+ "other_tasks": [
+  "time_series_reporting",
+  "temporal_question_answering"
+ ],
+ "modules": [
+  {
+   "id": "zephyrusr12026:curriculum-agentic-rl",
+   "name": "Verifiable-question to report curriculum RL",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning",
+    "instruction_reasoning"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_reporting",
+    "temporal_question_answering"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 gives LLM: LoRA rejection-sampling fine-tuning and CISPO RL update policy parameters in both stages. The verifier and the grounded reward are Harness modules and are listed separately.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 105,
+     "quote": "we train small models with a two-stage curriculum: RL first develops tool use and reasoning on"
+    },
+    {
+     "line": 323,
+     "quote": "therefore use a two-stage curriculum: Stage 1 trains tool use on verifiable weather-analysis questions; Stage 2 optimizes"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "zephyrusr12026:grounded-report-reward",
+   "name": "Grounding-gated rubric and claim-entailment report reward",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_reporting"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 holds: the rubric and claim-level F1 embed the forecast-discussion requirement, and the grounding gate requires dataset access and forecast fields at a lead before a report is accepted. A different report task needs a redesigned reward and gate.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - rubric, claim F1 and the grounding gate embed the forecast-discussion requirement; counterfactual: all change for another report task"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 200,
+     "quote": "Rubric Score. We first construct a meteorological rubric that captures the qualities of a strong forecast discussion. To"
+    },
+    {
+     "line": 229,
+     "quote": "Judge-scored quality and terminal reward. We combine the rubric and Discussion F1 scores as"
+    },
+    {
+     "line": 226,
+     "quote": "Reports submitted before these conditions are satisfied are rejected, and the interaction continues. If"
+    },
+    {
+     "line": 1504,
+     "quote": "The grounding state is maintained by the execution server and reset at the start of every episode. It contains three"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "zephyrusr12026:tool-environment",
+   "name": "Python weather-tool environment with plotting observations",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_reporting",
+    "temporal_question_answering"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "R3_1 fails: the tools are shared by Stage 1 and report tasks and embed no single objective. R3_2 holds: access depends on time indices, forecast lead times and climatology.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - tools are shared by Stage 1 and report tasks and embed no single objective",
+    "R3_2_GTS:yes - depends on time indices, forecast lead times and climatology, not bound to one task"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "time_series_reporting",
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 170,
+     "quote": "exposed through a Python API. It iteratively executes Python code to gather and analyze evidence from the numerical"
+    },
+    {
+     "line": 181,
+     "quote": "and access historical climatology for computing anomalies. It also has access to a forecaster that returns atmospheric"
+    },
+    {
+     "line": 186,
+     "quote": "In this work, we augment the environment by adding vision capabilities to the agent. It can now leverage a plotting tool"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "zephyrusr12026:stage1-verifier",
+   "name": "Graded verifier with required-tool check for verifiable questions",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 holds: the score ladder for numerical, location, time and anomaly answers and the required-tool check are specific to these question types; a different question family needs a different verifier.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - answer-type score ladder and required-tool check; counterfactual: verifier changes with question type"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 330,
+     "quote": "The verifier gives graded credit for numerical, location, time, and anomaly answers. The reward is"
+    },
+    {
+     "line": 1019,
+     "quote": "The required-tool condition holds when the server records at least one call to the dataset or climatology tool,"
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 451,
+   "quote": "At step 163, the 4B failure rate is 2.4% for Curriculum"
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 525,
+   "quote": "from 1995–2018 and evaluate on a test set of 197 temporally disjoint events from 2019–2020. Stage 1 uses eight easy,"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 552,
+   "quote": "Zephyrus-R1 improves report quality under all three judges. In Table 2, both routes improve every score at"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "zephyrusr12026:curriculum-agentic-rl",
+   "decision": "change",
+   "new_ids": [
+    "zephyrusr12026:curriculum-agentic-rl"
+   ],
+   "changes": [
+    "dimensions: Optimization and Evolution -> none (LLM modules carry no dimensions)",
+    "llm_route: added workflow_learning and instruction_reasoning",
+    "other_tasks: time_series_reporting, temporal_question_answering"
+   ],
+   "reason": "Same RL-training mechanism that updates policy parameters (packet L105, L323). Layer LLM confirmed by R2. Dimension removed because LLM modules carry none."
+  },
+  {
+   "existing_id": "zephyrusr12026:grounded-report-reward",
+   "decision": "change",
+   "new_ids": [
+    "zephyrusr12026:grounded-report-reward"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback (retired label) -> Optimization and Evolution + Planning and Orchestration",
+    "functions: none -> validation",
+    "evidence: rubric, reward combination, and grounding gate quoted from the packet (L200, L229, L226, L1504)"
+   ],
+   "reason": "Same TSK mechanism. The reward and the grounding gate act as one grounded-report procedure, so they stay one module (blind pass had listed the gate separately). The retired label maps to Optimization and Evolution for reward feedback across episodes and to Planning and Orchestration for the in-episode gate."
+  }
+ ],
+ "needs_human_review": true,
+ "notes": "The current card lacks modules for the Python tool environment and the Stage-1 graded verifier; both are added (medium confidence). Environment modification is the vision/plotting tool and image observations (L186); the base toolset is inherited from Zephyrus, so this is a judgment on materiality. Role of work is llm_side_technique because the policy training is the main contribution, though the runtime is also a feedback-driven agent. Tasks: the output is a forecast discussion, not one of the four families, so it is recorded as time_series_reporting and temporal_question_answering. Oracle forecaster (evaluation setup) and the expert claim-label audit are not counted as modules. Card locators cite PDF pages; evidence here uses packet line numbers."
+}

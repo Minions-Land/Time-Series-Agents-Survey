@@ -1,0 +1,175 @@
+{
+ "citation_key": "chow2024tsreasoning",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "The work supplies a trainable time-series encoder and CoT-supervised LLM adaptation for natural-language reasoning and zero-shot analysis of time-series.",
+ "claim_evidence": [
+  {
+   "line": 15,
+   "quote": "across various domains with powerful zero-shot performance. First, we train a lightweight time-series encoder on top of an LLM to directly extract time-series information."
+  },
+  {
+   "line": 17,
+   "quote": "information. Then, we fine-tune our model with chain-of-thought augmented timeseries tasks to encourage the model to generate reasoning paths."
+  }
+ ],
+ "task_memberships": [],
+ "other_tasks": [
+  "temporal_question_answering",
+  "time_series_captioning",
+  "time_series_classification",
+  "etiological_reasoning"
+ ],
+ "modules": [
+  {
+   "id": "chow2024tsreasoning:ts-encoder",
+   "name": "Time-series encoder and embedding projection",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering",
+    "time_series_captioning",
+    "time_series_classification",
+    "etiological_reasoning"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 LLM test: the trainable patch encoder and projection change how numerical series reach the LLM embedding space; task changes do not require redesigning temporal state, action space, tool semantics, or a verifier, so the Harness layer tests do not apply.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R3:LLM-side - representation and alignment change",
+    "R4:not_applicable - LLM module",
+    "R5:model_side",
+    "R6:representation_alignment",
+    "R7:other_tasks",
+    "R8:not_applicable - LLM module",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "LLM-side module"
+   },
+   "evidence": [
+    {
+     "line": 70,
+     "quote": "We first divide the input time-series into fixed, non-overlapping patches [14] and feed these patches into a multi-head self-attention encoder."
+    },
+    {
+     "line": 73,
+     "quote": "This is then followed by a linear layer which projects the features to match the dimensionality of the LLM’s word embedding."
+    },
+    {
+     "line": 108,
+     "quote": "Stage 1: Encoder warm-up. We train the encoder and projection layer from scratch for next token prediction while keeping the LLM frozen."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "chow2024tsreasoning:cot-sft",
+   "name": "CoT-supervised multimodal adaptation",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification",
+    "time_series_captioning",
+    "etiological_reasoning"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 LLM test: LoRA supervised fine-tuning changes the model's reasoning behavior; task changes do not require redesigning temporal state, action space, tool semantics, or a verifier, so the Harness layer tests do not apply.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R3:LLM-side - supervised reasoning adaptation",
+    "R4:not_applicable - LLM module",
+    "R5:model_side",
+    "R6:instruction_reasoning",
+    "R7:other_tasks",
+    "R8:not_applicable - LLM module",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "LLM-side module"
+   },
+   "evidence": [
+    {
+     "line": 116,
+     "quote": "Stage 2: Supervised fine-tuning on reasoning tasks."
+    },
+    {
+     "line": 119,
+     "quote": "2). CoT allows the model to learn to reason through a logical flow of natural language and to exploit the encoded time-series features."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 421,
+   "quote": "Following the original paper, subject 5 and 6 are used as test subjects. We split the time-series with non-overlapping two-second windows and only consider the 12 main activities."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 250,
+   "quote": "From Table 2, we see that the model performs significantly above chance on a majority of datasets."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet is complete. It reports task performance and dataset split/window handling, but no execution trace or downstream decision utility.",
+ "reconciliation": [
+  {
+   "existing_id": "chow2024tsreasoning:ts-encoder",
+   "decision": "change",
+   "new_ids": [
+    "chow2024tsreasoning:ts-encoder"
+   ],
+   "changes": [
+    "dimensions: Interface and Interaction -> []",
+    "llm_route: [] -> representation_alignment",
+    "other_tasks: add etiological_reasoning",
+    "evidence: add encoder warm-up passage"
+   ],
+   "reason": "The mechanism is the same encoder and projection, but the rubric classifies it as an LLM-side representation/alignment contribution, which requires an LLM route and no Harness dimensions."
+  },
+  {
+   "existing_id": "chow2024tsreasoning:cot-sft",
+   "decision": "change",
+   "new_ids": [
+    "chow2024tsreasoning:cot-sft"
+   ],
+   "changes": [
+    "dimensions: Optimization and Evolution -> []",
+    "llm_route: [] -> instruction_reasoning",
+    "other_tasks: temporal_question_answering -> time_series_captioning, etiological_reasoning"
+   ],
+   "reason": "The mechanism is the same supervised CoT adaptation, but the rubric classifies it as LLM-side instruction reasoning. The Stage 2 task table explicitly lists classification, captioning and etiological reasoning."
+  }
+ ]
+}

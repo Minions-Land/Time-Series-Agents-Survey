@@ -1,0 +1,250 @@
+{
+ "citation_key": "agenticrag2024",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "Proposes a hierarchical multi-agent Agentic RAG in which a ReAct master agent routes each request to a task-specialized sub-agent built on fine-tuned SLMs with retrieval-conditioned prompt pools, evaluated on forecasting, imputation, classification and anomaly detection.",
+ "claim_evidence": [
+  {
+   "line": 46,
+   "quote": "Our Agentic RAG framework presents a hierarchical, multi-agent architecture composed of a master (top-level) agent and specialized sub-agents customized"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "imputation",
+  "time_series_classification"
+ ],
+ "modules": [
+  {
+   "id": "agenticrag2024:master-orchestrator",
+   "name": "ReAct master agent routing to sub-agents",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3 tests: TSK no (routing picks a sub-agent but embeds no task output requirement or validator; adding a task adds a tool rather than redesigning the master); GTS no (no temporal semantics at master level); GH yes (delegation and execution control). Counterfactual for TSK: not triggered.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - routing only, no task objective or validator",
+    "R3_2_GTS:no - no temporal semantics at master level",
+    "R3_3_GH:yes - delegation and execution control"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "imputation",
+     "time_series_classification"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 119,
+     "quote": "In summary, the master agent orchestrates sub-agents, selects the most appropriate sub-agent, and allocates the task to the specialized sub-agent."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "agenticrag2024:task-specialized-subagents",
+   "name": "Task-specialized sub-agents",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK yes: each sub-agent's objective, training data and output (forecast, imputation, cluster label, anomaly score) is fixed to one task family. Counterfactual holds: changing the task family requires a different fine-tuned SLM, prompt pool and output procedure.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - per-task objective and output; counterfactual holds"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "evidence": [
+    {
+     "line": 273,
+     "quote": "It comprises a master agent that coordinates specialized sub-agents, each dedicated to a specific time series task such as forecasting, anomaly detection, or imputation."
+    },
+    {
+     "line": 117,
+     "quote": "However, in this work, the sub-agents operate in isolation, each handling only a single, specific task."
+    },
+    {
+     "line": 2830,
+     "quote": "We evaluated the Agentic-RAG framework using a single, universal sub-agent for all tasks versus specialized subagents for each task."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "agenticrag2024:slm-instruction-tuning",
+   "name": "Task-specific instruction tuning of SLMs (PEFT)",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 LLM: QLoRA/PEFT updates SLM parameters on task datasets. R6: supervision shaping analytical outputs, so instruction_reasoning.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM - updates model parameters",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "evidence": [
+    {
+     "line": 107,
+     "quote": "We fine-tune each SLM using instruction-tuning on task-specific datasets and optimize them for time series tasks such as forecasting,"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agenticrag2024:dpo-dynamic-masking",
+   "name": "DPO alignment with dynamic masking",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 LLM: preference optimization updates SLM parameters; the masked binary classification supplies the preference signal. R6: aligns analytical outputs, so instruction_reasoning.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM - updates model parameters",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "evidence": [
+    {
+     "line": 109,
+     "quote": "Additionally, we fine-tune using DPO[8] through a dynamic masking technique to align the SLMs task-specific outputs to preferred and non-preferred outcomes, providing adversarial feedback[47] through a binary classification task."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "agenticrag2024:dynamic-prompt-pool",
+   "name": "Retrieval-conditioned dynamic prompt pool",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R2 LLM: retrieved prompt values are concatenated to the model input embedding and projected by a learnable matrix, changing how the model receives the temporal input; the pool is described as differentiable. A Harness memory reading (GTS context_memory) is possible; see notes.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM - alters model input representation with learnable projection"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "evidence": [
+    {
+     "line": 94,
+     "quote": "the prompt pools store both domain and task-specific knowledge as key-value pairs."
+    },
+    {
+     "line": 289,
+     "quote": "The selected prompts, along with the original input, are concatenated to form the input embedding"
+    },
+    {
+     "line": 314,
+     "quote": "data, we utilize a differentiable dynamic prompting mechanism[3]."
+    }
+   ],
+   "confidence": "low"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1389,
+   "quote": "We adopted a time-based division strategy to split multiple benchmark datasets into training, validation, and testing sets."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1102,
+   "quote": "Our proposed framework outperforms baseline methods across the benchmark datasets, showing significant"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": true,
+ "notes": "Blind pass. Role fixed_workflow: the ReAct master can chain sub-agents, but the paper states that here sub-agents operate in isolation on one task each (L117-118), and no evaluated case shows returned feedback changing later actions. Dynamic prompt pool placed in LLM by the R2 test (concatenation into the input embedding, learnable projection, differentiable); low confidence. Excluded as off-the-shelf or protocol: SelfExtend long-context attention from [19] (L325-326, L373); the anomaly threshold (Eq. 1); k-means regime labels for classification; the missing-data simulation. Ablations (Tables 14-18) are evidence, not modules. Process validity and decision utility are not reported."
+}

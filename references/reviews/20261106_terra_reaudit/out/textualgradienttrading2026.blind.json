@@ -1,0 +1,208 @@
+{
+ "citation_key": "textualgradienttrading2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TradeGrad is a feedback-driven LLM harness that reuses optimization experience, applies multi-scale textual-gradient revisions, and evaluates candidate trading programs with a cross-period lower-tail objective.",
+ "claim_evidence": [
+  {
+   "line": 183,
+   "quote": "Figure 2: Overview of TradeGrad. TradeGrad iteratively samples archived strategies, estimates textual gradients from backtest feedback and optimization experience, updates strategies at varying revision scales, and evaluates and archives the resulting strategies."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "textualgradienttrading2026:global-optimization-memory",
+   "name": "Periodic global optimization memory",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The module is GH: it manages persistent optimization state and refreshes summaries; the temporal state, action space, and task objective can change without redesigning this archive-and-memory interface, and it does not depend on temporal order, windows, frequency, units, or information availability.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - it summarizes scored experiences without defining a task output or objective",
+    "R3_2_GTS:no - it does not use temporal order, windows, frequency, units, or availability",
+    "R3_3_GH:yes - it manages persistent execution state and experience updates"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 203,
+     "quote": "To avoid repeatedly providing the growing archive to the LLM, TradeGrad maintains a persistent global memory Mk that periodically distills recent optimization experience into reusable successful and failure patterns."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "textualgradienttrading2026:experience-gradient",
+   "name": "Sampling-based textual-gradient estimation",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The module is GH: rank-biased sampling and LLM gradient estimation orchestrate generic scored-program search; changing task family changes the scored program and evaluator, not this proposal mechanism, and it has no temporal semantics.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - it uses generic objective values without defining a task output or objective",
+    "R3_2_GTS:no - it does not use temporal order, windows, frequency, units, or availability",
+    "R3_3_GH:yes - it orchestrates scored-program proposals and execution"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 183,
+     "quote": "TradeGrad iteratively samples archived strategies, estimates textual gradients from backtest feedback and optimization experience, updates strategies at varying revision scales, and evaluates and archives the resulting strategies."
+    },
+    {
+     "line": 239,
+     "quote": "The textual gradient identifies weaknesses of the base strategy and specifies actionable modifications by comparing strategy programs and their backtest outcomes."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "textualgradienttrading2026:multi-scale-revision",
+   "name": "Multi-scale strategy revision",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The module is GH: it selects structural or local code edits for a generic scored program, without defining the task objective or using temporal semantics; changing task family leaves the revision-scale interface intact.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - it controls generic program edits without defining a task output or objective",
+    "R3_2_GTS:no - it does not use temporal order, windows, frequency, units, or availability",
+    "R3_3_GH:yes - it manages execution of structural and local revisions"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 251,
+     "quote": "When ηk = ηlarge , the LLM is instructed to make substantial changes to the core trading logic, and the resulting strategy is implemented as a full rewrite of the base program."
+    },
+    {
+     "line": 253,
+     "quote": "When ηk = ηsmall , the LLM focuses on localized improvements while preserving the overall strategy structure, and the revision is implemented through diff-based replacements of selected code segments."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "textualgradienttrading2026:cpro",
+   "name": "Cross-period lower-tail robust objective",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The module is TSK: its core logic defines the trading strategy's validation objective using annualized return, drawdown, trading frequency, and lower-tail aggregation. Changing task family changes the temporal state/action space, metrics, and verifier; although it uses historical windows, R3_1 matches before the GTS test.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - it embeds the trading-strategy objective and validation criterion"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "not_applicable"
+   },
+   "evidence": [
+    {
+     "line": 260,
+     "quote": "Aggregate backtest performance may favor strategies whose gains are concentrated in a few favorable periods. Therefore, we evaluate each strategy across multiple historical windows."
+    },
+    {
+     "line": 307,
+     "quote": "We refer to this objective as the Cross-Period Robust Objective (CPRO). By emphasizing lower-tail performance, CPRO prevents strong results in favorable periods from fully compensating for poor performance elsewhere, thereby promoting robustness across market periods."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 320,
+   "quote": "to 2025, chronologically split into an IS optimization period and an OOS evaluation period with a ratio of 3:1."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 346,
+   "quote": "TradeGrad combines effective IS optimization with strong OOS generalization. TradeGrad achieves the highest IS and OOS Scores among all compared strategy-design methods in all four settings."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 352,
+   "quote": "TradeGrad achieves favorable OOS risk–return trade-offs. TradeGrad obtains the highest OOS Sharpe ratio among strategy-design methods in all four settings. On CSI 300 cross-sectional trading, it achieves the highest AR of 27.99% with MDD of 12.19%."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The generic archive, gradient-estimation, and revision mechanisms are GH because they operate on scored programs without temporal semantics; CPRO is TSK because it embeds the trading objective and temporal-window validation."
+}

@@ -1,0 +1,316 @@
+{
+ "citation_key": "world2ts2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "World2TS contributes a feedback-driven Agent–CLI–Human construction workflow and world2ts-data, linking verified real-world events to heterogeneous time series for context-aware forecasting.",
+ "claim_evidence": [
+  {
+   "line": 18,
+   "quote": "forecasting with real-world event context. We first develop world2ts-core, a reusable tool that combines agent-led semantic reasoning and"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "time_series_annotation"
+ ],
+ "modules": [
+  {
+   "id": "world2ts2026:agent-cli-human-workflow",
+   "name": "Agent-CLI-Human curation workflow",
+   "layer": "GH",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution",
+    "Planning and Orchestration",
+    "Memory and Context"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_annotation"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "The core module manages agent, CLI and human execution, artifacts, approvals and resumable state; it has no task-specific output objective and its execution/state machinery does not require temporal semantics, so R3 selects GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-specific output objective",
+    "R3_2_GTS:no - execution and state machinery is general",
+    "R3_3_GH:yes - manages execution, validation, state and approvals"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 369,
+     "quote": "The CLI tool serves as the execution and validation layer. The CLI materializes the workflow artifacts under"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "world2ts2026:windowed-event-discovery",
+   "name": "Windowed feedback-driven event discovery",
+   "layer": "GTS",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution",
+    "Memory and Context"
+   ],
+   "functions": [
+    "data_management",
+    "processing",
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_annotation"
+   ],
+   "role": "method",
+   "scope_reason": "The procedure partitions temporal coverage into search windows and revises queries from evidence gaps; it is not bound to a forecast output, while its state and assumptions depend on temporal windows and evidence availability, so R3 selects GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - discovers event context rather than producing a task-family output",
+    "R3_2_GTS:yes - depends on temporal coverage, windows and evidence availability"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 395,
+     "quote": "If refinement is needed, the agent issues one additional query based on the latest feedback. This query may"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "world2ts2026:event-canonicalization",
+   "name": "Canonical event record construction",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory",
+    "data_management"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_annotation"
+   ],
+   "role": "method",
+   "scope_reason": "The module consolidates reports into timestamped, scoped event records; it is not tied to forecasting output, but its records depend on temporal dates and event scope, so R3 selects GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - canonicalizes evidence rather than optimizing a task output",
+    "R3_2_GTS:yes - event dates and temporal scope are intrinsic"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 414,
+     "quote": "consolidates selected evidence into canonical records, merging reports about a shared occurrence and separating"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "world2ts2026:event-series-grounding",
+   "name": "Temporal event-series grounding",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory",
+    "data_management",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_annotation"
+   ],
+   "role": "method",
+   "scope_reason": "The module applies semantic association rules and checks event-interval overlap with each series' temporal coverage; it is not bound to one forecast output and requires temporal scope, so R3 selects GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - grounds context rather than producing a task-family output",
+    "R3_2_GTS:yes - depends on event intervals and series temporal coverage"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 422,
+     "quote": "interval and each series’ temporal coverage. For example, a city-specific transport disruption can be associated"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "world2ts2026:world2ts-data",
+   "name": "World2TS event-context dataset",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "data_management",
+    "context_memory"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_annotation"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "The contributed resource stores temporal series, verified events and event-series links for other models and agents; it is not a task output procedure, while temporal event context is intrinsic, so R3 selects GTS at resource level.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - resource hosts and evaluates task systems",
+    "R3_2_GTS:yes - temporal series, events and links are the resource's organizing semantics"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 635,
+     "quote": "cross-domain resource contains 31 datasets, 4,179 series, 97.1 million observations, 1,159 verified events, and 56,846"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 375,
+   "quote": "not invent queries, event interpretations, or associations; it makes agent decisions reproducible and fails explicitly"
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1069,
+   "quote": "Evaluation protocol. We split each target series chronologically into 70%/10%/20% training, validation, and"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1115,
+   "quote": "Across the 54 paired model–domain–metric comparisons, With context reduces error in 49 cases; GPT improves in"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet supports both a feedback-driven construction agent and a reusable temporal event-context resource. Canonicalization and series grounding are separate reusable mechanisms.",
+ "reconciliation": [
+  {
+   "existing_id": "world2ts2026:agent-cli-human-workflow",
+   "decision": "change",
+   "new_ids": [
+    "world2ts2026:agent-cli-human-workflow"
+   ],
+   "changes": [
+    "dimensions: Coordination and Scaling, Tools and Execution, Control, Verification, and Feedback -> Interface and Interaction, Tools and Execution, Planning and Orchestration, Memory and Context",
+    "reuse_evidence: demonstrated -> inferred"
+   ],
+   "reason": "The packet describes a general Agent–CLI–Human execution and approval runtime; retired dimensions are remapped and only one task family is directly supported."
+  },
+  {
+   "existing_id": "world2ts2026:windowed-event-discovery",
+   "decision": "change",
+   "new_ids": [
+    "world2ts2026:windowed-event-discovery"
+   ],
+   "changes": [
+    "dimensions: Planning and Workflow, Tools and Execution, Control, Verification, and Feedback -> Planning and Orchestration, Tools and Execution, Memory and Context",
+    "functions: data_management retained and processing, context_memory, and validation made explicit",
+    "role: infrastructure -> method",
+    "reuse_evidence: demonstrated -> inferred"
+   ],
+   "reason": "The feedback loop is a contributed temporal-window discovery procedure and remains GTS under the current five-dimension vocabulary."
+  },
+  {
+   "existing_id": "world2ts2026:event-series-grounding",
+   "decision": "split",
+   "new_ids": [
+    "world2ts2026:event-series-grounding",
+    "world2ts2026:event-canonicalization"
+   ],
+   "changes": [
+    "split canonical event construction from event-series grounding",
+    "Control, Verification, and Feedback -> Planning and Orchestration",
+    "validation added for temporal-overlap checks",
+    "reuse_evidence: demonstrated -> inferred"
+   ],
+   "reason": "The packet explicitly presents report consolidation and series grounding as distinct ambiguities and mechanisms; the existing id is retained for grounding and a new id is added for canonicalization."
+  },
+  {
+   "existing_id": "(none)",
+   "decision": "change",
+   "new_ids": [
+    "world2ts2026:world2ts-data"
+   ],
+   "changes": [
+    "add contributed resource-level dataset module"
+   ],
+   "reason": "The paper explicitly contributes world2ts-data as a large cross-domain event-context resource, which was absent from the current module list."
+  }
+ ]
+}

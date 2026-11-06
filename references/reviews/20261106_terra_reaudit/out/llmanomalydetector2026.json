@@ -1,0 +1,231 @@
+{
+ "citation_key": "llmanomalydetector2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "An LLM-driven feedback loop edits and evaluates anomaly-detector programs against synthetic held-out training-region anomalies, yielding compact univariate and multivariate spectral-Gaussian detectors.",
+ "claim_evidence": [
+  {
+   "line": 12,
+   "quote": "model not as the detector but as the author of one: an autonomous research loop in which the model repeatedly edits a single short NumPy program under a leakage-free objective, keeping the bestscoring detector it finds."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "llmanomalydetector2026:detector-program-search",
+   "name": "Detector-program edit-and-evaluate loop",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The core logic requires per-timestep anomaly-score output and selects edits by an anomaly-validation score; changing task family changes that output contract and objective, so it meets R3_1_TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly-score output and anomaly-validation objective",
+    "R4:Optimization and Evolution; Tools and Execution"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 134,
+     "quote": "an LLM-driven agent that edits and re-evaluates a single program with no human intervention."
+    },
+    {
+     "line": 139,
+     "quote": "validation split, and (iv) reads the resulting validation score."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "llmanomalydetector2026:synthetic-anomaly-validation",
+   "name": "Leakage-free synthetic-anomaly validation",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The verifier injects labelled synthetic anomalies and scores anomaly-detector outputs, so its validation criterion is bound to anomaly detection and would need redesign for another task family; R3_1_TSK therefore takes precedence.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly-detection validation criterion",
+    "R4:Planning and Orchestration",
+    "R5:validation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 151,
+     "quote": "The search uses no real anomaly labels. Candidates are scored by detecting synthetic anomalies injected only into a held-out slice of each series’ training region."
+    },
+    {
+     "line": 1799,
+     "quote": "The validation slice is the last 30% of each series’ training region (at least 128 steps); synthetic anomalies are injected only into this slice with a fixed seed."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "llmanomalydetector2026:univariate-spectral-detector",
+   "name": "Univariate spectral-organization detector",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The contributed program directly computes anomaly scores for a univariate series using a task-specific novelty objective; changing task family changes the score output and procedure, so R3_1_TSK applies.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly-score task procedure",
+    "R4:Tools and Execution",
+    "R5:processing"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 185,
+     "quote": "Rather than looking at the raw values in a window, this detector looks at how the window’s energy is split between fast and slow rhythms, and at the overall shape of that split."
+    },
+    {
+     "line": 271,
+     "quote": "is scored by a shrunk full-covariance Mahalanobis distance to the Gaussian of normal windows and fused across a dyadic scale space with a tail-emphasized weighting."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "llmanomalydetector2026:multivariate-joint-spectral-detector",
+   "name": "Multivariate joint band-power detector",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The contributed program computes multichannel anomaly scores from a joint spectral descriptor and anomaly novelty objective; changing task family changes the output contract and procedure, so R3_1_TSK applies.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - multivariate anomaly-score task procedure",
+    "R4:Tools and Execution",
+    "R5:processing"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 275,
+     "quote": "For series with many channels, the detector describes the rhythms of all channels together. It slides a window across the channels, removes each window’s level so that only its shape matters, and measures how much energy each channel carries in a few frequency bands."
+    },
+    {
+     "line": 281,
+     "quote": "It then builds a single statistical model of what normal windows look like and scores each window by how far it lies from that model."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 326,
+   "quote": "run from their released checkpoints without tuning. We verified that our evaluation scripts reproduced the numbers reported in the paper, confirming the wrappers are faithful and that the comparison is one-to-one."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1799,
+   "quote": "The validation slice is the last 30% of each series’ training region (at least 128 steps); synthetic anomalies are injected only into this slice with a fixed seed."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 346,
+   "quote": "The detector discovered by the Opus 4.8 loop takes the most first-place finishes on every one of the four metrics, and its advantage is widest on the precision-oriented metrics (standard F1 and VUS-PR)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "llmanomalydetector2026:detector-program-search",
+   "decision": "keep",
+   "new_ids": [
+    "llmanomalydetector2026:detector-program-search"
+   ],
+   "changes": [],
+   "reason": "The packet confirms the existing task-specific feedback loop: the LLM edits a detector program, executes it through the validation harness, and reads the score to guide later proposals."
+  },
+  {
+   "existing_id": "llmanomalydetector2026:synthetic-anomaly-validation",
+   "decision": "change",
+   "new_ids": [
+    "llmanomalydetector2026:synthetic-anomaly-validation"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration",
+    "view_status: mapped -> task_procedure"
+   ],
+   "reason": "The validation criterion is anomaly detection, so R3_1_TSK applies; the current dimension is retired and the task-procedure view is required."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Added the two separately reusable Opus detector programs as task-specific method modules; the other search variants remain ablations and are excluded."
+}

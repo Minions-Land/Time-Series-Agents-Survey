@@ -1,0 +1,158 @@
+{
+ "citation_key": "marstsc2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "MarsTSC contributes a feedback-driven VLM workflow that builds and evolves a task-specific temporal knowledge bank through reflective reasoning, two-pass self-recheck, and deferred updates for few-shot multimodal time-series classification, with a preliminary discrete-forecasting extension.",
+ "claim_evidence": [
+  {
+   "line": 56,
+   "quote": "In this paper, we propose the first VLM agentic reasoning framework for few-shot multimodal Time Series Classification (MarsTSC),"
+  },
+  {
+   "line": 62,
+   "quote": "We further introduce a test-time update strategy to enable cautious, continuous knowledge bank refinement to mitigate few-shot"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "time_series_classification"
+ ],
+ "modules": [
+  {
+   "id": "marstsc2026:class-knowledge-bank",
+   "name": "Reflective class knowledge-bank refinement",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the bank and its reflective updates encode class labels, class-pair boundaries, and a classification decision criterion; changing the task family changes the task state and verifier, so this is not a task-independent GTS memory.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - class-specific decision boundaries and validation",
+    "R4:Memory and Context",
+    "R4:Planning and Orchestration",
+    "R4:Optimization and Evolution",
+    "R5:view_status:task_procedure",
+    "R5:context_memory",
+    "R7:other_task:time_series_classification",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 268,
+     "quote": "knowledge bank into feature bullet points to enable atomic updates,"
+    },
+    {
+     "line": 350,
+     "quote": "and the Reflector’s extracted lessons are then structured and committed to the knowledge bank by the Modifier. This cooperative loop"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "marstsc2026:test-time-knowledge",
+   "name": "Two-pass pseudo-label and deferred memory updates",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the second-pass answer, pseudo-label consistency, and deferred promotion/removal are tied to class-specific classification outputs; changing task family would require a different task objective and verifier, so this is not a task-independent GTS update.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - class-specific pseudo-label and final answer",
+    "R4:Memory and Context",
+    "R4:Planning and Orchestration",
+    "R4:Optimization and Evolution",
+    "R5:view_status:task_procedure",
+    "R5:context_memory",
+    "R7:other_task:time_series_classification",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 548,
+     "quote": "In the second pass, (𝑦ˆ1, R 1 ) is integrated into the Generator’s context and will be treated as a suspicious reference. The generator"
+    },
+    {
+     "line": 558,
+     "quote": "current test sample belongs to class 𝑦ˆ2 . We first examine the consistency between the two passes. If the two predictions disagree, we"
+    },
+    {
+     "line": 574,
+     "quote": "knowledge. Through this deferred update design, the system continuously filters and calibrates test time knowledge, ensuring that"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1487,
+   "quote": "framework, we cast it as a discrete forecasting problem: given observations from the previous 20 weeks, the model predicts whether the"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1491,
+   "quote": "F1 Score of 0.79154, significantly outperforming mainstream timeseries methodologies like MOMENT [18] (0.66197), Autoformer [47]"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The main experiments are few-shot multimodal time-series classification; Appendix D supplies a preliminary discrete-forecasting extension using the same dynamic-memory and agentic-reasoning framework."
+}

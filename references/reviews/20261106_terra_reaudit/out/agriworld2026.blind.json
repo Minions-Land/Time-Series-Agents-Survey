@@ -1,0 +1,275 @@
+{
+ "citation_key": "agriworld2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "AgriWorld contributes an agricultural temporal-data environment, an execution-feedback agent, temporal alignment, and a checker-based benchmark for tool-grounded reasoning.",
+ "claim_evidence": [
+  {
+   "line": 82,
+   "quote": "AGRI W ORLD: an executable agricultural environment. We introduce a Python environment that unifies geospatial querying, remote-sensing time-series analytics, crop simulation, and task-specific predictors through consistent APIs, enabling grounded and auditable agronomic analyses."
+  },
+  {
+   "line": 85,
+   "quote": "AGRO -R EFLECTIVE: an execution-driven reflective agent. We propose a multi-turn agent that iterates execute–observe–refine, using intermediate artifacts to self-correct and produce tool-grounded analysis traces rather than one-shot text."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis",
+  "decision_support"
+ ],
+ "other_tasks": [
+  "temporal_question_answering"
+ ],
+ "modules": [
+  {
+   "id": "agriworld2026:typed-world",
+   "name": "Agricultural temporal data and tool environment",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Interface and Interaction"
+   ],
+   "functions": [
+    "data_management"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "R3_2_GTS: yes, the environment represents temporal raster, weather, and event data and exposes time-series analytics; under the R3_1_TSK counterfactual, changing tasks preserves these temporal data interfaces because the environment is not bound to one task objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - general temporal data/tools, not one task objective",
+    "R3_2_GTS:yes - temporal data and analytics"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 161,
+     "quote": "AGRI W ORLD abstracts this complexity into a unified state space S composed of five typed entities:"
+    },
+    {
+     "line": 171,
+     "quote": "Weather Streams (W): Time-series of exogenous drivers, formalized as w = {(t, vt )}Tt=1 , where vt ∈ Rd includes variables like precipitation and radiation."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agriworld2026:canonical-alignment",
+   "name": "Canonical spatiotemporal alignment",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_2_GTS: yes, the operator reprojects spatial data and aligns temporal data to a canonical frequency; under the R3_1_TSK counterfactual, these remain temporal-data operations across tasks rather than a task-specific objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - alignment is not bound to one task criterion",
+    "R3_2_GTS:yes - resampling and temporal alignment"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 192,
+     "quote": "We define a composite alignment operator Π that maps arbitrary inputs to a unified working space:"
+    },
+    {
+     "line": 197,
+     "quote": "Sreproject transforms vector/raster geometries to a task-specific CRS (e.g., EPSG:3857 for metric calculation), and Tresample aligns temporal data to a canonical frequency (e.g., daily) using strictly defined interpolation policies (nearest/linear)[65]."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agriworld2026:reflective-execution",
+   "name": "Execute-observe-refine code loop",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK: no, feedback-driven code repair is not bound to one task family; R3_2_GTS: no, the loop manages execution and diagnostics without itself requiring temporal windows or order; R3_3_GH: yes, it controls execution and state.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - generic execution feedback",
+    "R3_2_GTS:no - temporal semantics belong to tools/checkers, not loop",
+    "R3_3_GH:yes - execution control and state"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 280,
+     "quote": "When a failure (runtime error or protocol violation) occurs, the agent inspects the artifact metadata M(α) to synthesize a corrective patch:"
+    },
+    {
+     "line": 283,
+     "quote": "Specifically, ρ categorizes errors into types (e.g., SpatialMisalignment, UnitError) and proposes targeted fixes."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "agriworld2026:intervention-checker",
+   "name": "Simulator-grounded intervention validation",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK: yes, the checker embeds an intervention objective and simulator criterion; under the counterfactual, another task family requires redesigned intervention semantics and verifier.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - intervention objective and simulator verifier"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 338,
+     "quote": "Counterfactual Consistency: For \"what-if\" analysis (e.g., \"Does irrigation I reduce stress?\"), we verify the causal direction."
+    },
+    {
+     "line": 369,
+     "quote": "M (s, aintervene ) − M (s, abaseline ) ≤ −∆,"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agriworld2026:agrobench",
+   "name": "Executable agricultural evaluation suite",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK: yes, generated instances embed task-specific schemas and executable checkers; changing task family changes the output and validation procedure. The suite is an evaluation resource, not a general temporal runtime (GTS no).",
+   "rubric_path": [
+    "R1:contributed benchmark/evaluation suite",
+    "R2:Harness resource",
+    "R3_1_TSK:yes - task-specific references/checkers"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 75,
+     "quote": "To evaluate such agents systematically, we build a verifiable evaluation suite on top of an existing agricultural benchmark by converting questions into tool-grounded instances with deterministic reference code and executable checker functions."
+    },
+    {
+     "line": 86,
+     "quote": "A verifiable evaluation suite with executable checkers. Built on top of an existing benchmark, we provide a scalable task generation and scoring pipeline with deterministic reference programs and executable checkers spanning lookups, forecasting, anomaly detection, and counterfactual interventions"
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 512,
+   "quote": "The reflection loop allowed the agent to recover from these errors in 92% of cases, converting a potential failure into a successful retrieval."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 460,
+   "quote": "In Forecasting tasks, however, the gap widens significantly (NRMSE 0.34 vs 0.18)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": true,
+ "notes": "AgroBench is treated as a task-specific benchmark resource (TSK/resource_level); confirm whether benchmark suites should be classified this way. Temporal OOD is reported, but the experiments do not clearly establish leakage control, information cutoffs, or temporal evidence availability."
+}

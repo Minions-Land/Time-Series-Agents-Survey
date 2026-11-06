@@ -1,0 +1,226 @@
+{
+ "citation_key": "timerlm2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TimeRLM makes long time-series queryable through iterative code execution, while the work contributes RL post-training and AnomalyXL to evaluate precise anomaly localization.",
+ "claim_evidence": [
+  {
+   "line": 144,
+   "quote": "We therefore introduce TimeRLM, an RLM formulation that enables manipulating time-series signals as external context, querying them over multiple turns in a sandboxed Python environment, and reasoning through code and vision to submit a structured answer grounded in the underlying signal."
+  },
+  {
+   "line": 149,
+   "quote": "introduce AnomalyXL, an open-source benchmark measuring precise anomaly localization in long horizon timeseries spanning two evaluation corpora, AnomalyXL-MCQ and AnomalyXL-Localize."
+  },
+  {
+   "line": 391,
+   "quote": "We posttrain TimeRLM with a Qwen3.5-4B RLM backbone using"
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "timerlm2026:recursive-sandbox",
+   "name": "Temporal code interaction runtime",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Memory and Context",
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is no: the runtime does not encode an anomaly output or verifier, and its code actions need not be redesigned for another task family. R3_2_GTS is yes: it exposes and operates on an ordered time-series as external state.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-family output or verifier is embedded",
+    "R3_2_GTS:yes - the external state is an ordered time-series queried and manipulated over time",
+    "R4:Interface and Interaction; Memory and Context; Tools and Execution; Planning and Orchestration",
+    "R5:data_management; processing",
+    "R7:anomaly_detection_diagnosis",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 297,
+     "quote": "A JSON object containing the time-series is pre-defined as a variable. This setup allows the model to operate over the full recording directly through code (Fig. 1)."
+    },
+    {
+     "line": 313,
+     "quote": "code returns an observation ot = exec(ct , st ) for t ≥ 1 appended to the history, and the episode terminates with a single verifiable reward r(ŷ, y) ∈ [0, 1]."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timerlm2026:anomaly-benchmark",
+   "name": "AnomalyXL benchmark and scoring",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK is yes: AnomalyXL defines anomaly-localization outputs and task-specific scorers; changing task family requires replacing its task schemas and validation criteria. The resource tests other systems rather than serving as their general runtime.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness resource",
+    "R3_1_TSK:yes - anomaly-localization output schemas and scoring criteria are task-specific",
+    "R5:validation",
+    "R7:anomaly_detection_diagnosis",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 320,
+     "quote": "AnomalyXL is a long-context, multi-channel benchmark for evidence-grounded anomaly localization: every answer requires precise retrieval of a time span, channel, or magnitude"
+    },
+    {
+     "line": 1826,
+     "quote": "Each precise row is scored by a deterministic function of the model’s final message that returns a value in [0, 1]. The same value is used as the evaluation score and, during RL, as the reward."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timerlm2026:anomaly-rl",
+   "name": "GRPO-trained anomaly workflow policy",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "This module updates the LLM policy with GRPO rewards from anomaly-localization workflow rollouts, so it changes model action selection from workflow feedback.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:workflow_learning",
+    "R7:anomaly_detection_diagnosis",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 392,
+     "quote": "Group Relative Policy Optimization (GRPO) (Shao et al. 2024) on AnomalyXL-Localize, with full-parameter tuning and no supervised warm start."
+    },
+    {
+     "line": 395,
+     "quote": "Rather than relying on a fixed training set, we integrate the generator directly into the training loop: every step synthesizes a fresh batch of recordings, so no sample repeats within a run."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 763,
+   "quote": "TimeRLM (image, GPT-5.5) leads on localization with 0.682 IoU, against 0.329 for the best single-pass variant and 0.323 for fine-tuned 32B Toto. On classify-with-evidence every baseline stays below 0.05 while TimeRLM reaches 0.745."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "timerlm2026:recursive-sandbox",
+   "decision": "change",
+   "new_ids": [
+    "timerlm2026:recursive-sandbox"
+   ],
+   "changes": [
+    "layer: GH->GTS",
+    "dimensions: Coordination and Scaling -> Planning and Orchestration; add Interface and Interaction; retain Memory and Context and Tools and Execution",
+    "functions: add data_management and processing",
+    "view_status: general_runtime -> mapped"
+   ],
+   "reason": "The existing runtime mechanism is the same, but its state is a queryable time-series exposed for code operations, meeting R3_2_GTS. It also supports temporal data management and processing."
+  },
+  {
+   "existing_id": "timerlm2026:anomaly-benchmark",
+   "decision": "change",
+   "new_ids": [
+    "timerlm2026:anomaly-benchmark"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration",
+    "functions: add validation",
+    "view_status: task_procedure -> resource_level"
+   ],
+   "reason": "AnomalyXL is a task-specific benchmark resource. Its anomaly outputs and deterministic temporal scoring meet R3_1_TSK, while its role is to evaluate other systems."
+  },
+  {
+   "existing_id": "timerlm2026:anomaly-rl",
+   "decision": "change",
+   "new_ids": [
+    "timerlm2026:anomaly-rl"
+   ],
+   "changes": [
+    "remove dimensions: Optimization and Evolution",
+    "llm_route: add workflow_learning"
+   ],
+   "reason": "The contribution is a GRPO-trained LLM policy that selects actions in an anomaly-localization workflow from verifiable rollout rewards; LLM modules use llm_route and no Harness dimensions."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": ""
+}

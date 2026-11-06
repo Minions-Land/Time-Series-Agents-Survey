@@ -1,0 +1,132 @@
+{
+ "citation_key": "timecopilot2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TimeCopilot contributes a feedback-driven forecasting agent that uses an LLM to orchestrate diagnostic and model-selection steps together with a unified API for heterogeneous forecasting models.",
+ "claim_evidence": [
+  {
+   "line": 54,
+   "quote": "In this paper, we introduce TimeCopilot1 , the first open-source framework designed specifically for agentic forecasting, see Figure 1."
+  },
+  {
+   "line": 89,
+   "quote": "TimeCopilot leverages LLMs in two ways: (i) to decide how to act at each step of this process, using their capacity to orchestrate multiple tools and reason over diverse signals"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "timecopilot2025:forecast-orchestration",
+   "name": "Forecasting workflow agent",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The core logic embeds the forecasting objective: feature diagnostics inform model choice, cross-validation evaluates candidates, and the best model is selected for forecasting. If the task family changed, the diagnostics, model-selection criteria, and forecast procedure would need redesign, so R3_1_TSK applies.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecasting model selection and forecast generation are the core objective",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:task_procedure - processing, validation",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 104,
+     "quote": "(ii) Model Selection and Evaluation: proposes candidate models starting from simple statistical baselines, documents their assumptions, evaluates them through cross-validation, and escalates to more complex models only when needed. [29]"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timecopilot2025:forecaster-hub",
+   "name": "Unified forecasting model hub and ensemble API",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "The hub and ensemble API are bound to producing and evaluating forecasts, so their core objective is the forecasting task. Changing task family would require redesigning the model interfaces, forecast outputs, and ensemble semantics; therefore R3_1_TSK applies.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - the unified model hub and ensemble are forecasting-specific",
+    "R4:Tools and Execution",
+    "R5:task_procedure - processing",
+    "R7:forecasting_prediction",
+    "R9:infrastructure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 114,
+     "quote": "The TimeCopilot Forecaster executes the models proposed by the agent. It provides access to the largest unified hub of TSFMs under a single API 2 , alongside statistical, machine learning, and deep learning methods."
+    },
+    {
+     "line": 124,
+     "quote": "Finally, TimeCopilot supports ensemble techniques, such as MedianEnsemble, which can combine forecasts from heterogeneous models (statistical, ML, and foundation) to improve robustness [46]."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 139,
+   "quote": "An ensemble of foundation models built with TimeCopilot achieved the best overall performance while maintaining reproducibility and low computational cost (approximately $24 of GPU-distributed inference)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet supports forecasting only. It describes cross-validation and reproducibility, but reports no explicit chronological split, information-cutoff or leakage check, execution trace, or downstream decision-utility measure."
+}

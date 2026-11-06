@@ -1,0 +1,262 @@
+{
+ "citation_key": "timera2025",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "Time-RA defines a multimodal anomaly-diagnosis task and supplies RAT S 40K feedback-refined reasoning data plus supervised fine-tuning and evaluation for LLMs.",
+ "claim_evidence": [
+  {
+   "line": 16,
+   "quote": "generative, reasoning-intensive paradigm."
+  },
+  {
+   "line": 139,
+   "quote": "• Multimodal Dataset (RAT S 40K): We construct"
+  },
+  {
+   "line": 141,
+   "quote": "• AI-Feedback Alignment Pipeline: We develop"
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "timera2025:time-ra-task",
+   "name": "TIME-RA structured anomaly diagnosis task",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The procedure embeds the anomaly-diagnosis output requirement: binary detection, anomaly class and explanatory thought; changing the task family would require redesigning those outputs and the structured stages.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific anomaly detection, classification and explanation outputs",
+    "R4:Interface and Interaction",
+    "R5:task_procedure",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 108,
+     "quote": "reformats these inputs as structured prompts and fine-tunes LLMs, guiding them"
+    },
+    {
+     "line": 110,
+     "quote": "into Observation, Thought, and Action stages."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timera2025:rats40k-dataset",
+   "name": "RAT S 40K multimodal reasoning dataset",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "This is training data built for LLM fine-tuning, combining time series, contextual text, visual representations and reasoning annotations that supervise anomaly analysis.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM - training data built to train the model",
+    "R6:instruction_reasoning",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 335,
+     "quote": "We first collect multimodal time series anomaly data, incorporating numeric time series, descriptive text, and visualization images."
+    },
+    {
+     "line": 423,
+     "quote": "we leverage LLMs to automatically annotate each time series segment with a reasoning explanation and an anomaly category."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timera2025:ai-feedback-alignment",
+   "name": "GPT-4 feedback annotation pipeline",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "The pipeline ranks and critiques anomaly-reasoning outputs using task-specific criteria and updates the reusable dataset; changing the task family would require changing its anomaly definitions, feedback prompts and selection criterion.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly reasoning is the selection and feedback objective",
+    "R4:Planning and Orchestration; Optimization and Evolution",
+    "R5:task_procedure",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 439,
+     "quote": "After generating 158,340 model completions from 36,311 univariate and 3,274 multivariate instructions, we use GPT-4 to provide two kinds of feedback for each"
+    },
+    {
+     "line": 599,
+     "quote": "After generating feedback through GPT-4, we merge the feedback results with the top-ranked results in the model pool"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timera2025:rats-sft",
+   "name": "RAT S 40K supervised fine-tuning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "The method updates language-model parameters by supervised fine-tuning on RAT S 40K multimodal inputs and outputs for anomaly labels, actions and reasoning.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM - supervised fine-tuning updates model parameters",
+    "R6:instruction_reasoning",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 289,
+     "quote": "In T IME -RA task, we address these limitations by fine-tuning LLMs with our unique RAT S 40K dataset."
+    },
+    {
+     "line": 296,
+     "quote": "max E(x,y)∼DRATS40K [log Pθ (y|x)]."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timera2025:anomaly-evaluation",
+   "name": "Detection, category and explanation evaluation",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "The evaluation protocol embeds task-specific validation criteria for binary anomaly labels, anomaly actions and textual reasoning, so its metrics must be redesigned for another task family.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - validation criteria are anomaly-task outputs",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 304,
+     "quote": "we adopt a multifaceted evaluation approach, considering three distinct aspects of anomaly detection"
+    },
+    {
+     "line": 311,
+     "quote": "employ standard metrics such as precision (P), recall (R), and F1-score (F1) for evaluation."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 311,
+   "quote": "employ standard metrics such as precision (P), recall (R), and F1-score (F1) for evaluation."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The source contributes both a task-specific anomaly reasoning procedure and LLM-side training/data mechanisms. No explicit chronological split, leakage control or downstream decision-utility experiment is reported."
+}

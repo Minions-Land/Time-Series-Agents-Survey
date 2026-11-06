@@ -1,0 +1,237 @@
+{
+ "citation_key": "metacaster2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "MetaCaster uses feedback-driven harness optimization to generate few-shot training series and train lightweight time-series forecasters.",
+ "claim_evidence": [
+  {
+   "line": 116,
+   "quote": "To address this challenge, we propose M ETA C ASTER, a Meta-harness-optimized agent for endto-end few-shot learning of lightweight forecasters."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "data_augmentation_synthesis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "metacaster2026:job-execution",
+   "name": "Training-job scheduling and recovery",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Queueing, GPU assignment, monitoring and recovery manage execution without temporal semantics or a task objective; R3_3_GH applies, and forecast-specific training is separate.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - reusable scheduling and recovery",
+    "R3_2_GTS:no - no temporal dependency",
+    "R3_3_GH:yes - manages execution and failures"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 442,
+     "quote": "During training, it monitors processes, resolves errors when encountered, and recovers interrupted jobs without human intervention."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "metacaster2026:generation",
+   "name": "Few-shot training-series generation",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Synthetic windows are generated to improve forecaster test MSE and pass quality gates; the objective and criterion bind this procedure to forecasting under R3_1_TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - generation optimized for forecaster MSE",
+    "R5:processing, validation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 2218,
+     "quote": "3. Validate: run the gates declared inside the SKILL.md (shape, NaN, per-channel mean/std drift,"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "metacaster2026:forecaster-training",
+   "name": "Lightweight forecaster training and selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "FTAGENT trains registered forecasters and selects by validation MSE; changing the task family changes its objective and selection criterion, so R3_1_TSK applies.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecaster training and selection use forecasting error"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 2244,
+     "quote": "Rank the trained forecasters by validation MSE, evaluate the chosen Top-1 on <test_dir>/test.npy, and ship it as the deliverable for the user."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "metacaster2026:harness-optimization",
+   "name": "Forecast-driven harness optimization",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Optimization and Evolution",
+    "Memory and Context"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "HPAGENT uses forecast-error feedback to diagnose and edit MGAGENT across epochs and stores snapshots for rollback; the loss embeds the forecasting objective, so R3_1_TSK applies.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecasting error determines harness updates",
+    "R4:Planning and Orchestration, Optimization and Evolution, Memory and Context"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 477,
+     "quote": "3) Update, which edits θ. Effectively, HPAGENT serves as the optimizer of Eq. (1), as defined by its system prompt."
+    },
+    {
+     "line": 483,
+     "quote": "HPAGENT therefore relies more heavily on long-term memory, which stores dataset snapshots, evaluation metrics,"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 442,
+   "quote": "During training, it monitors processes, resolves errors when encountered, and recovers interrupted jobs without human intervention."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 992,
+   "quote": "Time series are split chronologically into 80%/10%/10% train/validation/test sets."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1055,
+   "quote": "M ETAC ASTER outperforms the generation/augmentation baselines in most cases, demonstrating the benefit of optimizing data generation for forecasting;"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "metacaster2026:job-execution",
+   "decision": "split",
+   "new_ids": [
+    "metacaster2026:job-execution",
+    "metacaster2026:forecaster-training"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration",
+    "split generic scheduling/recovery from forecasting-specific training and selection"
+   ],
+   "reason": "Packet evidence supports reusable queue/process recovery and a distinct FTAGENT procedure whose validation-MSE ranking and Top-1 evaluation embed the forecasting objective."
+  },
+  {
+   "existing_id": "metacaster2026:generation",
+   "decision": "change",
+   "new_ids": [
+    "metacaster2026:generation"
+   ],
+   "changes": [
+    "dimensions: Tools and Execution -> Planning and Orchestration, Tools and Execution",
+    "add functions: processing, validation"
+   ],
+   "reason": "MGAGENT generates synthetic windows for forecaster MSE and applies statistical and shape gates, so it remains task-specific with processing and validation functions."
+  },
+  {
+   "existing_id": "metacaster2026:harness-optimization",
+   "decision": "change",
+   "new_ids": [
+    "metacaster2026:harness-optimization"
+   ],
+   "changes": [
+    "retire old dimension label; add Planning and Orchestration and Memory and Context alongside Optimization and Evolution"
+   ],
+   "reason": "HPAGENT uses downstream error and trace feedback to diagnose and edit the MGAGENT harness across epochs and stores snapshots for rollback."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The current card used a retired dimension and omitted distinct forecast-specific FTAGENT training/selection; packet evidence supports splitting it from generic job execution."
+}

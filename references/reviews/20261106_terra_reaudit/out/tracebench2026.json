@@ -1,0 +1,184 @@
+{
+ "citation_key": "tracebench2026",
+ "status": "paper_verified",
+ "role_of_work": "resource",
+ "claim_summary": "TraceBench contributes a simulation-based benchmark for evaluating LLM agents on time-series root-cause attribution under controlled context, noise, support-example, and submission conditions.",
+ "claim_evidence": [
+  {
+   "line": 81,
+   "quote": "In summary, our contributions are the following: First, we introduce TraceBench, a simulation-based framework for generating root-cause attribution tasks along four controllable axes: domain context, observation noise, labeled examples, and submission"
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "tracebench2026:root-cause-evaluation",
+   "name": "Controlled root-cause attribution benchmark",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK matches: intervention-defined root-cause labels, solvability rejection rules, and label-scored direct or Python submissions embed a diagnostic objective. Changing task family requires redesigning the intervention-label semantics, solvability verifier, and scoring objective; temporal inputs alone do not make this GTS. Numerical probe comparisons and window-dependent evidence admission implement processing and validation within the benchmark.",
+   "rubric_path": [
+    "R1:contributed - controlled task generation, solvability filtering, and submission/scoring protocol",
+    "R2:Harness - benchmark and evaluator surround unchanged LLM agents",
+    "R3_1_TSK:yes - diagnostic label objective and solvability verifier",
+    "R4:Interface and Interaction; Tools and Execution; Planning and Orchestration",
+    "R5:processing; validation; resource_level",
+    "R6:not_applicable",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable - TSK",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 195,
+     "quote": "TraceBench is a simulation-based framework for generating controlled agentic root-cause attribution tasks. Each TraceBench task"
+    },
+    {
+     "line": 335,
+     "quote": "We reject the intervention sample when its trajectory is not sufficiently distinguishable from either probe. Specifically, in each"
+    },
+    {
+     "line": 1495,
+     "quote": "The no-intervention probe is compared only after the intervention,\nwhereas the static-change probe is compared over the full trajectory."
+    },
+    {
+     "line": 262,
+     "quote": "At test time, the agent receives one instantiated task and either\nreturns one prediction for each sample in the test batch in Sdirect\nmode or submits a single reusable Python script in Sprog mode,"
+    },
+    {
+     "line": 2958,
+     "quote": "The primary evaluation metric is top-1 accuracy: the first\nlabel in each returned list is compared with the hidden\ncorrect label."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tracebench2026:execution-trace-metrics",
+   "name": "Agent exploration and resource trace metrics",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK does not match: counting tool invocations, executed Python, inspected artifacts, and resource use embeds no diagnostic objective. R3_2_GTS does not match: these metrics require neither temporal order nor time-series windows, frequency, or availability semantics. R3_3_GH matches general execution instrumentation; the same metrics can evaluate another task without redesign.",
+   "rubric_path": [
+    "R1:contributed - explicit trajectory metric definitions and computation",
+    "R2:Harness - log and artifact analysis outside the LLM",
+    "R3_1_TSK:no - independent of root-cause labels and diagnostic scoring",
+    "R3_2_GTS:no - numerical literals and execution logs have no required temporal semantics",
+    "R3_3_GH:yes - general tool execution and resource instrumentation",
+    "R4:Tools and Execution",
+    "R5:no temporal function; general_runtime",
+    "R6:not_applicable",
+    "R7:anomaly_detection_diagnosis",
+    "R8:inferred - one task family, basis work",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 2758,
+     "quote": "Python calls. The total number of parsed Python interpreter invocations in tool commands. Inline python -c programs, Python heredocs, module invocations, and executions of .py files are counted;"
+    },
+    {
+     "line": 2759,
+     "quote": "repeated executions of the same source are separate calls. Displaying Python source without executing it does not add a call."
+    },
+    {
+     "line": 2768,
+     "quote": "Plots inspected. The number of images generated by the LLM\nagent that are subsequently read, opened, or viewed successfully\nwith an image-capable tool."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 2768,
+   "quote": "Plots inspected. The number of images generated by the LLM\nagent that are subsequently read, opened, or viewed successfully\nwith an image-capable tool."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 415,
+   "quote": "files visible to the agent. For tasks using Sprog , we report accuracy\nboth on the episode batch and on a held-out batch of additional\nsamples that is inaccessible to the agent during the episode, thereby\nmeasuring generalization. From the agentic log traces, we extract"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 607,
+   "quote": "For each of the three closed-weight LLM agents, observed mean\nepisode accuracy decreases as noise increases from 𝜅 low to 𝜅 high ."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The current card prompted inclusion of the separately reusable trace-metric computation documented in Appendix G; both existing mechanism IDs are preserved. One TSK benchmark module groups diagnostic generation, filtering, and submission/scoring. Numerical probe comparisons and temporal comparison windows support its processing/validation functions. Off-the-shelf scaffolds, libraries, and classical baselines are excluded. Process evidence is limited to trace/artifact inspection metrics, not comprehensive execution-success rates. Temporal evidence concerns held-out information access, not chronological forecasting splits. Runtime cost is not downstream decision utility.",
+ "reconciliation": [
+  {
+   "existing_id": "tracebench2026:root-cause-evaluation",
+   "decision": "change",
+   "new_ids": [
+    "tracebench2026:root-cause-evaluation"
+   ],
+   "changes": [
+    "Preserve TSK layer, diagnostic task, and evaluation role.",
+    "Replace the retired dimension with Interface and Interaction, Tools and Execution, and Planning and Orchestration.",
+    "functions: [] -> processing, validation; view_status: task_procedure -> resource_level.",
+    "Add verbatim evidence and explicit R3 counterfactual."
+   ],
+   "reason": "The same controlled diagnostic benchmark is supported by task definitions (L195-L268), numerical solvability filtering and its temporal comparison windows (L335-L348, L1495-L1497), and label-scored direct/Python submissions. Its objective requires redesign for another task family; it is a benchmark resource with concrete interfaces, executable submissions, and rejection checkpoints."
+  },
+  {
+   "existing_id": "tracebench2026:execution-trace-metrics",
+   "decision": "change",
+   "new_ids": [
+    "tracebench2026:execution-trace-metrics"
+   ],
+   "changes": [
+    "Preserve GH layer, general_runtime view, evaluation role, and inferred reuse.",
+    "Replace the retired dimension with Tools and Execution.",
+    "Record anomaly_detection_diagnosis as the demonstrated application and add precise metric evidence."
+   ],
+   "reason": "Appendix G defines a separable execution-instrumentation procedure, including parsing Python invocations, distinguishing displayed code from executed code, and counting successfully inspected artifacts (L2758-L2770). This contributes general execution metrics without diagnostic scoring logic, temporal semantics, or demonstrated cross-task reuse."
+  }
+ ]
+}

@@ -1,0 +1,285 @@
+{
+ "citation_key": "genautoml2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "GenAutoML uses an LLM to synthesize task-specific time-series architectures, repair them from runtime traces, and optimize and execute them with temporal safeguards.",
+ "claim_evidence": [
+  {
+   "line": 70,
+   "quote": "In addition, to ensure that these structures have a mathematical form of validity, we proposed a Sandboxed Reflection Loop, that executes the generated code using simulated tensor structures within an in-process validation."
+  },
+  {
+   "line": 72,
+   "quote": "By feeding back the traceback and dimension mismatch errors to the LLM used to generate them, the Sandboxed Reflection Loop iterates through the process to help debug the architecture in preparation for final deployment [8]."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "genautoml2026:architecture-synthesis",
+   "name": "Task-specific architecture synthesis and search",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK: the procedure generates candidate architectures for defined forecast/reconstruction objectives and evaluates them by task losses; changing task objectives changes the architectures and optimization criteria. Counterfactual: the synthesis objective and training/search setup must change across forecasting and anomaly detection, so not generic temporal handling (GTS) or task-neutral runtime (GH).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific architecture synthesis and optimization",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 181,
+     "quote": "By using the automated architectural synthesis, the agent writes class definitions directly to a dynamic registry, enabling the system to \"invent\" complex structures like multi-scale Inception blocks [31] or residual dilated convolutions based on the user’s textual description of the data [13]."
+    },
+    {
+     "line": 221,
+     "quote": "Finally, through Dynamic Discovery, by treating these hallucinated models as first-class citizens, the optimization loop is able to compare baselines (like DLinear) [45] and agent-generated models (like ResNetBlockModel) [13] under the same mathematical circumstances."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "genautoml2026:forecast-shape-contract",
+   "name": "Sandboxed shape validation and traceback repair",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK: validation asserts the required forecast horizon output shape and repairs violations against this task-specific contract. Counterfactual: the output horizon and verifier must be redesigned for another task; it is not generic GTS temporal evidence validation or task-neutral GH error recovery.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast output shape contract",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure; validation",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 191,
+     "quote": "The system programmatically asserts that the output shape strictly conforms to the expected horizon dimensions RB×H×D ."
+    },
+    {
+     "line": 193,
+     "quote": "Because of this , even if the forward pass fails or returns an invalid shape, the framework can capture the execution traceback and dimension mismatch errors and then feeding them back to the LLM as an additional prompt."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "genautoml2026:dynamic-architecture-registry",
+   "name": "Runtime architecture discovery and hot-swapping",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "R3_1 TSK no: registry discovery and code hot-swapping do not embody a task output criterion. R3_2 GTS no: class loading and module-cache updates need no temporal semantics. R3_3 GH yes: this is task-neutral runtime execution and integration.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task objective",
+    "R3_2_GTS:no - no temporal dependency",
+    "R3_3_GH:yes - generic runtime integration",
+    "R4:Tools and Execution",
+    "R5:general_runtime",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis",
+    "R8:demonstrated",
+    "R9:infrastructure"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 217,
+     "quote": "First, through Introspection, the system searches the dynamic registry for new class definitions that inherit from torch.nn.Module using Python’s inspect module. Next, Hot-Swapping updates the module cache in real-time by using importlib.reload."
+    },
+    {
+     "line": 220,
+     "quote": "This eliminates the need for a system reboot by enabling the system to instantiate new architectures and register them as legitimate candidates in the Optuna-based hyperparameter optimization search space."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "genautoml2026:revin-wrapper",
+   "name": "Dynamic RevIN statistical wrapper",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK no: the wrapper does not define a task objective; R3_2 GTS yes: it computes and reverses per-instance statistics across temporal input windows to stabilize numerical series, independent of a single task; R3_3 GH is therefore not reached.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task objective",
+    "R3_2_GTS:yes - temporal-window numerical processing",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 243,
+     "quote": "To address this, we integrate a Dynamic Reversible Instance Normalization (Dyn-RevIN) wrapper, directly adopting the mathematical framework proposed by [19]."
+    },
+    {
+     "line": 291,
+     "quote": "This wrapping mechanism ensures that even if the AI-generated architecture is poorly scaled, the Dyn-RevIN layer enforces a stationary learning environment, which we demonstrate is essential for stable convergence."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "genautoml2026:causal-temporal-preprocessing",
+   "name": "Causal resampling and missing-value preprocessing",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK no: resampling and causal imputation do not embed one task's output criterion; R3_2 GTS yes: they explicitly depend on sampling frequency, timestamps, and information availability to prevent look-ahead leakage; R3_3 GH is not reached.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - preprocessing is not task-objective-specific",
+    "R3_2_GTS:yes - frequency, chronology and availability-aware temporal processing",
+    "R4:Tools and Execution",
+    "R5:data_management, processing, validation",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 1008,
+     "quote": "As a result, GenAutoML uses asymmetric regularization when resampling a temporal series to ensure that the data is sampled at a consistent overall frequency without introducing look-ahead bias."
+    },
+    {
+     "line": 1013,
+     "quote": "To ensure optimal data retention, all null values in the training set are resolved using a bilateral interpolation (limit_direction=’both’). Conversely, the test and validation sets only utilize causal forward-filling (limit_direction=’forward’)."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 785,
+   "quote": "however, the implementation of a Sandboxed Reflection Loop yielded a 100% pass rate on the shape validation harness within five iterations via the autonomous interpretation of Python traceback logs."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1002,
+   "quote": "We maintain our rigorous causal chronological split of 70% for Training, 10% for Validation, and 20% for Testing to prevent temporal data leakage across all datasets."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 595,
+   "quote": "the synthesized models demonstrated superior sensitivity on ETTh1. The agent-designed ResNetBlock exhibited unparalleled performance, achieving a separation gap 8 times better than TimesNet and 33 times better than DLinear, effectively compressing"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Blind classification based only on the packet; no task-specific LLM training is reported. Dyn-RevIN adopts an existing method but its integration as a wrapper is presented as a framework mechanism. The temporal preprocessing protocol is described in the appendix and applied within the experimental pipeline."
+}

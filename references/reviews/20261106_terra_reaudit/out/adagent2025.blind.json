@@ -1,0 +1,231 @@
+{
+ "citation_key": "adagent2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "AD-AGENT contributes a multi-agent anomaly-detection runtime that builds executable pipelines from natural-language requests, with shared memory, script repair, and optional detector tuning.",
+ "claim_evidence": [
+  {
+   "line": 17,
+   "quote": "AD-AGENT coordinates specialized agents for intent parsing, data preparation, library and model selection, documentation mining, and iterative code generation and debugging."
+  },
+  {
+   "line": 18,
+   "quote": "Using a shared short-term workspace and a long-term cache, the agents integrate popular AD libraries like PyOD, PyGOD, and TSLib into a unified workflow."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "adagent2025:code-review",
+   "name": "Executable AD pipeline generation and repair",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 applies because the procedure generates and validates executable anomaly-detection pipelines; changing task family changes the required detector APIs and validation objective, so it is task-specific rather than a temporal-general module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - AD pipeline generation and runnability are the task procedure's objective",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure; no temporal function embedded",
+    "R6:not LLM-side",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable for TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 155,
+     "quote": "These two agents collaborate to produce reliable detection scripts. The Generator composes code based on user instructions and knowledge from the Info Miner. To ensure correctness, the Reviewer validates the code through a dry run using LLM-generated synthetic samples."
+    },
+    {
+     "line": 160,
+     "quote": "If issues are detected, the two agents enter a feedback loop, iteratively refining the code until a valid and executable pipeline is achieved."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "adagent2025:documentation-memory",
+   "name": "Shared task state and cached model documentation",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 does not apply because the state/cache mechanism does not embed an anomaly-detection objective; R3_2 does not apply because it stores session artifacts and model documentation without temporal order, windows, or information-availability semantics. R3_3 therefore places it in GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - general state/cache, no task objective",
+    "R3_2_GTS:no - no temporal semantics",
+    "R3_3_GH:yes - manages shared state",
+    "R4:Memory and Context",
+    "R5:general_runtime",
+    "R6:not LLM-side",
+    "R7:anomaly_detection_diagnosis",
+    "R8:inferred - one task family; general state/cache interface",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 173,
+     "quote": "The short-term memory serves as the central workspace where agents read and write task-related content. It stores the user input, the processed dataset, selected models, and parameter configurations."
+    },
+    {
+     "line": 178,
+     "quote": "The long-term memory caches model information retrieved by Info Miner."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "adagent2025:detector-pipeline",
+   "name": "Anomaly-detection pipeline construction",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 applies because the pipeline coordinates model selection, library choice, and execution for anomaly detection; switching to another task family changes those task-specific outputs and tools. Its use of TSLib does not make the procedure GTS because it is still bound to the AD objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - constructs anomaly-detection pipelines",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:task_procedure; no temporal function embedded",
+    "R6:not LLM-side",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable for TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 123,
+     "quote": "We present AD-AGENT, a multi-agent framework that automates AD across diverse modalities and use cases. By integrating established AD libraries – PyOD for multivariate data, PyGOD for graph data, and TSLib for time series – AD-AGENT supports a broad range of models and enables end-to-end automation from user instruction to script."
+    },
+    {
+     "line": 140,
+     "quote": "Building on the Processor’s output, the Selector agent determines which AD library best aligns with the inferred data modality and task requirements. If the user does not specify a model, the Selector recommends one from the chosen library."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "adagent2025:optimizer",
+   "name": "Performance-driven detector hyperparameter tuning",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 applies because the feedback objective is improving anomaly-detection performance and returns detector hyperparameters; another task family would require a different task metric and parameter space. It is task-specific even though its iterative control resembles a general optimizer.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - optimizes anomaly detector parameters against detection performance",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure; no temporal function embedded",
+    "R6:not LLM-side",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable for TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 163,
+     "quote": "These two agents provide optional extensions for performance evaluation and hyperparameter tuning. The Evaluator runs the pipeline and summarizes detection results when ground truth labels are available for the target dataset. The Optimizer, inspired by Liu et al. (2025), performs LLM-powered hyperparameter tuning based on the provided training dataset."
+    },
+    {
+     "line": 168,
+     "quote": "They operate in a feedback loop, iterating between parameter updates and performance assessment."
+    },
+    {
+     "line": 657,
+     "quote": "To demonstrate the impact of Optimizer, we evaluated it on the dataset “cardio” within PyOD. As shown in Table 3, Optimizer consistently improved detection quality."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 281,
+   "quote": "Table 1 presents the success rate, indicating whether the generated code runs without errors"
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 316,
+   "quote": "The LLM’s recommendations substantially exceed the average baseline and closely track the best performance in most datasets."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The work supports anomaly detection across several modalities, including time series via TSLib. Reported experiments assess executable-code success and detection/model-selection performance, but do not report temporal leakage, chronology, or availability-time checks."
+}

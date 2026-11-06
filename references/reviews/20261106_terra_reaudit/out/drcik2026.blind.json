@@ -1,0 +1,227 @@
+{
+ "citation_key": "drcik2026",
+ "status": "paper_verified",
+ "role_of_work": "resource",
+ "claim_summary": "Dr-CiK contributes a benchmark resource that turns context-aided numerical forecasting into deep-research tasks with controllable evidence and distractors and evaluates retrieval, filtering, synthesis, and forecast performance.",
+ "claim_evidence": [
+  {
+   "line": 71,
+   "quote": "• We develop Dr-CiK, a benchmark for evaluating CAF via DR, and release 240 tasks with ground-truth annotations for supporting evidence retrieval and CAF. This design enables stage-wise evaluation of failures from DR to CAF."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "drcik2026:forecast-research-testbed",
+   "name": "Dr-CiK benchmark testbed",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK: the testbed embeds forecast-useful context retrieval and evidence-grounded forecasting as its task criteria; changing the task family changes the target and validation objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecasting objective and evidence validation are embedded",
+    "R4:Memory and Context; Planning and Orchestration",
+    "R5:resource_level",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 244,
+     "quote": "forecast-relevant context and evidence while avoiding distractors. To achieve this, we introduce Dr-CiK, a comprehensive testbed comprising 240 realistic CAF via DR tasks and a heterogeneous corpus of 8,849 documents (Figure 2)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "drcik2026:environment-generation",
+   "name": "Scalable DR environment generation pipeline",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "R3_1_TSK: the pipeline constructs forecast-specific evidence chains and documents from time-series instances; changing the task family requires changing the evidence and generation objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast evidence and environment construction are task-bound",
+    "R4:Memory and Context; Planning and Orchestration",
+    "R5:resource_level; processing, context_memory",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:infrastructure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 368,
+     "quote": "A core contribution of Dr-CiK is its scalable task-generation pipeline (Figure 3), which transforms multimodal timeseries instances into DR environments through three phases, each addressing a distinct evaluation requirement."
+    },
+    {
+     "line": 380,
+     "quote": "memory of historical events. We further shift the time window of real-world time series, and shift timestamps in the context accordingly. Together, these mechanisms mitigate both lexical and numerical memorization heuristics."
+    },
+    {
+     "line": 395,
+     "quote": "adjacent evidence nodes plus the connecting Reasoning Link, so consecutive documents share a causal anchor and the chain remains traceably connected for DR. Then, 7 Distractor Document Generation drafts distractor metadata"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "drcik2026:forecast-dependent-distractors",
+   "name": "Forecast-dependent distractor taxonomy",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK: distractors are generated and rejected according to whether they would change the forecast for the target series and horizon; another task family requires a different target-specific criterion.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - distractor validity is defined by forecast impact",
+    "R4:Memory and Context; Planning and Orchestration",
+    "R5:resource_level; validation",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 412,
+     "quote": "distractors are plausible-looking contexts that can steer the forecast in the wrong direction. To our knowledge, Dr-CiK is the first benchmark where distractors are explicitly forecast-dependent (Figure 2B). Each distractor is generated"
+    },
+    {
+     "line": 415,
+     "quote": "a confidently incorrect prediction. Crucially, every distractor remains rejectable: it can be logically ruled out by cross-referencing the task metadata or the observed historical time series."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "drcik2026:calibrated-verification",
+   "name": "Human-calibrated generation verification",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "R3_1_TSK: stage-specific judges validate evidence coverage, reasoning chains, and distractor acceptability for the forecasting benchmark; changing the task family changes those acceptance criteria.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - validation criteria are forecasting-specific",
+    "R4:Planning and Orchestration; Optimization and Evolution",
+    "R5:resource_level; validation",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:infrastructure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 1362,
+     "quote": "Judge calibration. For each generation stage, we design a specialized LLM judge with stage-specific acceptance criteria. These include an Evidence Judge for checking whether supporting-evidence units cover the rewritten context,"
+    },
+    {
+     "line": 1378,
+     "quote": "each pipeline stage is guarded by its corresponding calibrated LLM judge. We use a generate-until-correct procedure: if an intermediate output fails its judge, that output is regenerated and rechecked until it passes."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1378,
+   "quote": "each pipeline stage is guarded by its corresponding calibrated LLM judge. We use a generate-until-correct procedure: if an intermediate output fails its judge, that output is regenerated and rechecked until it passes."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 998,
+   "quote": "We preprocess series by resampling with mean aggregation to the target frequency and applying a 70/30 historical/forecast split."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 445,
+   "quote": "• Level 1: End-to-End. Measures overall forecasting accuracy when a DR agent retrieves context and synthesizes evidence for a downstream forecaster, conflating all three failure sources."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Blind classification treats Dr-CiK as a paper-verified forecasting benchmark/resource and identifies its environment generation, forecast-dependent distractor, and calibrated verification mechanisms."
+}

@@ -1,0 +1,273 @@
+{
+ "citation_key": "argos2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "ARGOS uses an LLM agent pipeline with feedback to generate executable anomaly rules and fuse them with an existing detector for time-series anomaly detection.",
+ "claim_evidence": [
+  {
+   "line": 186,
+   "quote": "To address these challenges, we propose A RGOS, a timeseries anomaly detection system that autonomously generates rules using LLMs. First, A RGOS employs an agent-based pipeline with feedback loops to iteratively correct anomaly detection rules and improve accuracy."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "argos2025:python-rule-synthesis",
+   "name": "Agentic executable anomaly-rule training",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK: the procedure generates executable anomaly labels and evaluates rule accuracy for the anomaly-detection objective; changing task family changes the output objective and verifier.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific anomaly labels and validation accuracy"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 587,
+     "quote": "Rule Training. During the rule training stage, the data chunks and corresponding ground-truth labels are fed into the Training Engine, which iteratively trains detection rules based on the preprocessed data chunks and labels using an agentic pipeline."
+    },
+    {
+     "line": 691,
+     "quote": "The Detection Agent is tasked with writing a Python function, inference(sample: np.ndarray) -> np.ndarray, to output prediction labels based on the input sample. We prompt the Detection Agent to first describe the abnormal rules in the form of comments, and then write the corresponding Python code"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "argos2025:syntax-repair",
+   "name": "Execution-feedback syntax repair",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_3_GH: dummy-data execution, error messages, and stack-trace handling manage runtime correction without temporal semantics or a task objective; the repair interface can be reused around another code task.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_3_GH:yes - execution and error recovery without temporal semantics"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 653,
+     "quote": "Repair Agent. Upon receiving anomlay detection rules from the Detection Agent, the Repair Agent first checks for syntax errors by executing the rules on dummy data that mimics the format of the input data. If syntax errors are detected, A RGOS provides error messages and call stack information"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "argos2025:data-preprocessing",
+   "name": "Temporal data preprocessing",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_2_GTS: chunking, scaling, timestamp removal/re-indexing, and fixed-interval assumptions depend on temporal order and numerical representation; changing task family does not remove these temporal input semantics.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_2_GTS:yes - temporal order, intervals, and windows",
+    "R5:data_management,processing"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 775,
+     "quote": "Since time-series data are continuous and unbounded, they must first be chunked into smaller segments for processing by the Training Engine. Meanwhile, the Data Preprocessor also applies scaling, indexing, and tokenization-specific preprocessing, which are essential for LLMs to learn patterns in the data."
+    },
+    {
+     "line": 780,
+     "quote": "Time-series inputs may have arbitrary precisions, which limits the amount of data that can fit within the context window of LLMs. To address this, the Data Preprocessor scales the input data to a specified significant figure."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "argos2025:data-selection",
+   "name": "Task-directed metric and contrastive-example selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK: partitioning and contrastive-example retrieval are designed to train anomaly rules and avoid anomaly-pattern mistakes; changing task family changes the labels, examples, and selection objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly-rule training objective"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 825,
+     "quote": "Given a time-series dataset, the Data Selector controls how the dataset is partitioned and which partition to use during the training process. The Data Selector supports two dataset modes: one-for-one and one-for-all."
+    },
+    {
+     "line": 849,
+     "quote": "When training anomaly detection rules from false negative or false positive examples of existing anomaly detection models, the Data Selector needs ensure that the contrasitive examples retrieved (i.e. true negatives or true positives) are from a similar distribution as the false negative or false positive examples."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "argos2025:detector-fusion",
+   "name": "False-positive and false-negative detector correction",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK: the aggregator changes anomaly labels by correcting false negatives and false positives against a base anomaly detector; another task family requires a different objective and label semantics.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly-label correction objective"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 704,
+     "quote": "Due to the lack of domain knowledge, LLMs may generate anomaly detection rules that underperform compared to existing anomaly detectors that have been well-tuned over time in production. Instead of directly using the LLM-generated rules, A RGOS proposes a model fusion approach that combines these rules with the well-established anomaly detectors deployed in production, ensuring an accuracy guarantee."
+    },
+    {
+     "line": 721,
+     "quote": "Lagg ← Lbase"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "argos2025:topk-rule-selection",
+   "name": "Top-k rule selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK: candidate rules are selected by validation accuracy for the anomaly-detection objective; changing task family changes the candidate score and selection criterion.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - validation-accuracy selection for anomaly rules"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 746,
+     "quote": "In each iteration, the Detection Agent uses the same input to propose n detection rules, which are passed to both the Repair Agent and the Review Agent. Once the Review Agent verifies that there is no accuracy regression in the generated n rules, the Rule Selector selects the top-k rules"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1098,
+   "quote": "With the help of the Repair Agent, all anomaly detection rules generated by the Training Engine have no syntax errors."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1326,
+   "quote": "Table 4 shows the overall accuracy comparison of all methods across the three datasets. A RGOS outperforms all baselines in every dataset. In the KPI dataset, A RGOS achieves an F1 score of 0.897, which is 9.5% higher than the best baseline,"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet supports a feedback-driven anomaly-detection agent and six contributed modules. The preprocessing is a GTS module because it depends on temporal order and fixed intervals; the rule-generation, data-selection, fusion, and top-k procedures are task-specific TSK modules."
+}

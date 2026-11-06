@@ -1,0 +1,134 @@
+{
+ "citation_key": "jin2024timellm",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "Time-LLM contributes learned temporal representation alignment and a forecasting-specific prompt procedure that reprogram patches for a frozen LLM and produce forecasts.",
+ "claim_evidence": [
+  {
+   "line": 94,
+   "quote": "We propose a new framework, T IME -LLM, which encompasses reprogramming the input time series into text prototype representations that are more natural for the LLM, and augmenting the input context with declarative prompts (e.g., domain expert knowledge and task instructions) to guide LLM reasoning."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "jin2024timellm:patch-reprogramming",
+   "name": "Temporal patch reprogramming and forecast projection",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places the learned patch-to-language-space transformation and forecast projection on the LLM side because they change how temporal inputs are represented and mapped through the frozen backbone; R3 does not apply to this model-side module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:representation_alignment",
+    "R7:forecasting_prediction",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 269,
+     "quote": "Here we reprogram patch embeddings into the source data representation space to align the modalities of time series and natural language to activate the backbone’s time series understanding and reasoning capabilities."
+    },
+    {
+     "line": 248,
+     "quote": "We note that only the parameters of the lightweight input transformation and output projection are updated, while the backbone language model is frozen."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "jin2024timellm:prompt-as-prefix",
+   "name": "Forecasting prompt with temporal statistics",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is the first match: the prompt embeds the objective to predict future steps from prior observations, so changing to another task family requires replacing its task instruction. Although it uses temporal statistics, it is task-bound rather than a task-agnostic GTS module or a general GH runtime component.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecasting objective embedded in task instruction",
+    "R4:Interface and Interaction",
+    "R5:processing",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 532,
+     "quote": "Prompt-as-Prefix, on the other hand, tactfully avoids these constraints. In practice, we identify three pivotal components for constructing effective prompts: (1) dataset context, (2) task instruction, and (3) input statistics."
+    },
+    {
+     "line": 536,
+     "quote": "Task instruction serves as a crucial guide for the LLM in the transformation of patch embeddings for specific tasks."
+    },
+    {
+     "line": 1283,
+     "quote": "the overall time series trend in natural language, we calculate the sum of differences between consecutive time steps. A sum greater than 0 indicates an upward trend, while a lesser sum denotes a downward trend."
+    },
+    {
+     "line": 1284,
+     "quote": "we calculate the top-5 lags of the time series, identified by computing the autocorrelation using fast Fourier transformation and selecting the five lags with the highest correlation values."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 699,
+   "quote": "we evaluate on scenarios with limited training data (i.e., ≤ first 10% training time steps)."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 544,
+   "quote": "T IME -LLM consistently outperforms state-of-the-art forecasting methods by large margins across multiple benchmarks and settings, especially in few-shot and zero-shot scenarios."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The prompt is classified as TSK Harness under the explicit prompt-template boundary; the learned patch transformation and projection remain LLM-side."
+}

@@ -1,0 +1,212 @@
+{
+ "citation_key": "alphacast2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "AlphaCast contributes a feedback-driven forecasting workflow that uses retrieved temporal features and cases to generate, evaluate, and refine time-series forecasts.",
+ "claim_evidence": [
+  {
+   "line": 12,
+   "quote": "we propose AlphaCast, an interaction-driven agentic reasoning framework that enables accurate time series forecasting with training-free large language models."
+  },
+  {
+   "line": 18,
+   "quote": "we develop a lightweight toolkit comprising a feature set, a knowledge base, a case library, and a contextual pool"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "alphacast2025:temporal-feature-set",
+   "name": "Temporal feature extraction",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The feature computation operates on temporal series and their sequential structure, without embedding a forecast output objective; if the task family changed, the temporal feature operations would remain usable, so R3_2_GTS applies rather than R3_1_TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - feature extraction does not itself require a forecasting output",
+    "R3_2_GTS:yes - extracts properties from ordered time-series observations",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:forecasting_prediction",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 236,
+     "quote": "AlphaCast extracts temporal features from endogenous time series and exogenous variables to summarize temporal dynamics."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "alphacast2025:forecast-case-context",
+   "name": "Model-linked historical-case forecasting context",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The case library associates each training sample with its optimal candidate forecasting model and retrieves forecasts for use as a prediction baseline. Its cases and outputs encode the forecasting objective; changing task family requires changing the stored model outputs and selection logic, so R3_1_TSK applies despite the temporal history retrieval.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - stores and retrieves candidate forecasts for the forecasting output objective",
+    "R4:Memory and Context; Tools and Execution",
+    "R5:context_memory",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 271,
+     "quote": "AlphaCast constructs a case library by associating each training sample ⟨Xi , Yi ⟩ with its optimal candidate model Mi selected from the candidate pool M"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "alphacast2025:forecast-reasoning",
+   "name": "Context-guided forecast generation",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The generator starts from a case-based forecast and produces an adjusted forecast for the requested horizon. The output requirement is forecasting; if the task family changed, the generation objective and forecast representation would need redesign, so R3_1_TSK applies.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - generates a forecast by adjusting a forecasting baseline",
+    "R4:Planning and Orchestration",
+    "R5:not_applicable - no separate temporal function is required for this task procedure",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 285,
+     "quote": "Given the consolidated context Icon , AlphaCast derives an intermediate prediction Yint through reasoning-driven generation instead of single-pass regression."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "alphacast2025:reflective-refinement",
+   "name": "Reflective forecast evaluation and refinement",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The reflector checks whether a forecast meets task requirements and evidence constraints, then returns feedback that changes the next forecast. Its criteria are defined around forecast validity; another task family would require redesigning its output checks, so R3_1_TSK applies.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - validates and refines forecasting outputs against task requirements",
+    "R4:Planning and Orchestration",
+    "R5:validation",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 317,
+     "quote": "AlphaCast includes a reflection stage to verify the prediction and support iterative refinement."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 347,
+   "quote": "Table 1. MSE and MAE results on short-term and long-term forecasting benchmarks (lower is better; best results are highlighted in bold,"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper describes leakage constraints and timestamp-aware checks, but the reported experiments do not establish temporal validity as an evaluation outcome; temporal_validity is therefore false."
+}

@@ -1,0 +1,209 @@
+{
+ "citation_key": "timeseriesscientist2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "The paper contributes an LLM-driven forecasting agent that diagnoses and preprocesses temporal data, selects and tunes forecasters using validation results, adaptively ensembles them, and reports its decisions.",
+ "claim_evidence": [
+  {
+   "line": 98,
+   "quote": "To this end, we introduce TimeSeriesScientist (TSci), the first end-to-end, agentic framework that leverages multimodal knowledge to automate the entire workflow a human scientist would follow for univariate time series forecasting."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "timeseriesscientist2025:curator",
+   "name": "Temporal diagnostics and preprocessing",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK=no: the module does not optimize a forecast loss or encode a forecast output criterion; rolling-window cleaning and temporal profiling remain meaningful for other time-series tasks. R3_2 GTS=yes: it operates on the ordered series and its local windows.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no forecast-specific objective or validation criterion",
+    "R3_2_GTS:yes - depends on ordered temporal data and local windows",
+    "R4:Tools and Execution",
+    "R5:mapped"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 192,
+     "quote": "Rather than computing fixed summaries, Curator leverages LLM-driven reasoning to both diagnose issues and execute appropriate preprocessing."
+    },
+    {
+     "line": 217,
+     "quote": "To effectively support downstream forecasting, an overall analysis is important in uncovering temporal structures and statistical properties that are essential for informed model selection and interpretation."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeseriesscientist2025:selection",
+   "name": "Validation-driven forecaster selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK=yes: the procedure selects and tunes forecasting models against forecast validation MAPE; changing task family changes its objective and model-selection criterion. R3_2 GTS is not reached.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - selects forecasting models by forecast validation performance",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 231,
+     "quote": "Planner extracts visual features from visualizations V via lightwise pattern recognition and LLM reasoning. It then maps the recognized data pattern to suitable model families and forms a candidate pool"
+    },
+    {
+     "line": 237,
+     "quote": "For each model mi ∈ Mp, let Θi denote its hyperparameter space. We sample up to N configurations"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeseriesscientist2025:forecaster",
+   "name": "Validation-guided ensemble forecasting",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK=yes: the module chooses a forecast ensemble strategy from candidate forecast validation results and produces the final prediction; its objective and validation criterion are forecasting-specific. R3_2 GTS is not reached.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - selects a forecasting ensemble from forecast validation results",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 306,
+     "quote": "Forecaster takes the top-k selected models Mselected and their validation metrics Sval as input. The agent leverages an LLM-guided policy to select an ensemble strategy from among three families: single–best selection, performance-aware averaging, or robust aggregation."
+    },
+    {
+     "line": 309,
+     "quote": "The ensemble strategy and (if applicable) weights are fixed before touching the test set to avoid data leakage."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeseriesscientist2025:reporter",
+   "name": "Forecasting report generation",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK=yes: the introduced report consolidates forecast results, ensemble forecast and task-specific model rationales for the forecasting workflow. R3_2 GTS is not reached because the reporting interface does not itself manage temporal data.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - produces a forecast-specific report and output",
+    "R4:Interface and Interaction",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 316,
+     "quote": "Reporter outputs a comprehensive report R that consolidates all intermediate statistical analyses and forecasting results."
+    },
+    {
+     "line": 325,
+     "quote": "an interpretability report in which an LLM generates natural-language explanations of (i) the rationale for selecting specific models, (ii) the derivation of ensemble weights, (iii) the system’s confidence in its forecast, and (iv) any underlying assumptions or limitations"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 307,
+   "quote": "The ensemble strategy and (if applicable) weights are fixed before touching the test set to avoid data leakage."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 341,
+   "quote": "Our brief results in Table 1 demonstrate that TSci consistently outperforms LLM-based baselines across eight benchmarks and significantly so for the majority of them. Compared with the second-best baseline, TSci reduces MAE by an average of 38.2%."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet supports two additional contributed mechanisms absent from the current card: validation-guided ensemble forecasting and forecasting report generation. Curator is retained as GTS; model selection remains TSK with the current dimension label updated to the five-dimension vocabulary."
+}

@@ -1,0 +1,217 @@
+{
+ "citation_key": "epidemicagent2026",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "The work contributes a fixed HFMD forecasting workflow that interprets temporal and epidemiological context, generates one-week-ahead forecasts, and calibrates them into count distributions.",
+ "claim_evidence": [
+  {
+   "line": 26,
+   "quote": "We propose a two-agent neuro-symbolic framework that decouples contextual interpretation from probabilistic forecasting. An LLM-based Event Interpreter ingests heterogeneous signals—school schedules, weather summaries, government reports, and clinical guidelines—and outputs a scalar transmission-impact signal."
+  },
+  {
+   "line": 30,
+   "quote": "A Forecast Generator combines this signal with historical case counts to produce point forecasts that are mapped to probabilistic predictions through Poisson/negative-binomial moment matching."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "epidemicagent2026:temporal-evidence-pack",
+   "name": "Temporal evidence preparation and retrieval",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing",
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The module aligns and curates time-indexed evidence, windows, and information available at each forecast origin. Its core assumptions are temporal availability and ordering, not the forecast output itself; if the task changed, temporal cutoff and alignment remain useful, though task-specific summaries could change.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - it prepares temporally aligned evidence but does not itself embed a task output requirement",
+    "R3_2_GTS:yes - it depends on weekly alignment, windows, and information availability"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 190,
+     "quote": "Daily records are aggregated to epidemiological weeks to match the HFMD surveillance series. For each week, the seven-day average temperature, average humidity, and cumulative precipitation are serialized as structured inputs."
+    },
+    {
+     "line": 214,
+     "quote": "The top-k passages (k = 2, up to approximately 1200 characters) are inserted at the beginning of the interpreter prompt."
+    },
+    {
+     "line": 366,
+     "quote": "Evidence packs are assembled only from information available before the forecast date, including the preceding eight weeks of weather, active school or holiday status, and the most recent released surveillance summaries."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "epidemicagent2026:hfmd-context-interface",
+   "name": "HFMD event-impact interpretation",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The interface emits a bounded HFMD transmission-impact score, confidence, and risk notes for next-week forecasting. Its disease-specific impact semantics and lag bind it to forecasting; changing task families would require redesigning the output and its interpretation.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - it embeds an HFMD forecasting signal and lag objective"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 238,
+     "quote": "Agent 1 returns four fields: transmission impact It ∈ [−1, 1] (positive for promoting conditions and negative for suppressive conditions), confidence Ct ∈ [0, 1], a concise event summary, and short risk notes."
+    },
+    {
+     "line": 261,
+     "quote": "This bounded interface serves two purposes. First, it makes the contextual adjustment inspectable: each weekly forecast can be traced to a compact impact score, confidence value, and evidence summary."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "epidemicagent2026:hfmd-probabilistic-forecast",
+   "name": "Context-conditioned count forecast generation",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The LLM consumes incidence history and the interpreter output to generate a nonnegative next-week mean and uncertainty for the forecasting objective. A different task family would require different outputs and forecast constraints.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - it embeds one-week count forecasting and its output constraints"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 286,
+     "quote": "Agent 2 receives the full available history Y1:t , the recent eight-week window, volatility vt , Agent 1 outputs (It , Ct ) and risk notes, and the one-week horizon."
+    },
+    {
+     "line": 292,
+     "quote": "The structured output contains a nonnegative mean forecast µt+1 and an uncertainty score ut+1 ∈ [0, 1]."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "epidemicagent2026:distribution-calibration",
+   "name": "Count-distribution calibration",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The calibration maps the forecast mean and uncertainty into Poisson or negative-binomial count predictions, embedding the forecasting output requirement. A different task family would need different output semantics and calibration.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - it constructs the required count distribution for incidence forecasting"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 338,
+     "quote": "Otherwise, a Poisson distribution is used. The 90% interval is obtained from the 0.05 and 0.95 inverse CDF values."
+    },
+    {
+     "line": 342,
+     "quote": "The LLM therefore controls the degree of uncertainty, while the support, parameterization, and quantile computation remain deterministic."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 293,
+   "quote": "Invalid or incomplete JSON outputs are reissued once under the same schema; no forecast origins were discarded in the reported experiments."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 363,
+   "quote": "At each forecast origin, the pipeline truncates all history and contextual records at that date, computes trend and volatility statistics, obtains (It , Ct ) from Agent 1, obtains (µt+1 , ut+1 ) from Agent 2, constructs the predictive distribution, and records the observed outcome."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 596,
+   "quote": "TimesFM achieves the lowest MAE (3.972), while the Qwen3-based framework achieves the lowest RMSE (5.688) and the highest empirical coverage (1.000)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The pipeline is a fixed sequence: Agent 1's structured result conditions Agent 2, but the paper does not describe feedback-driven action selection. The LLMs use fixed prompts without parameter training. Experiments report forecasting metrics and temporal cutoff controls, but no measured downstream decision utility."
+}

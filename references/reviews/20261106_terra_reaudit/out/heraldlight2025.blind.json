@@ -1,0 +1,220 @@
+{
+ "citation_key": "heraldlight2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "HeraldLight contributes temporal queue and arrival-guided signal-duration control with critic-guided LLM action correction and workflow learning.",
+ "claim_evidence": [
+  {
+   "line": 83,
+   "quote": "This paper presents HeraldLight, a dual LLMs architecture driven by Herald guided prompts. The LLM-Agent, enhanced via LoRA-based imitation fine-tuning, infers the active signal phase and duration from real-time traffic conditions."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "heraldlight2025:herald-timing",
+   "name": "Queue and approaching-vehicle duration guidance",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Computes phase-specific signal durations from queues and approaching vehicles. R3_1 TSK applies because the output is the task's control duration; changing task family changes its objective and action space. Counterfactually, despite temporal inputs, this is not task-independent GTS temporal data handling.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - embeds traffic-signal duration objective",
+    "R4:Tools and Execution",
+    "R5:processing"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 171,
+     "quote": "Herald Module determines signal phase durations by combining a queue-based release time model with predicted arrivals of running vehicles."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "heraldlight2025:phase-control-interface",
+   "name": "Herald-guided phase-control interface",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The structured prompt specifies the traffic-control context, objective, constraints and output. R3_1 TSK applies because the interface embeds the phase-and-duration action format. Counterfactually, another task needs a different objective and output schema; it is not task-independent GTS handling.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - embeds signal phase and duration outputs",
+    "R4:Interface and Interaction",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 189,
+     "quote": "The phase selection prompt is a structured template composed of six blocks: dintersection (static geometry and lane–phase mapping), dtask (objectives: phase choice and duration setting), ddetails (computational rules), dreq (I/O constraints and formatting), drules (fallbacks for edge cases), and dimportant (priority constraints to enforce consistency)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "heraldlight2025:dual-llm-critic",
+   "name": "Dual-LLM action correction",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The critic evaluates, corrects and scores signal-control actions. R3_1 TSK applies because correctness is judged against the phase-and-duration control task. Counterfactually, a different task changes action semantics and verifier; this is not task-independent GTS handling.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - verifies traffic-control outputs",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 249,
+     "quote": "a dual LLMs architecture is adopted: LLMAgent generates actions; LLM-Critic (a stronger reasoner, instantiated with the ChatGPT) evaluates outputs, proposes corrections, and assigns quality scores"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "heraldlight2025:imitation-finetuning",
+   "name": "Traffic-control imitation fine-tuning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "LoRA updates model parameters from prompt/action interaction logs to specialize traffic-control decisions; R2 places parameter-updating policy training on the LLM side.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:workflow_learning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 244,
+     "quote": "Low-Rank Adaptation (LoRA) [16] inserts low-rank adapters into selected layers and updates parameters, reducing computation and storage while preserving the base model."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "heraldlight2025:critic-score-training",
+   "name": "Critic-corrected score-ranking fine-tuning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "Critic-corrected trajectories and scores train the policy to improve later traffic-control actions from workflow feedback. R2 places parameter updates on the LLM side.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:workflow_learning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 280,
+     "quote": "Training alternates among interaction data collection, criticguided correction, and updates of the LLM-Agent using Lscore ."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 659,
+   "quote": "Hallucination is defined as context-incoherent, repetitive, or constraint-violating outputs at the decision step. The metric is computed as the fraction of interactions that exhibit any such symptoms."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 644,
+   "quote": "HeraldLight achieves a 20.03% reduction in average travel time relative to SOTA method."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Blind classification completed before opening the current card."
+}

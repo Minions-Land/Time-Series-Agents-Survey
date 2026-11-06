@@ -1,0 +1,258 @@
+{
+ "citation_key": "agentfm2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "AgentFM contributes a role-aware LLM multi-agent runtime that transforms metric and log evidence and coordinates failure detection, diagnosis, and mitigation.",
+ "claim_evidence": [
+  {
+   "line": 34,
+   "quote": "this insight, we propose AgentFM, a role-aware failure management framework for distributed databases powered by LLM-driven multi-agents. AgentFM addresses failure management by considering system roles, data roles, and task roles, with a meta-agent orchestrating these components."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis",
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "agentfm2025:role-management",
+   "name": "Runtime system-role reassignment",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The System Role Manager manages runtime execution state and role assignment without a temporal-data objective; under R3_3_GH, changing task family does not require redesigning its state or role-query logic.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - role assignment is not a task objective",
+    "R3_2_GTS:no - runtime state queries do not require temporal data semantics",
+    "R3_3_GH:yes - execution state and role management"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "anomaly_detection_diagnosis",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 295,
+     "quote": "As illustrated in Figure 2, the core component is the System Role Manager, which initializes by analyzing configuration files and system docs to identify each node’s role and importance. At runtime, it periodically queries the system state and updates roles accordingly."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agentfm2025:meta-orchestration",
+   "name": "Meta-agent trace orchestration",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The centralized meta-agent integrates agent state and trace evidence and selects execution of task agents; under R3_3_GH this is workflow orchestration without a temporal-data function or one task objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - it coordinates task agents rather than embedding one task criterion",
+    "R3_2_GTS:no - trace integration is execution coordination, not temporal-data semantics",
+    "R3_3_GH:yes - centralized orchestration and state integration"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "anomaly_detection_diagnosis",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 284,
+     "quote": "This information is then transmitted to a centralized meta-agent for unified decision-making. The decision-making process employs trace data as a cohesive framework to integrate key insights across nodes."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agentfm2025:metric-description",
+   "name": "Metric preprocessing and temporal descriptions",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The Metric Agent preprocesses multivariate time-series measurements and exposes intervals, trends, and anomalies; under R3_2_GTS, its temporal inputs and representations remain reusable when the task family changes, unlike a task-specific objective or verifier.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - preprocessing and description do not encode one task objective",
+    "R3_2_GTS:yes - depends on time-series values, missingness, intervals and trends"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "anomaly_detection_diagnosis",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 308,
+     "quote": "The overall workflow of the Metric Agent begins with simple data preprocessing, which includes noise removal and imputation of missing values."
+    },
+    {
+     "line": 333,
+     "quote": "time-series data is converted into natural language descriptions using a large model. The generated natural language descriptions capture key aspects of the data, including time intervals, fluctuation trends, and anomaly points."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agentfm2025:log-compression",
+   "name": "Log sequence and semantic compression",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The Log Agent compresses ordered event sequences and preserves operational context; under R3_2_GTS, it depends on sequence order and temporal availability without binding to one task objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - compression does not embed a task criterion",
+    "R3_2_GTS:yes - operates on ordered log sequences and ongoing operations"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "anomaly_detection_diagnosis",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 352,
+     "quote": "To address this, the Log Agent comprises two main components: sequence compression and semantic compression. Sequence compression focuses on reducing the raw log sequence by consolidating repetitive log patterns, while semantic compression extracts key operational information from the logs."
+    },
+    {
+     "line": 364,
+     "quote": "Semantic Compression: This component employs a prompt-based method to convert lengthy log sequences into descriptions of the database’s ongoing operations."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agentfm2025:failure-management",
+   "name": "Detection-diagnosis-mitigation task pipeline",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The task agents embed the failure-management objectives of anomaly detection, diagnosis, and mitigation; under R3_1_TSK, changing task family requires redesigning the task state, action semantics, and output criterion, while the pipeline’s windowing and historical examples are task-procedure temporal functions.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - detection, diagnosis and mitigation objectives are embedded",
+    "R3_2_GTS:not selected - task-specific objectives take precedence"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 372,
+     "quote": "This process involves three agent types—detection, diagnosis, and mitigation—which operate sequentially. Detection agents identify anomalies in each time window; upon detection, diagnosis agents locate and classify the issue; finally, mitigation agents propose solutions based on the diagnosis."
+    },
+    {
+     "line": 377,
+     "quote": "Though prompts vary by task, all agents follow a common RAG+CoT approach, using historical data as labeled examples—normal/abnormal for detection, failure types for diagnosis—to guide reasoning during querying."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 386,
+   "quote": "The evaluation is conducted based on Qwen2.5-72b to assess the results of anomaly detection and diagnosis. The performance is measured using precision, recall, and F1-score metrics."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 419,
+   "quote": "We also conduct a manual analysis of the mitigation solutions recommended by AgentFM. One example is illustrated in Figure 3. We extract the key information from the solution and find that these recommendations provide targeted and effective assistance in system remediation."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The current card omitted the meta-agent orchestration and Log Agent compression modules and used retired dimension labels; all revised modules are supported by the packet. No temporal split or information-cutoff validity experiment is reported."
+}

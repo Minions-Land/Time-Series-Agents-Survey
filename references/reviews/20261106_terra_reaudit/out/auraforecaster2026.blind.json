@@ -1,0 +1,245 @@
+{
+ "citation_key": "auraforecaster2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "AURA learns a feedback-driven market-tool forecasting policy through outcome-conditioned demonstrations and SFT/PPO, evaluated in a point-in-time sandbox on the chronological BETA stock-return benchmark.",
+ "claim_evidence": [
+  {
+   "line": 160,
+   "quote": "date, and a forecast horizon. The model retrieves observations, reasons about them, and selects\nfurther queries until it submits a forecast."
+  },
+  {
+   "line": 148,
+   "quote": "1. We build a market-analysis sandbox and a chronological stock-price forecasting benchmark for\nevaluating and post-training tool-using forecasting models."
+  },
+  {
+   "line": 423,
+   "quote": "reward through equation (2). PPO (Schulman et al., 2017) updates the policy from these rollouts,"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "auraforecaster2026:market-tools",
+   "name": "Point-in-time market retrieval tools",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "R3_1 is false for the retrieval tools separated from forecast submission and scoring: historical bars, indicators and ranks do not embed a forecasting output or loss. R3_2 applies because windows, candle resolution and the decision-date cutoff define their semantics. Changing to anomaly diagnosis could retain these retrieval and cutoff semantics.",
+   "rubric_path": [
+    "R1:contributed market-data tool integration",
+    "R2:Harness",
+    "R3_1_TSK:no - retrieval does not impose a forecast target or score",
+    "R3_2_GTS:yes - temporal windows, resolutions and information cutoff",
+    "R4:Interface and Interaction; Tools and Execution",
+    "R5:data_management; processing; validation",
+    "R7:forecasting_prediction",
+    "R8:inferred",
+    "R9:infrastructure"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 166,
+     "quote": "retrieval by the kind of evidence it exposes. The model can change the lookback window, candle\nresolution, comparison group, and indicator parameters."
+    },
+    {
+     "line": 169,
+     "quote": "are evaluated at the decision-date close, so repeated queries inspect different views of the same\nhistorical state."
+    },
+    {
+     "line": 171,
+     "quote": "store contains split-adjusted, regular-session one-minute bars; coarser candles and derived statistics\nare computed from that store."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "auraforecaster2026:beta-benchmark",
+   "name": "BETA forecasting task and scoring contract",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1 applies: the task fixes a stock, decision date and forecast horizon, terminates with a numerical log-return prediction, and scores direction and magnitude against its realized return. A different task family requires a new target, terminal action and scorer; chronology alone does not make this benchmark GTS.",
+   "rubric_path": [
+    "R1:contributed benchmark and forecast-scoring environment",
+    "R2:Harness",
+    "R3_1_TSK:yes - horizon-specific return target and forecast score",
+    "R4:Interface and Interaction; Tools and Execution",
+    "R5:validation; resource_level",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 148,
+     "quote": "1. We build a market-analysis sandbox and a chronological stock-price forecasting benchmark for\nevaluating and post-training tool-using forecasting models."
+    },
+    {
+     "line": 221,
+     "quote": "Wrong-sign and zero forecasts receive zero. For a correct-sign forecast, the score rewards a magnitude\nclose to the realized move and penalizes both underprediction and overprediction."
+    },
+    {
+     "line": 240,
+     "quote": "by time and also separate the realization windows of their labels. The final training label is realized\non December 29, 2023, before the first test decision on February 1, 2024."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "auraforecaster2026:demonstration-corpus",
+   "name": "Outcome-conditioned investigation demonstrations",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning",
+    "workflow_learning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R2 places data built to train model analysis, tool actions and numerical responses on the LLM side; R3 Harness tests do not apply. The teacher-only outcome context is removed from student prompts, but its generated trajectories and realized-return targets supervise the model.",
+   "rubric_path": [
+    "R1:contributed training corpus",
+    "R2:LLM - training data for analysis and tool-use policy",
+    "R3:not_applicable",
+    "R6:instruction_reasoning; workflow_learning",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 391,
+     "quote": "judgment and tool-use trajectories using the historical outcomes as supervision. The resulting corpus\ncontains 3,631 usable demonstrations."
+    },
+    {
+     "line": 402,
+     "quote": "student sample, we replace the teacher-only context with the ordinary solver prompt, retain the\ngenerated analysis and tool-use trajectory, and set the terminal target to the realized return."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "auraforecaster2026:policy-post-training",
+   "name": "SFT and outcome-reward PPO forecasting policy",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning",
+    "workflow_learning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 applies to parameter updates learning analysis, tool calls and terminal forecasts. These are LLM-side policy changes, not Harness Optimization and Evolution; R3 does not apply. SFT and PPO form the reported staged training recipe for one policy.",
+   "rubric_path": [
+    "R1:contributed staged forecasting-policy training recipe",
+    "R2:LLM - full-parameter SFT and PPO policy updates",
+    "R3:not_applicable",
+    "R6:instruction_reasoning; workflow_learning",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 408,
+     "quote": "We initialize the student from Qwen3-4B (Yang et al., 2025) and perform full-parameter SFT. The\nloss covers assistant tokens, including analysis, tool calls, and the terminal forecast; system, user, and"
+    },
+    {
+     "line": 421,
+     "quote": "The SFT model then generates its own forecasting episodes. It receives a training task, chooses market\nqueries, observes the results, and submits a forecast."
+    },
+    {
+     "line": 423,
+     "quote": "reward through equation (2). PPO (Schulman et al., 2017) updates the policy from these rollouts,\nwith a KL penalty anchoring it to the SFT checkpoint."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 240,
+   "quote": "by time and also separate the realization windows of their labels. The final training label is realized\non December 29, 2023, before the first test decision on February 1, 2024."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 436,
+   "quote": "Both stages increase the forecast score (table 4). SFT raises it from 20.94 to 37.94, an 81.2%\nimprovement."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "BETA is outcome-selected: 240 of 398 test tasks are scored using a test-label minimum-move mask. Chronological separation and decision-date restrictions are reported, but do not establish absence of pretrained-model historical knowledge. Tool-use counts and example traces describe behavior without testing execution validity; no downstream trading utility is evaluated. The benchmark is a contributed evaluation resource, not an ordinary method-evaluation dataset. Retrieval tools are separated from its task-specific forecast contract."
+}

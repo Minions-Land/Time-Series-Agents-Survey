@@ -1,0 +1,313 @@
+{
+ "citation_key": "multimodaldebate2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TS-Debate contributes a training-free harness protocol that coordinates modality-specialized time-series analysts and uses tool-backed temporal claim verification, conflict handling, and calibrated synthesis across reasoning tasks.",
+ "claim_evidence": [
+  {
+   "line": 53,
+   "quote": "We propose TS-Debate, an inference-time multi-agent protocol that requires no task-specific finetuning."
+  },
+  {
+   "line": 60,
+   "quote": "TS-Debate specifies how evidence is exposed, which claims are checkable, and how verification outcomes shape synthesis."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "time_series_classification",
+  "imputation",
+  "temporal_question_answering"
+ ],
+ "modules": [
+  {
+   "id": "multimodaldebate2026:modality-debate",
+   "name": "Modality-isolated iterative debate",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "time_series_classification",
+    "imputation",
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1: no task-family objective or validation criterion is embedded; changing task families leaves the report-exchange logic intact, so it is not TSK. R3_2: this module coordinates modality reports but does not itself depend on temporal ordering, windows, frequency, or availability; replacing the temporal evidence with other multimodal evidence would preserve the coordination logic, so it is not GTS. R3_3 therefore assigns the general coordination mechanism to GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - task-family objective or validation criterion is not embedded",
+    "R3_2_GTS:no - coordination logic does not depend on temporal order, windows, frequency, units, or availability",
+    "R3_3_GH:yes - general multi-agent coordination",
+    "R4:Planning and Orchestration",
+    "R5:general_runtime",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "time_series_classification",
+     "imputation",
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 479,
+     "quote": "analyst conditions on the others’ previous evidence and may refine, correct, or strengthen its position:"
+    },
+    {
+     "line": 486,
+     "quote": "Modality isolation thus constrains only first-round evidence generation. From round two onward, cross-modal integration is explicit and iterative, and reviewer agents subsequently verify each claim against all modalities."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "multimodaldebate2026:temporal-views",
+   "name": "Time-frequency charts and numerical lookup",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "time_series_classification",
+    "imputation",
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1: the views and lookup operations do not embed one task-family objective; switching forecasting to classification retains them, so they are not TSK. R3_2: the module derives time- and frequency-domain views and exposes interval-based queries over the series, which depend on temporal order and frequency; it is GTS before GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - temporal views and lookup are not bound to one task-family objective",
+    "R3_2_GTS:yes - derives temporal/frequency views and queries ordered series",
+    "R4:Interface and Interaction; Tools and Execution",
+    "R5:data_management; processing",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "time_series_classification",
+     "imputation",
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 342,
+     "quote": "Spectral View (vfreq ): a frequency-domain representation highlighting periodicities and oscillatory structure (e.g., seasonality and recurrences)."
+    },
+    {
+     "line": 440,
+     "quote": "Controlled tool access to the time series and derived attributes, denoted Lookup(·), supports querying values over intervals, probing neighborhoods, retrieving detected events/features, and obtaining frequency-domain information."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "multimodaldebate2026:temporal-verification",
+   "name": "Temporal-scope-aware claim verification",
+   "layer": "GTS",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "time_series_classification",
+    "imputation",
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1: verification applies across task families rather than embedding one family’s output objective; changing forecast to classification preserves the temporal verification procedure, so it is not TSK. R3_2: verification depends on the observed horizon and whether claims concern past-present or future information, so the temporal state must be reconsidered when that horizon changes; it is GTS before GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - temporal validation is not bound to one task-family objective",
+    "R3_2_GTS:yes - depends on observed horizon and past-present/future information availability",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:validation",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "time_series_classification",
+     "imputation",
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 579,
+     "quote": "For past-present tasks, direct verification against x1:T dominates. For future-oriented tasks, TS-Debate cannot verify future outcomes from past data; instead, it evaluates whether the causes of observed patterns plausibly persist under k."
+    },
+    {
+     "line": 535,
+     "quote": "determined by checking ω against available sources: numerical evidence via Lookup(·) and derived features; computational evidence via a lightweight code executor"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "multimodaldebate2026:task-conditioned-knowledge-elicitation",
+   "name": "Task-conditioned knowledge elicitation",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "time_series_classification",
+    "imputation",
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1: the elicitor provides guidance across task families without binding itself to one family’s objective or criterion, so it is not TSK. R3_2: it takes the query and context rather than temporal windows, frequency, units, or availability state, so it is not GTS. R3_3 assigns this general planning guidance to GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - elicitation is not bound to one task-family objective",
+    "R3_2_GTS:no - it consumes task query/context, not temporal state or availability",
+    "R3_3_GH:yes - produces general analysis guidance for orchestration",
+    "R4:Planning and Orchestration",
+    "R5:general_runtime",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "time_series_classification",
+     "imputation",
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 330,
+     "quote": "Before interpreting any data, TS-Debate elicits domain priors k = Elicit(q, c), which serve as a shared analysis contract for all agents."
+    },
+    {
+     "line": 333,
+     "quote": "recommended analysis procedure, common failure modes, and guidance on which modalities are most informative."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1222,
+   "quote": "Across all 5,742 stored traces, reviewer agents issued 28,741 claim verdicts: 94.5% verified, 3.0% unverified, 1.6% contradicted, and 0.9% partially verified."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 3976,
+   "quote": "This is the boundary stated in §3.5 and §E.4: futureoriented claims can only be calibrated for domain plausibility, not verified against data."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 915,
+   "quote": "Across all three task types, TS-Debate delivers consistent gains over the strongest baseline, 25.65% on classification, 36.92% on regression error reduction, and 15.06% on QA on average, without any task-specific training."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet supports a distinct preliminary knowledge-elicitation stage (L329-L337), added as a new GH module. The method is evaluated on forecasting, anomaly detection, classification, imputation, and QA. It reports trace-level claim verification and temporal-scope handling, but no explicit chronological-split or leakage audit and no downstream decision-utility measure.",
+ "reconciliation": [
+  {
+   "existing_id": "multimodaldebate2026:modality-debate",
+   "decision": "change",
+   "new_ids": [
+    "multimodaldebate2026:modality-debate"
+   ],
+   "changes": [
+    "dimension: Coordination and Scaling -> Planning and Orchestration",
+    "tasks and other_tasks: added supported cross-task application"
+   ],
+   "reason": "The old coordination label maps to Planning and Orchestration in the current vocabulary. The packet shows iterative report exchange across task types (L478-L493), so the module’s supported task memberships are recorded."
+  },
+  {
+   "existing_id": "multimodaldebate2026:temporal-views",
+   "decision": "change",
+   "new_ids": [
+    "multimodaldebate2026:temporal-views"
+   ],
+   "changes": [
+    "functions: processing -> data_management, processing"
+   ],
+   "reason": "The time/frequency views implement processing, while the lookup interface keeps temporal values addressable by interval and feature queries (L440-L444), supporting data_management as well."
+  },
+  {
+   "existing_id": "multimodaldebate2026:temporal-verification",
+   "decision": "change",
+   "new_ids": [
+    "multimodaldebate2026:temporal-verification"
+   ],
+   "changes": [
+    "dimension: Control, Verification, and Feedback -> Planning and Orchestration; added Tools and Execution",
+    "tasks and other_tasks: added supported cross-task application"
+   ],
+   "reason": "The within-episode verification and synthesis protocol maps to Planning and Orchestration and invokes lookup/code tools; it distinguishes observed-horizon claims from future claims (L579-L584) and is applied across the benchmark task types."
+  }
+ ]
+}

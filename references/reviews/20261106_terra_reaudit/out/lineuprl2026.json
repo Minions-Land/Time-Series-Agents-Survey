@@ -1,0 +1,108 @@
+{
+ "citation_key": "lineuprl2026",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "LineupRL post-trains a VLM time-series captioner with RLOO using a frozen LLM verifier's caption-to-series identification over statistic-matched distractors as a verifiable reward.",
+ "claim_evidence": [
+  {
+   "line": 121,
+   "quote": "In this work, we propose LineupRL, a reinforcement learning with verifiable rewards (RLVR) pipeline built on caption-to-series identification, a reward that satisfies all three desiderata (Figure 1c)."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "time_series_captioning",
+  "reconstruction"
+ ],
+ "modules": [
+  {
+   "id": "lineuprl2026:identification-rlvr",
+   "name": "Caption-to-series identification RLVR",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_captioning",
+    "reconstruction"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 LLM: the contribution updates the captioner parameters with reinforcement learning; under R3, the verifier and distractor loop is training-time reward computation rather than a TSK, GTS, or GH runtime module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R3_1_TSK:no - model-training objective, not a task runtime",
+    "R3_2_GTS:no - temporal values are reward inputs, not a reusable temporal-state runtime",
+    "R3_3_GH:no - no execution scheduler or general state manager",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "LLM-side module"
+   },
+   "evidence": [
+    {
+     "line": 179,
+     "quote": "We post-train the captioner with reinforcement learning from verifiable rewards (RLVR) (Lambert et al., 2024; Guo et al., 2025)."
+    },
+    {
+     "line": 217,
+     "quote": "The reward is caption-to-series identification (upper box of Figure 2b): it scores a caption c written for a series x by whether the frozen verifier R can identify x in C(x) from c alone."
+    },
+    {
+     "line": 274,
+     "quote": "is scored by a frozen LLM verifier that receives the caption and the candidate set C(x) printed as raw numbers and must locate x; the true series is placed at each of the K positions in turn, and the fraction of correct answers gives the reward r(c, x) = λ acc(c, x)."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1379,
+   "quote": "The split is chronological, so that adjacent windows cut at stride 1 cannot land on both sides of it. Each corpus is one univariate series whose rows are divided 60/20/20 in time order into a training, a validation and a test segment"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 680,
+   "quote": "LineupRL has the lowest error in all eight cells, significantly so in seven, the exception being reconstruction on Saugeen where the LLM-as-judge reward ties it."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "lineuprl2026:identification-rlvr",
+   "decision": "change",
+   "new_ids": [
+    "lineuprl2026:identification-rlvr"
+   ],
+   "changes": [
+    "dimensions: remove Optimization and Evolution and retired Control, Verification, and Feedback labels because LLM modules have no harness dimensions",
+    "llm_route: add instruction_reasoning",
+    "tasks: add forecasting_prediction and reconstruction evaluation coverage"
+   ],
+   "reason": "The existing module is the same contributed RLVR captioner-training mechanism, so its id is retained. The packet supports model-side RL and a caption-to-series verifier reward; the current harness dimension labels and missing LLM route do not match the current rubric."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The primary output is time-series captioning, outside the four named task families; forecasting_prediction and reconstruction are included because the paper evaluates caption-only forecasting and reconstruction."
+}

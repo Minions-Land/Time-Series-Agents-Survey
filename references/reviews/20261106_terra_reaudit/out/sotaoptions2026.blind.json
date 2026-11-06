@@ -1,0 +1,414 @@
+{
+ "citation_key": "sotaoptions2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "SOTA trains an LLM option-strategy policy with filtered teacher trajectories and portfolio-return reinforcement learning, and executes its decisions through a feedback-driven trading environment and deterministic resolvers.",
+ "claim_evidence": [
+  {
+   "line": 65,
+   "quote": "We construct a point-in-time trading environment whose state summarizes the option-implied"
+  },
+  {
+   "line": 274,
+   "quote": "We train the policy in two stages. Supervised fine-tuning on frontier-model trading trajectories"
+  },
+  {
+   "line": 241,
+   "quote": "option positions, and At portfolio-level information. Portfolio state allows each decision to condition"
+  },
+  {
+   "line": 242,
+   "quote": "on exposures and outcomes inherited from earlier trades."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "sotaoptions2026:trained-policy",
+   "name": "Teacher-initialized portfolio-return policy",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2: SFT and GRPO update the action-selection policy's parameters from trading trajectories and portfolio rewards; this is learned workflow operation, not a Harness optimization module.",
+   "rubric_path": [
+    "R1:contributed - option-strategy policy training",
+    "R2:LLM - SFT and GRPO update policy parameters",
+    "R6:workflow_learning",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 274,
+     "quote": "We train the policy in two stages. Supervised fine-tuning on frontier-model trading trajectories"
+    },
+    {
+     "line": 275,
+     "quote": "provides an initial strategy-selection policy, after which GRPO (Shao et al., 2024) optimizes the"
+    },
+    {
+     "line": 276,
+     "quote": "policy for portfolio performance. Appendix F describes the full procedure, and Appendix G.3 reports"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "sotaoptions2026:teacher-trajectories",
+   "name": "Anonymized filtered teacher trajectories",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R1 includes a constructed model-training corpus; R2 places the anonymized, Sharpe-filtered action trajectories on the LLM side because they supervise the trading policy.",
+   "rubric_path": [
+    "R1:contributed - constructed teacher-action corpus",
+    "R2:LLM - data built to train action selection",
+    "R6:workflow_learning",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 394,
+     "quote": "To reduce temporal and identity leakage, we anonymize the information presented to the frontier"
+    },
+    {
+     "line": 395,
+     "quote": "teacher by masking stock identity, absolute price levels, and calendar time, while retaining market"
+    },
+    {
+     "line": 396,
+     "quote": "states and contemporaneously available news. We find that including anonymized news improves the"
+    },
+    {
+     "line": 1043,
+     "quote": "We generate 1,000 trajectories using the frontier model and retain those with an annualized Sharpe ratio above"
+    },
+    {
+     "line": 1044,
+     "quote": "0.75, resulting in 144 trajectories used for SFT."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "sotaoptions2026:market-features",
+   "name": "Point-in-time numerical market feature interface",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1: no trading objective or required action is embedded in the feature calculations. R3_2: trailing volatility, session returns and maturity-aligned implied-volatility features depend on temporal windows and units. The same numerical features could serve forecasting or analysis without changing their core calculations; only decision-support use is demonstrated.",
+   "rubric_path": [
+    "R1:contributed - assembled numerical state interface; standard formulas are not separate contributions",
+    "R2:Harness - numerical preprocessing outside the model",
+    "R3_1_TSK:no - features impose no task-output criterion",
+    "R3_2_GTS:yes - trailing windows, decision time and tenor semantics",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:decision_support",
+    "R8:inferred - one task family",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 245,
+     "quote": "et al., 2003; Pan & Poteshman, 2006). For each underlying, the state contains 10 features: underlying"
+    },
+    {
+     "line": 246,
+     "quote": "return, realized volatility, implied-volatility level and change, the implied-minus-realized volatility"
+    },
+    {
+     "line": 247,
+     "quote": "wedge, term structure, skewness, curvature, option flow, and changes in open interest. Appendix C.1"
+    },
+    {
+     "line": 672,
+     "quote": "Realized volatility is the zero-mean estimator over a trailing n = 21 trading days,"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "sotaoptions2026:trading-environment",
+   "name": "Strategy-quote trading interaction environment",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1: the state-action loop embeds option-strategy actions, carried portfolio exposure and a net-portfolio-value reward. Changing to forecasting would require redesigning the action space, portfolio state and objective; temporal ordering alone does not make this GTS.",
+   "rubric_path": [
+    "R1:contributed - structured option-strategy environment and two-stage quote interface",
+    "R2:Harness - environment and interaction protocol around the policy",
+    "R3_1_TSK:yes - trading actions, portfolio state and financial reward",
+    "R4:Interface and Interaction; Memory and Context; Planning and Orchestration",
+    "R5:task_procedure - no separate general temporal operation claimed",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 241,
+     "quote": "option positions, and At portfolio-level information. Portfolio state allows each decision to condition"
+    },
+    {
+     "line": 242,
+     "quote": "on exposures and outcomes inherited from earlier trades."
+    },
+    {
+     "line": 261,
+     "quote": "To avoid querying prices for the full option chain, the agent first proposes up to six candidate"
+    },
+    {
+     "line": 262,
+     "quote": "strategies for each underlying. We resolve and price only these candidate packages before the final"
+    },
+    {
+     "line": 263,
+     "quote": "trading decision. This two-stage mechanism preserves price-aware strategy selection without placing"
+    },
+    {
+     "line": 271,
+     "quote": "Reward. The one-step reward is the change in log portfolio value,"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "sotaoptions2026:contract-resolver",
+   "name": "Strategy-to-contract resolver",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1: maps a requested option strategy and delta coordinates to executable expiry/strike contracts. A different task family would require replacing these trading actions and contract-selection semantics; expiry matching is subordinate to the task.",
+   "rubric_path": [
+    "R1:contributed - contract-resolution integration",
+    "R2:Harness - deterministic tool outside the learned policy",
+    "R3_1_TSK:yes - executable option-contract selection",
+    "R4:Tools and Execution",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 864,
+     "quote": "The contract resolver maps a strategy into an exact set of contracts. The expiry is chosen by the"
+    },
+    {
+     "line": 865,
+     "quote": "closest available expiry to the anchor of each tenor bucket a ∈ {5, 14, 45, 120} days. The strike price"
+    },
+    {
+     "line": 866,
+     "quote": "is selected by the contract with ∆ exposure closest to the requested ∆∗ ."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "sotaoptions2026:size-resolver",
+   "name": "Scenario-risk position sizing",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1: determines integer trade sizes from package notional and option-Greek scenario risk. Switching task family requires redesigning the action quantity, exposure state and risk objective.",
+   "rubric_path": [
+    "R1:contributed - risk-based sizing integration",
+    "R2:Harness - deterministic position-sizing tool",
+    "R3_1_TSK:yes - trading quantity and risk criterion",
+    "R4:Tools and Execution",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 870,
+     "quote": "The packages in a portfolio are traded in integer units based on equal notional value, and equal risk."
+    },
+    {
+     "line": 871,
+     "quote": "The risk is estimated by a second-order Taylor expansion of package value. The shocks are a onestandard-deviation move in the underlying taken in whichever direction hurts, a 10% move in implied"
+    },
+    {
+     "line": 872,
+     "quote": "volatility, and one day of carry:"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "sotaoptions2026:hedge-resolver",
+   "name": "Portfolio delta-hedge execution integration",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R1 counts the integration of deterministic hedge execution for selected strategy families, not the unchanged cited hedge-band formula. R3_1: neutralizing portfolio delta under transaction costs embeds a trading objective; another task family would require different actions and exposure semantics.",
+   "rubric_path": [
+    "R1:contributed - strategy-conditioned hedge execution integration; cited formula is not a new module",
+    "R2:Harness - deterministic hedge execution outside the policy",
+    "R3_1_TSK:yes - portfolio delta and transaction-cost objective",
+    "R4:Tools and Execution",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 265,
+     "quote": "The learned policy therefore focuses on strategy selection, while deterministic resolvers handle"
+    },
+    {
+     "line": 266,
+     "quote": "contract selection, portfolio sizing, and delta hedging. Appendix E reports the rules implemented by"
+    },
+    {
+     "line": 889,
+     "quote": "Hedging is applied to non-directional strategies to offset the ∆ exposure of the portfolio. To reduce"
+    },
+    {
+     "line": 890,
+     "quote": "transaction cost, there is a no-hedge band for small ∆, which is given by the formula that Whalley &"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 292,
+   "quote": "Supervised fine-tuning 2024-09-03 to 2024-11-29 Frontier-model generation and supervised fine-tuning\nReinforcement learning 2024-12-02 to 2025-02-28 Reinforcement learning to optimize the policy\nTest\n2025-03-03 to 2025-08-29 Out-of-sample evaluation of the policy and baselines"
+  },
+  "task_performance": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 373,
+   "quote": "SOTA earns a total return of 18.32%, an annualized Sharpe ratio of 1.60, and a maximum drawdown\nof 8.96%. All rule-based and supervised machine-learning baselines produce negative total and"
+  }
+ },
+ "needs_human_review": true,
+ "notes": "Chronological splits and teacher anonymization support temporal-validity evidence, not a clean-test guarantee: L1314-L1316 state every saved checkpoint was evaluated on the test window and the reported checkpoint is step 20. Human review should assess test-window model-selection risk. Financial return and risk metrics count as decision utility; no separate forecast accuracy or process-validity experiment is reported. Standard Greeks, volatility formulas and the cited hedge-band formula are not counted independently. The numerical market-feature interface is separable from portfolio/action semantics. News is used for teacher supervision but removed during the full method's RL."
+}

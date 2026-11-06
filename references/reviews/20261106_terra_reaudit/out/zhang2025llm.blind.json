@@ -1,0 +1,246 @@
+{
+ "citation_key": "zhang2025llm",
+ "status": "repository_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "LLM-TSFD supplies a prompt-driven DataFrame workflow that asks an LLM to generate and execute Python for time-series labeling and cleaning, with sandbox filtering and execution-error retries.",
+ "claim_evidence": [
+  {
+   "line": 22,
+   "quote": "If you are a time series analyst,you are provided with a pandas dataframe (df) with {num_rows} rows and {num_columns} columns. Among them, the first line is the title."
+  },
+  {
+   "line": 129,
+   "quote": "code = self._llm.generate_code("
+  },
+  {
+   "line": 158,
+   "quote": "answer = self.run_code("
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "data_quality",
+  "temporal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "zhang2025llm:prompted-ts-procedure",
+   "name": "Prompted time-series labeling and cleaning procedure",
+   "layer": "TSK",
+   "dimensions": [],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "data_quality",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:yes — the task instruction embeds labeling and cleaning rules, required outputs, and saved files; counterfactual: changing the task family changes those task rules and outputs.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - embeds task output requirements and criteria"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 28,
+     "quote": "Time series data label:"
+    },
+    {
+     "line": 32,
+     "quote": "Time series data cleaning:"
+    },
+    {
+     "line": 33,
+     "quote": "Step1: If there is a missing value in the data, fill in the missing value according to the average value."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "zhang2025llm:dataframe-execution",
+   "name": "Sandboxed DataFrame code execution",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "data_quality",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:no — execution does not encode a task objective or criterion; R3_2_GTS:no — it accepts generic Python and DataFrame state without temporal assumptions; R3_3_GH:yes — it manages code execution and the execution environment.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - generic execution",
+    "R3_2_GTS:no - no temporal dependency",
+    "R3_3_GH:yes - execution management"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 171,
+     "quote": "def remove_unsafe_imports(self, code: str) -> str:"
+    },
+    {
+     "line": 179,
+     "quote": "and any(alias.name not in WHITELISTED_LIBRARIES for alias in node.names)"
+    },
+    {
+     "line": 193,
+     "quote": "# Execute the code"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "zhang2025llm:error-correction-retry",
+   "name": "Execution-error correction retry",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "data_quality",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:no — the retry is triggered by any execution exception rather than a task-specific objective; R3_2_GTS:no — error recovery has no temporal-order or window dependency; R3_3_GH:yes — it controls execution retries from returned failure feedback.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - generic exception recovery",
+    "R3_2_GTS:no - no temporal dependency",
+    "R3_3_GH:yes - feedback-driven execution control"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 196,
+     "quote": "while count < self._max_retries:"
+    },
+    {
+     "line": 214,
+     "quote": "except Exception as e:"
+    },
+    {
+     "line": 234,
+     "quote": "code_to_run = self._llm.generate_code("
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "zhang2025llm:conversational-answer",
+   "name": "Conversational answer rewriting",
+   "layer": "GH",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "data_quality",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:no — it rewrites a returned answer without a task-specific criterion; R3_2_GTS:no — conversational formatting has no temporal dependency; R3_3_GH:yes — it provides the user-facing interaction step.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - generic response formatting",
+    "R3_2_GTS:no - no temporal dependency",
+    "R3_3_GH:yes - user interaction"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 104,
+     "quote": "def conversational_answer(self, question: str, code: str, answer: str) -> str:"
+    },
+    {
+     "line": 110,
+     "quote": "instruction = self._response_instruction.format("
+    },
+    {
+     "line": 113,
+     "quote": "return self._llm.call(instruction, \"\")"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet is readable repository source code and contains implementation prompts and runtime logic, but no paper experiment results. The current card's generic execution module is retained by id; the packet also supports separate task prompting, error-correction retry, and conversational response modules."
+}

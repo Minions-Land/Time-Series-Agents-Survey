@@ -1,0 +1,132 @@
+{
+ "citation_key": "s2sfdd2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "S2S-FDD converts industrial time series into language summaries, then uses retrieved maintenance knowledge and feedback-driven sensor queries for zero-shot fault diagnosis.",
+ "claim_evidence": [
+  {
+   "line": 110,
+   "quote": "We propose a multi-turn tree-structured diagnosis method based on LLMs. Leveraging textual time-series descriptions, the method achieves zero-shot fault diagnosis and analysis. It also supports dynamic reasoning updates based on operator feedback, forming a humanin-the-loop adaptive diagnosis loop."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "s2sfdd2026:sensor-fault-summary",
+   "name": "Fault-directed sensor selection and temporal summary",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The residual thresholds, fault onset, anomaly scores and candidate selection embed fault-detection criteria; if the task family changed, the detection objective and selection criterion would need redesign, so R3_1 TSK applies before temporal processing at GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - fault thresholds and candidate selection embed a fault-diagnosis criterion",
+    "R3_2_GTS:not reached - the task-specific test matches first",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 223,
+     "quote": "Candidate variables are selected by top n1 anomaly scores (S1 ) and top n2 earliest fault times (S2 ), forming S = S1 ∪S2 . Final selection uses variance comparison: Sfiltered = {j ∈ S | var(Xfault [:, j]) > 2 · var(Xbase [:, j])}"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "s2sfdd2026:diagnostic-retrieval",
+   "name": "Historical fault retrieval and iterative sensor inspection",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Retrieving fault records, deciding evidence sufficiency and requesting sensor tables serves the fault diagnosis objective; changing task family would require redesigning the fault knowledge, query semantics and output, so R3_1 TSK applies before temporal context handling at GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - retrieval and queries are organized around fault diagnosis",
+    "R3_2_GTS:not reached - the task-specific test matches first",
+    "R4:Memory and Context; Tools and Execution; Planning and Orchestration",
+    "R5:context_memory",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 255,
+     "quote": "Fault records Ktarget with similarity above a threshold are included in LLM prompts to activate reasoning. Notably, a chunking operation is performed before encoding each report Kj , and after recalling a particular chunk, the corresponding full report is retrieved."
+    },
+    {
+     "line": 264,
+     "quote": "If the LLM feels that the textual information for given variables is not sufficient to infer a fault, a function calling is made to retrieve information about variables that the LLM believes may be useful for fault diagnosis."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 495,
+   "quote": "the proposed method is effective and can achieve up to 76.92% accuracy with only 500 normal samples without any faulty sample training."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Human-in-the-loop refinement is described as a capability, but the reported experiments provide accuracy evidence only; they do not evaluate expert feedback or downstream operational utility."
+}

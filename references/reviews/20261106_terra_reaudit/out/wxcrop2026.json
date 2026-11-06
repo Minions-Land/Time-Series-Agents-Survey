@@ -1,0 +1,376 @@
+{
+ "citation_key": "wxcrop2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "WxCrop contributes a tool-grounded agricultural hazard assistant that integrates dated weather and crop evidence, branches on hazard tiers, and returns calibrated crop-loss predictions with source receipts.",
+ "claim_evidence": [
+  {
+   "line": 335,
+   "quote": "The hazard tier decides what the assistant does next."
+  },
+  {
+   "line": 1519,
+   "quote": "The platform runs the tools and records each result as a receipt that holds the value,"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "wxcrop2026:dated-evidence",
+   "name": "Dated weather and crop evidence integration",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1: no task-specific output objective is embedded in retrieving, versioning and harmonising dated observations. R3_2: source selection, daily aggregation and date-dependent crop versions have temporal semantics; changing the task can retain these inputs and operations.",
+   "rubric_path": [
+    "R1:contributed integration of public archives",
+    "R2:Harness",
+    "R3_1_TSK:no - dated evidence access does not impose a task output",
+    "R3_2_GTS:yes - dates, frequency, units and source versions",
+    "R4:Interface and Interaction; Tools and Execution",
+    "R5:data_management; processing",
+    "R7:forecasting_prediction; decision_support",
+    "R8:demonstrated at work level",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 155,
+     "quote": "the present and, using blended forecast guidance, the coming week. Each layer states"
+    },
+    {
+     "line": 156,
+     "quote": "its source, its grid and whether its values are observed, analysed or forecast, so that"
+    },
+    {
+     "line": 775,
+     "quote": "from 2018 to 2024, and the version for a date is the latest base year before the target"
+    },
+    {
+     "line": 758,
+     "quote": "by 1.3 to approximate sustained wind. Rainfall is the county mean of daily totals, logtransformed and standardised, and a standardised precipitation–evapotranspiration"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "wxcrop2026:crop-vulnerability",
+   "name": "Calendar-based crop vulnerability",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1: the calendar calculation encodes the fraction of season value or yield at risk. Switching to a different task family would require redesigning this exposure objective and its fixed-cost and phenology semantics, rather than merely reusing date handling.",
+   "rubric_path": [
+    "R1:contributed vulnerability calculation",
+    "R2:Harness",
+    "R3_1_TSK:yes - season-value exposure and yield vulnerability",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:forecasting_prediction; decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 779,
+     "quote": "harvest months for perennial crops. The vulnerability v of a parcel on the selected"
+    },
+    {
+     "line": 780,
+     "quote": "date is the fraction of the crop’s expected season value at risk, v = f + (1 − f )p, where"
+    },
+    {
+     "line": 1437,
+     "quote": "on the map. For a crop group, φg (t) is the mean, weighted by insured liability, of the"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "wxcrop2026:daily-hazard-index",
+   "name": "Compound hazard indices and tier gating",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1: causally selected compound indices and loss-anchored tiers implement agricultural hazard assessment, and tier feedback gates further loss estimation. A different task would require redesigning hazard semantics, thresholds and the stopping criterion.",
+   "rubric_path": [
+    "R1:contributed hazard indices and conditional assessment procedure",
+    "R2:Harness",
+    "R3_1_TSK:yes - agricultural hazard objective and tier-based stopping",
+    "R4:Tools and Execution; Planning and Orchestration",
+    "R5:processing",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 235,
+     "quote": "these two, showed no signal or lacked data (Methods). H therefore multiplies a wind"
+    },
+    {
+     "line": 236,
+     "quote": "load, which grows with the square of the sustained wind as dynamic pressure does, by"
+    },
+    {
+     "line": 237,
+     "quote": "an amplifier that grows with rainfall (equation 1). Of eight pre-specified forms, this"
+    },
+    {
+     "line": 335,
+     "quote": "The hazard tier decides what the assistant does next. If the index falls in the lowest"
+    },
+    {
+     "line": 338,
+     "quote": "background level; the answer ends at the tier, because for such days an estimate would"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "wxcrop2026:payout-calibrated-loss",
+   "name": "Insurance-calibrated crop-loss tool",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1: a numerical tool predicts crop-group damage and payout probability from hazard and yield vulnerability, using insurance-specific labels and calibration. Changing task families would require redesigning its prediction target, deductible inversion and fitting objective. Fitting this external numerical model does not train the LLM.",
+   "rubric_path": [
+    "R1:contributed calibrated loss model and label inversion",
+    "R2:Harness - external numerical tool, not LLM training",
+    "R3_1_TSK:yes - crop-loss prediction target and insurance calibration",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:forecasting_prediction; decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 962,
+     "quote": "reasons such as a zero payout not meaning zero loss in the field. We use bisection to"
+    },
+    {
+     "line": 963,
+     "quote": "solve this reverse direction from payout to d. For a unit whose liability is spread over"
+    },
+    {
+     "line": 359,
+     "quote": "end without a payout. Their product, the expected loss Lg = Pg Sg , is the quantity"
+    },
+    {
+     "line": 1448,
+     "quote": "The susceptibilities and the exponent were fitted by least squares, weighted by"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "wxcrop2026:receipt-grounded-tools",
+   "name": "Receipt-grounded answer assembly",
+   "layer": "GH",
+   "dimensions": [
+    "Interface and Interaction",
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1: generic tool-result recording and answer assembly do not encode a task objective. R3_2: retaining values, units, versions and filters does not itself implement temporal order or availability checks. R3_3: the mechanism manages execution evidence and response state; domain-specific tier checking belongs to the hazard procedure.",
+   "rubric_path": [
+    "R1:contributed receipt-based grounding integration",
+    "R2:Harness",
+    "R3_1_TSK:no - generic answer provenance",
+    "R3_2_GTS:no - no intrinsic temporal ordering or cutoff semantics",
+    "R3_3_GH:yes - tool result state and answer assembly",
+    "R4:Interface and Interaction; Memory and Context; Tools and Execution",
+    "R5:general_runtime",
+    "R7:forecasting_prediction; decision_support",
+    "R8:demonstrated at work level",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 1519,
+     "quote": "The platform runs the tools and records each result as a receipt that holds the value,"
+    },
+    {
+     "line": 1520,
+     "quote": "its unit, the data version and the filters applied. The reply is then assembled by the"
+    },
+    {
+     "line": 1521,
+     "quote": "platform from these receipts, and the model words the sentences around them, so"
+    },
+    {
+     "line": 1525,
+     "quote": "request falls outside the tools, the assistant says so instead of estimating, and when the"
+    },
+    {
+     "line": 1526,
+     "quote": "tools cover only part of a request it marks the answer as partial. The platform currently"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 429,
+   "quote": "cause of loss, had never seen that year. The predicted loss summed over storm countymonths matched the recorded total to within 2% (Fig. 4d)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Adds dated evidence integration (L745–776) omitted by the current card. All three existing mechanism IDs are retained; the vulnerability calculation is split from the old growth-stage-aware loss module because it also operates independently on the map. Forecast-loss prediction and hazard decision support are distinct source-supported work products; different hazards or states do not themselves establish cross-task reuse. No LLM training is contributed. Receipt safeguards are implementation claims without a reported process audit. Leave-one-year-out fitting is not chronological validation: other years include later years. Earliest crop inventories may be carried backward (L775–776), and external checks also guided index or label selection (L1501–1503). Thus temporal validity is not established. Decision uses remain unmeasured (L656–660).",
+ "reconciliation": [
+  {
+   "existing_id": "wxcrop2026:receipt-grounded-tools",
+   "decision": "change",
+   "new_ids": [
+    "wxcrop2026:receipt-grounded-tools"
+   ],
+   "changes": [
+    "Preserve GH and the existing mechanism ID.",
+    "Remove the retired control dimension; assign Interface and Interaction, Memory and Context, and Tools and Execution to receipt recording and answer assembly.",
+    "Add forecasting_prediction and update reuse to demonstrated with basis=work.",
+    "Separate task-specific tier checking and gating from generic receipts."
+   ],
+   "reason": "L1519–1526 describes generic result receipts, answer assembly and unsupported-request handling. It does not require temporal order. L335–344 makes tier-conditioned execution part of the agricultural assessment, so that control is recorded with the hazard procedure."
+  },
+  {
+   "existing_id": "wxcrop2026:daily-hazard-index",
+   "decision": "change",
+   "new_ids": [
+    "wxcrop2026:daily-hazard-index"
+   ],
+   "changes": [
+    "Preserve TSK and the existing mechanism ID.",
+    "Add processing.",
+    "Add Planning and Orchestration for tier-conditioned stopping and loss-tool invocation."
+   ],
+   "reason": "L220–238 and L264–332 describe contributed weather-index computations whose loss-anchored tiers implement agricultural hazard assessment. L335–344 explicitly states that the returned tier controls the next action; this also justifies feedback_driven_agent at work level."
+  },
+  {
+   "existing_id": "wxcrop2026:payout-calibrated-loss",
+   "decision": "split",
+   "new_ids": [
+    "wxcrop2026:payout-calibrated-loss",
+    "wxcrop2026:crop-vulnerability"
+   ],
+   "changes": [
+    "Retain the existing ID for the insurance-calibrated loss tool.",
+    "Extract calendar-based vulnerability as a separate TSK module used independently in parcel displays.",
+    "Add forecasting_prediction and processing.",
+    "Remove the retired planning dimension from the numerical loss tool; record tier orchestration with daily-hazard-index."
+   ],
+   "reason": "L185–201 and L779–786 specify a vulnerability product available before loss estimation, while L1433–1443 explains the related yield-only input to the loss model. L957–975 and L1448–1467 support the separate deductible inversion and fitted prediction tool. These are externally executed numerical mechanisms, not LLM-side training."
+  }
+ ]
+}

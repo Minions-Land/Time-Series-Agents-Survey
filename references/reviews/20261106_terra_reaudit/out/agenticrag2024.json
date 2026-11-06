@@ -1,0 +1,274 @@
+{
+ "citation_key": "agenticrag2024",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "The work combines a master-agent workflow for routing time-series requests, temporal prompt-pool conditioning, and task-specific SLM instruction tuning with preference optimization.",
+ "claim_evidence": [
+  {
+   "line": 59,
+   "quote": "a novel approach using an agentic Retrieval-Augmented Generation (RAG) framework for time series analysis to improve task-specific outcomes by addressing challenges like distributional shifts, fixed window limitations in time series data."
+  },
+  {
+   "line": 60,
+   "quote": "leverages a hierarchical, multi-agent architecture where the master agent orchestrates specialized sub-agents and delegates the end-user request to the relevant sub-agent."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "imputation",
+  "time_series_classification"
+ ],
+ "modules": [
+  {
+   "id": "agenticrag2024:master-router",
+   "name": "Master-agent task routing",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK no: routing requests to generic sub-agent interfaces does not embed a task-family output objective or verifier; R3_2_GTS no: dispatch state has no temporal semantics; R3_3_GH yes: it manages delegation and synthesis.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task output objective",
+    "R3_2_GTS:no - no temporal state",
+    "R3_3_GH:yes - agent orchestration",
+    "R4:Planning and Orchestration"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "imputation",
+     "time_series_classification"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 112,
+     "quote": "The master agent for sub-agent orchestration utilizes the ’ReAct’ prompting technique[45], encouraging the general-purpose SLM to think step-by-step and use external tools (sub-agents, each utilizing a fine-tuned SLM for specific time series tasks) to generate responses."
+    },
+    {
+     "line": 119,
+     "quote": "In summary, the master agent orchestrates sub-agents, selects the most appropriate sub-agent, and allocates the task to the specialized sub-agent."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agenticrag2024:pattern-prompt-pool",
+   "name": "Differentiable temporal prompt-pool conditioning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R2 assigns this module to the LLM side because it projects the time-series input, retrieves prompt embeddings by similarity, and concatenates them into the model input; the paper presents these operations as one differentiable dynamic prompting mechanism.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:representation_alignment",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 224,
+     "quote": "The key vector acts as an identifier or query vector to retrieve relevant prompts from the pool based on similarity to the input new data, providing a form of conditioning or context about historical patterns to enhance the predictions."
+    },
+    {
+     "line": 289,
+     "quote": "The selected prompts, along with the original input, are concatenated to form the input embedding"
+    },
+    {
+     "line": 300,
+     "quote": "W ∈ R is a learnable weight matrix."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "agenticrag2024:slm-adaptation",
+   "name": "Task-specific SLM instruction tuning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 assigns parameter-efficient instruction tuning of SLMs to the LLM side because it trains model responses on time-series tasks.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 373,
+     "quote": "We perform instruction-tuning of SLMs with an improved context length [19](32K tokens) using parameter-efficient fine-tuning (PEFT) techniques on their associated specific tasks (e.g., forecasting, imputation) using the corresponding time-series datasets."
+    },
+    {
+     "line": 443,
+     "quote": "Datasets: We evaluate the proposed Agentic-RAG framework on four tasks: forecasting, classification, anomaly detection, and imputation."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agenticrag2024:dpo-training",
+   "name": "Time-series direct preference optimization",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 assigns DPO to the LLM side because it updates SLM outputs toward preferred task-specific responses; it is separately described and ablated from instruction tuning.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 377,
+     "quote": "Direct Preference Optimization (DPO; [32]), which involves randomly masking 50 % of the data and performing binary classification task to predict the corresponding correct task-specific outcomes."
+    },
+    {
+     "line": 2834,
+     "quote": "Effectiveness of direct preference optimization (DPO): – We evaluated the framework’s performance with and without DPO and assessed how aligning SLMs with preferred outcomes impacts the accuracy and reliability of predictions."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1389,
+   "quote": "We adopted a time-based division strategy to split multiple benchmark datasets into training, validation, and testing sets."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 407,
+   "quote": "For forecasting and imputation tasks, the performance of the proposed framework is evaluated using MAE, RMSE, and MAPE metrics on the original scale of the time series data."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "agenticrag2024:slm-adaptation",
+   "decision": "split",
+   "new_ids": [
+    "agenticrag2024:slm-adaptation",
+    "agenticrag2024:dpo-training"
+   ],
+   "changes": [
+    "split instruction tuning and DPO into separately ablated LLM-side training modules",
+    "remove retired/invalid dimension label and assign instruction_reasoning llm_route"
+   ],
+   "reason": "The packet describes instruction tuning and DPO as distinct procedures and ablates them separately, so retaining the old id for instruction tuning and adding a DPO module preserves the existing mechanism while making the independently contributed training method explicit."
+  },
+  {
+   "existing_id": "agenticrag2024:master-router",
+   "decision": "change",
+   "new_ids": [
+    "agenticrag2024:master-router"
+   ],
+   "changes": [
+    "dimensions: Planning and Workflow + Coordination and Scaling -> Planning and Orchestration",
+    "task/objective scope reason clarified"
+   ],
+   "reason": "The module remains GH: it dispatches requests and synthesizes sub-agent responses, while its core mechanism does not encode time-series data semantics or any one task output objective."
+  },
+  {
+   "existing_id": "agenticrag2024:pattern-prompt-pool",
+   "decision": "change",
+   "new_ids": [
+    "agenticrag2024:pattern-prompt-pool"
+   ],
+   "changes": [
+    "remove Memory and Context dimension",
+    "add llm_route: representation_alignment",
+    "role: model_interface -> method",
+    "view_status: model_side retained"
+   ],
+   "reason": "The packet describes one differentiable prompting mechanism that embeds temporal input, retrieves similar prompts, concatenates them into the input embedding, and uses a learnable projection; this meets the LLM-side temporal representation/alignment test."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The prompt-pool mechanism is treated as LLM-side because it projects time-series inputs and concatenates retrieved prompt embeddings before the SLM; the paper presents the retriever and embedding conditioning as one differentiable mechanism. The master workflow is treated as fixed because experiments do not show tool feedback changing later actions."
+}

@@ -1,0 +1,233 @@
+{
+ "citation_key": "wawer2025integrating",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "ElliottAgents combines Elliott Wave analysis, specialized LLM agents, and DRL backtesting with historical outcome reuse to forecast stock movements and produce trading recommendations.",
+ "claim_evidence": [
+  {
+   "line": 15,
+   "quote": "This paper introduces ElliottAgents, an multi-agent system that integrates the Elliott Wave Principle with AI for stock market forecasting."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "wawer2025integrating:wave-tools",
+   "name": "Elliott-wave detection and market analysis tools",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the core reader embeds Elliott-wave pattern rules to identify structures for price forecasting; changing to another task family would require replacing those task-specific rules. Counterfactual: it does not merely process any temporal series independently of the forecasting objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - Elliott-wave pattern recognition embeds the forecasting criterion",
+    "R4:Tools and Execution",
+    "R5:task_procedure with processing"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 288,
+     "quote": "The platform implements algorithms for identifying Elliott Wave patterns across multiple timeframes as a tool for agents. Then results of this tool are interpreted by LLM-based agents."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "wawer2025integrating:investment-synthesis",
+   "name": "Multi-agent investment-strategy synthesis",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because this procedure combines wave and backtesting results into task-specific buy/sell/hold signals, targets and contingency plans; another task family would require different outputs and decision criteria. Counterfactual: it is not a task-independent coordinator or temporal data service.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - output is an investment strategy",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure with processing"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 321,
+     "quote": "This agent synthesizes all the information, incorporating insights from a RAG tool, to formulate a comprehensive investment strategy. This strategy includes specific buy/sell signals, price targets, and contingency plans."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "wawer2025integrating:agent-workflow",
+   "name": "Specialized-agent forecasting workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because coordinator-controlled decomposition and sequencing implement this stock-analysis workflow from data gathering through EWP analysis, backtesting, advice and reporting; changing the task family would require redesigning its agent roles and stages. Counterfactual: the flow is not task-neutral scheduling.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - orchestration is bound to the stock forecasting workflow",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 307,
+     "quote": "The Coordinator agent orchestrates the entire process. It begins by receiving user input, including the desired stock symbol and analysis timeframe."
+    },
+    {
+     "line": 430,
+     "quote": "The orchestration of the system is designed to facilitate seamless collaboration among agents, ensuring an efficient workflow. The system employs a hierarchical structure wherein each agent is assigned a specialized role"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "wawer2025integrating:drl-backtester",
+   "name": "DRL historical-pattern backtesting and refinement",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because this DRL procedure evaluates Elliott-wave patterns against historical price behavior to improve stock predictions and stores those task-specific outcomes for later reuse. Counterfactual: its objective and state would need redesign for another task family, so it is not a generic temporal memory service.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - EWP backtesting optimizes forecasting",
+    "R4:Tools and Execution; Optimization and Evolution",
+    "R5:task_procedure with processing and context_memory"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 312,
+     "quote": "The Backtester agent then receives the identified patterns and employs DRL to validate them against historical trends, assessing their effectiveness."
+    },
+    {
+     "line": 422,
+     "quote": "At the core of this process is the Backtester agent, which plays a crucial role in accumulating and leveraging historical knowledge. The Backtester’s workflow begins with a query to determine if relevant results are already available in the backtesting knowledge base."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 490,
+   "quote": "In both cases, we enforced the EWP rule that waves must not overlap."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 484,
+   "quote": "The second phase of our experimentation was designed to assess the system’s pattern recognition capabilities and the accuracy of its predictions."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 509,
+   "quote": "Based on them, we could simulate transactions and calculate theoretical investment returns, proving the effectiveness of predictions of future prices."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper describes a fixed agent sequence plus a DRL backtesting loop that reuses stored pattern outcomes; the returned historical evidence can affect subsequent forecasts.",
+ "reconciliation": [
+  {
+   "existing_id": "wawer2025integrating:wave-tools",
+   "decision": "change",
+   "new_ids": [
+    "wawer2025integrating:wave-tools"
+   ],
+   "changes": [
+    "view_status: mapped -> task_procedure",
+    "scope_reason: state explicit R3_1_TSK test and counterfactual"
+   ],
+   "reason": "The packet supports the same contributed Elliott-wave pattern reader, which embeds forecasting-specific pattern rules; processing remains a temporal function of this task procedure."
+  },
+  {
+   "existing_id": "wawer2025integrating:investment-synthesis",
+   "decision": "change",
+   "new_ids": [
+    "wawer2025integrating:investment-synthesis"
+   ],
+   "changes": [
+    "dimensions: retired Coordination and Scaling / Planning and Workflow -> Planning and Orchestration",
+    "functions: [] -> [processing]",
+    "view_status: task_procedure retained",
+    "scope_reason: state explicit R3_1_TSK test and counterfactual"
+   ],
+   "reason": "The strategy synthesis remains the same decision-support procedure described for the Investment Advisor; the packet supports its task-specific outputs and orchestration dimension."
+  }
+ ]
+}

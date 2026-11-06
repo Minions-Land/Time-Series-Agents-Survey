@@ -1,0 +1,379 @@
+{
+ "citation_key": "tsharness2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TSHarness contributes a feedback-driven TSQA harness that separates temporal tool perception into a reusable Time-Series Perception State and analytical memory, uses an evidence-request loop for task answers, and trains a tool-selection policy for zero-shot cross-dataset transfer.",
+ "claim_evidence": [
+  {
+   "line": 14,
+   "quote": "this challenge, we propose TSHarness, an agentic framework that establishes a"
+  },
+  {
+   "line": 16,
+   "quote": "Time-Series Perception State (TPS). Guided by a reusable memory of analytical"
+  },
+  {
+   "line": 18,
+   "quote": "salient statistical and temporal features into the TPS. The answering agent then performs semantic reasoning over the TPS to generate target outputs, triggering iterative re-perception through the feedback loop when evidence is deemed"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis",
+  "decision_support"
+ ],
+ "other_tasks": [
+  "temporal_question_answering",
+  "time_series_classification",
+  "temporal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "tsharness2026:perception-state",
+   "name": "Tool-grounded Time-Series Perception State",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Interface and Interaction"
+   ],
+   "functions": [
+    "data_management",
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "time_series_classification",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "The state retains temporal spans and indices, statistical and temporal primitives, and provenance in a reusable interface. The R3.1 task test is negative because its core schema is not tied to one answer objective; the R3.2 GTS test is positive because its state depends on temporal measurements and information availability, while task extensions vary separately.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - reusable state schema is not bound to one task objective",
+    "R3_2_GTS:yes - temporal fields, spans, indices and provenance are core state",
+    "R4:Memory and Context; Interface and Interaction",
+    "R5:mapped",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis, decision_support; other temporal QA, classification and analysis",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 331,
+     "quote": "The TPS defines a standardized interface for reading measured series properties and adding question-specific analyses. A stable core organizes statistical and temporal fields, while named extensions"
+    },
+    {
+     "line": 353,
+     "quote": "Evidence grounding. Within the core C, ιj stores metadata (series identities, channel configurations, and valid temporal spans); Sj and Fj record statistical summaries"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsharness2026:numerical-tool-suite",
+   "name": "Temporal numerical tool suite",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "time_series_classification",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "Callable tools operate on ordered numerical arrays, with eligibility and arguments depending on sequence length, channels and temporal intervals. The R3.1 task test is negative for the reusable tool interface; the R3.2 GTS test is positive because the operations and availability checks are temporal, while task-specific calculations are extensions.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - reusable tool interface is not bound to one task objective",
+    "R3_2_GTS:yes - eligibility and operations depend on temporal series properties",
+    "R4:Tools and Execution",
+    "R5:mapped",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis, decision_support; other temporal QA, classification and analysis",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 297,
+     "quote": "The perception phase grounds qualitative queries into verifiable numerical measurements via a suite of callable computational tools. Each tool τ declares its supported analyses, input requirements, and output fields."
+    },
+    {
+     "line": 1047,
+     "quote": "Tool interfaces and procedural guidance. The library covers statistics, trends, seasonality, volatility, change points, and cross-series relationships. Eligibility checks use declared requirements"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsharness2026:procedural-memory",
+   "name": "Procedural analytical memory bank",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "time_series_classification",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "The memory stores temporal analytical procedures, applicability conditions, recommended tools and evidence requirements for retrieval. The R3.1 task test is negative because the memory mechanism is reusable across objectives; the R3.2 GTS test is positive because its contents and applicability are temporal analytical knowledge.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - memory mechanism is not bound to one task objective",
+    "R3_2_GTS:yes - entries encode temporal analytical procedures and applicability",
+    "R4:Memory and Context",
+    "R5:mapped",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis, decision_support; other temporal QA, classification and analysis",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 1035,
+     "quote": "3. Organize analytical knowledge. An LLM editor turns the batch’s evidence and outcomes into Memory entries containing a general procedure, applicability conditions, recommended tools, and evidence requirements."
+    },
+    {
+     "line": 1043,
+     "quote": "detailed in Appendix C. Target inference loads the source-developed resources and computes measurements for each new question through the same tool interfaces and TPS schema."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsharness2026:re-perception-loop",
+   "name": "Evidence-gap re-perception loop",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "time_series_classification",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "The loop computes missing required evidence, validates targeted requests, and emits a task-formatted answer. The R3.1 TSK test is positive because required evidence and output parsing encode the question objective; changing task family changes the evidence requirements and request verifier. The temporal state is supplied by separate GTS modules.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - required evidence, validation and task-formatted output are embedded",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure; validation",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis, decision_support; other temporal QA, classification and analysis",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 375,
+     "quote": "1. Gap inspection. The runtime exposes missing evidence types:"
+    },
+    {
+     "line": 381,
+     "quote": "2. Targeted re-perception. A request qr = (Jr , Or , Ar , Qr ) specifies target series indices, operations, arguments, and required evidence. After validation and execution"
+    },
+    {
+     "line": 387,
+     "quote": "3. Constrained answer synthesis. The A NSWERER can commit a response at any iteration and"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsharness2026:rl-tool-selector",
+   "name": "Cost-aware RL tool selector",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "time_series_classification",
+    "temporal_analysis"
+   ],
+   "role": "model_training",
+   "scope_reason": "The PPO-trained policy selects tool subsets from execution state using final-answer feedback and a correctness-cost reward. Under R2, this trained workflow-action policy is LLM-side even though it is invoked inside the harness; the surrounding execution remains a Harness module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:workflow_learning",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis, decision_support; other temporal QA, classification and analysis",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "LLM-side module"
+   },
+   "evidence": [
+    {
+     "line": 398,
+     "quote": "While dynamic tool invocation ensures expressive perception, executing all candidate tools within the initial tool plan incurs substantial latency and computational overhead. We train a lightweight T OOL"
+    },
+    {
+     "line": 408,
+     "quote": "Each action selects a tool subset for execution. Transition P executes the selected tools"
+    },
+    {
+     "line": 422,
+     "quote": "The policy is optimized to maximize answer correctness while minimizing superfluous tool calls:"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1186,
+   "quote": "• Execute and attach. The harness validates the request against available operations and the request"
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1124,
+   "quote": "indices connect temporal findings back to the observations."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 569,
+   "quote": "TSH ARNESS improves source-benchmark accuracy with both open-weight and proprietary backbones"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "tsharness2026:perception-state",
+   "decision": "change",
+   "new_ids": [
+    "tsharness2026:perception-state"
+   ],
+   "changes": [
+    "dimensions: removed Tools and Execution; retained Memory and Context and Interface and Interaction",
+    "functions: added data_management",
+    "tasks and reuse evidence expanded to the evaluated task families",
+    "evidence converted to packet line quotes"
+   ],
+   "reason": "The TPS remains the same contributed state mechanism, but the packet supports its temporal metadata, provenance, processing fields and standardized interface; its tool execution is handled by a separate tool-suite module."
+  },
+  {
+   "existing_id": "tsharness2026:re-perception-loop",
+   "decision": "change",
+   "new_ids": [
+    "tsharness2026:re-perception-loop"
+   ],
+   "changes": [
+    "layer: GH->TSK",
+    "dimensions: Control, Verification, and Feedback and Planning and Workflow -> Planning and Orchestration",
+    "functions: added validation",
+    "view_status: general_runtime->task_procedure",
+    "tasks and other_tasks populated"
+   ],
+   "reason": "The loop embeds required evidence coverage, request validation and task-formatted output, so R3.1 makes it a task procedure."
+  },
+  {
+   "existing_id": "tsharness2026:rl-tool-selector",
+   "decision": "change",
+   "new_ids": [
+    "tsharness2026:rl-tool-selector"
+   ],
+   "changes": [
+    "layer: GH->LLM",
+    "dimensions removed",
+    "llm_route: workflow_learning",
+    "role: method->model_training",
+    "view_status: general_runtime->model_side",
+    "reuse_evidence: not_applicable"
+   ],
+   "reason": "The selector is a trained policy choosing workflow actions from execution state and final-answer feedback; R2 explicitly places trained policies on the LLM side."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Added standalone numerical tool-suite and procedural-memory modules because the packet explicitly describes their implementation and deployment. Reclassified the trained selector to LLM under R2 and the evidence loop to TSK under R3.1; retired dimension labels were replaced."
+}

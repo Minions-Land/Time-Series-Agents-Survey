@@ -1,0 +1,278 @@
+{
+ "citation_key": "agentictwin2026",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "AgenticTwin contributes a digital-twin-grounded multi-agent LLM workflow for time-series anomaly diagnosis, historical retrieval, and mitigation, together with a synthetic-anomaly benchmark.",
+ "claim_evidence": [
+  {
+   "line": 75,
+   "quote": "To address these challenges, we propose AgenticTwin, an agentic LLM framework integrated with a DT–driven anomaly detection pipeline. Instead of relying on a single monolithic LLM, our framework decomposes anomaly reasoning into task-specific agents responsible for diagnosis, mitigation planning, and contextual historical retrieval."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis",
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "agentictwin2026:dt-residual-event",
+   "name": "Digital-twin residual anomaly event generation",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the pipeline is built to classify normal versus abnormal sensor behavior and emit anomaly labels/events; changing the task family changes its classifier objective and event schema.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly-state and fault-label objective",
+    "R4:Tools and Execution",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 272,
+     "quote": "The system then forms a structured anomaly event Et , consisting of the timestamp, observed values, predicted values, residuals, and predicted anomaly label."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agentictwin2026:fault-retrieval-mitigation",
+   "name": "Historical anomaly retrieval agent",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the retrieval objective is to return similar historical anomaly cases for anomaly analysis; a different task family would require a different relevance and record-selection criterion.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - similar-anomaly retrieval objective",
+    "R4:Memory and Context",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 527,
+     "quote": "The RA retrieves and ranks previously observed anomaly cases that match the predicted anomaly type of the current event. Given an anomaly event Et , the RA filters the historical anomaly repository using the predicted anomaly label(s) and returns only the records that share the same anomaly type."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agentictwin2026:grounded-mitigation-agent",
+   "name": "Knowledge-grounded mitigation agent",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because this procedure embeds the corrective-action objective for diagnosed anomalies; changing task family changes the mitigation criterion and output.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - corrective-action objective",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 539,
+     "quote": "The MA generates corrective actions based on the DA’s outputs, retrieved historical evidence from the RA, and anomaly taxonomy information from the curated anomaly knowledge base (KB)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agentictwin2026:anomaly-knowledge-base",
+   "name": "Curated anomaly knowledge base",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the taxonomy encodes anomaly-analysis concepts, symptoms, causes, and mitigations for this task family; another task family would require a different taxonomy.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly-analysis taxonomy",
+    "R4:Memory and Context",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 406,
+     "quote": "To support grounded anomaly reasoning, we construct a curated anomaly knowledge base (KB) that contains structured descriptions of anomaly types observed in the benchmark environment."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agentictwin2026:agentic-supervision",
+   "name": "Multi-agent supervisory reasoning workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the workflow decomposes the anomaly diagnosis, retrieval, mitigation, and supervision objectives; changing task family changes the specialized stages and outputs.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly-reasoning workflow objectives",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 575,
+     "quote": "Rather than relying on a single monolithic LLM, AgenticTwin decomposes anomaly reasoning into multiple specialized agents coordinated through a supervisory architecture. Figure 4 illustrates the four-stage agentic reasoning workflow used in AgenticTwin: diagnosis, context retrieval, mitigation, and supervision."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agentictwin2026:benchmark-query-suite",
+   "name": "Synthetic anomaly and operator-query benchmark",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK applies because the benchmark hard-codes anomaly categories and diagnosis, retrieval, and mitigation query objectives; changing task family changes the injected scenarios and query suite. Its resource-level view reflects that it hosts evaluation of the workflow.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly-analysis benchmark objectives",
+    "R4:Tools and Execution",
+    "R5:resource_level"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 621,
+     "quote": "Synthetic anomalies are injected into the training set to train the anomaly classifier and a separately injected held-out testing set is used for evaluation. Following the formulations introduced in Section III-C, we generate four anomaly categories: spike, drift, stuck-at, and replay."
+    },
+    {
+     "line": 683,
+     "quote": "To systematically evaluate AgenticTwin’s reasoning capabilities, we construct an LLM-assisted benchmark containing a total of 12,000 synthetic operator queries generated from anomaly events."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1197,
+   "quote": "Table VI shows that AgenticTwin achieves the highest performance across all three tasks, obtaining diagnosis similarity, retrieval MRR, and mitigation similarity scores of 0.93, 0.95, and 0.92, respectively."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The workflow is fixed because the paper specifies a four-stage diagnosis, retrieval, mitigation, and supervision sequence; agent outputs affect later content but do not select a different next tool or action. The current card omitted the contributed benchmark, knowledge-base module, and supervisory workflow and used the retired Coordination and Scaling dimension. The paper reports temporal sampling and held-out data but does not explicitly report chronology/leakage or information-cutoff checks, so temporal_validity is false."
+}

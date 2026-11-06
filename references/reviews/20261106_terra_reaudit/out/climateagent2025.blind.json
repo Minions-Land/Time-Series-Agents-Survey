@@ -1,0 +1,321 @@
+{
+ "citation_key": "climateagent2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "ClimateAgent contributes a climate-workflow agent that plans and routes analysis subtasks, coordinates persistent artifacts, uses climate API metadata and feedback-conditioned correction, and introduces an 85-task benchmark.",
+ "claim_evidence": [
+  {
+   "line": 14,
+   "quote": "C LIMATE A GENT, an autonomous multi-agent framework that orchestrates end-to-end climate data analytic workflows."
+  },
+  {
+   "line": 15,
+   "quote": "C LIMATE A GENT decomposes user questions into executable sub-tasks coordinated by an O RCHESTRATE -A GENT and a P LAN -A GENT;"
+  },
+  {
+   "line": 19,
+   "quote": "To enable systematic evaluation, we introduce C LIMATE -A GENT-B ENCH -85, a benchmark of 85 real-world tasks spanning atmospheric rivers, drought, extreme precipitation, heat waves, sea surface temperature, and tropical cyclones."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "temporal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "climateagent2025:context-store",
+   "name": "Persistent workflow context and checkpointing",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 TSK no: this stores workflow artifacts rather than a task-family output or verifier. R3_2 GTS no: the stored plans, scripts, results and logs have no temporal-data semantics. R3_3 GH yes: it manages runtime state and resumption.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-family output objective or validator",
+    "R3_2_GTS:no - generic workflow artifacts, not temporal data",
+    "R3_3_GH:yes - persistent runtime state",
+    "R4:Memory and Context",
+    "R5:general_runtime",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis, temporal_analysis",
+    "R8:demonstrated across work tasks",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 239,
+     "quote": "We serialize context to JSON after each subtask, enabling: (1) workflow resumption from the last completed subtask after interruption; (2) reproducibility by preserving complete decision history; (3) debugging without re-executing earlier stages."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "climateagent2025:climate-task-planner",
+   "name": "Climate-analysis task decomposition and specialist routing",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 TSK yes: the planner generates a climate-science analysis/report procedure with scientific stages and task-directed agent assignments. If the task family changes, its objectives, stages and specialist routing change. Counterfactual GTS would be a reusable temporal-data operation independent of the analysis objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-directed climate analysis/report plan",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure with no standalone temporal operation",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis, temporal_analysis",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 208,
+     "quote": "P LAN A GENT decomposes queries into executable subtasks using climate-domain reasoning: it recognizes standard analysis patterns (climatology → anomalies → extremes → report), dataset dependencies (reanalysis vs. forecasts), and temporal constraints (initialization dates, lead times, aggregation windows)."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "climateagent2025:temporal-api-agents",
+   "name": "Metadata-grounded climate data acquisition",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 TSK no: the acquisition mechanism is used for distinct climate analyses rather than one task output objective. R3_2 GTS yes: request generation depends on temporal parameters, lead times, time ranges and dataset availability. Counterfactual GH would be generic tool execution without temporal-data constraints.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - shared acquisition mechanism, not one task objective",
+    "R3_2_GTS:yes - temporal request metadata and availability",
+    "R4:Tools and Execution",
+    "R5:data_management+validation",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis, temporal_analysis",
+    "R8:demonstrated across work tasks",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 1386,
+     "quote": "Valid request parameters (variables, levels, lead times, dataset-specific fields) are constrained and may evolve. Our data acquisition agents therefore include dynamic API introspection to ground request generation on runtime metadata, rather than relying on the LLM to guess parameters."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "climateagent2025:execution-recovery",
+   "name": "Feedback-conditioned execution recovery",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 TSK no: the retry loop reacts to execution errors without embedding a task-family output criterion. R3_2 GTS no: its trigger is runtime failure rather than temporal evidence. R3_3 GH yes: it controls retries and subsequent execution using returned diagnostics.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - runtime error recovery is not a task output criterion",
+    "R3_2_GTS:no - no temporal-data operation",
+    "R3_3_GH:yes - execution control from feedback",
+    "R4:Planning and Orchestration",
+    "R5:general_runtime",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis, temporal_analysis",
+    "R8:demonstrated across work tasks",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 253,
+     "quote": "Iterative refinement handles runtime errors: C ODING -A GENT retries up to Rmax = 3 times, incorporating diagnostics from previous failures, with up to 5 debug iterations per candidate."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "climateagent2025:semantic-task-validation",
+   "name": "Climate-science semantic validation",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 TSK yes: the LLM validator checks scientific correctness criteria such as statistical test choice and climatological periods, which must change with the task objective. Counterfactual GTS would be a temporal evidence guard independent of the task; this checks whether the analysis procedure is scientifically valid for its requested output.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific scientific validation criteria",
+    "R4:Planning and Orchestration",
+    "R5:validation",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis, temporal_analysis",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 254,
+     "quote": "LLM-based semantic validation catches subtle correctness issues (wrong statistical tests, incorrect climatological periods) that produce scientifically invalid results without runtime errors."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "climateagent2025:climate-bench-85",
+   "name": "Climate workflow benchmark",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_analysis"
+   ],
+   "role": "evaluation",
+   "scope_reason": "R3_1 TSK yes: benchmark items define scientific objectives, required data/tools and output contracts for climate workflow tasks. Changing the task family changes the tested procedure and references. Counterfactual GTS would be a reusable temporal operation on data; the benchmark specifies and tests task procedures.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness resource",
+    "R3_1_TSK:yes - task-specific workflow objectives and contracts",
+    "R4:Planning and Orchestration",
+    "R5:resource_level",
+    "R7:forecasting_prediction, anomaly_detection_diagnosis, temporal_analysis",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 106,
+     "quote": "Each task is specified in natural language with an explicit scientific objective, required datasets, mandatory external tools (e.g., TempestExtremes), and strict output contracts (filenames and formats), driving multi-step pipelines from data acquisition through processing, analysis, and visualization."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 2599,
+   "quote": "DeepAgent successfully produced scorable reports for 3/6 tasks (AR, HW, SST), while 3/6 runs failed (err) and did not generate a valid report for scoring (DR, EP, TC). In contrast, C LIMATE A GENT produced valid reports across all six tasks."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 2052,
+   "quote": "This is consistent with context drift causing downstream steps to mis-handle intermediate datasets, variable choices, or time/region settings when prior decisions are not propagated."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 115,
+   "quote": "our system achieves a 100% success rate in generating the report across the benchmark, with an overall report quality score of 8.32, compared to 6.27 for G IT H UB -C OPILOT and 3.26 for the GPT-5 baseline."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The planner is classified as a task procedure because it plans climate-science analysis/report objectives; persistent state and generic execution recovery are separate runtime mechanisms. The task suite covers forecast analysis and anomaly/event analysis, while no downstream decision-value experiment is reported."
+}

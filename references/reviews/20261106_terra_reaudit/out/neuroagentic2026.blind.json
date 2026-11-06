@@ -1,0 +1,130 @@
+{
+ "citation_key": "neuroagentic2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "The work couples an LLM control planner with TimesFM and contributes counterfactual forecast perturbation and deterministic risk-based filtering of proposed industrial control actions.",
+ "claim_evidence": [
+  {
+   "line": 56,
+   "quote": "We introduce a Counterfactual Physics Injection mechanism that translates LLM-generated semantic control actions into numerical perturbations of future forecasts. This enables deterministic validation of the proposed actions without finetuning the foundation model."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "neuroagentic2026:counterfactual-injection",
+   "name": "Counterfactual physics injection",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the injection embeds the control-action objective in a tank-level forecast; if the task family changed, the actuator semantics and intervention equation would need redesign. The series-valued forecast perturbation is a task-specific procedure, not a general temporal processor (counterfactual).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - embeds task-specific control actions in the forecast",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 225,
+     "quote": "The fundamental contribution of this work is the Physics Injection Function Φ(Ŷ , ci ) that translates the semantic command ci into a numerical perturbation of TimesFM forecast ( the model’s internal state cannot be directly modified)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "neuroagentic2026:hallucination-rejection",
+   "name": "Risk-based intervention rejection and selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because feasibility rules and minimizing the maximum projected tank level encode the specific control objective; changing task family requires redesigning the action space, actuator constraints, and risk criterion. Forecast-risk evaluation is task-specific processing (counterfactual: a reusable general validator would not need these water-control rules).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - embeds tank-control feasibility and projected-risk criteria",
+    "R4:Planning and Orchestration",
+    "R5:processing",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 242,
+     "quote": "We distinguish two categories of rejected candidates. A hallucinated action is an LLM-proposed control vector that is physically invalid or unsafe in direction."
+    },
+    {
+     "line": 248,
+     "quote": "The final control decision is formulated as an optimization problem. The optimal action a∗ is:"
+    },
+    {
+     "line": 256,
+     "quote": "Where c is a candidate, Φ(Ŷ , c) is its counterfactual forecast, and ∅ is the null action. If every candidate’s simulated risk exceeds the null risk, the system defaults to Monitor, treating the LLM proposals as hallucinated."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 803,
+   "quote": "No hallucinated action was ever executed (column “Hallucinated Action Executed” in Table III is False for all trials). The decomposition across attack types is approximately uniform; full per-trial categorical logs are maintained in the experimental artifact."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 806,
+   "quote": "The Neuro-Agentic model succeeded in preventing breach in five of 15 trials (33.3%), which is between 26.7% (4/15) of LSTM and 13.3% (2/15) of TCN."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 304,
+   "quote": "We define two key metrics for assessing the performance of the neuro-agentic framework: 1) Risk Reduction (∆R), the quantitative difference between the Passive Forecast peak and the Agent-Mitigated peak."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper evaluates attack scenarios as inputs to a water-treatment control policy; its reported output is a control decision, so decision_support is the supported task family. The stated train/validation/test proportions do not establish chronological or leakage-safe evaluation."
+}

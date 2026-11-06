@@ -1,0 +1,155 @@
+{
+ "citation_key": "hydroagent2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "HydroAgent formalizes forecaster judgment as a skill-constrained, case-based prior estimation and orchestrates it with hydrological simulation and expert review for flood forecasting.",
+ "claim_evidence": [
+  {
+   "line": 851,
+   "quote": "In this study, we proposed HydroAgent, a skill-orchestrated agent framework that embeds LLMs into a physically based flood forecasting workflow translating the tacit expertise of operational forecasters into an auditable and reproducible procedure."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "hydroagent2026:skill-orchestration",
+   "name": "Explicit skill contracts and workflow orchestration",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Skills specify permitted tools, resources, workflow instructions and output contracts. R3: the generic execution boundaries do not embed the flood-forecast objective (counterfactual: their execution and contract mechanism remains usable if the task changes); they are not temporal-order-dependent; they manage procedural execution, so GH applies.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - generic skill execution is not bound to a task objective",
+    "R3_2_GTS:no - generic contracts do not depend on temporal semantics",
+    "R3_3_GH:yes - manages execution and workflow"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 232,
+     "quote": "A skill is defined as a statically authored, self-contained procedural specification that encodes a complete workflow, including instructions, permitted tools, accessible resources, and a required output structure."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "hydroagent2026:flood-prior-skill",
+   "name": "Analog flood judgment with physical and human checks",
+   "layer": "TSK",
+   "dimensions": [],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The Step 1 procedure estimates peak-flow and flood-volume forecast intervals using analog flood records and hydrological constraints. R3: its core output is a flood forecast prior; if the task family changes, the state, rules and output criteria must be redesigned, so TSK applies. Retrieval uses temporal cases, but it is not a task-independent temporal service (counterfactual: replacing flood forecasting changes the retrieval attributes, constraints and judgment target).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - embeds the forecasting objective and validation criteria"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 263,
+     "quote": "The Step 1 skill formalizes the judgment process that a human forecaster would normally perform when turning event information into a prior forecast interval."
+    },
+    {
+     "line": 276,
+     "quote": "once the event has been parsed, a six-dimensional similarity retrieval is performed in which the executor computes a weighted score over the historical case library through score cases and returns the top five analogs."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "hydroagent2026:hydrological-scheme",
+   "name": "Flood-type scheme preparation and selection",
+   "layer": "TSK",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Flood events are grouped by peak-flow type to calibrate basin-specific parameter schemes, and the scheme matching the Step 1 prior ranges is selected for XAJ simulation. R3: these procedures directly serve the flood-forecast objective; changing task family requires redesigning the flood classes, calibration target and scheme-selection criterion (counterfactual: this is not a task-independent temporal data service).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - calibration and selection optimize the flood-forecast procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 156,
+     "quote": "In Step 0, scheme preparation, historical flood events are first classified into distinct groups according to peak flow magnitude (e.g., Type I–V), with basinspecific thresholds detailed in Section 2.4."
+    },
+    {
+     "line": 222,
+     "quote": "Step 2, scheme selection, retrieves from the Step 0 library the parameter set matching the Step 1 prior ranges and runs the XAJ simulation."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 857,
+   "quote": "All five state-of-the-art LLMs successfully executed the full workflow with comparable judgment accuracy, though moderate performance variation and substantial cost differences emerged across models."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 307,
+   "quote": "Events are grouped by flood class (Type I–V) and distributed across folds in a round-robin manner so that each fold preserves the overall class distribution; within each fold, the agent is evaluated on held-out events and is only allowed to retrieve cases from the corresponding reference pool."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 854,
+   "quote": "The Step 1 scenario judgment skill captured observed peak flow and flood volume within a 5% tolerance margin in 10 and 11 out of 14 validation events, respectively"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet describes retrospective flood forecasting and a reactive rolling-forecast step, supporting feedback_driven_agent; the published evaluation does not report downstream decision utility."
+}

@@ -1,0 +1,129 @@
+{
+ "citation_key": "seer2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "SEER uses forecast-error feedback to refine event retrieval memories and distill persistent causal knowledge that conditions a frozen forecaster.",
+ "claim_evidence": [
+  {
+   "line": 115,
+   "quote": "We design the SEER framework with two complementary feedback mechanisms - a reflective retrieval memory for dynamic query refinement and noise suppression, and a persistent causal knowledge base for abstracting transferable structural dynamics (§3.3)."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "seer2026:reflective-retrieval-memory",
+   "name": "Error-driven reflective retrieval memory",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK applies because this memory is updated by diagnosing forecast residuals against realized outcomes and encodes the forecasting objective; under the R3 counterfactual, changing task family would require adapting the outcome comparison and forecasting-specific retrieval/selection criteria. Its state also respects temporal cut-offs, but that does not remove the task-bound update objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - update logic uses forecast residuals and forecast outcomes",
+    "R5:task_procedure",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 243,
+     "quote": "Memory-Guided Expansion and Filtering: The expansion operator 𝜎 M𝑡ret utilizes the retrieval memory M𝑡ret to actively formulate search queries and gather missing exogenous information,"
+    },
+    {
+     "line": 265,
+     "quote": "Here, Φmem updates M𝑡 to refine future search queries (M𝑡ret ) and noise filters (M𝑡sel ), while Φknow derives general causal forecasting rules from past errors to update the persistent knowledge base K𝑡 ."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "seer2026:causal-knowledge-base",
+   "name": "Forecast-error causal knowledge distillation",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK applies because the knowledge rules are distilled specifically from forecasting attempts and their prediction errors to guide later forecasts; under the R3 counterfactual, changing task family would require changing the forecast objective and the causal-rule content. The persistent state is temporal, but its update criterion is forecast-task-specific.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - causal rules are distilled from forecast errors",
+    "R5:task_procedure",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 248,
+     "quote": "Knowledge-Driven Causal Reasoning: Rather than relying on static logic, the framework continuously distills and updates the causal forecasting knowledge K𝑡 from past forecasting attempts. This persistent knowledge provides direct reasoning support to the backbone 𝑓 ."
+    },
+    {
+     "line": 265,
+     "quote": "Here, Φmem updates M𝑡 to refine future search queries (M𝑡ret ) and noise filters (M𝑡sel ), while Φknow derives general causal forecasting rules from past errors to update the persistent knowledge base K𝑡 ."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 168,
+   "quote": "To enable sequential learning while strictly preventing look-ahead bias, we chronologically partition the sequence into a training set (𝑡 ≤ 𝜏) and a testing set (𝑡 > 𝜏)."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 677,
+   "quote": "SEER consistently outperforms all TSF categories, including supervised deep learning models, LLM-based forecasters, and zero-shot TSFMs. Notably, SEER achieves consistent error reductions"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The feedback-driven role is grounded in the learning phase: test-set memories are frozen. No separate downstream decision-utility or runtime process-validity result is reported."
+}

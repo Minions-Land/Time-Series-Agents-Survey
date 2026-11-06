@@ -1,0 +1,210 @@
+{
+ "citation_key": "tfrbench2026",
+ "status": "paper_verified",
+ "role_of_work": "resource",
+ "claim_summary": "TFRBench contributes a reasoning-aware forecasting benchmark and dual evaluation protocol, with reference traces built by a feedback-driven multi-agent refinement procedure and window-bounded external-event retrieval.",
+ "claim_evidence": [
+  {
+   "line": 7,
+   "quote": "We introduce TFRBench, the first benchmark designed to evaluate the reasoning capabilities of forecasting\nsystems."
+  },
+  {
+   "line": 50,
+   "quote": "To overcome the lack of verifiable reference reasoning, we develop TFRBench using a systematic multi-agent framework designed to synthesize and refine predictive logic."
+  },
+  {
+   "line": 60,
+   "quote": "Using our dual-evaluation protocol–combining LLM-as-a-Judge for reasoning quality and MASE\nfor numerical forecasting–we provide several findings."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "tfrbench2026:reasoning-benchmark",
+   "name": "Reference-reasoning benchmark and scoring protocol",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK matches: the reference-set admission rule and judge embed forecast accuracy, forecast dynamics, and logic-to-forecast consistency. Changing task family requires redesigning the reference outputs and evaluation criteria; temporal inputs alone do not make this GTS. resource_level records its benchmark role.",
+   "rubric_path": [
+    "R1:contributed - new reference-reasoning benchmark and dual evaluation protocol",
+    "R2:Harness - external reference corpus, filtering and LLM-as-a-Judge protocol",
+    "R3_1_TSK:yes - forecast-specific admission and scoring criteria",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:resource_level - hosts and tests forecasting systems",
+    "R6:not_applicable",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 396,
+     "quote": "Selection of Data Samples for TFRBench. To ensure quality, we employ a strict outcome-conditioned\nfiltering."
+    },
+    {
+     "line": 425,
+     "quote": "Evaluation Protocol. To assess reasoning validity alongside numerical accuracy (which standard\nmetrics like MASE, MAE), TFRBench introduces a standardized evaluation protocol (Figure 3) for research community."
+    },
+    {
+     "line": 428,
+     "quote": "four dimensions: Domain Relevance, Forecasting Correctness, Event Relevance, and Logic-to-Number\nConsistency."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tfrbench2026:trace-refinement",
+   "name": "Feedback-driven forecasting trace synthesis",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches: candidate reasoning is translated into horizon forecasts, ranked by MASE and consistency, and revised using failure feedback. A different task family would require redesigning the output, verifier, success criterion and feedback. This is a task-specific Harness procedure, not parameter training or task-neutral orchestration.",
+   "rubric_path": [
+    "R1:contributed - iterative multi-agent trace synthesis, verification and summary retention",
+    "R2:Harness - role prompts and feedback loop without parameter updates",
+    "R3_1_TSK:yes - forecast output, MASE-based stopping and reasoning-to-number verification",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:processing - numerical trend and channel analysis; validation - checks numerical meaning and reasoning-to-forecast consistency",
+    "R6:not_applicable",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 187,
+     "quote": "growth” or “sharp 10-15 unit spike”) by using 𝑋ℎ𝑖𝑠𝑡 as a historic reference, ensuring that the generated\nnumbers are consistent with historical units and provided reasoning."
+    },
+    {
+     "line": 207,
+     "quote": "evaluation: candidates are ranked based on a combined score that integrates quantitative accuracy\n(MASE) with a qualitative consistency score (𝑆 ∈ {1, ..., 5}) which measures the logical alignment\nbetween the narrative plan and the numerical output."
+    },
+    {
+     "line": 382,
+     "quote": "actionable textual feedback 𝐹 . This feedback is injected back into the A𝑟𝑒𝑎𝑠𝑜𝑛 for the next iteration\n(𝑘), explicitly instructing it to adjust specific assumptions or trend estimates."
+    },
+    {
+     "line": 387,
+     "quote": "To ensure no critical information was lost during compression, the system performs a final validation\ncheck: it generates a new forecast solely from 𝑅 𝑠𝑢𝑚 and retains the summary only if it maintains high\nforecasting accuracy."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tfrbench2026:windowed-event-retrieval",
+   "name": "Window-bounded external-event retrieval",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not match this separately reusable event-discovery interface: it returns dated events and explicitly excludes impact analysis, numerical forecasting and MASE. Changing to another temporal task can retain the same window/location/event-list semantics. R3_2_GTS matches because retrieval and admission depend on specified past and future windows; it is not temporally neutral GH.",
+   "rubric_path": [
+    "R1:contributed - window-constrained event-discovery integration, excluding unchanged search backend",
+    "R2:Harness - prompted retrieval interface around the LLM",
+    "R3_1_TSK:no - dated-event retrieval has no forecast output or task-specific score",
+    "R3_2_GTS:yes - past/future windows constrain temporal context and event admission",
+    "R4:Tools and Execution; Memory and Context",
+    "R5:context_memory; validation",
+    "R6:not_applicable",
+    "R7:forecasting_prediction",
+    "R8:inferred - only forecasting demonstrated, across multiple domains",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1096,
+     "quote": "You are a specialized Search Agent. Your sole mission is to find relevant, time-specific external\nevents that could impact a time-series forecast. Your task is to find events in BOTH the recent\npast and the future window."
+    },
+    {
+     "line": 1105,
+     "quote": "1. Time-Bound: Focus only on events within the specified windows."
+    },
+    {
+     "line": 1108,
+     "quote": "3. No Impact Analysis: Do NOT analyze the ’potential impact’. Just state the event and its date."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1675,
+   "quote": "Our Verifier successfully caught and penalized these flawed traces, dropping the average score to\n1.34/5.0 and rejecting 94.0% of the manipulated samples."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 4211,
+   "quote": "sample’s prediction window end date to verify adherence to temporal boundaries. The audit revealed\na 99.68% compliance rate, with only 83 instances (0.32%) where an event’s start date post-dated the\nwindow."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 797,
+   "quote": "In pattern-rich domains such as Solar and Car Parts, Gemini-3-Pro reduces MASE (w/o\nReasoning → w/ Reasoning) by ∼ 20% (1.037 → 0.834) and ∼ 18% (0.821 → 0.672), respectively."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The work's primary role is resource; its reference-creation subsystem is feedback-driven. Ten datasets and five domains constitute one task family, not demonstrated cross-task reuse. Reference creation deliberately uses oracle future-window events and ground-truth-derived MASE feedback; evaluation restricts external search to history. The temporal audit checks event dates against prediction-window end, not publication/availability time at the forecast origin. Thus temporal_validity records reported evidence, not proof of strict ex-ante integrity. Verifier perturbation rejection is trace/artifact-check evidence, not tool-call success. The search module isolates event discovery; forecast-hypothesis verification remains within the synthesis procedure. No parameter training, synthetic-series task, or downstream action utility is established."
+}

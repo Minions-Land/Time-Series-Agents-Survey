@@ -1,0 +1,108 @@
+{
+ "citation_key": "vendster2026",
+ "status": "paper_verified",
+ "role_of_work": "resource",
+ "claim_summary": "Vendster contributes a task-specific evaluation arena for measuring how forecast bias and prediction-interval width affect sales-target attainment in buyer-vendor negotiations between two LLM agents.",
+ "claim_evidence": [
+  {
+   "line": 50,
+   "quote": "two LLM agents negotiate promotional discounts while the Buyer privately consumes a demand forecast, so a forecaster’s bias and prediction-interval width can be varied with the data-generating process, action space, and negotiation held fixed"
+  },
+  {
+   "line": 82,
+   "quote": "The outcome is sales target attainment—whether realized sales meet the Buyer’s per-basket target, a challenging threshold fixed in advance by an effect-blind rule (Appendix A.2)."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "vendster2026:forecast-quality-arena",
+   "name": "Controlled forecast-quality negotiation arena",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "The arena’s core embeds the Buyer’s sales-target attainment requirement and the Vendor’s profit objective; changing the task family requires redesigning the negotiation state/action space and outcome criterion (R3_1_TSK), so it is task-specific rather than temporal-only GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - negotiation objective and success criterion are task-bound",
+    "R4:Tools and Execution",
+    "R4:Planning and Orchestration",
+    "R5:view_status:resource_level",
+    "R7:decision_support",
+    "R8:reuse_not_applicable (TSK)",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 56,
+     "quote": "In each episode a Buyer and a Vendor, both LLM agents, negotiate promotional discounts over a basket of five products for a single sales event"
+    },
+    {
+     "line": 73,
+     "quote": "The second is a synthetic perturbation grid that scales true expected demand by a prescribed log-bias and interval-width factor, giving independent, causal control over the two error axes."
+    },
+    {
+     "line": 82,
+     "quote": "The outcome is sales target attainment—whether realized sales meet the Buyer’s per-basket target, a challenging threshold fixed in advance by an effect-blind rule (Appendix A.2)."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 523,
+   "quote": "A malformed action is returned to the agent with the parse error for up to three retries."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 73,
+   "quote": "each trained under a leakage-safe temporal split, with its own bias, calibration, and quality (Table 5)."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 113,
+   "quote": "On a held-out test window, the model forecasters occupy a narrow, near-ideal band; for example, relWQL ranges only from 0.50 to 0.69 across the nine non-naive forecasters against the Seasonal-Naive floor of 1.00."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 125,
+   "quote": "Under-prediction correlates with higher sales target attainment, but only for frontier-closed LLMs."
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "vendster2026:forecast-quality-arena",
+   "decision": "change",
+   "new_ids": [
+    "vendster2026:forecast-quality-arena"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration"
+   ],
+   "reason": "The packet supports the same task-specific negotiation arena and scoring; the prior card’s legacy within-episode control/verification dimension maps to Planning and Orchestration, while the existing module ID remains because the mechanism is unchanged."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The arena is an evaluation resource; the cited model forecasters and M5 source data serve as experimental inputs rather than distinct contributed methods."
+}

@@ -1,0 +1,225 @@
+{
+ "citation_key": "ji2025lemad",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "LEMAD contributes a hierarchical multi-agent harness that aligns metric and log streams, performs service-anomaly detection and diagnosis, and uses LLM prompts for log semantics and explanations.",
+ "claim_evidence": [
+  {
+   "line": 85,
+   "quote": "To address the above challenges, this paper proposes a novel hierarchical framework called LEMAD (LLM-Empowered Multi-Agent System for Anomaly Detection)."
+  },
+  {
+   "line": 202,
+   "quote": "The system operates in four sequential stages: First, the performance data collection agent and log processing agent are responsible for continuously monitoring runtime metrics and ingesting structured logs, respectively."
+  },
+  {
+   "line": 288,
+   "quote": "Intelligent Parsing Module (LLM Integration): This utilizes large language models to perform deep parsing of complex logs, such as stack trace dissection and semantic-level error classification, enabling advanced log understanding and anomaly detection."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "ji2025lemad:stream-normalization",
+   "name": "Timestamp alignment and heterogeneous-stream preprocessing",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The module aligns timestamps, normalizes formats and handles missing values; it depends on temporal stream state but is independent of the anomaly objective, so changing task would preserve its preprocessing state and interface.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - preprocessing does not embed the anomaly output criterion",
+    "R3_2_GTS:yes - timestamp alignment and heterogeneous temporal streams",
+    "R4:Tools and Execution",
+    "R5:data_management, processing",
+    "R7:anomaly_detection_diagnosis",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 333,
+     "quote": "Data Preprocessing Module: this performs timestamp alignment, data format normalization, and missing value handling for heterogeneous data sources, ensuring consistent and accurate data streams."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "ji2025lemad:anomaly-diagnosis",
+   "name": "Hierarchical metric/log anomaly diagnosis workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The workflow's core logic is an anomaly report with root cause and recommendations; changing task family would change its event objective, detection criteria and diagnostic actions, so it is TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly report, root cause and recommendations are task requirements",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure, processing",
+    "R7:anomaly_detection_diagnosis",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 199,
+     "quote": "Instead of describing components in isolation, the framework adopts a closed-loop workflow—comprising data sensing, real-time analysis, in-depth diagnosis, and intelligent feedback—where each agent interacts asynchronously through Kafka-based message queues to collaboratively accomplish end-to-end service anomaly detection."
+    },
+    {
+     "line": 231,
+     "quote": "Output: Anomaly report R with root cause and recommendations"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "ji2025lemad:llm-log-parsing",
+   "name": "LLM-assisted semantic log parsing",
+   "layer": "GH",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "This prompt-driven parser executes around an off-the-shelf LLM, extracting structured log fields and semantic errors without changing model parameters; it has no anomaly decision criterion, so it is GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness - prompt procedure around the model",
+    "R3_1_TSK:no - parsing produces structured logs rather than the anomaly decision",
+    "R3_2_GTS:no - it does not depend on temporal order, windows or frequency",
+    "R3_3_GH:yes - model interaction and runtime parsing",
+    "R4:Interface and Interaction, Tools and Execution",
+    "R5:general_runtime",
+    "R7:anomaly_detection_diagnosis",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 288,
+     "quote": "Intelligent Parsing Module (LLM Integration): This utilizes large language models to perform deep parsing of complex logs, such as stack trace dissection and semantic-level error classification, enabling advanced log understanding and anomaly detection."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "ji2025lemad:llm-diagnostic-explanation",
+   "name": "LLM alert explanation and root-cause recommendations",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The prompts turn anomaly events into alert descriptions, root-cause analysis and O&M recommendations; replacing anomaly diagnosis with another task would change these output requirements and evidence fields.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness - prompt procedure around the model",
+    "R3_1_TSK:yes - alert explanation and root-cause recommendations are anomaly-task outputs",
+    "R4:Interface and Interaction",
+    "R5:task_procedure",
+    "R7:anomaly_detection_diagnosis",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 402,
+     "quote": "The Intelligent Explanation Module (LLM Integration) leverages large language models to generate root cause analyses and maintenance recommendations, thereby enhancing the interpretability and readability of reports, as illustrated in Figure 4."
+    },
+    {
+     "line": 341,
+     "quote": "The Intelligent Explanation Module (LLM Integration) employs large language models to generate natural language descriptions of alerts and maintenance suggestions, thereby enriching alert information and improving interpretability."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 545,
+   "quote": "To comprehensively evaluate the performance of our anomaly detection system, we employed three standard metrics in machine learning: precision (P), recall (R), and F1-score (F1)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet describes a fixed four-stage sequence; dynamic load balancing changes resource assignment rather than the anomaly-task action sequence. The experiments report anomaly metrics and latency but no chronological split, leakage control or information-availability evaluation."
+}

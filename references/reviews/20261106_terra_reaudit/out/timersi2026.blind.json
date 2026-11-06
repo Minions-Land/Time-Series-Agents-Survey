@@ -1,0 +1,134 @@
+{
+ "citation_key": "timersi2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TimeRSI uses forecasting feedback to revise deployment pipelines around frozen time-series foundation models, then selects a pipeline for each new forecast using similar completed windows.",
+ "claim_evidence": [
+  {
+   "line": 42,
+   "quote": "A coding agent translates task descriptions into executable pipeline changes."
+  },
+  {
+   "line": 43,
+   "quote": "uses observed errors to guide subsequent revisions."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "timersi2026:pipeline-revision",
+   "name": "Iterative forecasting pipeline improvement",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the revision loop scores candidate forecasting pipelines by forecast error and changes the forecasting procedure; if the task family changed, its forecast output, objective, and validation windows would need redesign. R3_2_GTS would fit only if it handled temporal windows without a task-specific forecast objective; R3_3_GH would fit only if it managed generic execution without temporal or forecast semantics.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - pipeline revisions optimize forecasting output using forecast errors",
+    "R3_2_GTS:no - temporal windows are evaluated against a forecasting objective",
+    "R3_3_GH:no - the loop has temporal forecasting semantics"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 116,
+     "quote": "The loop starts from direct TSFM inference as the reference pipeline. In each iteration, the agent uses the task description and earlier results to propose and implement a code revision. The system executes it on the adaptation windows and returns forecasting scores, window-level errors, and execution logs."
+    },
+    {
+     "line": 142,
+     "quote": "The agent writes Python code across four stages: preprocessing, feature construction, context selection, and post-processing."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timersi2026:adaptive-selection",
+   "name": "Similarity-weighted historical pipeline selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the selector ranks forecasting pipelines by their forecast errors under similar conditions; changing task family would require a different output objective and loss. R3_2_GTS would fit temporal retrieval independent of one task objective, while R3_3_GH would fit generic selection with no temporal or task-specific forecast semantics.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - candidate choice minimizes forecasting error",
+    "R3_2_GTS:no - retrieval is explicitly conditioned on forecasting error",
+    "R3_3_GH:no - similarity and completed-window state have temporal semantics"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 262,
+     "quote": "A pipeline that performs well on average may not be the best choice for every future window. T IME RSI therefore selects a pipeline for each target variable at each new forecast origin."
+    },
+    {
+     "line": 644,
+     "quote": "At a new origin, the selector first filters out windows whose outcomes are not yet complete."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 601,
+   "quote": "The evaluator supplies the same chronological windows to all candidates. Candidate code receives no target values beyond each window’s origin."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 31,
+   "quote": "T IME RSI achieves the best scores among all existing submissions across six point and probabilistic forecasting metrics."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper reports execution logs and traces, but its experiments do not separately score execution success or failure handling as process-validity evidence."
+}

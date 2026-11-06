@@ -1,0 +1,140 @@
+{
+ "citation_key": "forecastcompass2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "ForecastCompass contributes taxonomy-indexed factor and calibration memories that guide probabilistic forecasting and are revised from retrospective outcomes across time.",
+ "claim_evidence": [
+  {
+   "line": 17,
+   "quote": "factor-based memory framework for agentic forecasting. F O C O organizes forecasting experience with a hierarchical forecasting-task taxonomy, enabling retrieval"
+  },
+  {
+   "line": 18,
+   "quote": "task-relevant forecasting knowledge. It maintains two complementary memory components: factor memory, which captures reusable predictive dimensions, and reasoning memory, which encodes probability updating, uncertainty handling, and calibration principles."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "forecastcompass2026:factor-memory",
+   "name": "Forecasting factor and calibration memory",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The memory embeds the forecasting output and calibration objective. Under the R3 counterfactual, changing task family would require redesigning the forecasting taxonomy, predictive factors, and probability-calibration lessons; it is therefore TSK rather than general GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - memory content and retrieval are bound to probabilistic forecasting"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 249,
+     "quote": "F O C O organizes experience with a hierarchical taxonomy. At the update step w, the taxonomy Tw"
+    },
+    {
+     "line": 265,
+     "quote": "where each entry fw,s , i = 1, . . . , Ls describes a reusable predictive factor for subcategory s. Each factor entry contains the factor name, factor-specific evidence checks, common failure modes, and the factor’s typical effect on the forecast probability."
+    },
+    {
+     "line": 276,
+     "quote": "For each unresolved question qi at update step w, F O C O first assigns it to a category-subcategory pair (ci , si ) under the current taxonomy Tw . It then retrieves the corresponding subcategory memory Mw,si and provides it to the forecasting agent as structured guidance."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "forecastcompass2026:memory-revision",
+   "name": "Retrospective memory revision",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The diagnose-aggregate-revise procedure optimizes reusable memory from resolved forecasting outcomes and enforces the forecasting information cutoff. Under the R3 counterfactual, another task family would require different discrepancy criteria, memory abstractions, and outcome/calibration updates, so the core is TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - revision criteria are missing factors, misleading signals, and forecast calibration errors"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 292,
+     "quote": "After questions from update step w are resolved, F O C O updates the forecasting taxonomy and subcategory-level memories using only past resolved questions, preventing future inference from accessing post-resolution information for unresolved questions."
+    },
+    {
+     "line": 316,
+     "quote": "After the questions are resolved, F O C O constructs retrospective trajectories as learning signals."
+    },
+    {
+     "line": 326,
+     "quote": "F O C O then contrasts the original forecasting trajectory zi with the retrospective trajectory ziretro to obtain a discrepancy signal:"
+    },
+    {
+     "line": 363,
+     "quote": "After N iterations of diagnose–aggregate–revise procedure, the resulting memory is stored as Mw,s."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 387,
+   "quote": "chronological evaluation protocol: memory is constructed only from previously resolved questions and is used to forecast future unresolved questions. This prevents post-resolution information from leaking into the current forecast."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 416,
+   "quote": "Factor-centric memory consistently improves forecasting accuracy and calibration. Across both datasets and backbone models, F O C O consistently achieves the best average Brier and ECE scores among all deployable methods."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The work forecasts evolving future-event questions using evidence and categorical outcome probabilities. Its two contributed mechanisms are task-specific forecasting memory and retrospective memory evolution; no downstream action-utility evaluation or execution-validity trace is reported."
+}

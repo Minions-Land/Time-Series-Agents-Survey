@@ -1,0 +1,285 @@
+{
+ "citation_key": "atlas2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "ATLAS contributes a trading-agent runtime with specialist market, news, and fundamental analysis, order execution, and prompt optimization driven by delayed trading feedback.",
+ "claim_evidence": [
+  {
+   "line": 95,
+   "quote": "Market Intelligence Pipeline, which consists of specialized agents that prepare market, news, and fundamental inputs for downstream decisions;"
+  },
+  {
+   "line": 99,
+   "quote": "the OPRO framework that dynamically edits the Central Trading Agent’s instruction prompt based on real-time, stochastic market feedback."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "atlas2025:adaptive-opro",
+   "name": "Windowed prompt optimization",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The ATLAS instantiation updates the CTA instruction using portfolio ROI over trading windows. If the task family changes, its reward and scoring criterion must be redesigned, so the instantiated procedure embeds a task-specific objective (R3_1 TSK).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - uses task-specific portfolio ROI as the prompt-update reward",
+    "R3_2_GTS:no - the instantiated reward binds the procedure to trading decisions",
+    "R4:Optimization and Evolution",
+    "R5:processing, context_memory",
+    "R7:decision_support"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 147,
+     "quote": "It generalizes OPRO to interactive settings where decisions are temporally coupled and rewards arrive after multiple steps."
+    },
+    {
+     "line": 224,
+     "quote": "aggregate portfolio performance over K=5 trading days to reduce noise and capture delayed effects of sequential decisions"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "id": "atlas2025:market-analyst",
+   "name": "Market analyst procedure",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Interface and Interaction"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The procedure analyzes multi-timescale price and volume data to prepare technical assessment for trading decisions. If the task family changes, its analysis inputs and output criteria must be redesigned, so it embeds a trading-specific objective (R3_1 TSK).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - multi-timescale technical assessment is prepared for trading decisions",
+    "R4:Tools and Execution, Interface and Interaction",
+    "R5:processing",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 108,
+     "quote": "Market Analyst produces multi-timescale summaries from price and volume in varying time scales (2 years, 6 months, and 3 months of history with monthly, weekly, and daily candlesticks, respectively)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "atlas2025:news-analyst",
+   "name": "News analyst procedure",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The component retrieves timestamped financial news and produces trading-relevant structured analysis for the Central Trading Agent. Changing task family changes the information selection and analysis objective, so this is a trading-specific procedure (R3_1 TSK).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - retrieves and structures financial news for trading decisions",
+    "R4:Tools and Execution, Memory and Context",
+    "R5:context_memory",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1508,
+     "quote": "The News Analyst distills market-relevant information from financial news streams for a given ticker. Inputs are retrieved from the Massive API2 as batches of timestamped items"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "atlas2025:fundamental-analyst",
+   "name": "Fundamental analyst procedure",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The component retrieves periodic disclosures and corporate-action information to prepare trading-relevant context. The inputs and output criteria are specific to trading decisions, so the procedure is TSK (R3_1).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - extracts trading-relevant structure from corporate reports and actions",
+    "R4:Tools and Execution, Memory and Context",
+    "R5:context_memory",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1578,
+     "quote": "The Fundamental Analyst extracts trading-relevant structure from periodic corporate disclosures (earnings releases, financial statements) and corporate actions (dividends, splits)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "atlas2025:trading-execution",
+   "name": "Analyst-conditioned order execution",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Interface and Interaction",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The CTA converts structured analyst inputs and portfolio state into specified orders that StockSim executes. Its output requirement and action space are trading-specific, so it is TSK (R3_1).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - emits and executes portfolio orders",
+    "R4:Tools and Execution, Interface and Interaction, Planning and Orchestration",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 121,
+     "quote": "This agent consumes the structured inputs and current portfolio and emits orders that specify type (market, limit, stop), size, timing, and price levels."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 216,
+   "quote": "since no window is ever replayed under a later prompt, each variant is assessed on outcomes that unfolded after it was written, keeping optimization and evaluation on disjoint segments of the trajectory."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 551,
+   "quote": "Adaptive-OPRO consistently outperforms both static baseline prompts and reflection-based approaches across the tested models and market conditions."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 560,
+   "quote": "Return, risk-adjusted, and win-rate metrics jointly indicate successful adaptation to market feedback: models paired with Adaptive-OPRO achieve higher returns while maintaining or reducing drawdowns"
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "atlas2025:adaptive-opro",
+   "decision": "change",
+   "new_ids": [
+    "atlas2025:adaptive-opro"
+   ],
+   "changes": [
+    "layer GH->TSK",
+    "dimensions: removed retired Control, Verification, and Feedback; retained Optimization and Evolution",
+    "added temporal functions: processing, context_memory",
+    "view_status general_runtime->task_procedure"
+   ],
+   "reason": "The ATLAS instantiation updates the CTA prompt from portfolio ROI over fixed trading windows. Because that task-specific reward must change when the task changes, the instantiation meets the R3_1 counterfactual despite the generalized update procedure."
+  },
+  {
+   "existing_id": "atlas2025:trading-execution",
+   "decision": "split",
+   "new_ids": [
+    "atlas2025:trading-execution",
+    "atlas2025:market-analyst",
+    "atlas2025:news-analyst",
+    "atlas2025:fundamental-analyst"
+   ],
+   "changes": [
+    "removed retired Coordination and Scaling dimension",
+    "retained atlas2025:trading-execution for CTA order generation and execution",
+    "split out the three separately specified analyst procedures"
+   ],
+   "reason": "The packet describes three distinct specialist analysts with separate inputs and outputs, alongside a CTA that converts their outputs and portfolio state into trading orders. Each has an independently identifiable task-specific procedure."
+  }
+ ],
+ "needs_human_review": true,
+ "notes": "Adaptive-OPRO is classified as TSK for the ATLAS instantiation because its prompt updates are scored by trading portfolio ROI; the generalized procedure accepts task-dependent scoring, so the boundary with GTS is ambiguous and merits adjudication. The previous card grouped the analyst pipeline with order execution; the packet supports four separately described procedures."
+}

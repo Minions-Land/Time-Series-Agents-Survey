@@ -1,0 +1,203 @@
+{
+ "citation_key": "chatts2025",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "ChatTS supplies a multimodal LLM with native multivariate time-series representation and reasoning by training a patch encoder with attribute-based synthetic series and evolved question-answer data.",
+ "claim_evidence": [
+  {
+   "line": 216,
+   "quote": "• We propose to align LLMs with time series using attribute-based"
+  },
+  {
+   "line": 221,
+   "quote": "• We propose a context-aware TS-MLLM, ChatTS, designed for"
+  }
+ ],
+ "task_memberships": [],
+ "other_tasks": [
+  "temporal_question_answering",
+  "temporal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "chatts2025:temporal-alignment",
+   "name": "Context-aware patch encoder",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering",
+    "temporal_analysis"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 LLM test: the trained MLP maps time-series patches into the text-embedding space, changing how the model represents temporal input; this is not Harness execution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:representation_alignment"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 616,
+     "quote": "encode temporal patterns more effectively. We employ a simple 5-layer MLP to encode each patch of the time series, as time series"
+    },
+    {
+     "line": 623,
+     "quote": "Specifically, the encoded patches corresponding to each time series were inserted"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "chatts2025:value-preserved-normalization",
+   "name": "Value-preserved temporal normalization",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering",
+    "temporal_analysis"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 LLM test: normalization parameters are supplied in the model prompt to preserve numerical information while training temporal understanding; this changes the model-side representation rather than Harness execution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:representation_alignment"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 711,
+     "quote": "shown in Figure 7). First, we apply standard min-max normalization"
+    },
+    {
+     "line": 715,
+     "quote": "during normalization)—in the text as part of a prompt. This approach leverages the numerical understanding capabilities of LLMs,"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "chatts2025:synthetic-instruction",
+   "name": "Attribute-based synthetic series generator",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering",
+    "temporal_analysis"
+   ],
+   "role": "training_data",
+   "scope_reason": "R2 LLM test: the generator creates synthetic time-series/text training data for model alignment, so it is training data built to train the LLM rather than a deployed Harness component.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:representation_alignment"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 424,
+     "quote": "arrays that exactly match the attributes from the pool in a rulebased manner (more details can be found in the source code). This"
+    },
+    {
+     "line": 425,
+     "quote": "process allows us to generate diverse synthetic time series with"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "chatts2025:tsevol-instruction",
+   "name": "Time Series Evol-Instruct QA generator",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering",
+    "temporal_analysis"
+   ],
+   "role": "training_data",
+   "scope_reason": "R2 LLM test: TSEvol generates the Q&A training data used to improve the LLM’s time-series reasoning, so it is model training data rather than a task runtime.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 592,
+     "quote": "builds upon Evol-Instruct by introducing a mechanism to incorporate time series attributes dynamically into each evolutionary step"
+    },
+    {
+     "line": 598,
+     "quote": "as additional context, guiding the LLMs to generate Q&As about"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1578,
+   "quote": "We exclude responses that failed to parse, ensuring all outputs were valid."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 925,
+   "quote": "ChatTS consistently outperforms all baseline models across nearly"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper is a model-side technique; the current card merged two distinct training-data mechanisms and used retired or invalid dimensions."
+}

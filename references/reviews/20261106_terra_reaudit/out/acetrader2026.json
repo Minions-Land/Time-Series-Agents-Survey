@@ -1,0 +1,259 @@
+{
+ "citation_key": "acetrader2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "ACE-Trader contributes a feedback-driven portfolio-trading harness combining context-dependent memory selection, evidence-based proposal revision, and outcome-linked co-evolution of Trader and Red-Team memories without fine-tuning the LLMs.",
+ "claim_evidence": [
+  {
+   "line": 150,
+   "quote": "Second, we develop lightweight, context-dependent memory selectors trained with shared"
+  },
+  {
+   "line": 151,
+   "quote": "net-return feedback from complete memory-assisted and memory-free trading pipelines."
+  },
+  {
+   "line": 152,
+   "quote": "design a co-evolution mechanism that links the Trader’s and Red-Team’s role-specific memories"
+  },
+  {
+   "line": 395,
+   "quote": "disputed positions or provides additional current evidence to retain them. If the Red-Team returns\nPASS, we skip Revise without further memory retrieval, selection, or a Trader call, and set aRev"
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "acetrader2026:memory-selector",
+   "name": "Return-trained context-dependent memory selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies first: selector state includes market, portfolio and recorded trading outcomes, and supervision compares net returns of complete trading pipelines. Changing task family requires redesigning this state and reward; chronological retrieval alone does not make the module GTS. The trained external memory reranker is Harness under R2, not a trained LLM policy.",
+   "rubric_path": [
+    "R0:in_scope - historical numerical prices drive LLM portfolio decisions",
+    "R1:contributed - role-specific ensemble reranking and recency-weighted online updates",
+    "R2:Harness - external memory selectors; trading LLMs and semantic encoder remain frozen",
+    "R3_1_TSK:yes - portfolio features and net-return supervision bind the mechanism to trading",
+    "R4:Memory and Context; Optimization and Evolution",
+    "R5:context_memory; task_procedure",
+    "R6:not_applicable - no LLM-side learning",
+    "R7:decision_support",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 307,
+     "quote": "Here, ftu contains current market features from ot and portfolio features specific to phase u. In"
+    },
+    {
+     "line": 312,
+     "quote": "Scoring and selecting memories. The Trader and Red-Team use separate selectors, each comprising K feedforward networks."
+    },
+    {
+     "line": 453,
+     "quote": "At each trading step t, we run the complete trading workflow with and without memory using\nthe same market information ot and pre-decision account state bt ."
+    },
+    {
+     "line": 456,
+     "quote": "transaction-cost rules. Once the outcomes are observed, the net-return difference provides a shared\nbinary label, with near-tied outcomes excluded."
+    },
+    {
+     "line": 457,
+     "quote": "Each selector is trained on the saved representations of its selected memories using recency-weighted binary cross-entropy. The trading LLMs and\nsemantic encoder remain frozen."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "acetrader2026:adversarial-trading",
+   "name": "Evidence-based Commit–Challenge–Revise trading",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies: the procedure emits portfolio actions and weights, challenges investment assumptions against current financial evidence, and revises or retains disputed positions. Moving to a different task family requires redesigning the action space and challenge criterion; this is not task-neutral coordination.",
+   "rubric_path": [
+    "R0:in_scope - historical numerical prices drive LLM portfolio decisions",
+    "R1:contributed - concrete evidence-based trading integration with conditional revision",
+    "R2:Harness - phase prompts, financial tool use and feedback-controlled calls",
+    "R3_1_TSK:yes - portfolio outputs and investment-risk challenge criterion",
+    "R4:Interface and Interaction; Tools and Execution; Planning and Orchestration",
+    "R5:task_procedure - no separate temporal function assigned to the task-specific review",
+    "R6:not_applicable",
+    "R7:decision_support",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 364,
+     "quote": "The Red-Team examines the\nproposal’s assumptions and risks using current evidence gathered through news search and marketdata tools:"
+    },
+    {
+     "line": 369,
+     "quote": "Here, ct contains the review evidence and either a challenge or PASS. The Red-Team issues a\nchallenge only when current evidence contradicts a specific assumption in the Trader’s proposal."
+    },
+    {
+     "line": 371,
+     "quote": "Each challenge includes suggested portfolio adjustments and a risk warning specifying an observable\ncondition and when it should be evaluated."
+    },
+    {
+     "line": 395,
+     "quote": "disputed positions or provides additional current evidence to retain them. If the Red-Team returns\nPASS, we skip Revise without further memory retrieval, selection, or a Trader call, and set aRev"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "acetrader2026:co-evolution",
+   "name": "Outcome-linked shared-case memory co-evolution",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies: memory construction separately labels investment-risk warnings and the net-return benefit of revising portfolio plans, then stores linked role-specific experience and consolidated lessons. A different task family requires redesigning outcome labels, revision utility and experience schemas; shared memory alone is not GH or GTS.",
+   "rubric_path": [
+    "R0:in_scope - historical numerical prices drive LLM portfolio decisions",
+    "R1:contributed - linked shared/private cases and role-specific outcome attribution",
+    "R2:Harness - external case stores and LLM-prompted lesson consolidation",
+    "R3_1_TSK:yes - risk occurrence and portfolio revision net returns define experience",
+    "R4:Memory and Context; Optimization and Evolution",
+    "R5:context_memory; task_procedure",
+    "R6:not_applicable - consolidation does not update LLM parameters",
+    "R7:decision_support",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 430,
+     "quote": "We also check the risk warnings in ct against the conditions and evaluation times specified before\nexecution."
+    },
+    {
+     "line": 436,
+     "quote": "Risk occurrence and revision benefit are evaluated separately: a correct\nwarning can still be followed by a revision that reduces net return."
+    },
+    {
+     "line": 438,
+     "quote": "Constructing shared and role-specific memories. We store the complete interaction, risk labels,\nand return comparison as a shared memory case."
+    },
+    {
+     "line": 443,
+     "quote": "Both items include the\nmarket context and shared case identifier, preserving the connection between the proposal, critique,\nresponse, and outcome."
+    },
+    {
+     "line": 446,
+     "quote": "Each item is added to the corresponding role’s private short-term memory. Periodically, an LLM\nsummarizes recurring lessons from recent entries for long-term memory, specifying when each lesson applies and retaining references to its supporting cases."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1348,
+   "quote": "During testing, memory construction and selector updates use only outcomes\nfrom completed settlement intervals and affect subsequent decisions."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 811,
+   "quote": "The complete model achieves the highest return\nand Sharpe ratio with the lowest maximum drawdown and volatility, although Variant 3 retains the\nhighest hit rate."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 788,
+   "quote": "DeepSeek V4 Flash backbone, increasing cumulative return from -19.72% to 12.44%."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "All existing mechanism IDs are preserved. The new workflow module covers the concrete evidence-based financial integration and PASS-controlled revision, not the generic generator–critic pattern. The two role selectors remain one mechanism, with scoring and online update merged. Only decision_support is assigned; forecasting baselines are excluded. Task performance is evidenced by reported directional hit rate, while returns and risk measures establish decision utility. Process validity remains false: case studies illustrate decisions, but no runtime success/failure validation is reported. Temporal validity reflects the reported chronological, availability-restricted protocol, not an independent leakage audit. Generic tools, frozen backbones, baseline adapters and evaluation preprocessing are not promoted into separately contributed modules.",
+ "reconciliation": [
+  {
+   "existing_id": "acetrader2026:memory-selector",
+   "decision": "change",
+   "new_ids": [
+    "acetrader2026:memory-selector"
+   ],
+   "changes": [
+    "view_status: mapped -> task_procedure",
+    "Retain TSK, both dimensions, context_memory and decision_support",
+    "Add line-verified evidence, rubric path, llm_route, confidence and complete reuse fields"
+   ],
+   "reason": "The existing selector mechanism is supported by Sections 4.2.1 and 4.4 and Appendix B. Its portfolio-state features and net-return labels satisfy R3_1_TSK; mapped is reserved for GTS under R5. The trained feedforward reranker remains external to the frozen LLMs, so it is not LLM workflow_learning."
+  },
+  {
+   "existing_id": "acetrader2026:co-evolution",
+   "decision": "change",
+   "new_ids": [
+    "acetrader2026:co-evolution"
+   ],
+   "changes": [
+    "dimensions: replace retired labels with Memory and Context and Optimization and Evolution",
+    "functions: retain context_memory; remove validation",
+    "view_status: mapped -> task_procedure",
+    "Retain TSK, decision_support and the existing mechanism ID",
+    "Add the separately contributed trading workflow as acetrader2026:adversarial-trading"
+   ],
+   "reason": "Sections 4.3 and E.3 describe outcome-attributed memories and recurring lessons used across later interactions, supporting Optimization and Evolution. The shared cases preserve context but do not themselves implement scheduling. Settling risk-warning correctness and revision profitability is task-specific outcome evaluation, not a chronology, leakage or temporal-consistency guard. The conditional evidence-based trading workflow in Section 4.2.2 is separately usable, as the memory-free reference in Appendix B shows, and receives its own new module."
+  }
+ ]
+}

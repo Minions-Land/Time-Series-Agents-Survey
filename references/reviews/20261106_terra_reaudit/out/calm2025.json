@@ -1,0 +1,321 @@
+{
+ "citation_key": "calm2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "CALM contributes a feedback-driven harness that performs temporal stream processing, LLM-judged anomaly curation, and continuous TimesFm fine-tuning and model swapping for adaptive time-series anomaly detection.",
+ "claim_evidence": [
+  {
+   "line": 60,
+   "quote": "A Scalable Streaming Architecture: An end-to-end anomaly detection system architected on Apache Beam, specifically designed to handle high-throughput, out-of-order data streams."
+  },
+  {
+   "line": 62,
+   "quote": "The LLM-as-a-Judge Mechanism: A novel component that functions as an online, semantic concept drift detector."
+  },
+  {
+   "line": 66,
+   "quote": "A Closed-Loop Continuous Fine-Tuning Pipeline: A fully automated MLOps loop"
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "calm2025:event-windowing",
+   "name": "Ordered event-time window construction",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:no: the component does not embed an anomaly objective; R3_2_GTS:yes: ordered timestamps, event-time windows, watermarks and missing-time repair are its core assumptions and would need redesign for non-temporal inputs.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task objective",
+    "R3_2_GTS:yes - temporal order/windows/frequency",
+    "R4:Memory and Context; Tools and Execution",
+    "R5:mapped"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 253,
+     "quote": "We implement a custom stateful sliding-window function to handle this. As shown in Figure 2, incoming elements are first buffered in state (per key) instead of being immediately emitted."
+    },
+    {
+     "line": 271,
+     "quote": "We include a data-cleaning step that checks each window for missing timestamps based on the expected interval."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "calm2025:forecast-anomaly-detector",
+   "name": "Quantile-forecast anomaly detector",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:yes: the component embeds the anomaly-detection output criterion by comparing forecast quantiles with the observed value; changing the task family changes the score and validation rule. R3_2_GTS is not the most specific match because the defining logic is the anomaly objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly criterion and threshold",
+    "R4:Tools and Execution",
+    "R5:task_procedure - processing/validation",
+    "R7:anomaly_detection_diagnosis"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 283,
+     "quote": "The core anomaly detection logic uses a forecasting model (TimesFm) on each window of data. We developed a custom inference component (integrated with Beam’s “RunInference” transform) that processes each window by splitting it into a context portion and a prediction horizon."
+    },
+    {
+     "line": 287,
+     "quote": "Rather than using a single-point prediction, we leverage the model’s quantile forecasts (e.g., q20 , q30 , q70 , q80 ) to establish a robust threshold for anomalies."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "calm2025:stream-model-swap",
+   "name": "In-flight model-artifact swapping",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:no: artifact watching and weight reload do not encode a task objective. R3_2_GTS:no: the mechanism manages execution and deployment state without temporal semantics; R3_3_GH:yes.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task objective",
+    "R3_2_GTS:no - no temporal semantics",
+    "R3_3_GH:yes - execution/state management",
+    "R4:Tools and Execution",
+    "R5:general_runtime"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 292,
+     "quote": "A cornerstone of the CALM framework is its ability to adapt the model on the fly. We achieve this by using Apache Beam’s side input mechanism – an auxiliary, broadcast input that can provide configuration data to all workers."
+    },
+    {
+     "line": 297,
+     "quote": "Whenever the fine-tuning stage produces a new model artifact and saves it to this location, the side input value is updated to the new model’s path."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "calm2025:drift-curation",
+   "name": "Semantic drift curation",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:yes: KEEP/REMOVE is a task-specific anomaly judgment that validates whether an outlier is a meaningful shift and routes the result to adaptation. R3_2_GTS is not the first match because the core criterion is the anomaly-diagnosis objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly judgment/routing",
+    "R4:Planning and Orchestration; Optimization and Evolution",
+    "R5:task_procedure - context_memory/validation",
+    "R7:anomaly_detection_diagnosis"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 304,
+     "quote": "Once an outlier is detected by the forecasting model, it is not immediately used for fine-tuning. Instead, it is first passed to an LLM-based classifier (the ”LLM-as-a-Judge” component) for semantic analysis."
+    },
+    {
+     "line": 324,
+     "quote": "The LLM is then tasked to decide whether to “KEEP” the anomaly (if it signifies a sustained shift in the pattern) or “REMOVE” it (if it’s a transient, one-off event)."
+    },
+    {
+     "line": 336,
+     "quote": "If the decision is “KEEP,” the original data point (with its anomaly value) is forwarded to the fine-tuning pipeline. If the decision is “REMOVE,” we treat that point as a spurious outlier and replace its value with the model’s predicted value"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "calm2025:continuous-finetuning-loop",
+   "name": "Continuous fine-tuning orchestration",
+   "layer": "GTS",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:no: the orchestration can reuse the same adaptation pattern for another temporal task; R3_2_GTS:yes: it requires contiguous time-series batches and temporal state to train and redeploy the model.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - generic adaptation orchestration",
+    "R3_2_GTS:yes - contiguous temporal batches/state",
+    "R4:Planning and Orchestration; Optimization and Evolution",
+    "R5:mapped - processing/context_memory"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 390,
+     "quote": "The data points labeled “KEEP” by the LLM Judge are buffered and aggregated into batches for model training. We use a stateful batching mechanism that accumulates these points and only emits a batch when it has collected a full, continuous sequence"
+    },
+    {
+     "line": 397,
+     "quote": "When a batch of new data is ready, the system launches a fine-tuning process for the model."
+    },
+    {
+     "line": 405,
+     "quote": "After the model is saved, the pipeline’s model-watching mechanism picks up the new model version."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 423,
+   "quote": "Our experiment followed a strict temporal split to simulate a real-world scenario."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 429,
+   "quote": "For this reason, we chose the Receiver Operating Characteristic (ROC) Area Under the Curve (AUC) score as our primary metric."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "calm2025:event-windowing",
+   "decision": "change",
+   "new_ids": [
+    "calm2025:event-windowing"
+   ],
+   "changes": [
+    "functions: data_management -> data_management, processing, validation"
+   ],
+   "reason": "The packet explicitly describes ordered buffering, watermark emission, and missing-timestamp checks and repair."
+  },
+  {
+   "existing_id": "calm2025:stream-model-swap",
+   "decision": "keep",
+   "new_ids": [
+    "calm2025:stream-model-swap"
+   ],
+   "changes": [],
+   "reason": "The side-input path watcher and callback weight reload are the same contributed mechanism."
+  },
+  {
+   "existing_id": "calm2025:drift-curation",
+   "decision": "split",
+   "new_ids": [
+    "calm2025:drift-curation",
+    "calm2025:continuous-finetuning-loop"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration; added Optimization and Evolution",
+    "split semantic KEEP/REMOVE judging from stateful batching, fine-tuning launch, and redeployment"
+   ],
+   "reason": "The source presents semantic curation and the subsequent continuous fine-tuning orchestration as distinct stages with separate reusable logic."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The current card omitted the paper's custom quantile-forecast anomaly detector and did not separate the continuous fine-tuning loop from semantic curation. The LLM judge is a harness procedure because it is an in-context prompt and routing mechanism; no model parameters are updated by the judge itself."
+}

@@ -1,0 +1,204 @@
+{
+ "citation_key": "trafficr12025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "Traffic-R1 trains a 3B LLM with expert-informed offline RL and simulator-feedback online RL, then uses asynchronous neighboring-intersection communication for traffic signal control with reasoning and OOD handling.",
+ "claim_evidence": [
+  {
+   "line": 13,
+   "quote": "We introduce Traffic-R1, a 3B-parameter foundation model with human-like reasoning for"
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "trafficr12025:expert-collaborative-dataset",
+   "name": "Expert-collaborative TSC dataset",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R2 places this source-built training dataset on the LLM side because it supplies expert-validated actions for LLM finetuning; R3 does not apply to an LLM-side module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning",
+    "R7:decision_support"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 290,
+     "quote": "3,000-sample dataset using a human-in-the-loop pipeline. For each traffic scenario, a base model"
+    },
+    {
+     "line": 298,
+     "quote": "final, validated actions, excluding any reasoning"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "trafficr12025:traffic-policy-training",
+   "name": "Human-informed offline RL finetuning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places this mechanism on the LLM side because GRPO and rule-based expert rewards update the LLM policy; R3 does not apply to an LLM-side module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning",
+    "R7:decision_support"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 306,
+     "quote": "same offline RL framework to finetune the LLM"
+    },
+    {
+     "line": 331,
+     "quote": "Since signal actions are mutually exclusive, Racc = 1 only when"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "trafficr12025:open-world-stpo",
+   "name": "Open-world STPO policy optimization",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning",
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places simulator-feedback policy optimization on the LLM side because online rewards update the LLM policy to choose traffic actions; R3 does not apply to an LLM-side module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:workflow_learning",
+    "R6:instruction_reasoning",
+    "R7:decision_support"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 397,
+     "quote": "we propose an open-world online RL to inspire LLM explore multi-step and"
+    },
+    {
+     "line": 430,
+     "quote": "we propose Stepwise Trajectory Policy Optimization (STPO)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "trafficr12025:asynchronous-intersections",
+   "name": "Parity-scheduled intersection communication",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 selects TSK because the protocol's signal-action space, intersection groups and message semantics are specific to traffic-signal control; changing task family would require redesigning them. Its message buffer retains context across the ordered half-steps.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific signal actions and message semantics",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure",
+    "R7:decision_support"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 452,
+     "quote": "potential of our LLM-based model, we propose an asynchronous communication network. As"
+    },
+    {
+     "line": 462,
+     "quote": "TSC step is split into two inner steps: the first activates group one, and the second activates group two. This structure allows models activated in the first inner step to generate messages for their neighbors, which are then received and processed in the subsequent inner step."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1483,
+   "quote": "alternating weekly basis to mitigate temporal bias."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1491,
+   "quote": "Specifically, Traffic-R1 reduced the average and maximum queue lengths by 9.3% and 4.4%, respectively. Furthermore, it achieved a substantial 75% reduction in the human labor required for daily operations."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 1491,
+   "quote": "Specifically, Traffic-R1 reduced the average and maximum queue lengths by 9.3% and 4.4%, respectively. Furthermore, it achieved a substantial 75% reduction in the human labor required for daily operations."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Blind classification from the rubric and packet identified the training dataset, two separately reusable LLM training stages, and the task-specific communication protocol."
+}

@@ -1,0 +1,344 @@
+{
+ "citation_key": "timeclaw2026harness",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TimeClaw surrounds a frozen LLM with a temporal workspace and executable tools, reusable tool evolution, and multimodal episodic retrieval for contextualized time-series reasoning.",
+ "claim_evidence": [
+  {
+   "line": 138,
+   "quote": "• We introduce T IME C LAW, a time-seriesnative agentic harness that integrates executable tools, experience-driven capability\nevolution, and episodic multimodal memory."
+  },
+  {
+   "line": 258,
+   "quote": "decision, either from the harness or the agent’s internal reasoning. The policy selects\nar ∼ πθ (· | q, C, o1:r−1 ),"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis",
+  "decision_support"
+ ],
+ "other_tasks": [
+  "temporal_question_answering",
+  "temporal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "timeclaw2026harness:temporal-runtime",
+   "name": "Temporal workspace and executable interfaces",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1: the shared workspace and inspection interface impose no task output or objective; changing task family preserves their logic. R3_2: channel state, bounded temporal slices, autocorrelation and periodicity require temporal semantics. Numerical-claim grounding is integrated with execution, without a separate chronology validator.",
+   "rubric_path": [
+    "R1:contributed runtime integration; unchanged ARIMA/scipy algorithms excluded",
+    "R2:Harness",
+    "R3_1_TSK:no - shared temporal inspection interface",
+    "R3_2_GTS:yes - temporal workspace and ordered-series operations",
+    "R4:Interface and Interaction; Tools and Execution; Planning and Orchestration",
+    "R5:data_management; processing",
+    "R7:CiK, TSRBench and TSAIA applications",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 228,
+     "quote": "(q, X , Y, y ⋆ , ℓ), X1:T is loaded into a task-local\nworkspace W hosted by the harness runtime\nthat can be accessed through protocols (e.g.,\nModel Context Protocol (Anthropic, 2024)). This\nworkspace preserves the series at full numerical"
+    },
+    {
+     "line": 277,
+     "quote": "tool runs directly on W at numerical precision and\nreturns a compact structured observation."
+    },
+    {
+     "line": 285,
+     "quote": "The harness requires every numerical claim to be\ngrounded in a returned tool observation rather than\ninferred from free-form language reasoning."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeclaw2026harness:capability-evolution",
+   "name": "Verified executable-tool evolution",
+   "layer": "GH",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1: the synthesis/admission operator accepts supplied tasks and success criteria rather than embedding a financial objective. R3_2: its clustering, code synthesis, held-out execution and threshold admission require neither temporal order nor windows. R3_3 therefore selects GH; the generated financial procedures are separate TSK modules.",
+   "rubric_path": [
+    "R1:contributed synthesis and admission loop",
+    "R2:Harness - code-specialized LLM invocation without parameter updates",
+    "R3_1_TSK:no - task success supplied externally",
+    "R3_2_GTS:no - no intrinsic temporal semantics",
+    "R3_3_GH:yes - reusable tool synthesis and registration",
+    "R4:Optimization and Evolution; Tools and Execution",
+    "R5:no temporal function",
+    "R7:concrete evolved tools on TSAIA finance",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 245,
+     "quote": "Capability evolution mechanism. We implement the evolution operator E as a code-specialized\nLLM. Given clustered trajectories and task descriptions, E abstracts recurring analytical subprocedures into self-contained executable tools,"
+    },
+    {
+     "line": 248,
+     "quote": "W. Each candidate tool is verified by execution on\na held-out subset of similar tasks and is admitted\ninto T only if its held-out success rate exceeds a\nthreshold γ. Once admitted, the tool is immediately registered alongside the seed tools and can be\ninvoked in future rollouts."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeclaw2026harness:multimodal-memory",
+   "name": "Multimodal episodic trajectory retrieval",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1: stored analytical traces and retrieval are independent of a particular output objective; switching task family changes records, not retrieval logic. R3_2: numerical fingerprints explicitly depend on lagged autocorrelation, spectral structure and temporal dynamics, making the memory GTS.",
+   "rubric_path": [
+    "R1:contributed multimodal fingerprints and trajectory retrieval",
+    "R2:Harness",
+    "R3_1_TSK:no - task-independent retrieval",
+    "R3_2_GTS:yes - order-sensitive temporal fingerprints",
+    "R4:Memory and Context",
+    "R5:context_memory; processing",
+    "R7:CiK, TSRBench and TSAIA applications",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 281,
+     "quote": "Memory records. Each memory record m ∈ M\nstores a past task, its retrieval keys, and its successful analytical trace:"
+    },
+    {
+     "line": 482,
+     "quote": "The time series key ψ = Ψ(X1:T ) is a time-series\nfingerprint that encodes structural, statistical, spectral, temporal-dynamic, and multivariate properties."
+    },
+    {
+     "line": 2204,
+     "quote": "Stage 2 (signal-side ranking). Within the textside candidate pool, we rank by L2 distance in the\nbank-normalized fingerprint space,"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeclaw2026harness:portfolio-var",
+   "name": "Evolved portfolio risk procedure",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1: computes portfolio loss over a specified horizon and compares options by downside risk; changing task family requires replacing the financial state, metric and comparison objective, so TSK wins before GTS.",
+   "rubric_path": [
+    "R1:contributed evolved executable tool",
+    "R2:Harness",
+    "R3_1_TSK:yes - portfolio risk comparison objective",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 3931,
+     "quote": "• portfolio_var(channels, weights, horizon=H, alpha=α, method=\"parametric\"): compute portfolio risk using task metadata and compare the resulting losses across options."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeclaw2026harness:portfolio-sharpe",
+   "name": "Evolved risk-adjusted return procedure",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1: evaluates candidate portfolios using a risk-free-adjusted return criterion. Changing task family requires redesigning portfolio inputs and the financial comparison objective, so TSK precedes GTS.",
+   "rubric_path": [
+    "R1:contributed evolved executable tool",
+    "R2:Harness",
+    "R3_1_TSK:yes - risk-adjusted portfolio comparison",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 3929,
+     "quote": "• portfolio_sharpe(channels, weights, risk_free, period_per_year): compute risk-adjusted return\nfor each portfolio option and compare the returned ratios."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeclaw2026harness:capm-regression",
+   "name": "Evolved market-factor analysis procedure",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1: estimates market-relative asset statistics to select the matching answer option. A different task family requires replacing the asset/market semantics and target financial statistic; this is a task-specific financial analysis procedure.",
+   "rubric_path": [
+    "R1:contributed evolved executable tool",
+    "R2:Harness",
+    "R3_1_TSK:yes - market-relative financial output criterion",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:decision_support",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 3932,
+     "quote": "• capm_regression(asset_channel, market_channel): estimate market-factor statistics {α, β, r2 } and\nselect the option whose target statistic matches the returned value."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 3897,
+   "quote": "1. Targeted tool use. Primed by the retrieved rule, the agent runs only the inspections needed to confirm direction:\nlist_channels → series_overview → five compute_acf probes, one per river."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 578,
+   "quote": "T IME C LAW achieves the best average RCRPS and\nsMAPE, improving average RCRPS by 11.5% relative to the strongest baseline."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Frozen policy: no LLM training module. Three independently callable evolved finance tools are distinct from the general evolution operator; predicted future tools are excluded. Demonstrated cross-family reuse of runtime/memory uses the work's benchmark applications; concrete evolution is shown on finance. Process evidence is a qualitative operation trace, not a tool-call reliability rate. Random train/test separation and isolated workspaces do not establish chronological validity; no explicit temporal-validity audit is reported. Financial and decision-making results measure answer accuracy, not realized downstream utility."
+}

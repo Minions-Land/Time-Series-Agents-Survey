@@ -1,0 +1,456 @@
+{
+ "citation_key": "aqua2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "Two separate LLM-driven research loops, one for formulaic factor discovery (Part I) and one for config-driven hybrid time-series model development (Part II), each retain validated experiment evidence to guide later proposals inside a sealed data-and-evaluator sandbox.",
+ "claim_evidence": [
+  {
+   "line": 11,
+   "quote": "We present AQuA, which comprises two separate language-model-driven research systems:"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "decision_support"
+ ],
+ "modules": [
+  {
+   "id": "aqua2026:manager-pipeline",
+   "name": "Manager-mediated specialist pipeline",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "decision_support"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK yes: the specialists and the plan are built for factor research whose output is a combined forward-return signal; counterfactual: another task family would need different specialists and objectives.",
+   "rubric_path": [
+    "R0:feedback_driven_agent",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - factor-research specialists and plan",
+    "R4:Planning and Orchestration"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 253,
+     "quote": "Part I of AQuA is a multi-agent system that turns a research goal into validated factors."
+    },
+    {
+     "line": 256,
+     "quote": "never call one another; each handoff passes through the Manager, which keeps a run auditable and"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "aqua2026:falsifiable-proposal",
+   "name": "Falsifiable factor proposal before construction",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK yes: hypothesis, expected direction and label horizons are forecasting-specific; counterfactual: a new task changes the proposal schema.",
+   "rubric_path": [
+    "R0:feedback_driven_agent",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast direction and labels in proposal",
+    "R4:Planning and Orchestration"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 266,
+     "quote": "A factor enters the pipeline as a proposal rather than as an expression."
+    },
+    {
+     "line": 209,
+     "quote": "Before assembling the expression, the agent states each factor as a falsifiable proposal, with"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "aqua2026:event-profile-retrieval",
+   "name": "Historical event-profile retrieval",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "context_memory",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_2_GTS yes: searches temporal event windows in the history without binding to a task objective.",
+   "rubric_path": [
+    "R0:feedback_driven_agent",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task objective embedded",
+    "R3_2_GTS:yes - event windows over history"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 259,
+     "quote": "returns a quality report together with a set of atomic features. The Visual Analyst searches the history"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "id": "aqua2026:causal-operator-registry",
+   "name": "Causal formulaic-alpha operator registry",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_2_GTS yes: trailing-window and current-timestamp operators make causality hold under composition; not bound to one target.",
+   "rubric_path": [
+    "R0:feedback_driven_agent",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - operators are not bound to a task objective",
+    "R3_2_GTS:yes - windowing and causality"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 203,
+     "quote": "Every time-series operator reads only its trailing window and every cross-sectional"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "aqua2026:factor-falsification-evaluator",
+   "name": "Factor evaluator with controlled falsification tests",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "decision_support"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK yes: IC-based acceptance against forward-return labels and baselines embeds the forecasting criterion.",
+   "rubric_path": [
+    "R0:feedback_driven_agent",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - IC criterion over forward-return labels",
+    "R4:Planning and Orchestration"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 311,
+     "quote": "The Factor Evaluator computes information coefficients across forward-return labels, monthly stability,"
+    },
+    {
+     "line": 318,
+     "quote": "both the proposed direction and the reversed direction and keeps the cleaner trading interpretation."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "aqua2026:cross-run-beliefs",
+   "name": "Cross-run memory of mechanism beliefs",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_3_GH yes: structured records and confidence-weighted beliefs carried across runs; no temporal semantics or task objective of its own.",
+   "rubric_path": [
+    "R0:feedback_driven_agent",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_3_GH:yes - memory and cross-run state"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 324,
+     "quote": "The system improves across runs because it maintains memory."
+    },
+    {
+     "line": 329,
+     "quote": "The next run is planned against this memory."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "aqua2026:sealed-sandbox",
+   "name": "Sealed sandbox with validation-only search feedback",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "data_management",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_2_GTS yes: frozen chronological splits, feature/label definitions and held-out window control information availability without binding to one task.",
+   "rubric_path": [
+    "R0:feedback_driven_agent",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - splits and data path are not task-bound",
+    "R3_2_GTS:yes - frozen splits and held-out information availability"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 171,
+     "quote": "The data splits D, the feature and label definitions F and L, and the evaluator V are sealed and"
+    },
+    {
+     "line": 185,
+     "quote": "During search the harness returns to the agent only a score on a validation slice"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aqua2026:config-diff-loop",
+   "name": "Config-diff experiment loop",
+   "layer": "GH",
+   "dimensions": [
+    "Interface and Interaction",
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_3_GH yes: one config diff is one compiled, scored variant; execution and state only; splits inherited from the sandbox.",
+   "rubric_path": [
+    "R0:feedback_driven_agent",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_3_GH:yes - execution and state loop"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 410,
+     "quote": "Part II of AQuA develops trading models through the config-driven loop of Figure 4."
+    },
+    {
+     "line": 423,
+     "quote": "Because one diff produces exactly one variant and the data path is fixed,"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "aqua2026:hybrid-ts-predictor",
+   "name": "Hybrid convolution-sequence return predictor",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK yes: trained for per-stock forward-return scores with an IC-based loss; counterfactual: a new task would change loss and readout.",
+   "rubric_path": [
+    "R0:feedback_driven_agent",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forward-return IC objective",
+    "R4:Tools and Execution"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 427,
+     "quote": "Our predictor is a hybrid model that combines convolutional feature extraction with sequence modeling Kabir et al. (2025); Zhang et al. (2019), shown in Figure 5."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aqua2026:threshold-strategy",
+   "name": "Threshold long/short strategy with causal volatility overlay",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK yes: converts scores into a dollar-neutral book evaluated by cost-adjusted Sharpe; counterfactual: a different decision task changes the book rules.",
+   "rubric_path": [
+    "R0:feedback_driven_agent",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - decision book rules and Sharpe objective",
+    "R4:Tools and Execution"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 523,
+     "quote": "The score is turned into a dollar-neutral threshold long/short book: stocks above"
+    },
+    {
+     "line": 552,
+     "quote": "A causal volatility-targeting overlay, which scales daily exposure by an online estimate of"
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 557,
+   "quote": "and a fully causal walk-forward that chooses"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 68,
+   "quote": "coefficient of +0.0843, versus +0.0613 for the strongest baseline, a GRU, under the same evaluator"
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 70,
+   "quote": "long/short strategy reaches a held-out Sharpe of +2.50 at a two-leg cost of 2 bps and is positive in"
+  }
+ },
+ "needs_human_review": true,
+ "notes": "Blind pass. Part II (hybrid predictor, config loop, threshold book) and the cross-run memory are contributions the paper states explicitly. No LLM-side module: the work does not train or adapt a language model; the hybrid predictor is a non-LLM time-series model. The Visual Analyst is described in one paragraph (L259-L260) and is low confidence."
+}

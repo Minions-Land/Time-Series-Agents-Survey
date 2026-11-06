@@ -1,0 +1,202 @@
+{
+ "citation_key": "epiworld2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "EpiWorld contributes a policy-conditioned epidemic world model and a protocol-guided LLM decision workflow whose counterfactual rollout feedback is distilled into reusable, regime-specific lessons.",
+ "claim_evidence": [
+  {
+   "line": 44,
+   "quote": "We present EpiWorld, a closed-loop framework that grounds an LLM policy actor in a learned actionconditioned epidemiological world model and a tiered skill library of public-health protocols, surveillance tools, and adaptive lessons accumulated through after-action analysis."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "epiworld2026:action-conditioned-world-model",
+   "name": "Action-conditioned epidemic world-model rollouts",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the model predicts epidemic trajectories conditioned on interventions and evaluates policy futures against hospital burden; changing to a non-policy forecasting task would require a different action-conditioned state and decision objective. It is temporal processing because it encodes observation windows and forecasts their evolution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - action-conditioned epidemic policy rollouts and hospital-burden objective",
+    "R5:processing",
+    "R7:forecasting_prediction,decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 233,
+     "quote": "EpiWorld addresses the epidemic policy optimisation problem in Eq. 2 through two coupled components: (i) an epidemiological world model that approximates the unknown policy-conditioned dynamics and enables counterfactual rollout, and (ii) a protocol-guided policy actor that generates interventions from predicted epidemic trajectories."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "epiworld2026:tiered-skill-library",
+   "name": "Protocol-constraint gates",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the predicates define admissible public-health interventions and their validation criteria; changing task family changes the action envelope and policy constraints. Temporal consistency checks such as the minimum step-down interval instantiate validation.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - intervention admissibility and policy validation are task-specific",
+    "R5:validation",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 298,
+     "quote": "Protocol Constraints (T1 ). Protocol Constraints are deterministic procedures codified by international and national public-health authorities: pandemic-interval classification, ACIP vaccineallocation ordering, NPI proportionality validation, and IHR notification thresholds. Each skill κ ∈ T1 returns a constraint predicate cκ (a, Xt , g) ∈ {0, 1}."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "epiworld2026:surveillance-skills",
+   "name": "Epidemic surveillance estimators",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the estimators supply epidemic-specific evidence (transmission, severity, stringency, vulnerability) for intervention selection; another task family would require different estimators and decision semantics. Their calculations operate on ordered epidemic observations, so processing is embedded.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - epidemic estimators support intervention decisions",
+    "R5:processing",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 319,
+     "quote": "Surveillance Skills (T2 ). Surveillance Skills are analytical tools epidemiologists use: Rt estimators (Cori et al., 2013) quantify transmission acceleration, severity ratios (CFR, IFR) project hospital load, the OxCGRT stringency index (Hale et al., 2021) aggregates NPI levels into a scalar, and the ATSDR Social Vulnerability Index flags vulnerable populations."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "epiworld2026:after-action-lessons",
+   "name": "After-action lesson evolution and retrieval",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because each lesson changes a surveillance parameter used to select epidemic interventions, and the source targets policy-relevant failures and hospital outcomes; another task requires redesigned lesson targets and objectives. The bank retains and retrieves prior rollout evidence as temporal context.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - lesson updates are bound to epidemic policy parameters and outcomes",
+    "R5:context_memory",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 398,
+     "quote": "The protocol-guided actor improves through an after-action adaptation cycle that updates the Adaptive-Lesson bank from simulated epidemic rollouts, leaving Protocol Constraints and Surveillance Skill structures untouched and inference cost unchanged."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1034,
+   "quote": "The world model is trained on Dec 2020 – Sep 2021 (Alpha and Delta waves) and evaluated on the heldout Jan 2022 Omicron wave plus eight subsequent weeks, giving a temporal-OOD setting."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 589,
+   "quote": "Table 1 shows world-model performance. EpiWorld outperforms all baselines on OOD PeakMAE across the three datasets, with gains of ∼ 6%, ∼ 4%, and ∼ 8% on COVID-19 SEIR, Influenza SEIR, and Real US (Omicron) respectively"
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 557,
+   "quote": "Table 2: Policy optimisation performance over 8-week rollouts, reported as cumulative hospitalisation reduction against the reference historical policy (lower is better)."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The skill-library card module spans two separately described mechanisms, so blind classification separates protocol constraints from surveillance estimators. The packet reports both temporal-OOD forecasting and downstream intervention outcomes."
+}

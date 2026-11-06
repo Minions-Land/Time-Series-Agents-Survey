@@ -1,0 +1,171 @@
+{
+ "citation_key": "timeseriesexamagent2026",
+ "status": "paper_verified",
+ "role_of_work": "resource",
+ "claim_summary": "The work introduces a controlled synthetic time-series reasoning benchmark and a feedback-driven framework that generates and verifies domain-specific question templates.",
+ "claim_evidence": [
+  {
+   "line": 23,
+   "quote": "Then, with TimeSeriesExamAgent, we scale our approach by"
+  },
+  {
+   "line": 71,
+   "quote": "Scalable framework. Building on this foundation, we propose TimeSeriesExamAgent, which"
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "temporal_question_answering",
+  "temporal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "timeseriesexamagent2026:exam-template-generation",
+   "name": "Domain-specific question-template generation",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because templates encode question logic, time-series instance selection, and answer computation for a QA task. Changing the output task requires changing those procedures, so the module is task-bound rather than GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific QA logic and answer computation",
+    "R5:processing"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 399,
+     "quote": "Given a dataset D and task description T , a generator LLM produces a diverse set of templates conditioned on dataset structure and domain-specific concepts."
+    },
+    {
+     "line": 404,
+     "quote": "Templates define both the question format and the logic for selecting relevant time series instances and computing answers."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeseriesexamagent2026:capability-filter",
+   "name": "Capability-aligned template filtering",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not apply because the core criterion is test-taker capability ordering, not the QA task's output requirement. R3_2_GTS does not apply because the filter uses no temporal order, windows, frequency, units, or information availability; R3_3_GH applies to this general workflow control.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - capability-order criterion",
+    "R3_2_GTS:no - no temporal state",
+    "R3_3_GH:yes - general workflow filter"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "temporal_question_answering"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 417,
+     "quote": "Inspired by TimeSeriesExam, which leverages IRT to enhance differentiability across questions, we adopted a similar but localized framework that operates at the level of each template."
+    },
+    {
+     "line": 424,
+     "quote": "A template is retained if performance scales with model capability, or if all models perform poorly, since such questions may still capture genuine difficulty."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeseriesexamagent2026:timeseriesexam-benchmark",
+   "name": "TimeSeriesExam synthetic reasoning benchmark",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_analysis",
+    "anomaly_detection_diagnosis"
+   ],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK applies because the benchmark encodes output and scoring requirements for specific time-series reasoning tasks. If the reasoning task changes, its templates and answer criteria must change; it is task-bound rather than a general temporal harness module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness/resource",
+    "R3_1_TSK:yes - task-specific reasoning assessment",
+    "R5:processing"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 43,
+     "quote": "we begin with a simple proof of concept, and introduce TimeSeriesExam, a controlled benchmark which uses synthetic time series to evaluate LLM reasoning across five core categories: pattern recognition, noise understanding, similarity analysis, anomaly detection, and causality."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 413,
+   "quote": "We check whether the generated template can be executed successfully."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 522,
+   "quote": "Even the strongest model achieves only 51.5% average accuracy, which highlights the limitations of current LLMs."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper's overall contribution is benchmark infrastructure. TimeSeriesExam and its domain-specific generator are distinct resources; the generation framework also contains a feedback-dependent workflow, but does not operate as an agent for downstream time-series analysis."
+}

@@ -1,0 +1,165 @@
+{
+ "citation_key": "dast2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "DAST contributes a zero-shot, three-stage workflow for cross-interface O-RAN anomaly detection, combining aligned visual profiling, domain-grounded scoring, and targeted interval verification.",
+ "claim_evidence": [
+  {
+   "line": 18,
+   "quote": "we present DAST, a zero-shot multi-agent framework for cross-interface anomaly detection in O-RAN that chains a three-stage VLM → LLM → VLM pipeline."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "dast2026:oran-profile",
+   "name": "Aligned cross-interface KPI profiling",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The module turns ordered multichannel KPI values into temporally aligned plots and summaries; it depends on temporal order, so it is GTS. The plot-generation mechanism does not embed anomaly criteria (counterfactual: it remains reusable if the task objective changes), and it is not GH because its shared alignment depends on temporal semantics.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - plotting/alignment does not embed an anomaly objective",
+    "R3_2_GTS:yes - preserves temporal alignment across channels",
+    "R4:Interface and Interaction",
+    "R5:processing",
+    "R7:anomaly_detection_diagnosis",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 256,
+     "quote": "The pipeline begins by ingesting the complete multivariate time series representing raw metric data from different O-RAN network interfaces (e.g., UL latency of E2, DL throughput of F1-c, DL packet loss of A1, etc.), and rendering a single, vertically stacked line-plot image to preserve temporal alignment across all channels."
+    },
+    {
+     "line": 263,
+     "quote": "It generates a report highlighting the metric label, the axis ranges, and the general behaviour"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "dast2026:oran-semantic-detection",
+   "name": "Domain-scored anomaly localization and impact",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The pipeline scores suspicious metrics and verifies anomalous intervals, embedding the anomaly-detection output requirement; the temporal-series processing is part of that task procedure. Under the counterfactual, changing to another task family would require redesigning the criteria and verifier, so this is TSK rather than GTS; it is Harness execution around models, not an LLM-side parameter or representation change.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - metric scoring and anomaly-interval verification embed anomaly detection",
+    "R5:processing",
+    "R7:anomaly_detection_diagnosis",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 274,
+     "quote": "Rather than performing a direct, pixel-by-pixel visual study of the raw time-series and directly trying to detect the anomalies, an LLM ingests the text reports generated in the first stage (LLM-1 in Fig. 1), to decide which time series present the most remarkable anomalies."
+    },
+    {
+     "line": 290,
+     "quote": "For any metric flagged by the LLM with a high certainty score (i.e., > 0.9), the framework dynamically retrieves the heatmap figures of the selected metrics."
+    },
+    {
+     "line": 297,
+     "quote": "This second VLM pinpoints the exact time interval where anomalies happen, taking into account possible cascade effects between time series."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 580,
+   "quote": "We evaluate DAST and the above mentioned benchmarks with two different sets of metrics. First, we use standard Recall, Precision, F1-Score and Accuracy"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "dast2026:oran-profile",
+   "decision": "change",
+   "new_ids": [
+    "dast2026:oran-profile"
+   ],
+   "changes": [
+    "dimensions: remove Tools and Execution; retain Interface and Interaction",
+    "scope_reason: clarify GTS temporal-semantics test",
+    "reuse_evidence: basis work -> module"
+   ],
+   "reason": "The packet supports a contributed aligned plotting/profile mechanism. Its processing is temporal, but it does not invoke an external tool as described by Tools and Execution; it remains GTS because temporal alignment is essential and the procedure does not encode a task objective."
+  },
+  {
+   "existing_id": "dast2026:oran-semantic-detection",
+   "decision": "change",
+   "new_ids": [
+    "dast2026:oran-semantic-detection"
+   ],
+   "changes": [
+    "dimensions: retired Control, Verification, and Feedback plus Coordination and Scaling -> Planning and Orchestration",
+    "functions: add processing",
+    "scope_reason: clarify TSK counterfactual"
+   ],
+   "reason": "The existing scoring and verification module is supported as one task-bound procedure. Its legacy dimensions map to Planning and Orchestration under the current vocabulary, and its heatmap-based interval localization implements temporal processing within anomaly detection."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The packet supports a feedback-driven classification because the LLM score controls whether the later heatmap-verification stage runs. It evaluates interval detection quality, but does not report execution validity, temporal leakage or availability checks, or measured utility of downstream actions."
+}

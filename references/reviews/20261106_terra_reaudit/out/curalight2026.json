@@ -1,0 +1,194 @@
+{
+ "citation_key": "curalight2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "CuraLight uses an RL assistant and multi-LLM deliberation to curate traffic-signal decisions, then trains the LLM with priority-aware LoRA imitation.",
+ "claim_evidence": [
+  {
+   "line": 77,
+   "quote": "An RL-assisted data generation pipeline is developed, where a diffusion-based RL agent explores the phase and timing space and collaborates with GPT to generate interaction trajectories, which are converted into prompt and answer pairs for LoRA-based imitation fine-tuning."
+  },
+  {
+   "line": 82,
+   "quote": "A multi-LLM ensemble deliberation system is introduced to evaluate and decompose candidate signal timing actions, enabling priority-aware collection, ranking, filtering, and adapter training on scenario-specific datasets."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "curalight2026:priority-lora",
+   "name": "Priority-aware traffic-controller adaptation",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places adapter fine-tuning that updates the model on the LLM side; this is supervised learning of signal-control reasoning and responses, not Harness execution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 229,
+     "quote": "The unified priority scores are used as weights in a second stage of adapter fine-tuning."
+    },
+    {
+     "line": 247,
+     "quote": "After convergence, the updated adapters are merged into the CuraLight agent, completing the second training stage that combines RL filtering, multi-LLM ensemble review, and priority-aware imitation for traffic signal control."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "curalight2026:traffic-debate-curation",
+   "name": "RL-filtered traffic-action debate and data selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "The core selects and ranks phase-duration signal actions using queue and congestion criteria; if the task family changed, the action semantics and evaluation criteria would need redesign, so R3_1 assigns TSK before the temporal/general Harness tests.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - signal-action objective and criteria are task-specific"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 252,
+     "quote": "For each ai (t), the RL critic computes an approximate value and discards actions dominated under the current congestion pattern. The remaining set Ãi (t) is forwarded to the ensemble deliberation system."
+    },
+    {
+     "line": 256,
+     "quote": "Each ai (t) ∈ Ãi (t) is assigned to a defender LLM, which receives the structured intersection state, competing actions, and historical summaries, and outputs a concise justification focusing on queue dissipation, balance across approaches, and anticipated network-level effects."
+    },
+    {
+     "line": 261,
+     "quote": "A consensus LLM aggregates defender arguments with the shared traffic context and produces a condensed comparison of candidates."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "curalight2026:rl-assistant",
+   "name": "Diffusion RL traffic-control assistant",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The controller maps traffic observations to phase-duration actions under the traffic-control objective; changing task family requires redesigning its action space and reward/critic, so R3_1 assigns TSK. Its history pool explicitly retrieves previously executed durations.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - signal phase-duration action and congestion objective are task-specific"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 126,
+     "quote": "Each signalized intersection i is assisted by a diffusion-based RL controller."
+    },
+    {
+     "line": 138,
+     "quote": "a diffusion policy πθ D | hi (t), pi (t) generates duration proposals, while a History Experience Pool retrieves a small set of previously executed durations as anchors."
+    },
+    {
+     "line": 171,
+     "quote": "The diffusion-based RL assistant also guides the LLM traffic signal controller."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 273,
+   "quote": "Table I shows that CuraLight delivers the most consistent gains across heterogeneous networks and ranks first on most scenario–metric combinations. Compared with FixedTime, MaxPressure, and deep RL baselines such as MPLight and CoLight variants, CuraLight achieves lower travel time, waiting time, delay, and queue length in most settings, indicating stronger adaptability to heterogeneous phase structures and demand patterns."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "curalight2026:priority-lora",
+   "decision": "change",
+   "new_ids": [
+    "curalight2026:priority-lora"
+   ],
+   "changes": [
+    "dimensions removed for LLM module",
+    "llm_route added: instruction_reasoning"
+   ],
+   "reason": "The packet supports priority-aware adapter training as an LLM-side instruction/reasoning capability; the current card incorrectly gives an LLM module a Harness dimension and omits its required LLM route."
+  },
+  {
+   "existing_id": "curalight2026:traffic-debate-curation",
+   "decision": "change",
+   "new_ids": [
+    "curalight2026:traffic-debate-curation"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback; Coordination and Scaling -> Planning and Orchestration"
+   ],
+   "reason": "This is one task-specific traffic-action evaluation and data selection procedure, so its legacy dimensions map to Planning and Orchestration under the current vocabulary. The packet also supports a separate RL assistant module, added as curalight2026:rl-assistant."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The RL assistant is added as a separate TSK procedure because the packet describes it supplying reference actions and retrieving past durations, distinct from ensemble deliberation and priority-based data selection. Experiments report traffic-control performance and transfer, but no temporal leakage or information-availability validation and no separate downstream utility measure."
+}

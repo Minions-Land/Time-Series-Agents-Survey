@@ -1,0 +1,329 @@
+{
+ "citation_key": "tsagent2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TS-Agent contributes a feedback-driven time-series QA runtime that gathers evidence from raw-series tools, records observations, refines tool use, and verifies answers against required evidence.",
+ "claim_evidence": [
+  {
+   "line": 16,
+   "quote": "Our framework solves time series tasks through an evidence-driven agentic process: (1) it alternates between thinking, tool execution, and observation in a ReAct-style loop, (2) records intermediate results in an explicit evidence log and corrects the reasoning trace via a self-refinement critic, and (3) enforces a final answer-verification step"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "temporal_question_answering"
+ ],
+ "modules": [
+  {
+   "id": "tsagent2025:evidence-loop",
+   "name": "Adaptive reasoner and action loop",
+   "layer": "GH",
+   "dimensions": [
+    "Interface and Interaction",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK no: it selects actions across question types without embedding one task objective or verifier. R3_2_GTS no: it manages generic thought/action/observation state without temporal windows, frequency, units, or availability. R3_3_GH yes: it controls runtime execution; a TSK version would need task-specific action logic, while this loop applies across task families.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - not bound to one task objective",
+    "R3_2_GTS:no - generic action and observation state",
+    "R3_3_GH:yes - runtime execution control",
+    "R4:Interface and Interaction",
+    "R4:Planning and Orchestration",
+    "R5:general_runtime",
+    "R7:forecasting_prediction; anomaly_detection_diagnosis; temporal_question_answering",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 222,
+     "quote": "At the core of our framework is an iterative LLM reasoner that drives the reasoning process through cycles of thought, action, and observation. Rather than producing a fixed plan upfront, the agent adaptively generates the next reasoning step only after incorporating the structured outcome of the previous step."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsagent2025:evidence-log",
+   "name": "Temporal evidence log",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK no: the log stores observations for different question types without one task's output criterion. R3_2_GTS yes: it retains evidence produced by operations on temporal series; a GH counterfactual would reduce those temporally grounded observations to arbitrary state. R3_3_GH is not reached because GTS is the more specific match.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - shared across question types",
+    "R3_2_GTS:yes - retains temporal analysis evidence",
+    "R4:Memory and Context",
+    "R5:context_memory",
+    "R5:mapped",
+    "R7:forecasting_prediction; anomaly_detection_diagnosis; temporal_question_answering",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 237,
+     "quote": "Formally, let T = {t1 , . . . , tM } be the set of callable tools, and Lk = {e1 , . . . , eM } be evidence log, i.e., the memory module that records of all accumulated observations produced during reasoning."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "tsagent2025:analytical-operators",
+   "name": "Raw-series analytical tools",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK no: the library supports summarization, extraction, querying, detection, prediction, and relations across question types. R3_2_GTS yes: its tools operate on raw numerical series and temporal windows, slices, segments, and resampling; the same operators remain useful across task families. R3_3_GH is not reached because temporal data semantics are more specific.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - library spans question types",
+    "R3_2_GTS:yes - operates on raw series and temporal windows",
+    "R4:Tools and Execution",
+    "R5:data_management; processing",
+    "R5:mapped",
+    "R7:forecasting_prediction; anomaly_detection_diagnosis; temporal_question_answering",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 229,
+     "quote": "To support fine-grained and verifiable reasoning, TS-AGENT is equipped with a library of callable analytical APIs that operate directly on native numeric time series and return structured outputs."
+    },
+    {
+     "line": 262,
+     "quote": "Extract (fext : X × Θ → X ). These tools extract part of the time series for subsequent local analysis, such as selecting channels, slicing a temporal interval, segmenting into subseries, or resampling to a desired granularity."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsagent2025:stepwise-critic",
+   "name": "Step-wise self-refinement critic",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK no: it reviews tool use and evidence across question types, rather than imposing one task-family criterion. R3_2_GTS no: it consumes time-series results but does not itself implement windows, chronology, or availability semantics. R3_3_GH yes: it changes later runtime actions through feedback; a TSK critic would require task-specific review rules, while this execution review is shared.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - general step-level review",
+    "R3_2_GTS:no - no temporal operation implemented",
+    "R3_3_GH:yes - reviews and redirects execution",
+    "R4:Planning and Orchestration",
+    "R5:general_runtime",
+    "R7:forecasting_prediction; anomaly_detection_diagnosis; temporal_question_answering",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 376,
+     "quote": "After the execution of each action, we invoke the same LLM in a critic role to assess the new evidence in the context of the accumulated reasoning trace and the evidence log."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "tsagent2025:intent-evidence-gate",
+   "name": "Intent-specific answer verification gate",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK yes: the gate checks question-intent predicates and answer schemas, so another task family would require different requirements and verifiers. If it were GTS, it would validate temporal validity independently of task; this gate validates a temporal QA answer's task-specific schema and evidence requirements. R3_2_GTS is not selected because R3_1 matches first.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific predicates and schema",
+    "R4:Planning and Orchestration",
+    "R5:validation; task_procedure",
+    "R7:temporal_question_answering",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 411,
+     "quote": "Final Answer Verification. When the agent proposes an answer ŷ, we pass it to a quality gate which enforces data-grounding before output."
+    },
+    {
+     "line": 415,
+     "quote": "the gate checks: (i) schema compliance—ŷ matches schema (e.g., belongs to the MCQ option set); and (ii) evidence sufficiency—all required predicates are verified (Gk = ∅) and no contradictions remain."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1070,
+   "quote": "provides feedback about the expected input format, leading the agent to correct its tool usage."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 391,
+   "quote": "We first evaluate TS-AGENT on time series understanding tasks using the TimeSeriesExam benchmark (Cai et al., 2024), which contains 763 multiple-choice questions over five categories: pattern recognition, noise understanding, anomaly detection, similarity analysis, and causality analysis."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "tsagent2025:evidence-loop",
+   "decision": "split",
+   "new_ids": [
+    "tsagent2025:evidence-loop",
+    "tsagent2025:evidence-log"
+   ],
+   "changes": [
+    "split adaptive reasoner from evidence log",
+    "dimension: Planning and Workflow -> Planning and Orchestration"
+   ],
+   "reason": "The packet describes adaptive next-action generation and the evidence log as a memory module, so they can be reused separately; the old dimension label is retired."
+  },
+  {
+   "existing_id": "tsagent2025:analytical-operators",
+   "decision": "change",
+   "new_ids": [
+    "tsagent2025:analytical-operators"
+   ],
+   "changes": [
+    "name: Numeric time-series analytical operators -> Raw-series analytical tools",
+    "functions: processing -> data_management, processing"
+   ],
+   "reason": "The packet supports raw-series temporal tools including extraction and resampling as well as numerical operators; the mechanism and ID remain."
+  },
+  {
+   "existing_id": "tsagent2025:intent-evidence-gate",
+   "decision": "split",
+   "new_ids": [
+    "tsagent2025:intent-evidence-gate",
+    "tsagent2025:stepwise-critic"
+   ],
+   "changes": [
+    "add separate step-wise critic",
+    "dimension: Control, Verification, and Feedback -> Planning and Orchestration",
+    "view_status: mapped -> task_procedure"
+   ],
+   "reason": "The paper describes the critic and final answer gate as complementary, distinct mechanisms. The gate is task-specific; the critic is a separate runtime feedback module omitted as a distinct module in the card."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The paper includes context-aided forecasting among benchmark tasks but primarily evaluates understanding and reasoning QA. The critic is GH execution review; the answer gate is separately task-specific. The prior card combined mechanisms the packet describes separately."
+}

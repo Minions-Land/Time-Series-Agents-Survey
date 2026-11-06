@@ -1,0 +1,203 @@
+{
+ "citation_key": "timeclaw2026explore",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TimeClaw compares candidate time-series agent executions by task metrics, counters exploration collapse, and distills task-scoped experience for later inference-time reuse.",
+ "claim_evidence": [
+  {
+   "line": 19,
+   "quote": "we present TimeClaw, an exploratory execution learning framework that turns exploratory execution into reusable hierarchical distilled experience through a four-stage loop: Explore, Compare, Distill, and Reinject."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "temporal_question_answering",
+  "time_series_classification",
+  "temporal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "timeclaw2026explore:explore-distill",
+   "name": "Metric-supervised exploratory execution learning",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "time_series_classification",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because candidate validity and selection use the task contract and task-dependent loss; changing task family changes the required output validation and metric. Its core is bound to the task objective, so the GTS counterfactual does not apply.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-valid filtering and task-dependent quality determine the winner"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 191,
+     "quote": "TimeClaw implements exploratory execution learning as a four-stage loop, Explore → Compare → Distill → Reinject, that turns exploration into reusable inference-time experience."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeclaw2026explore:tool-dropout",
+   "name": "Task-aware tool dropout",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "time_series_classification",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because tool exposure is chosen from per-task usage and protected task-critical tools; a different task family changes the usage state and candidate pool. It is not GTS because the mechanism does not itself operate on temporal order or windows.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - dropout is task-indexed and preserves candidate diversity for that task"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 366,
+     "quote": "TimeClaw mitigates this problem with task-aware tool dropout, which operates during explorationtime sub-agent tool exposure."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timeclaw2026explore:rule-injection",
+   "name": "Hierarchical distilled experience and reinjection",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "time_series_classification",
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because experience is stored and retrieved under a task scope with task-specific applicability; changing task family requires a different experience state and rules. It is not GTS: the reusable rules guide task procedures rather than manage temporal evidence such as timestamps or availability.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-local experience and applicability govern retrieval"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 423,
+     "quote": "The key runtime layer is M EMORY, whose entries are structured reusable rules rather than free-form reflections."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1325,
+   "quote": "A sample is excluded from summary aggregation if it is unscorable under the benchmark contract, for example, because the ground truth is invalid, the prediction cannot be parsed into the required output type, or execution terminates abnormally."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 682,
+   "quote": "Under this setting, TimeClaw achieves the best overall result on 27 of the 30 reported metrics."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "timeclaw2026explore:explore-distill",
+   "decision": "change",
+   "new_ids": [
+    "timeclaw2026explore:explore-distill"
+   ],
+   "changes": [
+    "layer GH->TSK",
+    "dimension Planning and Workflow -> Planning and Orchestration",
+    "added task memberships"
+   ],
+   "reason": "Task validity and task-dependent metrics define candidate comparison and learning, so the module meets R3_1_TSK; changing output family changes validation and metric."
+  },
+  {
+   "existing_id": "timeclaw2026explore:rule-injection",
+   "decision": "change",
+   "new_ids": [
+    "timeclaw2026explore:rule-injection"
+   ],
+   "changes": [
+    "layer GH->TSK",
+    "removed retired dimension Control, Verification, and Feedback",
+    "added Optimization and Evolution",
+    "added task memberships"
+   ],
+   "reason": "The packet scopes stored experience and its applicability to tasks, meeting R3_1_TSK."
+  },
+  {
+   "existing_id": "",
+   "decision": "split",
+   "new_ids": [
+    "timeclaw2026explore:tool-dropout"
+   ],
+   "changes": [
+    "added task-aware tool dropout module"
+   ],
+   "reason": "The card omits a distinct contribution: per-task usage counts suppress dominant tools to preserve candidate diversity."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Task-level reuse spans forecasting and reasoning outputs, but the mechanisms are task-scoped under R3."
+}

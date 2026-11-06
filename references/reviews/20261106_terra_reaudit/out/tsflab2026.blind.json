@@ -1,0 +1,240 @@
+{
+ "citation_key": "tsflab2026",
+ "status": "paper_verified",
+ "role_of_work": "resource",
+ "claim_summary": "TSFLab contributes an agent-agnostic workbench that provides forecasting research guidance, structured temporal knowledge, shared experiment execution, and verified maintenance of reusable research resources.",
+ "claim_evidence": [
+  {
+   "line": 22,
+   "quote": "propose TSFLab, a self-improving agent-agnostic “workbench” that equips compatible coding agents with shared resources and tools for low-cost TSF research and continuous maintenance of research resources."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "tsflab2026:domain-guide",
+   "name": "Forecasting research guide and task-specific skills",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "data_management",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "R3.1 TSK: the guide encodes forecasting workflows and protocol checks; changing the task family requires replacing forecast-specific targets and evaluation checks. R3.2 GTS is insufficient because the guide embeds a forecasting task procedure, and R3.3 GH is too general because the procedure is task-bound.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecasting workflow and evaluation checks are task-bound"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 250,
+     "quote": "For example, when benchmarking methods on a new dataset, a skill guides the agent to identify time fields, forecasting variables, sampling frequency, and evaluation settings, then register data through the workbench’s “add” interface and inspect partitioning and scaling through its “split” interface."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsflab2026:knowledge-structurer",
+   "name": "Progressively disclosed method, dataset, and unit knowledge",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "R3.2 GTS: the catalog stores temporal dataset and method properties such as frequency, protocols, and model parameters, while its retrieval structure is not bound to a forecasting output objective. A different time-series task can use the same catalog mechanism with different resources; R3.1 TSK is therefore not met, and R3.3 GH misses the temporal metadata in its state.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - catalog organization does not encode a forecast output criterion",
+    "R3_2_GTS:yes - it organizes temporal datasets, methods, and units"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 260,
+     "quote": "It provides a knowledge card for each method, dataset, and unit, organized into summary, card, and source levels. Summaries support screening; cards describe capabilities, parameters, interfaces, and limitations; sources provide papers, reference code, and detailed explanations."
+    },
+    {
+     "line": 298,
+     "quote": "Knowledge Structurer also extracts common blocks, such as RevIN, series decomposition, and attention variants, into shared units that methods import, enabling shared maintenance; 263 methods reuse at least one unit."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsflab2026:shared-data-protocol",
+   "name": "Temporal data registration, splitting, and validation",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "data_management",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "R3.2 GTS: the shared routines manage chronological data splits and train-only scaling, which depend on temporal information and remain useful across time-series task families. They do not themselves define the forecast objective required by R3.1 TSK; R3.3 GH would omit the temporal data constraints.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - the data operations do not encode a forecast output criterion",
+    "R3_2_GTS:yes - the operations depend on temporal splits and data availability"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 314,
+     "quote": "Shared routines split data as configured, fit scaling on training data only, select checkpoints on validation data, and compute metrics consistently."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsflab2026:experiment-workflower",
+   "name": "Declarative experiment runner under shared forecasting protocols",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "R3.1 TSK: the runner organizes experiments around forecasting lookback, horizon, and training budgets. Changing the task family requires redesigning the task configuration and evaluation procedure; temporal semantics alone (R3.2 GTS) do not capture the forecast-specific experiment contract, and the runner is more than generic scheduling (R3.3 GH).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - experiment configuration and evaluation are forecasting-specific"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 309,
+     "quote": "Agents use Compose to combine presets, Override to change settings, and Sweep to expand methods or values. For new-data benchmarking, an agent combines dataset and method presets, fixes the lookback, horizon, and training budget, and sweeps methods and seeds."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsflab2026:recursive-improver",
+   "name": "Verified maintenance of shared research resources",
+   "layer": "GH",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "R3.3 GH: the core mechanism screens and integrates resource updates through usability, complexity, and consistency checks. Its update cycle remains applicable if the task family changes, while temporal or task-specific checks can be supplied by the resources; it does not itself depend on temporal order or embed a forecast objective, so R3.1 TSK and R3.2 GTS do not apply.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - it does not encode a task output criterion",
+    "R3_2_GTS:no - its update and CI lifecycle is not temporal-state dependent",
+    "R3_3_GH:yes - it manages shared resource verification and integration"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 327,
+     "quote": "Recursive Improver brings external resources and agent-produced outcomes back into the shared workbench through checks for usability, complexity, and consistency (Fig. 2d). Failed checks prompt revision and rechecking before integration, supporting workbench maintenance."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1125,
+   "quote": "A session is accepted if it covers the complete requested matrix with executed metrics, the prescribed splits, train-only scaling, the common evaluation over all windows, and no test-informed configuration selection;"
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1107,
+   "quote": "Data. Chronological 70/10/20 split; train-only scaling; all channels; input 168 and horizon 24."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 572,
+   "quote": "On ETTh1 and Weather (Fig. 3b,c), TSFLab reaches the lowest test MSE with less time and fewer fresh tokens than every other setting; details are in App. D."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The blind classification treats Knowledge Structurer as one integrated GTS catalog; the current card's combined cards-and-units module is split in the final record because the packet describes independently retrievable cards and importable shared code units."
+}

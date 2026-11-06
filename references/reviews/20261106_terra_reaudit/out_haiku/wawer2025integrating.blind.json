@@ -1,0 +1,255 @@
+{
+ "citation_key": "wawer2025integrating",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "ElliottAgents is a multi-agent LLM system that applies Elliott Wave pattern detection, DRL backtesting and stored analysis history to stock price data to produce forecasts and investment strategies.",
+ "claim_evidence": [
+  {
+   "line": 15,
+   "quote": "This paper introduces ElliottAgents, an multi-agent system that integrates the Elliott Wave"
+  },
+  {
+   "line": 113,
+   "quote": "By integrating the EWP into its core framework, ElliottAgents ensures that market analyses are grounded"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "wawer2025integrating:multi-agent-workflow",
+   "name": "Coordinated multi-agent analysis workflow",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 no: the workflow does not embed a task objective. R3_2 no: it manages agent order and state, not temporal semantics. R3_3 yes: a coordinator schedules seven agents and passes messages.",
+   "rubric_path": [
+    "R0_work:in-scope (stock price series are primary input; GPT-4o-mini agents run in a runtime)",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - workflow has no task objective",
+    "R3_2_GTS:no - no temporal semantics",
+    "R3_3_GH:yes - coordinator orchestration and state"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 432,
+     "quote": "The system employs a hierarchical structure wherein each agent is assigned a specialized role (Guo et al., 2024), contributing to scalability."
+    },
+    {
+     "line": 307,
+     "quote": "The Coordinator agent orchestrates the entire process. It begins by receiving user input, including the"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "wawer2025integrating:elliott-wave-detector",
+   "name": "Elliott Wave pattern detection and chart tool",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 no: the detector does not depend on a task objective; it identifies wave structure in an ordered price series, so the same detector is unchanged for other tasks. R3_2 yes: it depends on temporal order and multiple timeframes.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - detection does not embed a task objective",
+    "R3_2_GTS:yes - wave detection over ordered series and timeframes"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 288,
+     "quote": "The platform implements algorithms for identifying Elliott Wave patterns across multiple timeframes as"
+    },
+    {
+     "line": 311,
+     "quote": "equipped with a specialized tool to identify and classify Elliott Wave patterns within the historical data."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "wawer2025integrating:drl-backtest-validation",
+   "name": "DRL backtesting validation of wave patterns",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "decision_support"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 yes: the module validates pattern-based price predictions against historical outcomes, which is the forecasting validation criterion; a different task would need a different reward and verifier. Counterfactual: changing to another task family redesigns the DRL reward and action space, so TSK. Ambiguity: the DRL model is a separate agent, not the LLM, so it is not LLM side.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness (DRL model is separate from the LLM; not a parameter update of the LLM)",
+    "R3_1_TSK:yes - validates forecasts against historical outcomes; counterfactual requires new reward and verifier"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 313,
+     "quote": "receives the identified patterns and employs DRL to validate them against historical trends, assessing their"
+    },
+    {
+     "line": 492,
+     "quote": "The DRL model was trained on 10 years of historical data for each company under examination."
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "id": "wawer2025integrating:backtest-knowledge-store",
+   "name": "Backtest knowledge store with continuous accumulation",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 no: storing and querying past pattern analyses has no task objective. R3_2 yes: stored items are time-indexed pattern analyses and outcomes per company, and a query checks whether results already exist before analysis. Counterfactual: the stored records remain valid for other tasks.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - stored records have no task objective",
+    "R3_2_GTS:yes - past pattern analyses and outcomes indexed by company and interval; retrieval checks prior analyses"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 425,
+     "quote": "then stored in the Neo4j graph database for future reference."
+    },
+    {
+     "line": 420,
+     "quote": "on traditional fine-tuning methods. Instead, agents"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "wawer2025integrating:investment-synthesis",
+   "name": "Investment strategy synthesis with price targets and stop-loss",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 yes: the advisor prompt embeds the decision output requirements (buy/sell/hold, entry and exit targets, stop-loss, time frames). Counterfactual: another decision task needs a different output and risk criterion, so TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness (prompt-defined role, no parameter update)",
+    "R3_1_TSK:yes - decision-output requirements embedded in advisor prompt"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 330,
+     "quote": "This strategy includes specific buy/sell signals, price targets, and contingency"
+    },
+    {
+     "line": 365,
+     "quote": "- Buy, sell, or hold recommendations"
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 533,
+   "quote": "Table 1 presents the results of the cross-validation"
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 510,
+   "quote": "we could simulate transactions and calculate theoretical investment returns, proving the effectiveness of"
+  }
+ },
+ "needs_human_review": true,
+ "notes": "No LLM-side module: GPT-4o-mini is used unchanged (L463) and the system avoids fine-tuning (L419-L420). Knowledge-graph RAG (L381-L397) and yfinance data access (L286-L287) are treated as off-the-shelf components, so not counted. The data engineer role is folded into the workflow. The DRL backtester is a separate model from the LLM, so TSK vs LLM-side is a judgment call. Temporal validity is absent: the cross-validation split is not described as chronological (L484-L487). Decision utility is one simulated trade and is theoretical (L510-L524). The packet text is extracted from a PDF; figures and Table 1 are partly garbled."
+}

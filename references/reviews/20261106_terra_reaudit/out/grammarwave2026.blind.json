@@ -1,0 +1,176 @@
+{
+ "citation_key": "grammarwave2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "The work contributes ELT, an interactive SELA VLM-agent workflow for explainable time-series event detection, and the KITE benchmark.",
+ "claim_evidence": [
+  {
+   "line": 38,
+   "quote": "Building on ELT, we present SELA, a neurosymbolic VLM agent framework that iteratively grounds primitives from signal visualizations and composes them under ELT constraints, producing both event intervals and faithful tree-structured explanations."
+  }
+ ],
+ "task_memberships": [],
+ "other_tasks": [
+  "time_series_event_detection"
+ ],
+ "modules": [
+  {
+   "id": "grammarwave2026:event-logic-grounding",
+   "name": "Event Logic Tree representation and logic engine",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_event_detection"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because ELT encodes event-identification and interval-localization criteria; changing to forecasting or another task family requires redesigning its event primitives, temporal operators, and event-validity constraints. Although it uses temporal intervals (counterfactual GTS), the task objective is embedded in the logic.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - event-specific output and validity logic",
+    "R4:Planning and Orchestration",
+    "R5:processing, validation",
+    "R7:time_series_event_detection",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 71,
+     "quote": "ELT decomposes an event into atomic signal primitives and composes them through operators such as succession, synchronization, containment, and alternatives."
+    },
+    {
+     "line": 177,
+     "quote": "To avoid physically invalid trees, ELT follows three validity principles: constructive composition, requiring each composite to add non-trivial structure; temporal compactness, preventing unbounded unexplained gaps inside a composite event; and physical exclusivity, preventing one channel from supporting incompatible primitive states at the same time."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "grammarwave2026:sela-agent-workflow",
+   "name": "Interactive SELA grounding workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_event_detection"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the two-role procedure grounds event descriptions to event intervals and revises candidates using event-specific ELT constraints; changing task family requires different actions, tools, and validation. Temporal visualization and interval reasoning (counterfactual GTS) are subordinate to this event-detection objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific agent roles, grounding actions, and validation",
+    "R4:Interface and Interaction; Tools and Execution; Planning and Orchestration",
+    "R5:processing, validation",
+    "R7:time_series_event_detection",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 304,
+     "quote": "SELA decomposes the task into two role-specific agents. The Logic Analyst receives only the textual event description and submits an ELT schema."
+    },
+    {
+     "line": 308,
+     "quote": "The Signal Inspector receives the compiled schema and grounds it in the observed time series. It uses visualization tools to inspect global and local signal views, places optional temporal markers, and submits primitive instances with intervals and confidence scores"
+    },
+    {
+     "line": 320,
+     "quote": "Agents interact with the backend through structured function calls and typed artifacts"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "grammarwave2026:kite-benchmark",
+   "name": "KITE event detection benchmark",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_event_detection"
+   ],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK applies because the benchmark consists of event descriptions and interval annotations for the specific event-detection output; a benchmark for a different family needs different labels and task criteria. It is a resource-level benchmark, not a GTS runtime component (counterfactual GTS).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness resource",
+    "R3_1_TSK:yes - event detection labels and intervals",
+    "R4:Tools and Execution",
+    "R5:resource_level",
+    "R7:time_series_event_detection",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 79,
+     "quote": "To evaluate our approach, we release KITE, a real-world benchmark with expert-verified event descriptions and event annotations from energy and climate domains."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 491,
+   "quote": "We first report the pass rate (Pass), the probability that a model produces a valid schema that can pass the syntax check within a fixed number of turns (20)."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 732,
+   "quote": "SELA consistently outperforms zero-shot and few-shot Numeric and VL-Time baselines on both KITE datasets, despite itself operating in the zero-shot setting."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper explicitly distinguishes semantic event detection from anomaly detection; classify the task as time_series_event_detection under other_tasks. ELT, SELA's interactive workflow, and KITE are distinct contributions."
+}

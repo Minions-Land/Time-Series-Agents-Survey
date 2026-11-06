@@ -1,0 +1,232 @@
+{
+ "citation_key": "batterylake2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "BatteryLake contributes an evidence-grounded, human-governed agentic pipeline for curating heterogeneous battery time series, plus a reproducible SOH/RUL benchmark.",
+ "claim_evidence": [
+  {
+   "line": 12,
+   "quote": "BatteryLake, a governed data lakehouse that turns raw public battery data into benchmark-ready assets through an agentic, evidence-grounded curation framework."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "batterylake2026:quoted-metadata",
+   "name": "Evidence-grounded metadata extraction",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK does not apply because extraction has no task-family objective; R3_2 GTS does not apply because its inputs and state are source documents without temporal order, windows, units, or availability constraints; R3_3 GH applies because the provenance-ranked extraction workflow organizes model execution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-family objective",
+    "R3_2_GTS:no - no temporal semantics",
+    "R3_3_GH:yes - organizes source-grounded extraction"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 271,
+     "quote": "prompts require a verbatim quotation for every non-⊥ value, and a post-hoc string check rejects any tuple whose quotation does not occur in the source text"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "batterylake2026:human-review",
+   "name": "Selective human verification",
+   "layer": "GH",
+   "dimensions": [
+    "Interface and Interaction",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK does not apply because confidence-based review is not tied to a prediction objective; R3_2 GTS does not apply because the routing criterion is confidence rather than temporal state; R3_3 GH applies because the mechanism routes uncertain decisions to a human interface and gates execution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-family objective",
+    "R3_2_GTS:no - confidence routing has no temporal semantics",
+    "R3_3_GH:yes - human review workflow"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 198,
+     "quote": "auto-accepts decisions with c ≥ τ and routes the rest to a human reviewer, who edits or confirms them through the platform interface; no row enters the lake unconfirmed."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "batterylake2026:temporal-schema",
+   "name": "Canonical time-series schema and validation gate",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "data_management",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "R3_1 TSK does not apply because the schema and gate are shared across task families; R3_2 GTS applies because the representation fixes sample ordering, units, sign conventions, and temporal consistency checks, which would remain useful if SOH/RUL were replaced by another time-series task.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - schema and admission checks are not prediction-objective-specific",
+    "R3_2_GTS:yes - ordered samples, units, and temporal consistency"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 179,
+     "quote": "Time series T: one tuple per sample with canonical signals time_s, voltage_V, current_A, temperature_C, charge/discharge_capacity_Ah, step_type, under fixed units and the sign convention I > 0 on charge"
+    },
+    {
+     "line": 374,
+     "quote": "Consistency: monotonic timestamps, contiguous cycle numbering, a single current sign convention, step-type coherence"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "batterylake2026:converter-repair",
+   "name": "Validation-guided converter synthesis and repair",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK does not apply because converter generation is not bound to SOH/RUL outputs; R3_2 GTS applies because conversion maps numerical temporal signals, units, and cycle structure into a canonical time-series representation and validates them; changing the downstream task need not redesign that conversion contract.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - conversion is not prediction-task-specific",
+    "R3_2_GTS:yes - maps and checks temporal measurement data"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 354,
+     "quote": "The validator replays Σ on the outputs and emits a machinereadable report; on failure, the error report is fed back and the agent repairs π , up to k rounds."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "batterylake2026:soh-rul-benchmark",
+   "name": "SOH/RUL reproducible benchmark",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1 TSK applies because the benchmark embeds SOH/RUL prediction targets, split protocols, and metrics; changing the task family requires changing these task-specific requirements, so it is a benchmark resource rather than a reusable GTS procedure.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - SOH/RUL targets and evaluation protocol define prediction tasks"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 454,
+     "quote": "BatteryLake defines two primary tasks with standardized labels: SOH estimation (predict capacity retention at a cycle from partial-cycle signals or cycle-level features) and RUL prediction (predict cycles remaining to a manifest-recorded end-of-life threshold)."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 458,
+   "quote": "Because split design dominates apparent performance in battery ML, every experiment declares one of three protocols: random (cycles shuffled; optimistic), temporal (early cycles train, late cycles test; forecasting under distribution shift), and cross-cell (whole cells held out; generalization to unseen units)."
+  },
+  "task_performance": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet describes benchmark protocols and metric choices but contains no reported benchmark result values, so task_performance is not marked present."
+}

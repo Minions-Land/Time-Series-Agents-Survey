@@ -1,0 +1,147 @@
+{
+ "citation_key": "tracemas2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TraceMAS contributes an iterative multi-agent forecasting workflow that traces document evidence through causal representations, data mappings, features, and forecast revisions.",
+ "claim_evidence": [
+  {
+   "line": 103,
+   "quote": "We introduce Ideal CLD and Data-Grounded CLD as shared representations for tracing how textual evidence is transformed into causal assumptions, data choices, features, and model components."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "tracemas2026:cld-forecast-lineage",
+   "name": "Versioned CLD-to-data-to-forecast lineage",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "data_management",
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the core representation links document factors to proxies, features, model components, and forecast revisions; changing from forecasting would require redesigning these task-specific links. The temporal data mappings would otherwise suggest GTS, while the forecasting objective makes TSK more specific.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecasting-specific causal-to-feature/model procedure",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 185,
+     "quote": "The Data-Grounded CLD is the main inspectable representation in the demo. It shows which document-derived factors are used for forecasting, how they are linked to data, and how they guide feature construction, lag selection, interactions, and model components."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tracemas2026:temporal-risk-review",
+   "name": "Temporal availability and source consistency review",
+   "layer": "GTS",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not apply because these checks validate temporal evidence rather than a forecast-output criterion and can transfer across tasks; R3_2_GTS applies because they depend on chronology, timestamp alignment, and information availability. R3_3_GH is less specific because temporal semantics govern the checks.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-family output criterion",
+    "R3_2_GTS:yes - temporal evidence and availability checks",
+    "R5:mapped"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 158,
+     "quote": "The Risk Reviewer checks generated data, code, mappings, and model outputs for leakage, timestamp misalignment, inconsistent units, missing sources, and hard-coded values."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 158,
+   "quote": "The Risk Reviewer checks generated data, code, mappings, and model outputs for leakage, timestamp misalignment, inconsistent units, missing sources, and hard-coded values."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 296,
+   "quote": "The interface reports validation metrics only to help users compare iterations and inspect how CLD updates, proxy choices, and feature revisions affect model behavior, rather than to claim benchmark-level forecasting performance."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "tracemas2026:cld-forecast-lineage",
+   "decision": "change",
+   "new_ids": [
+    "tracemas2026:cld-forecast-lineage"
+   ],
+   "changes": [
+    "dimensions: Planning and Workflow, Coordination and Scaling -> Planning and Orchestration",
+    "functions: add context_memory",
+    "view_status: mapped -> task_procedure"
+   ],
+   "reason": "The packet supports the existing versioned CLD lineage mechanism, but it is a forecasting task procedure and its versioned linked evidence also implements context memory."
+  },
+  {
+   "existing_id": "tracemas2026:temporal-risk-review",
+   "decision": "change",
+   "new_ids": [
+    "tracemas2026:temporal-risk-review"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration"
+   ],
+   "reason": "The packet supports a distinct temporal reviewer that checks leakage, timestamp alignment, units, and source completeness; the retired dimension maps to Planning and Orchestration for within-iteration review checkpoints."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The paper is a demo and explicitly does not claim benchmark-level forecasting performance."
+}

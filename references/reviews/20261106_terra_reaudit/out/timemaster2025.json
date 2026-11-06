@@ -1,0 +1,140 @@
+{
+ "citation_key": "timemaster2025",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "TimeMaster trains a multimodal LLM for structured time-series classification reasoning and recommendations using GPT-4o-generated warm-up pairs, SFT, and reward-driven GRPO.",
+ "claim_evidence": [
+  {
+   "line": 98,
+   "quote": "Central to our approach is a structured output format that unifies the model’s response into three components: reasoning, classification, and extension."
+  },
+  {
+   "line": 2340,
+   "quote": "To construct high-quality time series–text paired reasoning data for warm-up training, we adopt an automated pipeline leveraging GPT-4o via the OpenAI API"
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [
+  "time_series_classification"
+ ],
+ "modules": [
+  {
+   "id": "timemaster2025:sft-grpo",
+   "name": "Structured time-series reasoning post-training",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification",
+    "decision_support"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 places SFT/GRPO here because they update the multimodal model parameters to shape temporal reasoning outputs; R3 applies only to Harness modules. The reward is part of model training, not a task-specific runtime verifier (TSK) or temporal-data harness (GTS).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R3:not_applicable_model_side"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 21,
+     "quote": "The model is trained using a two-stage pipeline: we first apply supervised finetuning (SFT) to establish a good initialization, followed by Group Relative Policy Optimization (GRPO) at the token level to enable stable and targeted rewarddriven improvement in time-series reasoning."
+    },
+    {
+     "line": 327,
+     "quote": "The format reward enforces strict adherence to the predefined output structure. A regex-based parser automatically checks if the generated response contains correctly nested and ordered <think>, <class>, and <extension> tags, with non-empty reasoning and classification spans."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timemaster2025:reasoning-warmup-data",
+   "name": "GPT-4o-generated reasoning warm-up data",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "training_data",
+   "scope_reason": "R2 explicitly places training data built to train the model on the LLM side; R3 applies only to Harness modules. The generated paired samples supervise the model, rather than serving as a temporal runtime store (GTS) or task-specific procedure (TSK).",
+   "rubric_path": [
+    "R1:contributed_training_data",
+    "R2:LLM",
+    "R3:not_applicable_model_side"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 2340,
+     "quote": "To construct high-quality time series–text paired reasoning data for warm-up training, we adopt an automated pipeline leveraging GPT-4o via the OpenAI API (with temperature set to 1.0 and all other parameters at default values)."
+    },
+    {
+     "line": 2344,
+     "quote": "Only samples whose predicted labels match the ground truth are retained as high-quality supervision. We collect approximately 1,000 class-balanced samples per dataset."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 641,
+   "quote": "Table 1 presents the performance of different methods on the T IMER B ED benchmark [17]. Our proposed method, TimeMaster, achieves a new state-of-the-art in time-series reasoning with multimodal LLMs, attaining an average accuracy of 75.29%, which surpasses classical time-series models and"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "timemaster2025:sft-grpo",
+   "decision": "split",
+   "new_ids": [
+    "timemaster2025:sft-grpo",
+    "timemaster2025:reasoning-warmup-data"
+   ],
+   "changes": [
+    "added module timemaster2025:reasoning-warmup-data",
+    "removed unsupported temporal_question_answering task membership"
+   ],
+   "reason": "Keep the existing post-training mechanism under its id and add the separately reusable GPT-4o-generated warm-up training data as a contributed training-data module. The packet describes classification prompts and recommendation extensions, not a temporal QA task."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The packet supports decision-support style recommendations as generated extensions, but reports no downstream decision-utility evaluation. It does not describe a tool-using runtime or temporal QA task."
+}

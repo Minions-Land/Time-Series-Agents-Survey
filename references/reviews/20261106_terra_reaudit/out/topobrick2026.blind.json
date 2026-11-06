@@ -1,0 +1,127 @@
+{
+ "citation_key": "topobrick2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TopoBrick selects and verifies topology-grounded exogenous variables and organizes them by deployment-time availability for zero-shot building sensor forecasting.",
+ "claim_evidence": [
+  {
+   "line": 124,
+   "quote": "Propose TopoBrick, a zero-shot pipeline that constructs compact building skeletons and uses an agentic topology sampler with KG-grounded verification to select target-specific exogenous variables."
+  },
+  {
+   "line": 126,
+   "quote": "Design a deployment-faithful forecasting setup that separates past-known and future-known exogenous variables,"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "topobrick2026:topology-routing",
+   "name": "Topology-guided exogenous routing and verification",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the sampler selects forecasting covariates and the verifier checks their suitability for that forecast; changing task family changes the selection objective and validation criterion. It is not GTS because topology context and physics checks are not general temporal-order or availability operations.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - embeds the forecasting covariate-selection objective",
+    "R3_2_GTS:no - no task-independent temporal semantics",
+    "R3_3_GH:no - task objective is embedded"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 320,
+     "quote": "A second agent audits the composition of L (𝑝) against the physics of the target. It receives the topology context C(𝑝) together with the Brick classes present in L (𝑝) and their counts, and returns a set of classes to remove and a set of additional actions to execute:"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "topobrick2026:availability-contract",
+   "name": "Past-known and future-known availability contract",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the contract formats known covariates over a forecast history and prediction horizon; a different task family requires a different temporal state and availability contract. It is not GTS because this is bound to forecasting inputs and the prediction horizon rather than a task-independent temporal facility.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - binds inputs to the forecasting horizon",
+    "R3_2_GTS:no - availability handling is specific to forecasting",
+    "R3_3_GH:no - temporal task objective is embedded"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 414,
+     "quote": "Past-known exogenous variables: Including the observations of sensor measurements and equipment states, such as power demand, flow rates, pressures, valve or damper positions, operating modes, and status that are observed up to time 𝑇 , providing historical context but are masked over the prediction horizon."
+    },
+    {
+     "line": 419,
+     "quote": "Future-known exogenous variables: Varibles that are available over both the historical window and the prediction horizon,"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 441,
+   "quote": "Training, validation, and testing sets are separated based on the natural calendar (see Table 2)."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 452,
+   "quote": "The model is evaluated in mean squared error (MSE) and mean absolute error (MAE)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The two mechanisms are separable: topology sampling and verification construct the selected covariate set, while the availability contract formats the selected variables over history and forecast horizons."
+}

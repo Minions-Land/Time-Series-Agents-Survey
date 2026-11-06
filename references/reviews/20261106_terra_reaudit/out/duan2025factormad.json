@@ -1,0 +1,259 @@
+{
+ "citation_key": "duan2025factormad",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "FactorMAD contributes a feedback-driven, two-agent debate controller and a code-based factor development pipeline for interpretable stock-return prediction, with downstream portfolio simulations.",
+ "claim_evidence": [
+  {
+   "line": 592,
+   "quote": "The evaluation results are recorded and used as valuable feedback for the debating agents, informing their subsequent factor\nproposals and critiques, thereby forming a closed-loop system that\nenables iterative factor improvement."
+  },
+  {
+   "line": 380,
+   "quote": "As illustrated in Figure 2, our pipeline\nconsists of four key stages: generation, validation, correction, and\nevaluation."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "duan2025factormad:factor-debate",
+   "name": "Feedback-driven factor debate",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Memory and Context"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches first: agents propose and critique stock alpha factors using their predictive metrics, factor histories and factor-design requirements. Changing the task family requires redesigning the proposed artifacts, objective and feedback; this is not a task-neutral temporal utility. Initialization, seed selection and transcript retention support this single debate mechanism.",
+   "rubric_path": [
+    "R0:in_scope - historical numerical price/volume series and an LLM runtime",
+    "R1:contributed - specialized factor initialization and iterative two-agent debate",
+    "R2:Harness - prompting, history and orchestration without model training",
+    "R3_1_TSK:yes - stock-return factor objective and performance feedback",
+    "R4:Planning and Orchestration; Memory and Context",
+    "R5:task_procedure - debate history alone is not temporally aligned context",
+    "R6:not_applicable",
+    "R7:forecasting_prediction",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 234,
+     "quote": "3.2.1 Agent Initialization. We initialize two agents with distinct\nperspectives before debating. This initialization adopts a stepback\nmethod that first extracts high-level insights from existing factors\nand then leverages these insights to establish distinct perspectives\nfor the agents."
+    },
+    {
+     "line": 339,
+     "quote": "Given the seed factor 𝛼 0 , the debate proceeds through multiple\nrounds of structured interactions. Formally, at each round 𝑡, the\nimproved factor 𝛼𝑡 is generated based on the last factor 𝛼𝑡 −1 and"
+    },
+    {
+     "line": 592,
+     "quote": "The evaluation results are recorded and used as valuable feedback for the debating agents, informing their subsequent factor\nproposals and critiques, thereby forming a closed-loop system that\nenables iterative factor improvement."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "duan2025factormad:factor-validation",
+   "name": "Factor implementation, repair and diversity admission",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches first: factor code must satisfy a factor-specific output/comparability contract, and IC/ICIR against future returns plus factor correlation determine admission. A different task family requires redesigning these outputs and acceptance criteria. The task-neutral past-only check is classified separately; its use does not change this pipeline's task-specific objective.",
+   "rubric_path": [
+    "R0:in_scope - executable factors transform historical market series",
+    "R1:contributed - standardized factor implementation, correction and diversity admission",
+    "R2:Harness - code execution, checks, correction prompts and evaluation",
+    "R3_1_TSK:yes - factor output contract and predictive-quality/diversity verifier",
+    "R4:Tools and Execution; Planning and Orchestration",
+    "R5:processing - numerical factor calculation; past-only validation is a separate module",
+    "R6:not_applicable",
+    "R7:forecasting_prediction",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 384,
+     "quote": "3.3.1 Generation. In the generation phase, the agent leverages\nthe summary and critiques from the current debate to generate\nfactor function code in Python."
+    },
+    {
+     "line": 439,
+     "quote": "3.3.3 Correction. In the correction phase, we employ a specialized\nLLM-based correction agent to refine factor codes that fail to meet\nthe specified validation criteria."
+    },
+    {
+     "line": 573,
+     "quote": "OUTPUT FORMAT\nPlease make sure that the return value of the function is a pandas Series."
+    },
+    {
+     "line": 581,
+     "quote": "DIMENSION\nEnsure that factor values are dimensionless and comparable across different symbols."
+    },
+    {
+     "line": 548,
+     "quote": "predictive performance by computing critical metrics such as information coefficient (IC) and information coefficient information\nratio (ICIR)."
+    },
+    {
+     "line": 554,
+     "quote": "set. Only factors that demonstrate both strong predictive power\nand low correlation with existing factors are added to the factor\nset as 𝛼𝑡 = (𝑓𝑡 , 𝑐𝑡 )."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "duan2025factormad:causal-window-check",
+   "name": "Past-only factor calculation check",
+   "layer": "GTS",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not match this isolated check: rejecting future-timestamp access and recommending past-window statistics does not depend on a return-prediction objective or portfolio rule. Under the task-change counterfactual, these availability rules remain unchanged. R3_2_GTS matches because the check explicitly depends on timestamp availability and temporal windows; its surrounding factor admission procedure remains TSK.",
+   "rubric_path": [
+    "R0:in_scope - temporal availability checking in an LLM factor-code runtime",
+    "R1:contributed - explicit LOOK-AHEAD BIAS validation category and rolling-window correction guidance",
+    "R2:Harness - external validation and feedback, not model training",
+    "R3_1_TSK:no - past-only availability rule survives a change of task family",
+    "R3_2_GTS:yes - future-timestamp exclusion and rolling-window semantics",
+    "R4:Planning and Orchestration - within-episode verification checkpoint",
+    "R5:validation",
+    "R6:not_applicable",
+    "R7:forecasting_prediction",
+    "R8:inferred - only factor-mining use of this check is established",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 525,
+     "quote": "phase evaluates multiple critical aspects, such as error-free code execution, no look-ahead bias, time-series stationarity, and dimension\nconsistency."
+    },
+    {
+     "line": 577,
+     "quote": "LOOK-AHEAD BIAS\nPlease make sure not to include any data from future timestamps when calculating the factor value.\n1. Use rolling functions instead of computing values over the entire time series, e.g., x.rolling(window).mean()\ninstead of x.mean()."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 598,
+   "quote": "(2014-2021) is utilized for factor mining and model training, while\nthe out-of-sample period (2022-2023) serves as the out-of-sample\ndataset for evaluating the effectiveness of the mined factors."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 758,
+   "quote": "To evaluate the predictive performance of the factors, we report four key metrics based on the out-of-sample dataset. These\nmetrics include the information coefficient (IC), which measures\nthe correlation between signals and labels;"
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 787,
+   "quote": "performance assessment, Table 2 reports three key metrics calculated from the cumulative excess returns (CER) relative to the benchmark: the annualized return (AR), which measures the strategy’s\nabsolute performance;"
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The blind pass grouped temporal validation into the factor pipeline. Reconciliation retains the existing isolated past-only check because Table 1 describes a distinct, task-neutral availability criterion and correction guidance; the remaining factor implementation/admission module is TSK. All three original ids are preserved. The packet does not detail the leakage detector's implementation or report its success rate; the GTS label does not assert complete leakage prevention. GPT-4o, standard predictors, market data and TopK simulation are not separately contributed modules. Decision support is a work-level downstream evaluation, not a second demonstrated use of each module. Process-validity checks are method descriptions, not reported runtime-validity measurements. Temporal-validity evidence establishes chronological splitting, not comprehensive leakage freedom. No separate cross-episode optimization mechanism or LLM training is established.",
+ "reconciliation": [
+  {
+   "existing_id": "duan2025factormad:factor-debate",
+   "decision": "change",
+   "new_ids": [
+    "duan2025factormad:factor-debate"
+   ],
+   "changes": [
+    "Keep TSK and the existing mechanism/id",
+    "Map both retired planning/coordination labels to Planning and Orchestration",
+    "Retain Memory and Context",
+    "Module tasks: forecasting_prediction only; retain decision_support at work level",
+    "Add packet quotes, ordered rubric path and complete reuse evidence"
+   ],
+   "reason": "Sections 3.2 and 3.3.4 establish factor-design initialization, stored debate context and performance-driven subsequent proposals. The controller optimizes predictive factors; the TopK investment simulation evaluates their downstream utility and does not demonstrate a separate decision-support debate procedure."
+  },
+  {
+   "existing_id": "duan2025factormad:factor-validation",
+   "decision": "change",
+   "new_ids": [
+    "duan2025factormad:factor-validation"
+   ],
+   "changes": [
+    "Keep TSK and the existing mechanism/id",
+    "Replace retired verification label with Planning and Orchestration",
+    "Retain Tools and Execution and describe generation/correction within the contributed pipeline",
+    "Functions: add processing for executable numerical factor calculation",
+    "Module tasks: forecasting_prediction only",
+    "Separate task-neutral past-only checking from task-specific factor requirements and admission"
+   ],
+   "reason": "Sections 3.3.1-3.3.4 specify factor code generation, output/comparability requirements, iterative repair, IC/ICIR evaluation and low-correlation admission. The output contract and acceptance criteria satisfy R3_1_TSK; their within-episode checks use the current planning dimension."
+  },
+  {
+   "existing_id": "duan2025factormad:causal-window-check",
+   "decision": "change",
+   "new_ids": [
+    "duan2025factormad:causal-window-check"
+   ],
+   "changes": [
+    "Keep GTS, validation, mapped and the existing mechanism/id",
+    "Replace retired verification label with Planning and Orchestration",
+    "Reuse evidence: demonstrated -> inferred",
+    "Module tasks and reuse tasks: forecasting_prediction only",
+    "Separate this check from the integrated pipeline used in the blind decomposition"
+   ],
+   "reason": "Table 1 supplies a concrete LOOK-AHEAD BIAS check category with future-timestamp exclusion and rolling-window guidance. This isolated temporal availability rule passes R3_2_GTS without a prediction objective. Applying already-mined factors in portfolio backtesting does not demonstrate that the checker itself was reused for a second task family."
+  }
+ ]
+}

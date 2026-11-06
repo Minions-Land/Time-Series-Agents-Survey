@@ -1,0 +1,222 @@
+{
+ "citation_key": "llmlight2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "LLMLight turns real-time traffic observations into signal actions with a knowledgeable prompt, while LightGPT is trained by filtered GPT-4 reasoning imitation and critic-guided refinement.",
+ "claim_evidence": [
+  {
+   "line": 116,
+   "quote": "To this end, we introduce LLMLight, a traffic signal control agent"
+  },
+  {
+   "line": 130,
+   "quote": "Furthermore, we construct a specialized LLM, LightGPT, to enhance the LLMLight framework."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [
+  "traffic_signal_control"
+ ],
+ "modules": [
+  {
+   "id": "llmlight2025:traffic-controller",
+   "name": "Traffic observation-to-signal control workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [
+    "traffic_signal_control"
+   ],
+   "role": "method",
+   "scope_reason": "The workflow counts and verbalizes traffic conditions, then selects a signal phase to improve traffic flow; changing the task family changes the action space and objective, so the R3 task-specific test applies.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - signal selection embeds the traffic-control objective and action space",
+    "R4:Interface and Interaction; Planning and Orchestration",
+    "R5:processing"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 193,
+     "quote": "This subsection details the workflow of our proposed LLMLight"
+    },
+    {
+     "line": 229,
+     "quote": "Subsequently, it selects the signal for the lanes experiencing the highest"
+    },
+    {
+     "line": 200,
+     "quote": "executes its selected control action."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "llmlight2025:trajectory-filtering",
+   "name": "Critic-filtered GPT-4 reasoning trajectories",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [
+    "traffic_signal_control"
+   ],
+   "role": "training_data",
+   "scope_reason": "The module constructs and filters reasoning trajectories used to train the LLM, which is an LLM-side training-data contribution rather than a runtime component.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 259,
+     "quote": "that identifies reasoning trajectories aligning most closely with"
+    },
+    {
+     "line": 262,
+     "quote": "This filter operation is achieved by aligning"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "llmlight2025:lightgpt-training",
+   "name": "Imitation fine-tuning of LightGPT",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [
+    "traffic_signal_control"
+   ],
+   "role": "model_training",
+   "scope_reason": "Imitation fine-tuning updates the backbone LLM on GPT-4 control actions and rationales, so it changes model behavior on the LLM side.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 299,
+     "quote": "In the initial stage of backbone LLM training, we employ an imitation learning process"
+    },
+    {
+     "line": 301,
+     "quote": "the LLM to train on the control actions taken by GPT-4 and their underlying rationales."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "llmlight2025:critic-guided-refinement",
+   "name": "Critic-guided policy refinement",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning",
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [
+    "traffic_signal_control"
+   ],
+   "role": "model_training",
+   "scope_reason": "The critic scores actions and the LLM is fine-tuned on that feedback to improve its reasoning and control policy, which is an LLM-side workflow-learning mechanism.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:workflow_learning; instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 266,
+     "quote": "we propose a policy refinement procedure, which adjusts the LLM’s reasoning trajectory for directing better actions."
+    },
+    {
+     "line": 269,
+     "quote": "Higher evaluation scores correspond to greater estimated future rewards."
+    },
+    {
+     "line": 271,
+     "quote": "we implement an alignment fine-tuning algorithm to adjust the reasoning trajectory"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 468,
+   "quote": "we leverage average travel time (ATT), average queue length (AQL), and the average waiting time (AWT) of vehicles to evaluate the performance of different policies made by traffic signal control agents."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 923,
+   "quote": "In contrast, our proposed method ensures both the shortest travel and waiting times, highlighting its remarkable scalability and applicability when transitioning to much larger road networks."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Traffic signal control is recorded under decision_support with traffic_signal_control as the source-supported other task. The experiments report policy outcomes and scenario robustness, but no explicit leakage guard, information-cutoff check, or execution-failure trace."
+}

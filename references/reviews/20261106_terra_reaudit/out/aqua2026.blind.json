@@ -1,0 +1,245 @@
+{
+ "citation_key": "aqua2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "AQuA contributes two independent feedback-driven quantitative research loops that use validated time-series experiment evidence to guide later factor proposals and model configurations within sealed evaluation sandboxes.",
+ "claim_evidence": [
+  {
+   "line": 11,
+   "quote": "We present AQuA, which comprises two separate language-model-driven research systems: one for symbolic factor discovery and one for trainable model development. The two systems do not share agents, memories, candidate spaces, or research state."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "aqua2026:manager-handoffs",
+   "name": "Manager-mediated specialist handoffs",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Manager-mediated assignments and handoffs coordinate execution without temporal semantics or a task-specific objective. TSK counterfactual: changing the research goal does not require redesigning handoffs; GTS counterfactual: the mechanism does not depend on timestamps, windows, units, or availability.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - handoff coordination is not task-objective logic",
+    "R3_2_GTS:no - no temporal semantics",
+    "R3_3_GH:yes"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 253,
+     "quote": "An AI Manager mediates each run. It reads the research policy, the accumulated memory, and the record of previous runs, and from these it writes a plan that assigns every downstream agent a concrete task. The agents never call one another; each handoff passes through the Manager"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aqua2026:sealed-search",
+   "name": "Sealed temporal evaluation and validation-only feedback",
+   "layer": "GTS",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The sandbox constrains temporal information availability and selection using fixed splits and withheld test windows. TSK counterfactual: the same temporal contract covers both systems and is not bound to one task objective. GTS counterfactual: a non-temporal task would remove the need for chronology and leakage controls.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - shared temporal contract, not one task objective",
+    "R3_2_GTS:yes - temporal availability and leakage validation"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 171,
+     "quote": "The data splits D, the feature and label definitions F and L, and the evaluator V are sealed and human-authored, and the model never edits them."
+    },
+    {
+     "line": 185,
+     "quote": "During search the harness returns to the agent only a score on a validation slice fixed in advance"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aqua2026:causal-factor-grammar",
+   "name": "Causal formulaic-alpha operator grammar",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The operator grammar constructs formulaic-alpha candidates for trading decisions, embedding a factor-discovery objective. GTS counterfactual: changing from alpha discovery requires changing the formulaic-alpha vocabulary and factor-construction objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - factor-discovery objective embedded in alpha grammar"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 203,
+     "quote": "Every time-series operator reads only its trailing window and every cross-sectional operator reads only the current timestamp, so causality is closed under composition: any expression the model assembles from O is causal by construction"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aqua2026:cross-run-research-memory",
+   "name": "Cross-run market research memory",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The memory retains event profiles, market-context beliefs, and evaluated temporal factors for later proposals. TSK counterfactual: it stores evidence across market mechanisms rather than encoding one factor objective; GTS counterfactual: without temporally ordered market observations and prior evidence, this contextual memory would not be meaningful.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - reusable context spans factor mechanisms",
+    "R3_2_GTS:yes - retains market-event and prior-evidence context"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 324,
+     "quote": "After each run, the Research Librarian writes a structured record containing the goal, event type, visual observations, proposed mechanisms, evaluated factors, selected signals, backtest summaries, and updated beliefs. A belief attaches confidence to a mechanism in a market context"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aqua2026:model-development-loop",
+   "name": "Config-driven model-development loop",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The loop plans model variants, runs training, evaluates outcomes, and updates knowledge. TSK counterfactual: it is variant-search orchestration rather than logic embedding a particular task output criterion. GTS counterfactual: the orchestration mechanism itself does not depend on temporal units, windows, or availability.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - general config-driven variant search",
+    "R3_2_GTS:no - orchestration has no temporal semantics",
+    "R3_3_GH:yes"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 410,
+     "quote": "Each iteration begins with a hypothesis written as a single config diff over the sealed sandbox of Section 3.1: a change to the architecture, the loss, the sampler, or the optimizer."
+    },
+    {
+     "line": 422,
+     "quote": "a training run, scores it through the sealed evaluator, and writes the result to a knowledge store that the next hypothesis reads."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 452,
+   "quote": "We split the data chronologically: we train on 2010–2019, leave 2020 as an embargo gap that no part of training or selection touches, and report on the untouched 2021–2025 test window."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 555,
+   "quote": "Table 3 reports the held-out metrics for 2021–2025. The model reaches a per-stock raw information coefficient of +0.0843 and a per-stock 𝑅2 of 1.20%."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 556,
+   "quote": "The threshold long/short book reaches a Sharpe of +2.15 before the volatility overlay and +2.50 after it, and a fully causal walk-forward that chooses every parameter from past data alone still reaches a Sharpe of about +2.0."
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The two research systems have independent agents, memories, candidate spaces, and state. The memory module here is the Part I market-event research memory; Part II's model-variant knowledge update is represented within its config-driven loop."
+}

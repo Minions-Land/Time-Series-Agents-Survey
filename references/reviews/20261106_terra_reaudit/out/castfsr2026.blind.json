@@ -1,0 +1,128 @@
+{
+ "citation_key": "castfsr2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "CastFSR contributes a forecasting-specific Fast–Slow–Reflect agent workflow and a two-stage strategy for internalizing its orchestration and reasoning in compact LLMs.",
+ "claim_evidence": [
+  {
+   "line": 105,
+   "quote": "We introduce a Fast–Slow–Reflect formulation that reframes context-aware time series forecasting as an agentic process integrating numerical prediction, contextual reasoning, and knowledge-constrained refinement."
+  },
+  {
+   "line": 112,
+   "quote": "We instantiate CastFSR with general-purpose LLMs and compact models, both achieving strong performance against representative baselines, with two-stage training improving overall performance on most benchmarks."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "castfsr2026:forecast-revision",
+   "name": "Fast–Slow–Reflect forecasting workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution",
+    "Memory and Context"
+   ],
+   "functions": [
+    "processing",
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the workflow's state, actions, numerical prior, and verifier serve the forecast horizon and output; if the task family changed, these forecasting actions and validation criteria would need redesign. Its temporal windows and context do not make it GTS because the procedure is bound to forecasting.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast-specific state, actions, and validation objective"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 257,
+     "quote": "We formulate TSF as a sequential decision-making problem, where forecasting requires a sequence of decisions,"
+    },
+    {
+     "line": 334,
+     "quote": "The reflective evaluation stage verifies the candidate forecast before final output. It enforces the constraint-aware principle that forecasts should be not only accurate but also consistent with temporal regularities, domain knowledge, and operational constraints."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "castfsr2026:policy-training",
+   "name": "Two-stage workflow post-training",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning",
+    "workflow_learning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "The SFT and RL stages update the compact model's behavior and decision policy, so R2 places this mechanism on the LLM side; the trained workflow policy selects actions from forecasting feedback.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 367,
+     "quote": "First, SFT learns executable Fast–Slow–Reflect behavior from general LLM trajectories distilled on the full cross-domain training data."
+    },
+    {
+     "line": 370,
+     "quote": "multi-turn RL optimizes complete decision trajectories under delayed forecasting feedback."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 893,
+   "quote": "Table 1 compares CastFSR with forecasting baselines across long- and short-term benchmarks. CastFSR achieves the best or second-best performance on most metrics"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The experiments report forecasting performance, but no process-validity, temporal-validity, or downstream decision-utility evaluation."
+}

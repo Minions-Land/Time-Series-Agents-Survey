@@ -1,0 +1,291 @@
+{
+ "citation_key": "agenticactivelearning2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "The work contributes a light-curve image interface and an anomaly-search harness that uses prompted LLM vetting, feedback-driven candidate acquisition, classifier expansion, and conservative multi-agent consensus.",
+ "claim_evidence": [
+  {
+   "line": 172,
+   "quote": "iteratively refine the initial ranking through an active\nlearning loop in which multimodal LLM agents repeatedly label the top-ranked anomaly candidates, and their\nlabels are propagated to neighboring sources in the embedding space (Section 3.3)."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "agenticactivelearning2026:light-curve-interface",
+   "name": "Phase-folded light-curve image interface",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not match: cleaning, phase folding, and rendering periodic multiband observations do not encode an anomaly objective. Changing task family can retain this interface. R3_2_GTS matches because periods, phase order, magnitude units, and filter identity determine its representation; the unchanged DINOv2 backbone is not a separate contribution.",
+   "rubric_path": [
+    "R1:contributed - temporal image preparation and LLM input integration",
+    "R2:Harness - preprocessing and interface around unchanged models",
+    "R3_1_TSK:no - representation does not require anomaly labels",
+    "R3_2_GTS:yes - period folding, magnitude scale, and multiband phase representation",
+    "R4:Interface and Interaction; Tools and Execution",
+    "R5:processing; mapped",
+    "R6:not_applicable",
+    "R7:anomaly_detection_diagnosis",
+    "R8:inferred - one demonstrated task family",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 203,
+     "quote": "then phase-folded the remaining observations on the\nVSX period and plotted magnitude against phase over\n[−0.5, +0.5], with the V band in blue and the g band in\ngreen."
+    },
+    {
+     "line": 316,
+     "quote": "received a phase-folded light-curve image (same as the\ninput to DINOv2 but overlaid with a gray reference grid;"
+    },
+    {
+     "line": 208,
+     "quote": "than spurious visual cues, but retained the magnitude\nrange ∆m of each plot and the period P of each light\ncurve as metadata for the subsequent analysis."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agenticactivelearning2026:structured-vetting",
+   "name": "Eight-step anomaly vetting prompt",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches first: the prompt assigns anomaly relevance using class-specific amplitude and period thresholds, folding and quality gates, and a conservative scoring order. A different task family requires redesigning the output schema, scoring anchors, and verifier. Amplitude estimation and folding checks implement processing and temporal validation inside this task procedure.",
+   "rubric_path": [
+    "R1:contributed - authored eight-step prompt and scoring gates",
+    "R2:Harness - in-context procedure without parameter updates",
+    "R3_1_TSK:yes - anomaly relevance objective and class-specific verification",
+    "R4:Interface and Interaction; Planning and Orchestration",
+    "R5:processing; validation; task_procedure",
+    "R6:not_applicable",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1523,
+     "quote": "review (Section 3.5) relied on a single prompt implementing eight sequential steps: visual inspection, data quality\nchecks, amplitude estimation, classification, extreme-parameter flagging, scoring, self-audit, and structured JSON"
+    },
+    {
+     "line": 336,
+     "quote": "relevance score y ∈ {0, 1, 2} followed a strict priority\norder in which the score could be elevated above zero\nonly after the data quality and folding checks had been\ncleared, ensuring that artifacts could never receive a positive score."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agenticactivelearning2026:adaptive-acquisition",
+   "name": "Feedback-driven anomaly candidate acquisition",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches: class-conditional anomaly initialization, accumulated relevance labels, anomaly-neighbor promotion, and the exploration quota determine which sources are vetted next. Changing task family requires changing the relevance objective and acquisition rule. This is within-search execution feedback, not demonstrated evolution of reusable agent assets across episodes.",
+   "rubric_path": [
+    "R1:contributed - anomaly ranking integration and feedback-based acquisition rule",
+    "R2:Harness - external label state, rank updates, and model invocation",
+    "R3_1_TSK:yes - anomaly relevance labels control candidate acquisition",
+    "R4:Planning and Orchestration; Memory and Context; Tools and Execution",
+    "R5:task_procedure - label propagation itself has no distinct temporal function",
+    "R6:not_applicable",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 279,
+     "quote": "source. We then converted these scores into percentile\nranks within each forest and took the minimum across\nall ranks, yielding the baseline anomaly score s(0) (x)."
+    },
+    {
+     "line": 363,
+     "quote": "{ l ∈ L(t) : cos θul > 0.90 } is the neighborhood of u comprising all members of the labeled set L(t) accumulated\nup to iteration t whose cosine similarity to u exceeds\n0.90."
+    },
+    {
+     "line": 365,
+     "quote": "This propagation mechanism promoted sources\nwith anomaly neighbors to the top of the ranking and\ndemoted those surrounded by low-scoring neighbors to\nthe bottom, while sources with no labeled neighbors retained their baseline anomaly scores."
+    },
+    {
+     "line": 369,
+     "quote": "To balance exploration of new regions with exploitation of known anomaly clusters, we capped the number\nof elevated anomaly-neighbor sources reviewed in each\niteration at half the batch size."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agenticactivelearning2026:classifier-expansion",
+   "name": "Agent-label classifier search expansion",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches: this stage turns accumulated relevance scores into binary anomaly targets and selects high-probability anomalies for further LLM review. Changing task family requires redesigning training targets and admission thresholds. Training an external logistic regressor does not train the LLM and therefore remains Harness.",
+   "rubric_path": [
+    "R1:contributed - agent-label classifier integration and follow-up selection",
+    "R2:Harness - trains an external classifier, not the LLM",
+    "R3_1_TSK:yes - binary anomaly target and probability-gated review",
+    "R4:Tools and Execution; Planning and Orchestration",
+    "R5:task_procedure - anomaly prediction is not a separate temporal function",
+    "R6:not_applicable",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 377,
+     "quote": "To recover them, we trained\na logistic regression classifier on the relevance labels accumulated across all iterations and used it to score the\nentire unlabeled pool directly, without imposing a hard\nsimilarity limit."
+    },
+    {
+     "line": 390,
+     "quote": "standardized the features. We collapsed the three-level\nscale into a binary label (y = 2 positive, y ∈ {0, 1} negative) and trained with balanced class weights to offset"
+    },
+    {
+     "line": 393,
+     "quote": "remaining unlabeled pool and passed up to 100 sources\nwith anomaly probability above 0.90 to the agents for\nlabeling, utilizing the same prompt and scoring protocol\nas in the main loop (Figure 5)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agenticactivelearning2026:consensus-review",
+   "name": "Conservative multi-agent anomaly consensus",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches: entry requires a positive anomaly-relevance score, five reviewers repeat the anomaly-specific prompt, and ties favor the lower relevance class. Changing task family requires redesigning candidate admission and the conservative relevance verifier; generic majority voting alone does not capture this contributed procedure.",
+   "rubric_path": [
+    "R1:contributed - targeted five-agent review with conservative label aggregation",
+    "R2:Harness - coordinated repeated inference and vote aggregation",
+    "R3_1_TSK:yes - anomaly-specific admission and conservative relevance decision",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure - vote aggregation adds no separate temporal function",
+    "R6:not_applicable",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 411,
+     "quote": "list. To mitigate this, we subjected all sources that received y ∈ {1, 2} in the main iterative loop or the logistic regression step to a multi-agent consensus review,"
+    },
+    {
+     "line": 414,
+     "quote": "We submitted each candidate to five independent\nGemini 3 Flash agents, each following the same eightstep prompt as in the main iterative loop (Figure 5).\nThe final label was assigned by majority vote, breaking\nties in favor of the lower relevance class to be conservative."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1528,
+   "quote": "To verify that the reasoning of the agents was consistent with the assigned relevance scores, we performed an n-gram\nfrequency analysis of the rationales from the consensus review."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 549,
+   "quote": "In all remaining cases, the\nagent-estimated g-band amplitudes agree with ours to\nwithin 15%."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1140,
+   "quote": "and overturned sources and found the majority-vote relevance scores to be generally consistent with our own assessments (Section 4.2). Removing the demoted sources\ntherefore increased the purity of the anomaly sample\n(fraction passing our inspection) by a factor of ∼2."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The whole pipeline is feedback driven, but individual LLM annotators are stateless, tool-free, and unable to plan (lines 136–140). No LLM training, retrieval memory, live alert deployment, or cross-task reuse is demonstrated. Classification and quality flags support the anomaly objective rather than independently evaluated task families. Process evidence is rationale/flag consistency rather than tool-call success. Temporal evidence checks numerical amplitude meaning, supplemented by phase-shift/crop robustness in Appendix C; it does not establish chronological splits or availability-time control. Ordinary labeled/unlabeled centering leakage control is not treated as chronological evidence. API cost and catalog yield are not downstream decision utility; completeness is unknown."
+}

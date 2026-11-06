@@ -1,0 +1,122 @@
+{
+ "citation_key": "bridge2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "BRIDGE contributes an LLM multi-agent procedure that refines time-series descriptions into paired training data for text-controlled time-series generation, alongside a separate diffusion generator.",
+ "claim_evidence": [
+  {
+   "line": 31,
+   "quote": "propose a novel LLM-based Multi-Agent framework that synthesizes diverse, realistic text-to-TS datasets."
+  }
+ ],
+ "task_memberships": [
+  "data_augmentation_synthesis",
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "bridge2025:template-collection",
+   "name": "ReAct-based time-series template collection",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R3 selects GH: query decomposition and web-search execution are not bound to a task-family output criterion, and the module does not enforce temporal order, windows, frequency, units, or availability. Changing the downstream task leaves the search workflow intact, so neither TSK nor GTS applies.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-family output criterion",
+    "R3_2_GTS:no - no temporal state or availability constraint",
+    "R3_3_GH:yes - general search and execution workflow"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "data_augmentation_synthesis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 193,
+     "quote": "we propose a single-agent framework, which prompts LLMs to generate dynamic reasoning traces for collecting candidates and actions to interact with external environments (e.g., Google, Wikipedia) in an interleaved manner"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "bridge2025:description-refinement",
+   "name": "Multi-agent description refinement for synthesis data",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "data_augmentation_synthesis",
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R3 selects TSK because the refinement procedure evaluates text paired with a historical series through forecast performance; changing that task-specific verifier requires redesigning its evaluation objective. It is not a general temporal utility separable from that criterion, so GTS does not apply.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - refinement is evaluated against a forecasting criterion"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 305,
+     "quote": "This is achieved by incorporating a ts task conditioned on accompanying text, based on the premise that higher-quality text improves performance."
+    },
+    {
+     "line": 323,
+     "quote": "we use LSTPrompt (Liu et al., 2024b) and LLMTime (Gruver et al., 2023) as our evaluation backbone"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 400,
+   "quote": "we use the Mean Absolute Error (MAE). For TCTSG, we measure the Marginal Distribution Discrepancy (MDD) and Kullback-Leibler (K-L) divergence to quantify the realism of the synthesized data"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet does not report an experiment testing chronological split integrity, information cutoffs, or temporal leakage. The described external-source restriction is a data-preparation precaution, not an evaluated temporal-validity result. The diffusion generator is excluded because it uses a pretrained LLM encoder unchanged and is neither an LLM-side contribution nor a harness module."
+}

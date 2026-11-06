@@ -1,0 +1,231 @@
+{
+ "citation_key": "streasoner2026",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "STReasoner adds a temporal encoder and spatial-aware reinforcement learning to train LLMs for spatio-temporal reasoning over graph-structured time series.",
+ "claim_evidence": [
+  {
+   "line": 135,
+   "quote": "STReasoner, which integrates a dedicated time series encoder with LLM to process numerical time series and textual inputs."
+  },
+  {
+   "line": 137,
+   "quote": "spatial-aware group relative policy optimization (S-GRPO), which assigns additional reward only when spatial information improves performance."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "temporal_question_answering"
+ ],
+ "modules": [
+  {
+   "id": "streasoner2026:spatial-tslm",
+   "name": "Temporal series encoder",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 places the patch encoder on the LLM side because it changes how temporal inputs are represented for the model; R3 Harness layer tests do not apply.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 393,
+     "quote": "we patchify the input time series (Nie, 2022) and encode each patch using a lightweight five-layer MLP (Time Series Encoder)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "streasoner2026:spatial-reasoning-training",
+   "name": "Spatio-temporal alignment and reasoning training",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 places alignment pretraining and reasoning SFT on the LLM side because they train the model to align text with series embeddings and inject spatio-temporal reasoning priors; R3 Harness layer tests do not apply.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 420,
+     "quote": "In the first stage, we perform large-scale alignment pretraining using ST-Align."
+    },
+    {
+     "line": 437,
+     "quote": "The selected reasoning trajectories are aggregated to form the ST-CoT dataset, which is then used to perform SFT."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "streasoner2026:s_grpo",
+   "name": "Spatial-aware GRPO",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 places the learned reasoning objective on the LLM side because it updates the model policy; it does not train selection of workflow tools/actions, so workflow_learning is not applicable. R3 Harness layer tests do not apply.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 443,
+     "quote": "we propose Spatial-Aware GRPO (S-GRPO), which introduces a contrastive reward mechanism that explicitly encourages spatial reasoning"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "streasoner2026:sde-synthesis",
+   "name": "Scenario-constrained network-SDE synthesis",
+   "layer": "TSK",
+   "dimensions": [],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "training_data",
+   "scope_reason": "R3_1 TSK applies because the synthesis procedure is designed to produce task-specific spatio-temporal QA data; changing from this task family requires changing scenario specifications and QA generation. R3_2 GTS is not chosen because the core is bound to this synthesis objective, while R3_3 GH is less specific. The network SDE explicitly models temporal dynamics, so processing applies.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific spatio-temporal data and QA synthesis",
+    "R3_2_GTS:no - bound to a synthesis task",
+    "R3_3_GH:no - task-specific core logic"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 223,
+     "quote": "we propose a network SDEs-based multi-agent data synthesis pipeline"
+    },
+    {
+     "line": 310,
+     "quote": "we generate two spatio-temporal QA datasets: ST-Bench and ST-Align."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 519,
+   "quote": "STReasoner achieves the best overall performance among open-source and time series models across all four tasks."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "streasoner2026:sde-synthesis",
+   "decision": "change",
+   "new_ids": [
+    "streasoner2026:sde-synthesis"
+   ],
+   "changes": [
+    "dimensions removed because TSK is not a Harness layer",
+    "added processing temporal function",
+    "other_tasks: temporal_question_answering",
+    "evidence and scope rationale grounded in packet"
+   ],
+   "reason": "The packet supports the network-SDE synthesis procedure as task-specific data/QA generation. Under R3_1 it remains TSK; temporal dynamics make processing applicable. The legacy harness dimensions on the card are not valid for TSK."
+  },
+  {
+   "existing_id": "streasoner2026:spatial-tslm",
+   "decision": "split",
+   "new_ids": [
+    "streasoner2026:spatial-tslm",
+    "streasoner2026:spatial-reasoning-training",
+    "streasoner2026:s_grpo"
+   ],
+   "changes": [
+    "name narrowed to temporal series encoder",
+    "tasks expanded to forecasting_prediction and temporal_question_answering",
+    "split training stages and S-GRPO into independently reusable model-side mechanisms",
+    "added LLM routes and source evidence"
+   ],
+   "reason": "The encoder, alignment/SFT reasoning training, and contrastive S-GRPO objective are distinct model-side mechanisms that can be applied separately, as indicated by the separate training stages and ablations."
+  }
+ ],
+ "needs_human_review": true,
+ "notes": "The synthesis pipeline is classified as TSK because its core output is task-specific synthetic QA data; its training-data role overlaps with dataset construction. ST-Bench is an evaluation dataset of a method paper and is excluded under R1. The experiments report task accuracy/forecasting error but no explicit temporal leakage or information-availability validation."
+}

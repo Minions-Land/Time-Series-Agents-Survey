@@ -1,0 +1,261 @@
+{
+ "citation_key": "anomamind2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "AnomaMind contributes an anomaly-specific sequential agent workflow that combines learned interval decisions with tool-based evidence construction and iterative refinement.",
+ "claim_evidence": [
+  {
+   "line": 98,
+   "quote": "Crucially, AnomaMind adopts a hybrid inference mechanism: general-purpose models handle tool invocation and self-reflective refinement, while a detection-specific policy is optimized through rule-based rewards that encourage valid parsing, F1-score alignment, and false-positive control."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "anomamind2026:anomaly-workflow",
+   "name": "Coarse-to-fine anomaly workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK applies because the stages produce anomaly interval decisions and organize anomaly evidence; if the family changed, the candidate-interval actions and anomaly decision objective would need redesign. The workflow uses temporal intervals, but its core is bound to anomaly detection, so it fails the task-independent GTS counterfactual.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - anomaly interval decisions and evidence workflow",
+    "R4:Planning and Orchestration; Tools and Execution"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 473,
+     "quote": "AnomaMind instantiates the general process as a structured coarse-to-fine workflow. The workflow is organized into four implementation stages, each corresponding to one role in Table I:"
+    },
+    {
+     "line": 476,
+     "quote": "Table I: coarse evidence acquisition by the locator, adaptive evidence construction by the actor, anomaly detection by the detector, and iterative refinement by the evaluator."
+    },
+    {
+     "line": 529,
+     "quote": "AnomaMind further incorporates an iterative refinement mechanism to evaluate and revise detection outcomes when necessary."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "anomamind2026:detector-rl",
+   "name": "Anomaly detector SFT and reinforcement learning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places this policy on the LLM side because it trains the model to produce interval-level anomaly decisions. R3 does not apply; the module is not harness code, and changing the task requires changing its anomaly-specific decision objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 560,
+     "quote": "we conduct supervised fine-tuning to initialize the detection-specific policy with anomaly reasoning traces. This stage teaches the detector to interpret diagnostic context and generate interval-level outputs,"
+    },
+    {
+     "line": 564,
+     "quote": "while the RL stage further optimizes decision quality using parsing, F1-score, and false-positive rewards."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "anomamind2026:knowledge-memory",
+   "name": "Anomaly pattern and domain knowledge memory",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK does not apply to the memory mechanism itself: it retrieves contextual knowledge and pattern prototypes rather than implementing the anomaly output objective or verifier. Its temporal anomaly examples make it GTS; the retrieval and retained-context structure could be reused for another task with different contents, so the task-change counterfactual does not require redesigning its temporal memory mechanism.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - memory supplies context but does not decide anomaly labels",
+    "R3_2_GTS:yes - retains and retrieves temporal pattern context",
+    "R4:Memory and Context",
+    "R5:context_memory"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 413,
+     "quote": "The knowledge memory K corresponds to the left part of the toolkit box in Figure 1. It stores three types of reusable knowledge:"
+    },
+    {
+     "line": 387,
+     "quote": "The visual anomaly patterns in Kvap are constructed offline through anomaly pattern mining over the training set, corresponding to the “Anomaly Pattern Mining” block in Figure 1."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "anomamind2026:diagnostic-toolkit",
+   "name": "Numerical diagnostic toolkit",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK applies because the operators construct and verify evidence for anomaly decisions; their anomaly thresholds, candidate-region interface, and interpretation would need redesign for another task family. Although they process ordered numerical series, this task-specific output purpose means the task-independent GTS counterfactual fails.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - operators construct anomaly evidence",
+    "R4:Tools and Execution",
+    "R5:processing"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 422,
+     "quote": "The numerical-evidence toolkit N corresponds to the right part of the toolkit box in Figure 1. It contains four evidence operators:"
+    },
+    {
+     "line": 428,
+     "quote": "Nval identifies magnitude outliers by normalizing segment values with global statistics and returning points that exceed an adaptive threshold."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "anomamind2026:temporal-preprocessing",
+   "name": "Time-series normalization and indexing",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK does not apply because these operations prepare the temporal data and do not encode an anomaly objective or verifier. R3_2 GTS applies because normalization, timestamp/index standardization, and detrending depend on numerical series and temporal indexing; the procedures remain applicable if the task family changes.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - preprocessing does not implement an anomaly decision criterion",
+    "R3_2_GTS:yes - operates on temporal values and indices",
+    "R4:Tools and Execution",
+    "R5:data_management; processing"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1692,
+     "quote": "Time series data often exhibit significant variations in numerical magnitude and timestamp formats. To ensure accurate anomaly pattern recognition and enhance model stability, we implement the following preprocessing steps:"
+    },
+    {
+     "line": 1701,
+     "quote": "To mitigate the inconsistencies caused by varying timestamp formats and sampling frequencies across datasets, we abstract absolute time into a unified zero-based integer index."
+    },
+    {
+     "line": 1713,
+     "quote": "To mitigate the influence of global trends that are irrelevant to local anomalies, we remove the linear component:"
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1450,
+   "quote": "then performs tool-assisted inspection: value-based detection finds no clear amplitude outliers, while change-based detection reveals sharp transitions around indices 1083 and 1084."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1117,
+   "quote": "The cross-domain variant achieves stronger results on WSD and IOPS, suggesting that unified training across heterogeneous datasets improves generalization across diverse anomaly patterns."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The toolkit is split into reusable contextual memory, task-specific anomaly evidence operators, and temporal preprocessing because each has a distinct interface and scope. The packet reports task metrics and one qualitative execution trace, but does not report temporal leakage/availability checks or downstream decision utility."
+}

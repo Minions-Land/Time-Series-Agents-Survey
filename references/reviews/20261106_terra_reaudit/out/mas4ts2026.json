@@ -1,0 +1,242 @@
+{
+ "citation_key": "mas4ts2026",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "MAS4TS contributes a temporal visual-reasoning and latent reconstruction mechanism, shared agent memory, and task-routed tool-chain execution with verification for forecasting, classification, imputation, and anomaly detection.",
+ "claim_evidence": [
+  {
+   "line": 139,
+   "quote": "Based on this insight, we propose MAS4TS, the first tool-driven Multi-Agent System for general Time Series analysis, built upon an Analyzer–Reasoner–Executor paradigm."
+  },
+  {
+   "line": 145,
+   "quote": "Specifically, MAS4TS performs visual reasoning directly on time series plots using VLMs to obtain structured anchors, which subsequently guide trajectory reconstruction in latent space."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "time_series_classification",
+  "imputation"
+ ],
+ "modules": [
+  {
+   "id": "mas4ts2026:temporal-carriers",
+   "name": "Plot-anchor and latent-trajectory reasoning",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "time_series_classification",
+    "imputation"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 TSK no: sparse visual anchors and latent trajectory reconstruction are not defined by one output objective and support multiple task families. R3_2 GTS yes: it operates on ordered series and reconstructs a temporally coherent latent trajectory. Counterfactual: changing task outputs does not require redesigning its temporal plot-to-trajectory mechanism.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - shared temporal reasoning across tasks",
+    "R3_2_GTS:yes - plot anchors guide temporal trajectory reconstruction",
+    "R4:Interface and Interaction; Tools and Execution",
+    "R5:processing"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "time_series_classification",
+     "imputation"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 364,
+     "quote": "The Reasoner aims to bridge intuitive visual pattern recognition and precise numerical inference for time series analysis."
+    },
+    {
+     "line": 303,
+     "quote": "we introduce a latent construction module that reconstructs a continuous latent trajectory by treating anchors as conditioning signals that guide latent-space evolution."
+    },
+    {
+     "line": 265,
+     "quote": "MAS4TS provides a unified agent-driven framework that shares common perception, reasoning, and memory components across these tasks."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "mas4ts2026:shared-memory",
+   "name": "Confidence-gated shared agent memory",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK no: this exchanges agent states without embedding a task output criterion. R3_2 GTS no: the shared matrix coordinates agent hidden states but does not impose temporal ordering, windows, frequency, units, or information availability. R3_3 GH yes: it manages execution state and inter-agent coordination. Counterfactual: its mechanism need not be redesigned when changing task families.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - shared coordination mechanism",
+    "R3_2_GTS:no - no temporal semantics in the memory update criterion",
+    "R3_3_GH:yes - manages agent execution state",
+    "R4:Memory and Context; Planning and Orchestration",
+    "R5:general_runtime"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "time_series_classification",
+     "imputation"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 288,
+     "quote": "We define a set of agents {Agent(i) }N i=1 for batch data processing, where in our instantiation N =3 corresponds to Analyzer, Reasoner, and Executor."
+    },
+    {
+     "line": 294,
+     "quote": "Cross-agent coordination is achieved through a shared memory matrix M ∈ RL×dm , which integrates knowledge across agents via gated fusion."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "mas4ts2026:temporal-tools",
+   "name": "Task-routed tool chains and result verification",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "time_series_classification",
+    "imputation"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 TSK yes: the router conditions on task type and chooses task-specific chains, while the verifier applies task-specific consistency criteria. Counterfactual: changing the task family requires changing tool-chain semantics and validation objectives. R3_2/R3_3 are not selected because the core procedure embeds task objectives.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-conditioned chains and verifier criteria",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:task_procedure; processing; validation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 401,
+     "quote": "At execution time, an adaptive router selects a tool chain from a predefined library T = {T1 , . . . , TM }, where each tool implements a specialized operation (e.g., trend extrapolation, decomposition, smoothing, statistical prediction, constraint projection, and residual correction)."
+    },
+    {
+     "line": 431,
+     "quote": "To ensure numerical validity and task consistency, MAS4TS employs a lightweight verifier that performs: (i) format and shape correction, (ii) constraint validation, and (iii) task-specific normalization."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 446,
+   "quote": "Results. As shown in Table 1, MAS4TS achieves competitive performance across all benchmarks."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The workflow dynamically routes from task type, priors, and memory, but the packet does not state that returned tool feedback changes later action selection; fixed_workflow is therefore the supported role.",
+ "reconciliation": [
+  {
+   "existing_id": "mas4ts2026:temporal-carriers",
+   "decision": "keep",
+   "new_ids": [
+    "mas4ts2026:temporal-carriers"
+   ],
+   "changes": [
+    "dimensions retained: Interface and Interaction; Tools and Execution",
+    "added functions: processing",
+    "added required rubric_path"
+   ],
+   "reason": "The card's plot-anchor and latent-trajectory mechanism is supported as a shared temporal processing module used across all four tasks."
+  },
+  {
+   "existing_id": "mas4ts2026:shared-memory",
+   "decision": "change",
+   "new_ids": [
+    "mas4ts2026:shared-memory"
+   ],
+   "changes": [
+    "dimensions: Coordination and Scaling -> Planning and Orchestration",
+    "added required rubric_path"
+   ],
+   "reason": "The shared gated memory is a general runtime coordination mechanism. The retired dimension label maps to Planning and Orchestration; evidence does not establish temporal availability semantics for the shared state."
+  },
+  {
+   "existing_id": "mas4ts2026:temporal-tools",
+   "decision": "change",
+   "new_ids": [
+    "mas4ts2026:temporal-tools"
+   ],
+   "changes": [
+    "added function: validation",
+    "view_status: mapped -> task_procedure",
+    "reuse_evidence: demonstrated -> not_applicable",
+    "added required rubric_path"
+   ],
+   "reason": "Adaptive selection and verification are task-conditioned; the verifier applies task-specific criteria. TSK keeps its applicable Harness dimensions and task memberships, with temporal functions recorded where implemented."
+  }
+ ]
+}

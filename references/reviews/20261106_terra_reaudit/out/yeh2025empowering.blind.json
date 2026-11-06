@@ -1,0 +1,158 @@
+{
+ "citation_key": "yeh2025empowering",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "DCATS uses metadata-guided dataset proposals and validation-error feedback to refine auxiliary-series selection for forecasting, evaluated through warm-started model fine-tuning.",
+ "claim_evidence": [
+  {
+   "line": 163,
+   "quote": "Each proposal is then evaluated by the forecasting module, which\ntrains models using the sub-dataset and reports performance on\nthe validation dataset."
+  },
+  {
+   "line": 166,
+   "quote": "Using the validation performance, the LLM-agent\nprovides a new set of proposals for the next evaluation round,\ntypically refining the winning strategy from the previous iteration."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "yeh2025empowering:dataset-proposal-refinement",
+   "name": "Metadata-guided forecasting dataset search",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches: prompts propose auxiliary-series subsets to improve forecasting MAE, retain ranked experiment results, and refine until forecasting validation no longer improves. Changing task family requires redesigning the forecasting objective, evaluator feedback, and stopping criterion.",
+   "rubric_path": [
+    "R1:contributed - metadata-guided dataset proposals and feedback-driven refinement",
+    "R2:Harness - prompt-based procedure without LLM parameter updates",
+    "R3_1_TSK:yes - forecasting MAE governs proposal refinement and termination",
+    "R4:Interface and Interaction; Memory and Context; Planning and Orchestration",
+    "R5:task_procedure - experiment-result memory and metadata selection do not independently establish a temporal function",
+    "R6:not_applicable",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 174,
+     "quote": "The LLM-agent generates initial proposals using a five-section\nprompt: 1) background, 2) task, 3) guidelines, 4) neighbor sets, and\n5) output format."
+    },
+    {
+     "line": 325,
+     "quote": "The experiment section lists all sub-dataset setups and their corresponding performance, as shown in Listing 7."
+    },
+    {
+     "line": 375,
+     "quote": "Based on the experiment results, baseline performance, and best-so-far\nperformance, provide a new set of proposals to further enhance the\nforecasting model."
+    },
+    {
+     "line": 381,
+     "quote": "3. Aim to minimize the Mean Absolute Error (MAE)"
+    },
+    {
+     "line": 169,
+     "quote": "This iterative\nprocess continues until no proposals in the current round show\nimprovement over the best-so-far solution."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "yeh2025empowering:forecasting-proposal-evaluator",
+   "name": "Warm-started forecasting proposal evaluator",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches: this candidate-subset evaluator integrates model pretraining, discord filtering, fine-tuning, and forecasting validation. A different task family requires redesigning its model output and performance criterion. Its numerical-series filtering implements processing, but forecasting-specific evaluation takes precedence over GTS.",
+   "rubric_path": [
+    "R1:contributed - integration of warm-started candidate fitting, filtering, and forecasting evaluation; cited models and discord algorithms are not separate contributions",
+    "R2:Harness - trains external forecasting models, not the LLM",
+    "R3_1_TSK:yes - evaluates candidate data by forecasting performance",
+    "R4:Tools and Execution",
+    "R5:processing; task_procedure",
+    "R6:not_applicable",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 298,
+     "quote": "The forecasting module trains time series forecasting models using\nthe sub-dataset and evaluates their performance on the validation\nset."
+    },
+    {
+     "line": 307,
+     "quote": "To enhance model convergence speed, we first train a foundation\nmodel [12, 20, 24, 25] using all available time series data before user\nqueries."
+    },
+    {
+     "line": 309,
+     "quote": "We then use the sub-dataset proposed by the LLM-agent to\nfine-tune the foundation model when testing different proposals."
+    },
+    {
+     "line": 310,
+     "quote": "To\nfurther refine the data before fine-tuning, we remove the 10% most\nanomalous data from the sub-dataset using discord-based anomaly\ndetection methods [21, 26]."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 403,
+   "quote": "Our framework was applied to the training and validation sets, with performance reported\non the test set."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 468,
+   "quote": "The DCATS framework consistently improved performance across\nall tested methods, with an average improvement of 6% across all\nqueries, models, and metrics."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Temporal-validity evidence is limited to restricting framework optimization to training/validation and reporting held-out test performance; chronological ordering, metadata availability cutoffs, and comprehensive leakage controls are not specified. Forecasting models and discord detection are existing components; only their evaluator integration is counted. Anomaly removal is internal preprocessing, not an evaluated anomaly-detection task. Metadata neighbor sets are inputs to the forecasting search, not a separately established reusable temporal retrieval contribution. Proposal explanations are qualitative analyses, not checks of tool-call or execution validity."
+}

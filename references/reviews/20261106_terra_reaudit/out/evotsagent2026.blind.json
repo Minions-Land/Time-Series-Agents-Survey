@@ -1,0 +1,166 @@
+{
+ "citation_key": "evotsagent2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "EvoTS-Agent uses curated EDA and validation-guided trajectory evolution to select, revise, and synthesize financial time-series change-point detection pipelines.",
+ "claim_evidence": [
+  {
+   "line": 41,
+   "quote": "We propose EvoTS-Agent, a validation-guided self-evolving LLM agent for autonomous financial time-series change-point detection. EvoTS-Agent first performs curated exploratory data analysis to characterize dataset properties and initialize candidate detection models."
+  }
+ ],
+ "task_memberships": [],
+ "other_tasks": [
+  "change_point_detection"
+ ],
+ "modules": [
+  {
+   "id": "evotsagent2026:detector-bank",
+   "name": "Change-point detector bank",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "change_point_detection"
+   ],
+   "role": "method",
+   "scope_reason": "The bank supplies detection algorithms for a specific change-point objective; if the task family changes, the detector set and its output semantics must be redesigned, so R3_1 selects TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - change-point detectors directly implement the task output",
+    "R4:Tools and Execution",
+    "R5:task_procedure",
+    "R7:other_tasks=change_point_detection",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 178,
+     "quote": "We build a comprehensive model bank, containing a diverse collection of change-point detection methods with fundamentally different assumptions, enabling the agent to handle a broad spectrum of change-point scenarios."
+    },
+    {
+     "line": 879,
+     "quote": "Our model bank integrates eight complementary change-point detection methods."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "evotsagent2026:cp-model-selection",
+   "name": "Change-sensitive EDA and detector selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "change_point_detection"
+   ],
+   "role": "method",
+   "scope_reason": "The procedure computes change-sensitive features and selects candidate change-point models; its logic embeds the change-point task, so a different task family would require redesign under R3_1.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - change-sensitive features and detector selection target change-point detection",
+    "R4:Tools and Execution; Planning and Orchestration",
+    "R5:task_procedure",
+    "R7:other_tasks=change_point_detection",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 351,
+     "quote": "The resulting meta features, an unlabeled time-series visualization, task metadata, and candidate model descriptions are provided to an LLM-based selector. The selector chooses K primary models for warm-up experiments and up to two alternatives."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "evotsagent2026:trajectory-evolution",
+   "name": "Validation-controlled trajectory evolution",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "change_point_detection"
+   ],
+   "role": "method",
+   "scope_reason": "Validation scores govern revision, exploration, recombination, and incumbent selection for change-point pipelines. Because the selection objective is change-point validation performance, changing task family requires redesign, so R3_1 selects TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - trajectory actions and selection are governed by the change-point validation objective",
+    "R4:Memory and Context; Planning and Orchestration; Optimization and Evolution",
+    "R5:task_procedure",
+    "R7:other_tasks=change_point_detection",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 232,
+     "quote": "EvoTS-Agent uses validation outcomes to control the evolutionary process: it revises the incumbent by default, activates an alternative strategy when revision stagnates, and performs evidence-based recombination for final synthesis. Thus, empirical feedback determines not only which solution is retained, but also how the subsequent search is conducted."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 895,
+   "quote": "Finally, Success Rate reports the percentage of runs that complete successfully without execution or runtime failures, reflecting the reliability of each autonomous agent in producing executable solutions."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 877,
+   "quote": "Following [11, 20], each dataset is split chronologically into training (60%), validation (20%), and test (20%) sets."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 888,
+   "quote": "We evaluate detection quality using four complementary metrics. F1 is the primary metric and is computed using boundary-aware matching between predicted and ground-truth change points within a predefined ±10-sample tolerance window, balancing precision and recall."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Change-point detection is recorded as an explicit other task because the paper evaluates locating structural changes, not downstream decision utility."
+}

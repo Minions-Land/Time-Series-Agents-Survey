@@ -1,0 +1,263 @@
+{
+ "citation_key": "conversationaltsfm2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TSOrchestra combines forecasting-specific ensemble optimization with a fine-tuned LLM judge that revises metric selection, stopping decisions, and explanations from optimization feedback.",
+ "claim_evidence": [
+  {
+   "line": 52,
+   "quote": "To address this gap, we propose TSOrchestr, which positions LLMs as intelligent judges that evaluate, explain, and strategically coordinate ensembles of specialized forecasting models, thereby combining the numerical precision of time series foundation methods with the interpretive power of language models."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "conversationaltsfm2025:forecast-ensemble-control",
+   "name": "Forecasting ensemble optimization and continuation control",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because candidate weights and continue/accept choices are judged by forecasting performance; changing task family requires replacing the forecast objective, model pool, and validation criterion. GTS would fit temporal dependence alone, but this embeds the forecasting objective; GH would fit task-neutral execution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast objective and validation criterion are embedded",
+    "R3_2_GTS:no - temporal semantics are present but the forecasting objective is binding",
+    "R3_3_GH:no - the procedure is task-specific"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 241,
+     "quote": "The agent orchestrates iterative refinement through two capabilities: (i) strategic exploration by iteratively selecting metrics Lk ∈ L to test specific hypotheses about weight quality from optimizing Eq. 3.2 , (ii) evaluative reasoning that synthesizes evidence into confidence scores, decision rationales, and next hypotheses:"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "conversationaltsfm2025:forecast-judge-adaptation",
+   "name": "SFT and GRPO adaptation of the ensemble judge",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning",
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places the parameter updates on the LLM side: SFT and GRPO train the model to make temporal ensemble workflow decisions and grounded explanations, rather than prompting an unchanged model.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM-side trained capability",
+    "R6:workflow_learning and instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 268,
+     "quote": "We address these gaps through a two-stage training approach that transforms a general-purpose LLM into a specialized ensembledecider: supervised fine-tuning (SFT) teaches structured decision protocols through expert-annotated trajectories, while reinforcement learning (GRPO) refines these capabilities"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "conversationaltsfm2025:optimization-trajectory-data",
+   "name": "Synthetic optimization trajectory training data",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning",
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R2 treats purpose-built examples that train the model as LLM-side contributions; these trajectories teach forecasting workflow decisions and evidence-grounded explanations.",
+   "rubric_path": [
+    "R1:contributed training data",
+    "R2:LLM-side training data",
+    "R6:workflow_learning and instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1846,
+     "quote": "Our training dataset, comprising over 2,800 trajectories, was constructed via a four-stage synthetic pipeline. This approach eliminates the need for manual human annotation while ensuring ground-truth validity:"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "conversationaltsfm2025:ensemble-audit-reflection",
+   "name": "Weight-optimization audit and reflective explanation",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the stored optimization history and synthesis concern forecast weights, metrics, and task-specific faithfulness; changing the task changes the evidence and synthesis. GTS would fit independent temporal availability management, while GH would fit task-neutral logs.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast-specific optimization evidence and synthesis",
+    "R3_2_GTS:no - no independent temporal availability mechanism",
+    "R3_3_GH:no - stored state is interpreted for the forecasting objective"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 349,
+     "quote": "Each record captures the weight configuration, performance metric, confidence score, faithfulness validation, decision outcome, and generated hierarchical explanation. Critically, the faithfulness score Fk validates whether explanations accurately reflect true causal mechanisms. After optimization completes, the system analyzes the entire audit trail A to generate hierarchical synthesis explanations:"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "conversationaltsfm2025:shap-faithfulness-validator",
+   "name": "SHAP-based temporal explanation faithfulness validator",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the validator checks attribution of forecasting performance to temporal components; its criterion changes with the task objective. GTS would fit task-independent temporal consistency checks, but this score is forecast-performance-grounded; GH would fit generic verification.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - criterion is causal contribution to forecast performance",
+    "R3_2_GTS:no - temporal decomposition alone does not determine its criterion",
+    "R3_3_GH:no - not generic verification"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1698,
+     "quote": "From the causal perspective, the STL-SHAP decomposition creates counterfactual time series by intervening on specific temporal concepts C = {Trend, Seasonality, Residual}. For each subset S ⊆ C, we evaluate model performance f (S), where the presence or absence of components represents causal interventions:"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 21,
+   "quote": "Validated on the GIFT-Eval benchmark on 23 datasets across 97 settings, our approach significantly outperforms leading time series foundation models on both CRPS and MASE metrics, establishing new state-of-the-art results."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "conversationaltsfm2025:forecast-judge-adaptation",
+   "decision": "change",
+   "new_ids": [
+    "conversationaltsfm2025:forecast-judge-adaptation"
+   ],
+   "changes": [
+    "remove dimensions because LLM modules have no dimensions",
+    "add llm_route: workflow_learning and instruction_reasoning"
+   ],
+   "reason": "SFT and GRPO update model parameters for accept/continue decisions, optimization reasoning, and explanations; classify this as an LLM-side trained capability under R2."
+  },
+  {
+   "existing_id": "conversationaltsfm2025:forecast-ensemble-control",
+   "decision": "change",
+   "new_ids": [
+    "conversationaltsfm2025:forecast-ensemble-control"
+   ],
+   "changes": [
+    "dimensions: retain Tools and Execution; map Control, Verification, and Feedback and Planning and Workflow to Planning and Orchestration",
+    "functions: add validation"
+   ],
+   "reason": "SLSQP weight selection and iterative continuation are bound to forecast metrics, so the module remains TSK. CV-based forecast assessment implements validation."
+  },
+  {
+   "existing_id": "conversationaltsfm2025:ensemble-audit-reflection",
+   "decision": "change",
+   "new_ids": [
+    "conversationaltsfm2025:ensemble-audit-reflection"
+   ],
+   "changes": [
+    "dimension: Control, Verification, and Feedback -> Planning and Orchestration"
+   ],
+   "reason": "The audit trail and hierarchical reflection are distinct forecasting workflow state and synthesis mechanisms, supported by the packet’s record fields and post-optimization analysis."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The packet supports an audit/reflection mechanism, a SHAP faithfulness validator, and synthetic trajectory training data. CV/test comparisons do not establish chronological split or leakage-control details, so temporal validity is unmarked."
+}

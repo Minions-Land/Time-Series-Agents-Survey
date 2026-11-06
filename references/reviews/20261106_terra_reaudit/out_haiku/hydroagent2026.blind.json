@@ -1,0 +1,165 @@
+{
+ "citation_key": "hydroagent2026",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "HydroAgent is a skill-orchestrated flood forecasting workflow that places an LLM-driven analog prior judgment and human review gates around a deterministic Xinanjiang model, evaluated with five LLMs.",
+ "claim_evidence": [
+  {
+   "line": 51,
+   "quote": "To address this issue, we propose HydroAgent, a skill-orchestrated agent framework that embeds Large Language Models (LLMs)"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "hydroagent2026:skill-orchestrated-workflow",
+   "name": "Flood forecasting skill workflow with expert review gates",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Interface and Interaction"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Step 0-4 chain, flood outputs (peak, volume, warning level) and review gates are embedded in the procedure; a different task family would require redesigning the chain (R3_1 counterfactual).",
+   "rubric_path": [
+    "R0:fixed_workflow",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - flood peak, volume and warning outputs embedded in the chain"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 154,
+     "quote": "HydroAgent workflow includes five steps: (1) scheme preparation, (2) scenario judgment, (3) scheme selection, (4) rolling forecasting, and (5) warning bulletin."
+    },
+    {
+     "line": 229,
+     "quote": "to await expert approval before advancing"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "hydroagent2026:step1-prior-judgment",
+   "name": "Analog-case flood prior judgment with physical red-line check",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Peak and volume prior ranges are derived from flood-specific similarity rules and runoff constraints; a new task family would change the rules (R3_1 counterfactual).",
+   "rubric_path": [
+    "R0:fixed_workflow",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - flood peak and volume interval rules embedded"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 276,
+     "quote": "a six-dimensional similarity retrieval is performed in which the executor computes a weighted score over the historical case library"
+    },
+    {
+     "line": 296,
+     "quote": "Third, before the prior judgment is finalized, a physical red-line validation verifies"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "hydroagent2026:flood-type-scheme",
+   "name": "Flood-type-indexed XAJ parameter library and scheme selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Event typing by peak-flow thresholds and selection against Step 1 ranges are flood-specific (R3_1 counterfactual).",
+   "rubric_path": [
+    "R0:fixed_workflow",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - scheme library indexed by flood peak classes selected against flood judgment ranges"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 159,
+     "quote": "Calibration yields one XAJ parameter set per flood"
+    },
+    {
+     "line": 384,
+     "quote": "Selected the optimal parameter set from the Step 0 scheme library, matching Step 1 constraints."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 44,
+   "quote": "All five state-of-the-art large language models successfully execute the workflow"
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 330,
+   "quote": "A subset of 113 events from 1995–2019 was used as the historical case library and as the calibration set for the Step 0 XAJ parameter schemes."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 433,
+   "quote": "with Pearson correlation coefficients (r) of 0.62 and 0.84 between observed values and predicted midpoints for peak flow and flood volume, respectively."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": true,
+ "notes": "Role is a judgment call: the work calls itself an agent, but the step order is fixed and only human review verdicts (rollback) change the next action. The LLM is used off the shelf (GPT-5.4 and four others) with no training, so no LLM-side module. No GTS module is assigned: the chronological split and the retrieval-pool restriction in cross-validation are evaluation design, and Step 3 rolling updating is described in one sentence."
+}

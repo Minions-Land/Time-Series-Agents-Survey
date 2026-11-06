@@ -1,0 +1,260 @@
+{
+ "citation_key": "multimodaltsad2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "The work contributes VisualTimeAnomaly, a configurable multimodal TSAD benchmark, and TSAD-Agents, which adaptively route anomaly detection and refine predictions using collaborating agents.",
+ "claim_evidence": [
+  {
+   "line": 192,
+   "quote": "We build an early benchmark VisualTimeAnomaly for multimodal TSAD, covering point-, range-, variate-wise, and irregular anomalies. The benchmark is highly configurable to facilitate future research in this area."
+  },
+  {
+   "line": 195,
+   "quote": "We propose the first multi-agent systems TSAD-Agents for multimodal TSAD. Guided by the insights, TSAD-Agents harnesses MLLMs’ strong reasoning, planning, tool-use, and selfreflection capabilities to achieve automatic TSAD."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "multimodaltsad2026:granularity-evaluation",
+   "name": "VisualTimeAnomaly benchmark",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK applies because the generated anomaly classes and evaluation targets encode anomaly detection; changing task family requires redesigning the anomaly generators and labels. R3_2_GTS does not apply because this is task-bound rather than task-agnostic temporal processing; R3_3_GH does not apply because it is not general execution state.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific anomaly classes and evaluation targets",
+    "R3_2_GTS:no - benchmark is bound to TSAD",
+    "R3_3_GH:no - task objective is embedded",
+    "R4:Tools and Execution",
+    "R5:processing and resource_level",
+    "R7:anomaly_detection_diagnosis",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 192,
+     "quote": "We build an early benchmark VisualTimeAnomaly for multimodal TSAD, covering point-, range-, variate-wise, and irregular anomalies. The benchmark is highly configurable to facilitate future research in this area."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "multimodaltsad2026:chain-of-scanning",
+   "name": "Chain-of-Scanning anomaly classification",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the procedure classifies TSAD anomaly types to guide detection; another task family requires a different classification objective. R3_2_GTS does not apply because the output is a TSAD category, not task-independent temporal processing; R3_3_GH does not apply because the procedure embeds the anomaly-detection objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - infers TSAD anomaly categories",
+    "R3_2_GTS:no - output is task-specific",
+    "R3_3_GH:no - classification is part of TSAD",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure",
+    "R7:anomaly_detection_diagnosis",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 789,
+     "quote": "We propose a Chain-of-Scanning (CoS) technique that guides the agent to hierarchically infer the anomaly type step by step."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "multimodaltsad2026:adaptive-detector",
+   "name": "Anomaly-type-conditioned detection routing",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the plan maps TSAD anomaly categories to task-specific detectors and modalities; a different task family requires different routing semantics. R3_2_GTS does not apply because the route is chosen by the anomaly-detection objective; R3_3_GH does not apply because detector selection is task-bound.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - detector and modality route is TSAD-specific",
+    "R3_2_GTS:no - temporal inputs do not make the task-bound route general",
+    "R3_3_GH:no - routing embeds anomaly detection",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:task_procedure",
+    "R7:anomaly_detection_diagnosis",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 797,
+     "quote": "Planing Agent generates a tailored plan to instruct the detection and checking agents, adapting to the inferred anomaly type."
+    },
+    {
+     "line": 807,
+     "quote": "Detection Agent executes anomaly detection using a tool set that includes traditional TSAD methods (e.g., iForest) and MLLM-based detectors (e.g., Gemini) after receiving the guidance from the planning agent."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "multimodaltsad2026:checking-refinement",
+   "name": "Prediction checking and refinement",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the checker judges anomaly predictions for over- or under-broad boundaries; changing task family changes its validation criterion. R3_2_GTS does not apply because it verifies a TSAD result rather than temporal evidence generically; R3_3_GH does not apply because the check is task-specific.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - validates TSAD prediction boundaries",
+    "R3_2_GTS:no - validation criterion is anomaly detection",
+    "R3_3_GH:no - checker is task-bound",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure",
+    "R7:anomaly_detection_diagnosis",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 999,
+     "quote": "With the enriched representations, the checking agent is able to think if the original prediction is too broad or too narrow, and finally output refined prediction."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "multimodaltsad2026:shared-dynamic-memory",
+   "name": "Shared dynamic agent memory",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not apply because the memory mechanism stores and exposes messages without implementing the anomaly criterion; R3_2_GTS does not apply because it does not manage time-indexed data, chronology, or availability; R3_3_GH applies because it shares runtime context across agents.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - memory does not implement the task criterion",
+    "R3_2_GTS:no - no temporal data semantics in the memory mechanism",
+    "R3_3_GH:yes - shared runtime state",
+    "R4:Memory and Context",
+    "R5:general_runtime",
+    "R7:anomaly_detection_diagnosis",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 1003,
+     "quote": "Shared Dynamic Memory is a central memory that dynamically stores key contextual information (e.g., anomaly type) inferred during the process."
+    },
+    {
+     "line": 1005,
+     "quote": "This memory can be retrieved by all agents, ensuring coherent and context-aware decision-making across modules."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 142,
+   "quote": "To explore robustness to irregularity, we further introduce random points dropping at varying rates (RQ2)."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 961,
+   "quote": "Table 4 demonstrates that TSAD-Agents consistently outperforms the baselines."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The paper contributes both an evaluation benchmark and a feedback-driven TSAD workflow. No LLM parameter-training contribution is described."
+}

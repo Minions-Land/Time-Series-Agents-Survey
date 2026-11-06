@@ -1,0 +1,158 @@
+{
+ "citation_key": "chang2024llm4ts",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "LLM4TS supplies an LLM-side forecasting capability through two-stage time-series adaptation and learned two-level aggregation of multi-scale temporal attributes.",
+ "claim_evidence": [
+  {
+   "line": 73,
+   "quote": "fine-tuning approach: the time-series alignment stage and the forecasting fine-tuning stage."
+  },
+  {
+   "line": 87,
+   "quote": "a two-level aggregation method is proposed to integrate multi-scale temporal data within\npre-trained LLMs."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "chang2024llm4ts:two-stage-adaptation",
+   "name": "Two-stage time-series adaptation",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places this trained time-series representation and forecasting adaptation on the LLM side: autoregressive patch alignment transfers learned backbone and encoding weights into forecasting fine-tuning. R3 Harness tests and the TSK/GTS counterfactual therefore do not apply.",
+   "rubric_path": [
+    "R0:in_scope - numerical time-series forecasting capability supplied to a pre-trained LLM",
+    "R1:contributed - integrated two-stage adaptation recipe; standard components are not separate contributions",
+    "R2:LLM - changes learned temporal representations and prediction parameters",
+    "R3:not_applicable - LLM-side training, not Harness execution",
+    "R4:not_applicable - no Harness dimensions",
+    "R5:model_side",
+    "R6:representation_alignment",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:model_training",
+    "R10:work_level_evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 166,
+     "quote": "adopts the same autoregressive training methodology used during its pre-training phase."
+    },
+    {
+     "line": 169,
+     "quote": "model generates an output sequence shifted one patch to the right (e.g., 2nd patch, 3rd patch,\n4th patch, etc.)."
+    },
+    {
+     "line": 285,
+     "quote": "stage, we transfer the trained weights of the backbone model, including those from the encoding\nlayers, to the forecasting fine-tuning stage."
+    },
+    {
+     "line": 289,
+     "quote": "Studies have shown that a sequential approach—initial linear probing followed by full fine-tuning\n(LP-FT, as illustrated in Fig. 3(b))—consistently surpasses strategies exclusively employing"
+    },
+    {
+     "line": 210,
+     "quote": "we drop the original token encoding layer in the LLM, and employ a one-dimensional convolutional layer Convtoken as our new token encoding layer."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "chang2024llm4ts:multi-scale-temporal-encoding",
+   "name": "Multi-scale temporal encoding",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R2 places the trainable temporal-attribute lookup embeddings and their two-level aggregation on the LLM side because they encode numerical timestamps into model input representations. Temporal semantics do not make a learned encoder GTS; R3 Harness tests and their counterfactual are inapplicable.",
+   "rubric_path": [
+    "R0:in_scope - temporal encoding supplies the forecasting LLM",
+    "R1:contributed - new two-level multi-scale temporal encoder",
+    "R2:LLM - trainable input representation and alignment layer",
+    "R3:not_applicable - model encoder, not a Harness preprocessing service",
+    "R4:not_applicable - no Harness dimensions",
+    "R5:model_side",
+    "R6:representation_alignment",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method",
+    "R10:work_level_evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 230,
+     "quote": "we employ Level 1 aggregation: a trainable lookup table for each temporal attribute (e.g.,\nEsec , Emin , ...), mapping it into a high-dimensional space, and then summing them to produce a\nsingular temporal embedding."
+    },
+    {
+     "line": 233,
+     "quote": "a patch, we use Level 2 aggregation: a pooling method to extract the final temporal embedding."
+    },
+    {
+     "line": 234,
+     "quote": "For the pooling method, we opt for the “select first” method, where the initial timestamp is\ndesignated as representative of the entire patch."
+    },
+    {
+     "line": 250,
+     "quote": "Finally, the token, positional, and temporal embeddings are summed to yield the final\nembedding e ∈ RTp ×D , which is then fed into the pre-trained Transformer blocks:"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 651,
+   "quote": "shows LLM4TS’s superior performance over competitors on the ETTh1 dataset, highlighting\nthe effectiveness of adapting the LLM to time-series characteristics in the time-series alignment\nstage."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Channel-independence, patching, RevIN, LoRA, layer-normalization tuning and LP-FT are adopted components, not separately contributed modules. The convolutional patch encoder is included in the adaptation mechanism. Classification and anomaly detection appear only as future work (lines 837-841). Consistent train/validation/test splits (lines 420-422) do not explicitly establish chronological separation or leakage control. Training/inference timing is not process-validity or downstream decision-utility evidence."
+}

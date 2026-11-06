@@ -1,0 +1,120 @@
+{
+ "citation_key": "moiraiagent2026",
+ "status": "repository_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "Moirai Agent documents two composable forecasting procedures: context-aware forecast adaptation and LLM-based selection of a forecasting expert.",
+ "claim_evidence": [
+  {
+   "line": 2,
+   "quote": "This repository provides an early research preview and enables replication of benchmark results for two independent yet composable agents."
+  },
+  {
+   "line": 3,
+   "quote": "First, it enables context-aware forecasting by combining numerical history with external contextual inputs to refine lookback windows, detect anomalies, and anticipate future effects. Second, it performs expert selection through an LLM-based selector that chooses the most suitable forecasting model for each task from a pool of state-of-the-art forecasters."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "moiraiagent2026:context-expert-forecast",
+   "name": "Context-aware forecast adaptation",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The procedure is explicitly for context-aware forecasting and refines forecast lookback windows. Under R3_1, its core logic serves the forecasting output requirement; if the task family changed, the forecast-refinement objective would need redesign. The temporal-window operation alone does not make it GTS, and it is not task-independent GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - explicitly a forecasting procedure that refines forecast lookback windows",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure; processing"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 3,
+     "quote": "First, it enables context-aware forecasting by combining numerical history with external contextual inputs to refine lookback windows, detect anomalies, and anticipate future effects."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "moiraiagent2026:expert-selection",
+   "name": "Forecasting expert selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The selector chooses a forecasting model for each task. Under R3_1, its selection objective is tied to the forecasting task family; changing the task family would require changing the expert-selection objective and pool. It is not a task-independent temporal service (GTS) or general runtime mechanism (GH).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - selects a forecaster for the forecasting task",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 3,
+     "quote": "Second, it performs expert selection through an LLM-based selector that chooses the most suitable forecasting model for each task from a pool of state-of-the-art forecasters."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet is an official repository README rather than a paper text. It identifies two composable agents but provides no experiment details or measured results."
+}

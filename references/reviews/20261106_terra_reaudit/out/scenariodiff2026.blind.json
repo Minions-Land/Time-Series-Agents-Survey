@@ -1,0 +1,223 @@
+{
+ "citation_key": "scenariodiff2026",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "SCENARIODIFF contributes a fixed multimodal forecasting pipeline that turns temporally aligned textual evidence into historical summaries, forecast-horizon scenarios, and local anchor guidance for a diffusion forecaster.",
+ "claim_evidence": [
+  {
+   "line": 165,
+   "quote": "We introduce S CENARIO D IFF, a hierarchical contextual reasoning framework that transforms noisy textual documents into three levels of guidance for MTSF: historical evidence, future scenario, and local anchor constraints."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "scenariodiff2026:historical-context",
+   "name": "Historical context summarization",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is no: summarizing per-timestep documents does not embed a forecasting output criterion, and the same aligned summaries could support a different temporal task. R3_2_GTS is yes: the module relies on document-to-timestep alignment and preserves historical context; changing tasks need not change that temporal interface.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - per-timestep evidence summarization has no task-specific output objective",
+    "R3_2_GTS:yes - depends on temporal alignment and preserves temporal context"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module: applied to forecasting; per-timestep aligned summaries can support other temporal tasks without changing their temporal interface"
+   },
+   "evidence": [
+    {
+     "line": 333,
+     "quote": "We therefore use a frozen Historical Context Agent to compress each local document set into a concise summary."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "scenariodiff2026:scenario-guidance",
+   "name": "Forecast scenario generation",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is yes: the agent generates a qualitative prior specifically for the forecast horizon; changing to another task family would require changing the target output and procedure. It does not match the broader GTS case because its output is forecast-specific.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - produces a forecast-horizon scenario prior whose output objective is forecasting"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "task-specific procedure"
+   },
+   "evidence": [
+    {
+     "line": 438,
+     "quote": "The scenario description is a short natural-language statement about expected future behavior, such as overall direction, volatility, or likely disruptions."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "scenariodiff2026:anchor-guidance",
+   "name": "Forecast anchor generation",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is yes: the agent produces future-timestep value intervals and confidence weights to guide forecasts; a different task family would require a different output criterion and anchor semantics.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - generates forecast-horizon value constraints for forecasting"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "task-specific procedure"
+   },
+   "evidence": [
+    {
+     "line": 465,
+     "quote": "We therefore introduce an Anchor Guidance Agent, which converts the available context into sparse anchor points for inference-time guidance."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "scenariodiff2026:anchor-blended-sampling",
+   "name": "Anchor-blended forecast refinement",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is yes: the refinement loss edits a generated forecast toward forecast-horizon anchor bands; another task family would require redesigning the temporal target and objective, so this is not a task-independent GTS process.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - locally refines the generated forecasting trajectory against forecast anchors"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "task-specific procedure"
+   },
+   "evidence": [
+    {
+     "line": 614,
+     "quote": "Anchor Blended Sampling refines this source trajectory by editing anchor-relevant regions while preserving the remaining temporal structure."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "scenariodiff2026:diffusion",
+   "name": "Scenario-conditioned diffusion forecasting",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is yes: the denoiser's target is the clean future horizon; changing task family changes the prediction target and forecasting procedure. The model is the numerical forecasting capability executed by the pipeline, hence Tools and Execution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - denoises and predicts the forecast horizon"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "task-specific procedure"
+   },
+   "evidence": [
+    {
+     "line": 324,
+     "quote": "Starting from Gaussian noise, the reverse process generates a trajectory consistent with both numerical history and scenario-level context."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 721,
+   "quote": "To avoid temporal leakage, each forecast origin uses only documents and textual representations aligned to observed timesteps."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 731,
+   "quote": "Overall, S CENARIO D IFF achieves the strongest horizon-level performance, with the largest number of MSE/MAE wins across horizons and domains."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The agents run in a fixed sequence and their outputs condition later computation, but the packet does not describe feedback changing which action is selected. The paper reports forecasting quality and temporal leakage control, not tool-execution validity or downstream decision utility."
+}

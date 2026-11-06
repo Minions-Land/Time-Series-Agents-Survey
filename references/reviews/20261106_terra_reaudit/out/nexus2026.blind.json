@@ -1,0 +1,251 @@
+{
+ "citation_key": "nexus2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "Nexus contributes a multi-agent forecasting workflow that organizes chronological multimodal context, generates macro and micro outlooks, synthesizes them, and calibrates later forecasts from backtest errors.",
+ "claim_evidence": [
+  {
+   "line": 84,
+   "quote": "• We introduce Nexus , a multi-agent framework that models macro (coarse) and micro (granular)"
+  },
+  {
+   "line": 69,
+   "quote": "Additionally, Nexus features a domain-level calibration loop. By evaluating past prediction errors"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "nexus2026:chronological-context",
+   "name": "Value-linked chronological context",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The module depends on temporal order and timestep pairing, while its core logic does not require a forecast objective; changing task family would not require redesigning the chronological state or interface, so it passes R3_2_GTS rather than R3_1_TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-family output or validation criterion",
+    "R3_2_GTS:yes - chronological timestep/value/text alignment is core"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 124,
+     "quote": "the first stage of Nexus employs a dedicated agent to clean and structure the historical data C1:𝜏"
+    },
+    {
+     "line": 128,
+     "quote": "chronological timeline H1:𝜏 . For each timestep 𝑡 , the agent receives the available external textual information 𝑒𝑡 alongside the numerical value 𝑥𝑡 ."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "nexus2026:dual-resolution-forecast",
+   "name": "Macro-reasoning forecast outlook",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The procedure embeds the forecasting output and horizon: it maps causal temporal context to a broad forecast trajectory; changing task family would require redesigning its temporal state and output criterion, so it passes R3_1_TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - macro numerical forecasts are task outputs",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 142,
+     "quote": "Macro-Reasoning Agent (A 𝑚𝑎𝑐𝑟𝑜 ). This agent takes a top-down approach."
+    },
+    {
+     "line": 143,
+     "quote": "structured causal memory H1:𝜏 to map out a broad trajectory for the entire forecast horizon 𝑇 ."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "nexus2026:micro-reasoning",
+   "name": "Micro-reasoning forecast outlook",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The procedure embeds per-step forecasting outputs and immediate-catalyst reasoning over a declared horizon; changing task family would require redesigning its temporal state and output criterion, so it passes R3_1_TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - per-timestep numerical forecasts are task outputs",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 149,
+     "quote": "Micro-Reasoning Agent (A 𝑚𝑖𝑐𝑟𝑜 ). In contrast, this agent takes a more granular approach."
+    },
+    {
+     "line": 150,
+     "quote": "walks through the forecast horizon step-by-step. For every single future timestep 𝑡 ∈ [ 𝜏 + 1, 𝜏 + 𝑇 ], it"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "nexus2026:forecast-synthesizer",
+   "name": "Forecast synthesizer agent",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The synthesizer directly produces the final forecast and reasoning by weighting macro and micro forecast views; changing task family would require redesigning its task output and weighting criterion, so it is TSK under R3_1.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - synthesizes the forecasting output and justification",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 169,
+     "quote": "Forecast Synthesizer Agent (A 𝑠𝑦𝑛 ). This agent computes the final forecast by dynamically"
+    },
+    {
+     "line": 174,
+     "quote": "producing the final numerical forecast X𝜏+1:𝜏+𝑇 alongside explicit"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "nexus2026:backtest-calibration",
+   "name": "Validated backtest critique guidelines",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The calibration logic is governed by forecast prediction error and a hidden-fold improvement threshold; changing task family would require redesigning its objective and verifier, while feedback updates reusable guidelines, so it is TSK and Optimization and Evolution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast error and improvement gate define the criterion",
+    "R4:Optimization and Evolution - feedback updates reusable guidelines",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 178,
+     "quote": "data is divided into 𝑛 sequential backtest splits, designating the final split as a hidden validation set"
+    },
+    {
+     "line": 187,
+     "quote": "To ensure these synthesized guidelines are actually beneficial and do not degrade future performance, the synthesized guidelines G undergo a validation pass."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 922,
+   "quote": "knowledge cutoff date of January 2025, and conducted all our experiments strictly on data occurring"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 575,
+   "quote": "Table 3 details the performance across the Zillow and Stocks datasets. Nexus demonstrates strong performance across both domains."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet is a complete paper text with method, prompts, setup, experiments, ablations, and limitations. The prior combined dual-resolution card module is split because the paper describes separate Macro-Reasoning and Micro-Reasoning agents plus a distinct synthesizer."
+}

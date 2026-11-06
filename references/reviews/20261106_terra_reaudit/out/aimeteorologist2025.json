@@ -1,0 +1,223 @@
+{
+ "citation_key": "aimeteorologist2025",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "AI-Meteorologist contributes a fixed in-context multi-agent workflow that serializes hourly weather forecasts with climatological and geographic context and produces explanatory reports, hazard interpretations, and aligned plots.",
+ "claim_evidence": [
+  {
+   "line": 67,
+   "quote": "The system employs a modular agent-based LLM architecture designed for the automated generation of explainable"
+  },
+  {
+   "line": 73,
+   "quote": "The pipeline begins with data acquisition for a selected location, retrieving forecast time series via the OpenWeather API."
+  }
+ ],
+ "task_memberships": [
+  "decision_support",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "temporal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "aimeteorologist2025:weather-report",
+   "name": "Meteorological interpretation and hazard bulletin",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Interface and Interaction",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "TSK: the core output contract is a structured weather summary, causal explanation, confidence level and hazard or anomaly warnings; changing the task family changes that report objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific report objective",
+    "R4:Memory and Context; Interface and Interaction; Planning and Orchestration",
+    "R5:task_procedure",
+    "R7:decision_support; anomaly_detection_diagnosis; temporal_analysis",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 80,
+     "quote": "The core analytical component generates a structured output containing four key fields: a natural language summary outlining expected weather evolution; a causal explanation grounded in meteorological reasoning; a self-assessed confidence level; and warnings"
+    },
+    {
+     "line": 125,
+     "quote": "Across all test cases, the system consistently identified key meteorological phenomena through explainable diagnostic reasoning steps."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aimeteorologist2025:temporal-context-integration",
+   "name": "Temporal forecast and climatology context integration",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "decision_support",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "GTS: ingestion depends on hourly temporal order, resolution, units and information availability; changing the task family would preserve the temporal acquisition and serialized context interface rather than a task objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task output objective",
+    "R3_2_GTS:yes - temporal order, frequency and availability govern ingestion",
+    "R4:Memory and Context; Tools and Execution",
+    "R5:mapped",
+    "R7:decision_support; anomaly_detection_diagnosis; temporal_analysis",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "decision_support",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 73,
+     "quote": "The pipeline begins with data acquisition for a selected location, retrieving forecast time series via the OpenWeather API. This includes more than ten meteorological parameters, including temperature, humidity, wind, precipitation, and visibility at a resolution of one hour."
+    },
+    {
+     "line": 78,
+     "quote": "All collected data are serialized into a structured EXTERNAL INFO block and propagated downstream to the reasoning agent."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aimeteorologist2025:plot-code",
+   "name": "Code-generated report illustrations",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "TSK: the Illustrator Agent generates plots of forecast variables whose visual form must align with the weather report; changing the task family changes the required visualization objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast-report visualization objective",
+    "R4:Tools and Execution",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "TSK module"
+   },
+   "evidence": [
+    {
+     "line": 88,
+     "quote": "Illustrator Agent. Based on the selected parameters, this agent generates Python code using matplotlib to produce plots of forecast data such as temperature, wind, and precipitation, ensuring that visual representations align with the textual narrative."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 125,
+   "quote": "Across all test cases, the system consistently identified key meteorological phenomena through explainable diagnostic reasoning steps."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "aimeteorologist2025:weather-report",
+   "decision": "change",
+   "new_ids": [
+    "aimeteorologist2025:weather-report"
+   ],
+   "changes": [
+    "dimensions: Coordination and Scaling -> Planning and Orchestration",
+    "tasks: decision_support -> decision_support, anomaly_detection_diagnosis",
+    "functions: [] -> processing, context_memory"
+   ],
+   "reason": "The packet supports the existing task procedure, but its legacy dimension label must be updated and its climatology-grounded anomaly reasoning is an additional supported task/function."
+  },
+  {
+   "existing_id": "aimeteorologist2025:plot-code",
+   "decision": "change",
+   "new_ids": [
+    "aimeteorologist2025:plot-code"
+   ],
+   "changes": [
+    "layer: GH -> TSK",
+    "view_status: general_runtime -> task_procedure",
+    "tasks: [] -> decision_support",
+    "functions: [] -> processing"
+   ],
+   "reason": "The Illustrator Agent produces forecast plots that must align with the textual weather narrative, so the output objective is task-bound under R3_1_TSK."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Added aimeteorologist2025:temporal-context-integration because the packet describes substantive multi-source temporal ingestion and EXTERNAL INFO serialization. The fixed pipeline has no feedback-driven action selection. It explicitly says the prompt is not generating a forecast; it interprets past or present observed or modeled weather data. Quantitative forecast and explanation evaluation, and explicit process or temporal-validity checks, are not reported."
+}

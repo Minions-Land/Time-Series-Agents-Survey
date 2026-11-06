@@ -1,0 +1,238 @@
+{
+ "citation_key": "memcast2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "MemCast contributes a forecasting-specific, feedback-driven harness that builds hierarchical experience memory, uses it to select and repair forecast reasoning, and adapts memory confidence from prediction feedback.",
+ "claim_evidence": [
+  {
+   "line": 106,
+   "quote": "Based on the above analysis, we propose MemCast, a learning-to-memory framework that reformulates TSF as an experience-conditioned reasoning task."
+  },
+  {
+   "line": 108,
+   "quote": "MemCast begins by extracting forecasting experience from the training set and organizing it into a hierarchical memory."
+  },
+  {
+   "line": 110,
+   "quote": "patterns, inference trajectories are distilled into reusable reasoning wisdom, and statistical features discovered from data are abstracted into general laws."
+  },
+  {
+   "line": 113,
+   "quote": "historical patterns guide the reasoning process, reasoning wisdom supports the selection of effective reasoning trajectories, and general laws provide criteria for reflective iteration."
+  },
+  {
+   "line": 116,
+   "quote": "we introduce a dynamic confidence adaptation strategy that updates entry-level confidence while avoiding test set distribution leakage."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "memcast2026:forecast-experience",
+   "name": "Hierarchical forecasting experience memory",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK: it stores forecasting outcomes and trajectories to condition forecasts; changing task family requires redesigning the case schema and outcome criteria. Although it handles temporal experience, it is forecast-objective-bound rather than task-neutral GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast outcomes and prediction trajectories are specific to forecasting",
+    "R4:Memory and Context",
+    "R5:task_procedure; context_memory",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 176,
+     "quote": "Each historical forecasting case is encoded as a textual memory entry, which records the historical pattern, reasoning wisdom, and general law in a structured natural-language format."
+    },
+    {
+     "line": 223,
+     "quote": "learns from the prediction outcomes, inference trajectories, and extracted temporal features on the training set to build a hierarchical memory."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "memcast2026:confidence-adaptation",
+   "name": "Forecast-feedback confidence adaptation",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK: updates are gated by whether a generated forecast beats a moving-average baseline after its ground truth arrives; a different task family needs a different target and success criterion, so the mechanism is task-bound rather than general temporal infrastructure.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - the confidence update is gated by forecast error against a task-specific baseline",
+    "R4:Optimization and Evolution",
+    "R5:task_procedure; context_memory",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 446,
+     "quote": "we introduce a confidence-aware refinement strategy that decouples experience accumulation from utilization."
+    },
+    {
+     "line": 448,
+     "quote": "Each training-derived experience is assigned a confidence score reflecting its empirical reliability and contribution to successful predictions."
+    },
+    {
+     "line": 451,
+     "quote": "Once the ground truth becomes available, we compare the generated forecast ŷ with y using a moving average (MA) baseline, avoiding updates based solely on absolute error."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "memcast2026:forecast-reflection",
+   "name": "Wisdom-guided trajectory selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK: the mechanism selects among trajectories whose content is a forecast using forecast-derived reasoning wisdom; another task family requires different candidate outputs and reliability criteria. Its state and objective are task-bound rather than generic temporal-order logic (R3_2 GTS).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - it selects forecast trajectories against forecasting-derived wisdom",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure; context_memory",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 369,
+     "quote": "We thus design an uncertainty-aware trajectory exploration strategy that generates multiple candidate trajectories and selects the relatively reliable one with memory guidance."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "memcast2026:law-reflection",
+   "name": "Law-based forecast reflection and repair",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK: the verifier checks a candidate future forecast against forecast feasibility rules and triggers revision; a different task family requires a redesigned output criterion and verifier, so it is not task-neutral GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast feasibility rules validate the forecast output",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure; validation",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 463,
+     "quote": "encapsulate essential constraints, such as non-negativity or range-bound continuity checks, and provide explicit criteria for verifying prediction feasibility."
+    },
+    {
+     "line": 470,
+     "quote": "loop feeds the specific violation details back into the LLM as a corrective prompt, forcing the model to revise its prediction with awareness of the violated constraint"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 541,
+   "quote": "raw time series without normalization, so as to preserve the physical meaning of the original numerical values."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 577,
+   "quote": "Table 2 summarizes the performance on diverse contextrich benchmarks. Overall, MemCast achieves the best results on most metrics, surpassing different baselines in a broad range of forecasting scenarios."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The confidence update changes entry weights after ground truth becomes available while leaving the stored experience content unchanged."
+}

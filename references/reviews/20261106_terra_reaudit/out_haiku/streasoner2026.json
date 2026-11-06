@@ -1,0 +1,191 @@
+{
+ "citation_key": "streasoner2026",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "Contributes ST-Bench and a network-SDE multi-agent synthesis pipeline for spatio-temporal reasoning over graph-coupled time series, and STReasoner, a TS-LM with a dedicated time series encoder trained with SFT and a spatial-aware GRPO reward (S-GRPO).",
+ "claim_evidence": [
+  {
+   "line": 1070,
+   "quote": "the first TS-LM for complex spatio-temporal reasoning, trained in three stages on synthetic data,"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "data_augmentation_synthesis"
+ ],
+ "other_tasks": [
+  "temporal_question_answering"
+ ],
+ "modules": [
+  {
+   "id": "streasoner2026:spatial-tslm",
+   "name": "Time series encoder interleaved with text tokens (TS-LM)",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R2 LLM: the patch MLP encoder changes how the model represents time series inputs (embeddings placed in the LLM input stream); not a Harness component. The TS-LM encoder is kept as the existing spatial-tslm module.",
+   "rubric_path": [
+    "R0:llm_side_technique",
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 389,
+     "quote": "As shown in Figure 3, STReasoner processes multimodal inputs by separately encoding time series"
+    },
+    {
+     "line": 394,
+     "quote": "and encode each patch using a lightweight fivelayer MLP (Time Series Encoder)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "streasoner2026:s-grpo",
+   "name": "Spatial-aware GRPO reward (S-GRPO)",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 LLM: an RL objective that trains the reasoning policy; the contrastive reward changes model parameters, not the workflow around the model.",
+   "rubric_path": [
+    "R0:llm_side_technique",
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 443,
+     "quote": "lacks explicit reward for spatial reasoning. To address this, we propose Spatial-Aware GRPO (SGRPO), which introduces a contrastive reward"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "streasoner2026:sde-synthesis",
+   "name": "Network-SDE multi-agent data synthesis pipeline (ST-Align, ST-Bench)",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R2 LLM: training and evaluation data built to train the model; the agent loop runs offline to generate data, not at inference.",
+   "rubric_path": [
+    "R0:llm_side_technique",
+    "R1:contributed",
+    "R2:LLM (training data built to train the model)"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 223,
+     "quote": "Network SDEs-based multi-agent spatiotemporal data synthesis pipeline. A key"
+    },
+    {
+     "line": 228,
+     "quote": "consists of six agents. The Scenario Generation"
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 519,
+   "quote": "Superior Performance. STReasoner achieves"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "streasoner2026:sde-synthesis",
+   "decision": "change",
+   "new_ids": [
+    "streasoner2026:sde-synthesis"
+   ],
+   "changes": [
+    "layer TSK->LLM",
+    "dimensions: Tools and Execution, Coordination and Scaling -> none (LLM modules carry no dimensions)",
+    "view_status: task_procedure->model_side",
+    "llm_route: none->instruction_reasoning",
+    "role training_data and tasks data_augmentation_synthesis unchanged"
+   ],
+   "reason": "The pipeline agents (scenario, SDE, adjacency, judges) run offline to generate the ST-Align, ST-Bench and training data that the LLM is trained and tested on. Under the R2 boundary, training data built to train the model is LLM side. The mechanism is unchanged, so the id is kept. 'Coordination and Scaling' is a retired label."
+  },
+  {
+   "existing_id": "streasoner2026:spatial-tslm",
+   "decision": "split",
+   "new_ids": [
+    "streasoner2026:spatial-tslm",
+    "streasoner2026:s-grpo"
+   ],
+   "changes": [
+    "name -> Time series encoder interleaved with text tokens (TS-LM)",
+    "role model_training -> method",
+    "llm_route: none->representation_alignment",
+    "S-GRPO contrastive reward moved to new module streasoner2026:s-grpo (llm_route instruction_reasoning, role model_training)"
+   ],
+   "reason": "The card merged the encoder/TS-LM architecture with the three-stage training and S-GRPO. The packet presents S-GRPO as its own contribution (L443-L444) that can be reused apart from the encoder, so it is split. The Align and SFT stages are standard recipe (rejection-sampled CoT SFT, alignment pretraining) and are not counted as modules under R1."
+  }
+ ],
+ "needs_human_review": true,
+ "notes": "Layer of the synthesis pipeline is the main ambiguity: the multi-agent loop with judge feedback could read as a Harness workflow (TSK or GH). Chosen LLM side because its outputs (ST-Align, ST-Bench, ST-SFT, ST-RL) are training and evaluation data for the model (R2 boundary). ST-Bench is not a separate module: it is produced by the pipeline and used for training and held-out testing (R1 excludes evaluation datasets of a method paper). The zero-shot CausalRivers test (L763-L768) is evaluation only. Cost columns are not decision utility. The graph enters only as a text prompt (L389-L390), so graph conditioning is not a separate module. Packet is the arXiv text; the appendix agent prompts were not treated as modules."
+}
