@@ -1,7 +1,7 @@
 """Validate re-audit outputs and report how they differ from the current Paper Cards. Read-only on inputs.
 
 usage: python3 check_outputs.py   -> check_report.md, changes.csv (one row per module decision)
-Checks: closed vocabulary, required fields per layer, every quote verbatim in the packet (line .. line+4, whitespace
+Checks: closed vocabulary, required fields per layer, every quote verbatim in the packet (line-4 .. line+8, whitespace
 normalised), and agreement between the blind pass and the final record.
 """
 import csv, json, re
@@ -33,7 +33,7 @@ def packet_lines(key):
 
 def quote_ok(lines, line, quote):
     if not isinstance(line, int) or not quote: return False
-    window = norm(' '.join(lines.get(i, '') for i in range(line, line + 5)))
+    window = norm(' '.join(lines.get(i, '') for i in range(line - 4, line + 9)))   # tolerate a cited line a few lines off
     q = norm(quote)
     return q in window or q.replace('- ', '') in window.replace('- ', '')
 

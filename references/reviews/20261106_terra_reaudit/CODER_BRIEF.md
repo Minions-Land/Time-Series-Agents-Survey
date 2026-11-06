@@ -14,14 +14,14 @@ evaluation evidence). Your job is a careful, source-grounded reclassification.
 ## Step A - blind classification
 
 Read `rubric_tree.yaml`, then the whole packet (method, setup and experiments, not only the abstract).
-Write `out/<key>.blind.json` with the schema below but WITHOUT `reconciliation`.
+Keep this record (schema below, WITHOUT `reconciliation`); it becomes `blind` in your final message.
 
 ## Step B - reconcile with the current card
 
 Now read `cards/<key>.json`. For every existing module decide `keep`, `change`, `merge`, `split` or `drop`, and
 explain from the packet. Keep an existing `id` whenever the mechanism is the same (even if its layer or labels change);
 give new modules ids `<key>:<short-slug>`. Revisit Step A if the card shows something you missed, but do not copy the
-card: every module and label must be supported by the packet and the rubric. Write the final `out/<key>.json`.
+card: every module and label must be supported by the packet and the rubric. This record becomes `final`.
 
 ## Output schema (JSON object, UTF-8)
 
@@ -83,4 +83,5 @@ card: every module and label must be supported by the packet and the rubric. Wri
    components or future work (R1).
 5. When unsure between two layers, apply the R3 tests literally, choose one, set `confidence: low` and
    `needs_human_review: true`, and explain in `notes`.
-6. Write only `out/<key>.blind.json` and `out/<key>.json`. Do not read other papers' outputs or modify any other file.
+6. Do not create or modify any file and do not run system commands (mount, sudo, chmod). Your final message is one JSON
+   object `{"blind": ..., "final": ...}`; the runner saves it. Do not read other papers' packets, cards or outputs.
