@@ -38,8 +38,9 @@ def tokens(s):
 
 
 def quote_ok(lines, line, quote):
-    """Quote tokens must appear in order in the cited window (line-4 .. line+8). A few short tokens of PDF-extraction
-    noise (page or line numbers, subscript lines, math glyphs) may sit between them; invented wording does not pass."""
+    """Quote tokens must appear in order in the cited window (line-4 .. line+8). Extraction noise may sit between them:
+    one gap of up to 15 tokens (a running page header or footer, a figure label) plus a few other skipped tokens (page
+    or line numbers, subscript glyphs). Reworded or invented text does not pass."""
     if not isinstance(line, int) or not quote: return False
     q = tokens(quote)
     if not q: return False
@@ -47,14 +48,16 @@ def quote_ok(lines, line, quote):
     if ''.join(q) in ''.join(win): return True          # hyphenation split by extraction, e.g. "onefor-all"
     budget = max(3, len(q) // 10)
     for start in (i for i, t in enumerate(win) if t == q[0]):
-        j, skipped = start + 1, 0
+        j, gaps = start + 1, []
         for t in q[1:]:
-            while j < len(win) and win[j] != t and skipped <= budget and len(win[j]) <= 6:
-                j += 1; skipped += 1
-            if j >= len(win) or win[j] != t or skipped > budget: break
+            g = 0
+            while j < len(win) and win[j] != t and g <= 15:
+                j += 1; g += 1
+            if j >= len(win) or win[j] != t: break
+            if g: gaps.append(g)
             j += 1
         else:
-            return True
+            if not gaps or (max(gaps) <= 15 and sum(gaps) - max(gaps) <= budget): return True
     return False
 
 
