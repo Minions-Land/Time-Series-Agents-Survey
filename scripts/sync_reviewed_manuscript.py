@@ -7,6 +7,8 @@ records=json.loads((ROOT/'paper_classification_ledger.json').read_text());p=ROOT
 def escape(v):
  # Manuscript wording keeps "time series" unhyphenated, also as a modifier.
  v=v.replace('time-series','time series').replace('Time-series','Time series')
+ # Canonical task-family names used throughout the manuscript and figures.
+ v=re.sub(r'(?<![Dd]ata )Augmentation and synthesis','Data augmentation and synthesis',v)
  return v.replace('&',r'\&').replace('%',r'\%').replace('_',r'\_').replace('–','--').replace('—','---')
 bykey={r['citation']['key']:r for r in records}
 lines=s.splitlines();new=[]
@@ -40,7 +42,7 @@ mods=[m for r in active for m in r['module_level_contributions']['modules']];lay
 snapshot=(r'\textbf{Current ledger snapshot.} The database contains \textbf{'+str(len(records))+r'} examined records: '
  +str(status['paper_verified'])+' paper-supported works, '+str(status['repository_verified'])+' repository-supported resources, and '+str(status['out_of_scope'])+' background records excluded from contribution counts. '
  +'The '+str(len(active))+' retained records contain '+str(len(mods))+' source-located modules: '+str(layers['LLM'])+' LLM-side, '+str(layers['GH'])+' General Harness, '+str(layers['GTS'])+' General Time Series Harness, and '+str(layers['TSK'])+' Task-Specific Harness modules. '
- +'Task memberships comprise '+str(tasks['forecasting_prediction'])+' forecasting/prediction, '+str(tasks['data_augmentation_synthesis'])+' augmentation/synthesis, '+str(tasks['anomaly_detection_diagnosis'])+' anomaly/diagnosis, and '+str(tasks['decision_support'])+' decision-support records; additional task values include classification, imputation, annotation, and question answering. Each module has one layer and may have several mechanism and task labels.')
+ +'Task memberships comprise '+str(tasks['forecasting_prediction'])+' forecasting and prediction, '+str(tasks['data_augmentation_synthesis'])+' data augmentation and synthesis, '+str(tasks['anomaly_detection_diagnosis'])+' anomaly detection and diagnosis, and '+str(tasks['decision_support'])+' decision support records; additional task values include classification, imputation, annotation, and question answering. Each module has one layer and may have several mechanism and task labels.')
 s=re.sub(r'\\textbf\{Current ledger snapshot\.\}[^\n]*',lambda _:snapshot,s)
 s=re.sub(r'Profiles of the \d+ (?:reviewed|retained) works\.', 'Profiles of the '+str(len(active))+' retained works.',s)
 s=re.sub(r'It covers \d+ examined records, including \d+ retained works and resources with \d+ module entries\.', f'It covers {len(records)} examined records, including {len(active)} retained works and resources with {len(mods)} module entries.',s)
