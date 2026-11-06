@@ -2,6 +2,7 @@
 # One Codex CLI run per paper (gpt-6.1-terra). Resumable: a key whose out/<key>.json parses is skipped.
 #   bash run_terra.sh [parallel_jobs] [keys_file]     e.g.  bash run_terra.sh 1 keys_pilot.txt
 # Run on H20 inside tmux, from a login shell (so CODEX_HOME is set):  bash -lc 'bash run_terra.sh 4'
+# The H20 kernel cannot start the bwrap sandbox, so runs use danger-full-access; the prompt confines writes to out/<key>*.json.
 set -u
 W="$(cd "$(dirname "$0")" && pwd)"
 P="${1:-4}"
@@ -30,7 +31,7 @@ job() {
   local k="$1" out="$W/out/$1.json"
   if python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$out" 2>/dev/null; then echo "skip $k"; return 0; fi
   local t0=$(date +%s)
-  timeout 2700 codex exec --skip-git-repo-check -C "$W" -m "$MODEL" --sandbox workspace-write \
+  timeout 2700 codex exec --skip-git-repo-check -C "$W" -m "$MODEL" --sandbox danger-full-access \
     -c model_reasoning_effort="\"$EFFORT\"" "$(prompt "$k")" > "$W/logs/$k.log" 2>&1
   local rc=$? ok=no
   python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$out" 2>/dev/null && ok=yes
