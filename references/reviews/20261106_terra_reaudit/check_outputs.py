@@ -1,14 +1,16 @@
 """Validate re-audit outputs and report how they differ from the current Paper Cards. Read-only on inputs.
 
-usage: python3 check_outputs.py   -> check_report.md, changes.csv (one row per module decision)
-Checks: closed vocabulary, required fields per layer, every quote verbatim in the packet (line-4 .. line+8, whitespace
-normalised), and agreement between the blind pass and the final record.
+usage: python3 check_outputs.py [out_dir]   -> <out_dir>/../check_report.md (default out/), changes.csv (one row per module decision)
+Checks: closed vocabulary, required fields per layer, every quote verbatim in the packet (line-4 .. line+8, NFKC tokens in order,
+a few short noise tokens allowed), and agreement between the blind pass and the final record.
 """
-import csv, json, re
+import csv, json, re, sys, unicodedata
 from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+OUT = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else HERE / 'out'
+REP = HERE if OUT == HERE / 'out' else OUT
 LAYERS = {'LLM', 'GH', 'GTS', 'TSK'}
 DIMS = {'Interface and Interaction', 'Memory and Context', 'Tools and Execution', 'Planning and Orchestration',
         'Optimization and Evolution'}
@@ -31,11 +33,29 @@ def packet_lines(key):
     return lines
 
 
+def tokens(s):
+    return re.findall(r'\w+', unicodedata.normalize('NFKC', s or '').lower())
+
+
 def quote_ok(lines, line, quote):
+    """Quote tokens must appear in order in the cited window (line-4 .. line+8). A few short tokens of PDF-extraction
+    noise (page or line numbers, subscript lines, math glyphs) may sit between them; invented wording does not pass."""
     if not isinstance(line, int) or not quote: return False
-    window = norm(' '.join(lines.get(i, '') for i in range(line - 4, line + 9)))   # tolerate a cited line a few lines off
-    q = norm(quote)
-    return q in window or q.replace('- ', '') in window.replace('- ', '')
+    q = tokens(quote)
+    if not q: return False
+    win = tokens(' '.join(lines.get(i, '') for i in range(line - 4, line + 9)))
+    if ''.join(q) in ''.join(win): return True          # hyphenation split by extraction, e.g. "onefor-all"
+    budget = max(3, len(q) // 10)
+    for start in (i for i, t in enumerate(win) if t == q[0]):
+        j, skipped = start + 1, 0
+        for t in q[1:]:
+            while j < len(win) and win[j] != t and skipped <= budget and len(win[j]) <= 6:
+                j += 1; skipped += 1
+            if j >= len(win) or win[j] != t or skipped > budget: break
+            j += 1
+        else:
+            return True
+    return False
 
 
 def check(rec, lines):
@@ -74,7 +94,7 @@ def check(rec, lines):
 def main():
     rows, report, stats = [], [], Counter()
     layer_moves, dims_new, agree = Counter(), Counter(), Counter()
-    finals = sorted(p for p in (HERE / 'out').glob('*.json') if not p.name.endswith('.blind.json'))
+    finals = sorted(p for p in OUT.glob('*.json') if not p.name.endswith('.blind.json'))
     for p in finals:
         key = p.stem
         try:
@@ -106,7 +126,7 @@ def main():
         if rec.get('needs_human_review'): stats['needs_human_review'] += 1
         for k in EVAL:
             if ((rec.get('evaluation_evidence') or {}).get(k) or {}).get('present'): stats['eval_' + k] += 1
-        bp = HERE / 'out' / f'{key}.blind.json'
+        bp = OUT / f'{key}.blind.json'
         if bp.exists():
             try:
                 blind = {m.get('id'): m.get('layer') for m in json.loads(bp.read_text()).get('modules') or []}
@@ -114,7 +134,7 @@ def main():
                 agree['same_layer_profile' if bl == fl else 'different_layer_profile'] += 1
             except Exception:
                 agree['blind_unreadable'] += 1
-    with (HERE / 'changes.csv').open('w', newline='') as f:
+    with (REP / 'changes.csv').open('w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=['key', 'existing_id', 'decision', 'old_layer', 'new_layers', 'old_dims', 'new_dims', 'reason'])
         w.writeheader(); w.writerows(rows)
     out = ['# Re-audit check report', '', f'Records: {stats["records"]} (valid {stats["valid"]}, with errors {stats["with_errors"]}, invalid JSON {stats["invalid"]}).',
@@ -125,7 +145,7 @@ def main():
            'Evaluation evidence present: ' + ', '.join(f'{k} {stats["eval_" + k]}' for k in EVAL) + '.',
            f'Needs human review: {stats["needs_human_review"]}. Blind vs final layer profile: {dict(agree)}.', '',
            '## Records with errors', ''] + (report or ['None.'])
-    (HERE / 'check_report.md').write_text('\n'.join(out) + '\n')
+    (REP / 'check_report.md').write_text('\n'.join(out) + '\n')
     print('\n'.join(out[:9]))
 
 
