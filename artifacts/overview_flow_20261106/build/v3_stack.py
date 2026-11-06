@@ -70,7 +70,7 @@ def build(out):
     # feedback rail
     rx = x + w + 0.35
     polyline(fs, [(x + w, ys[4] + h / 2), (rx, ys[4] + h / 2), (rx, ys[0] + h / 2), (x + w, ys[0] + h / 2)], NEON['ev'], lw=3)
-    rl = text(fs, rx - 1.3, 3.2, 2.6, 0.3, FLOW['fb'] + ' / terminate', size=8, bold=True, color=NEON['ev'], font=M)
+    rl = text(fs, rx - 1.48, 3.2, 2.6, 0.3, FLOW['fb'] + ' / terminate', size=8, bold=True, color=NEON['ev'], font=M)
     rl.rotation = 270
     # output
     oc = box(fs, 11.65, 4.35, 1.45, 1.9, fill=PANEL, line=NEON['ev'], lw=1.2, radius=0.12)

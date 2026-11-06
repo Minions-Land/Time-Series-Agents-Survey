@@ -11,8 +11,14 @@ on run argv
   set outPath to item 2 of argv
   with timeout of 90 seconds
     tell application "Keynote"
-      set d to open (POSIX file inPath)
-      delay 1
+      launch
+      delay 2
+      open (POSIX file inPath)
+      repeat 40 times
+        if (count of documents) > 0 then exit repeat
+        delay 0.5
+      end repeat
+      set d to front document
       export d to (POSIX file outPath) as PDF
       close d saving no
     end tell

@@ -60,7 +60,7 @@ def build(out):
     ring = box(ls, cx - rxl, cy - ryl, 2 * rxl, 2 * ryl, line='8A93B2', lw=2, shape=MSO_SHAPE.OVAL, dash=MSO_LINE.DASH)
     plat = box(ls, cx - 0.95, cy + 0.27, 1.9, 0.42, fill='D9D4C7', line='B9B2A2', lw=1, shape=MSO_SHAPE.OVAL)
     icon(ls, ST, 'robot', cx - 0.82, cy - 1.15, 1.64)
-    badge(ls, cx, cy + 1.12, 1.9, 'LLM  ·  selects actions', fill=C['llm'], size=8.5)
+    badge(ls, cx, cy + 0.8, 1.6, 'LLM selects actions', fill=C['llm'], size=7.5)
     pos = dict(gh=(cx, cy - ryl), gts=(cx + rxl, cy), tsk=(cx, cy + ryl), ev=(cx - rxl, cy))
     order = ['gh', 'gts', 'tsk', 'ev']
     lab = dict(gh=FLOW['ops'], gts=FLOW['cap'], tsk=FLOW['cand'])

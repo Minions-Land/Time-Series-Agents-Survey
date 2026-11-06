@@ -49,9 +49,9 @@ def build(out):
     hand_arrow(a, 8.05, 1.7, 9.3, 1.95, color=C['llm'], label=FLOW['act'], lx=7.9, ly=1.35)
     hand_arrow(a, 9.3, 2.55, 8.05, 2.5, color=C['gh'], label=FLOW['obs'], lx=7.75, ly=2.55)
     hand_arrow(a, 11.0, 3.25, 11.0, 3.72, color=C['gh'], label=FLOW['ops'], lx=11.1, ly=3.35)
-    hand_arrow(a, 9.3, 4.9, 8.05, 5.2, color=C['gts'], label=FLOW['cap'], lx=7.8, ly=5.25)
-    hand_arrow(a, 5.3, 5.3, 4.1, 4.4, color=C['tsk'], label=FLOW['cand'], lx=3.6, ly=4.95)
-    hand_arrow(a, 3.4, 2.55, 5.3, 1.5, color=C['ev'], lw=2.8, label=FLOW['fb'], lx=3.75, ly=2.2)
+    hand_arrow(a, 9.3, 4.9, 8.05, 5.2, color=C['gts'], label=FLOW['cap'], lx=7.7, ly=5.42)
+    hand_arrow(a, 5.3, 5.3, 4.1, 4.4, color=C['tsk'], label=FLOW['cand'], lx=3.25, ly=5.05)
+    hand_arrow(a, 3.4, 2.55, 5.3, 1.5, color=C['ev'], lw=2.8, label=FLOW['fb'], lx=3.9, ly=2.5)
     for c in a:
         if c.__class__.__name__ == 'Connector':
             sketchy(c)
