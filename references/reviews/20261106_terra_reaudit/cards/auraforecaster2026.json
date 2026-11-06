@@ -1,0 +1,73 @@
+{
+ "citation_key": "auraforecaster2026",
+ "title": "Can Language Models Learn to Forecast Stock Prices",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "AURA learns tool-using numerical stock forecasting through full-parameter supervised trajectory training followed by PPO on realized-return forecast quality.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "auraforecaster2026:market_sandbox",
+   "name": "Decision-date market investigation sandbox",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "Nine retrieval tools expose market observations at one decision-date close; the terminal action predicts stock return at a declared horizon.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.3; 2.1 A sandbox for market investigation"
+   ]
+  },
+  {
+   "id": "auraforecaster2026:forecast_posttraining",
+   "name": "Assistant-trajectory SFT and terminal-return PPO",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "role": "model_training",
+   "scope_reason": "Full-parameter SFT and PPO update the language model policy that selects market queries and emits numerical forecasts.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.7; 3.2 Supervised training; 3.3 Reinforcement learning",
+    "PDF p.7; 3.3 Reinforcement learning from realized outcomes"
+   ]
+  }
+ ]
+}

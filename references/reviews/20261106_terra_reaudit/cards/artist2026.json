@@ -1,0 +1,68 @@
+{
+ "citation_key": "artist2026",
+ "title": "Adaptive Time Series Reasoning via Segment Selection",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "ARTIST trains a shared language-model policy to select temporal segments and answer questions through controller/reasoner interaction.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "temporal question answering",
+  "axes": [],
+  "other": "temporal_question_answering",
+  "other_labels": [
+   "temporal_question_answering"
+  ],
+  "original_values": {
+   "other": "temporal_question_answering",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "artist2026:joint-policy",
+   "name": "Hierarchical segment-selection reasoning policy",
+   "layer": "LLM",
+   "dimensions": [],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "model_training",
+   "scope_reason": "The same LLM is SFT- and RL-trained in controller and reasoner roles.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.7; method passage beginning Training proceeds in two"
+   ]
+  },
+  {
+   "id": "artist2026:segment-selection",
+   "name": "Iterative temporal-segment acquisition",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Planning and Workflow"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "Segment selection and ACCEPT/CONTINUE decisions are conditioned on a QA answer contract.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.4; method passage beginning The controller decides"
+   ]
+  }
+ ]
+}

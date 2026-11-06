@@ -1,0 +1,79 @@
+{
+ "citation_key": "acetrader2026",
+ "title": "ACE-Trader: Adversarial Co-Evolution for Generator-Critic Trading Systems",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "ACE-Trader runs a Commit-Challenge-Revise loop between an LLM Trader and Red-Team, picks each role's memory with selectors trained online on memory-on versus memory-off net-return differences, and settles critiques and revisions against realized outcomes to build linked role-specific memories.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support",
+  "axes": [
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "acetrader2026:memory-selector",
+   "name": "Net-return-trained context-dependent memory selectors",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Selector inputs combine market and portfolio features, and labels come from net-return differences between memory-assisted and memory-free trading pipelines, so the mechanism is bound to the trading objective.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"Each selector combines a frozen\"",
+    "PDF p.6; passage beginning \"Once the outcomes are observed\""
+   ]
+  },
+  {
+   "id": "acetrader2026:co-evolution",
+   "name": "Outcome-settled Trader and Red-Team memory co-evolution",
+   "layer": "TSK",
+   "dimensions": [
+    "Coordination and Scaling",
+    "Memory and Context",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Critiques carry observable conditions and evaluation horizons that are settled against realized prices, and revision benefit is the net-return difference between portfolio plans, so the memory content is defined by trading outcomes.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.6; passage beginning \"We also check the risk\"",
+    "PDF p.5; passage beginning \"The Red-Team issues a challenge\""
+   ]
+  }
+ ]
+}

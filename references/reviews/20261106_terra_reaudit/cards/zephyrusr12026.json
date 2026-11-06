@@ -1,0 +1,71 @@
+{
+ "citation_key": "zephyrusr12026",
+ "title": "Zephyrus-R1: Agentic Reinforcement Learning for Weather Reporting",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "Zephyrus-R1 trains tool-using vision-language weather agents with a two-stage curriculum, RL on verifiable weather-analysis questions followed by RL on report generation scored by a meteorological rubric and bidirectional claim entailment against NWS discussions and gated on evidence read at the current state and a forecast lead.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "time series reporting",
+  "axes": [],
+  "other": "time_series_reporting",
+  "other_labels": [
+   "time_series_reporting"
+  ],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "zephyrusr12026:curriculum-agentic-rl",
+   "name": "Verifiable-question to report curriculum RL",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_reporting"
+   ],
+   "role": "model_training",
+   "scope_reason": "CISPO-based RL with LoRA updates the vision-language policy, first on verifier-scored weather-analysis questions and then on the report reward, so the contribution changes the model itself.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"Direct report training must jointly learn\"",
+    "PDF p.7; passage beginning \"Both RL stages use CISPO with\""
+   ]
+  },
+  {
+   "id": "zephyrusr12026:grounded-report-reward",
+   "name": "Grounding-gated rubric and claim-entailment report reward",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_reporting"
+   ],
+   "role": "method",
+   "scope_reason": "The reward compares a generated forecast discussion with the NWS reference through a six-criterion meteorological rubric and claim-level Discussion F1, and its grounding flag requires reads of the current state and a forecast lead, so the verifier is bound to the weather-report output.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"we require a minimum amount of\"",
+    "PDF p.4; passage beginning \"After review, we freeze a six-criterion\""
+   ]
+  }
+ ]
+}

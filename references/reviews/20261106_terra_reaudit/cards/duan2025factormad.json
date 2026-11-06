@@ -1,0 +1,105 @@
+{
+ "citation_key": "duan2025factormad",
+ "title": "FactorMAD: A Multi-Agent Debate Framework Based on Large Language Models for Interpretable Stock Alpha Factor Mining",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "FactorMAD alternates two differently initialized LLM debaters to propose alpha-factor code, repairs invalid implementations and retains factors based on predictive quality and diversity.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; Decision support",
+  "axes": [
+   "forecasting_prediction",
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "duan2025factormad:factor-debate",
+   "name": "Perspective-diverse alpha-factor debate",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Workflow",
+    "Coordination and Scaling"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Agents derive perspectives from existing factor code/performance and critique candidate alpha factors against a return-prediction objective.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"3.2 Agent Debate Framework\""
+   ]
+  },
+  {
+   "id": "duan2025factormad:factor-validation",
+   "name": "Alpha-factor implementation and diversity validation",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Validation enforces factor-specific output and cross-sectional comparability; IC/ICIR and factor correlation decide library admission.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"3.3.2 Validation.\""
+   ]
+  },
+  {
+   "id": "duan2025factormad:causal-window-check",
+   "name": "Past-only rolling-window constraint",
+   "layer": "GTS",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Future-timestamp exclusion and replacing full-series statistics with rolling operations express temporal availability independent of the financial objective.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.6; passage beginning \"LOOK-AHEAD BIAS\""
+   ]
+  }
+ ]
+}

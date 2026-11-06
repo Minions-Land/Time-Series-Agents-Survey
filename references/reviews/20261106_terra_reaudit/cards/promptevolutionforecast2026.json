@@ -1,0 +1,103 @@
+{
+ "citation_key": "promptevolutionforecast2026",
+ "title": "Training-Free Continual Learning for Multimodal Forecasting via Prompt Evolution",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "The work evolves a plain-text guidance block for a frozen LLM forecaster through GEPA-style reflection on forecast-versus-realized traces, parent gating and Pareto selection, under knowledge-cutoff contamination control, and optionally compiles the guidance into code that calls a TSFM.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "promptevolutionforecast2026:guidance-evolution",
+   "name": "Outcome-gated forecasting guidance evolution",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Memory and Context",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The reflector rewrites forecasting guidance from forecast-versus-realized traces and per-window MASE, and children are gated and Pareto-selected on forecast error.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"2. Reflect. The reflector reads\""
+   ]
+  },
+  {
+   "id": "promptevolutionforecast2026:cutoff-tiers",
+   "name": "Cutoff-postdating tiers with untouched monitor",
+   "layer": "GTS",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "Windows are admitted by their origin relative to each model's knowledge cutoff and consumed at separate rates; this availability-time control does not depend on the forecast output and applies to other LLM tasks on time-indexed data.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"Cross-model experiments with Claude Opus\""
+   ]
+  },
+  {
+   "id": "promptevolutionforecast2026:guidance-compilation",
+   "name": "Guidance-to-code compilation with TSFM tool",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Interface and Interaction",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Each guidance candidate is compiled into a forecast(window) function that may call TabPFN-TS, and a final LLM pass issues the forecast.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.6; passage beginning \"(1) A coding LLM (Claude\""
+   ]
+  }
+ ]
+}

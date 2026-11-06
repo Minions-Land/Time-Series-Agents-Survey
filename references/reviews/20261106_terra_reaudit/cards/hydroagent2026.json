@@ -1,0 +1,99 @@
+{
+ "citation_key": "hydroagent2026",
+ "title": "HydroAgent: Formalizing Forecaster Expertise into Skill-Orchestrated Flood Forecasting Workflows",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "HydroAgent encodes hydrological expertise as executable skills linking analog-case prior judgment, scheme selection, simulation and human-reviewed warning workflows.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "hydroagent2026:skill-orchestration",
+   "name": "Explicit skill contracts and deterministic executors",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Workflow"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Skill boundaries separate procedural control, LLM interpretation and deterministic artifact generation; mechanism can be reused beyond hydrology.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.10; passage beginning \"The skill layer defines the procedure\""
+   ]
+  },
+  {
+   "id": "hydroagent2026:flood-prior-skill",
+   "name": "Analog flood judgment with physical and human checks",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Control, Verification, and Feedback",
+    "Planning and Workflow"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Prior peak/volume intervals are grounded in similar floods and hydrological rules, then reviewed before scheme selection.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.10; passage beginning \"The Step 1 skill formalizes\""
+   ]
+  },
+  {
+   "id": "hydroagent2026:hydrological-scheme",
+   "name": "Flood-type-indexed calibration and rolling simulation",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Workflow"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "XAJ parameter schemes calibrated by flood type feed a rolling flood forecasting workflow.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.8; passage beginning \"In Step 0, scheme preparation\""
+   ]
+  }
+ ]
+}

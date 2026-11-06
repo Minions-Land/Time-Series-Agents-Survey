@@ -1,0 +1,79 @@
+{
+ "citation_key": "sagesleep2026",
+ "title": "SAGE: Sensor-Augmented Grounding Engine for LLM-Powered Sleep Care Agent",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "SAGE connects wearable data to a queryable temporal database, routes conversational requests into grounded queries, and issues selective sleep-care notifications.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support; temporal question answering",
+  "axes": [
+   "decision_support"
+  ],
+  "other": "temporal_question_answering",
+  "other_labels": [
+   "temporal_question_answering"
+  ],
+  "original_values": {
+   "other": "temporal_question_answering",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "sagesleep2026:temporal-query",
+   "name": "Queryable temporal sensor-data layer",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution",
+    "Memory and Context"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "Period, metric and comparison semantics support longitudinal sensor questions without tying the interface to one prediction target.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "data_management"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.2; 2.1 Sensor Ingestion"
+   ]
+  },
+  {
+   "id": "sagesleep2026:sleep-monitor",
+   "name": "Personal-baseline sleep monitoring",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback",
+    "Interface and Interaction"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "role": "method",
+   "scope_reason": "Predefined sleep/activity queries trigger interventions on personal-baseline deviations and sleep debt.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.3; 2.3 Proactive & Selective Monitoring"
+   ]
+  }
+ ]
+}

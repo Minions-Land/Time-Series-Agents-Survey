@@ -1,0 +1,73 @@
+{
+ "citation_key": "fromnewstoforecast2024",
+ "title": "From News to Forecast: Integrating Event Analysis in LLM-Based Time Series Forecasting with Reflection",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "News-to-forecast aligns selected event news with time-series histories, fine-tunes a forecasting LLM and refines news-selection logic using validation forecast errors.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "fromnewstoforecast2024:news-conditioned-lora",
+   "name": "News-conditioned forecasting LoRA",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "Supervised instruction tuning changes model parameters using textualized temporal/news input-output pairs.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"We employ a supervised instruction tuning\""
+   ]
+  },
+  {
+   "id": "fromnewstoforecast2024:news-reflection",
+   "name": "Validation-guided news selection refinement",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Control, Verification, and Feedback",
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "Prediction errors identify overlooked event news and update selection logic used to prepare forecasting training pairs.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.7; passage beginning \"For the evaluation agent\""
+   ]
+  }
+ ]
+}

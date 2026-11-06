@@ -1,0 +1,70 @@
+{
+ "citation_key": "heraldlight2025",
+ "title": "A Dual Large Language Models Architecture with Herald Guided Prompts for Parallel Fine Grained Traffic Signal Control",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "HeraldLight combines queue/arrival-informed phase-duration estimates with dual-LLM correction training for distributed traffic signal control.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support",
+  "axes": [
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "heraldlight2025:herald-timing",
+   "name": "Queue and approaching-vehicle duration guidance",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Workflow"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Release times and arriving vehicle estimates determine signal-phase durations under lane demand.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"Herald Module determines\""
+   ]
+  },
+  {
+   "id": "heraldlight2025:critic-score-training",
+   "name": "Critic-corrected score-ranking fine-tuning",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "CityFlow interaction errors produce corrected trajectories and a ranking loss to update the LLM-Agent.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"Training alternates among interaction\""
+   ]
+  }
+ ]
+}

@@ -1,0 +1,73 @@
+{
+ "citation_key": "fairamo2026",
+ "title": "Rethinking Agentic Model Orchestration for Time Series Forecasting",
+ "review_status": "paper_verified",
+ "work_type": "Benchmark",
+ "claim": {
+  "summary": "FairAMO evaluates TSFM orchestrators on a frozen forecast bank where each must commit a selection or weights from a fixed backtest budget before test labels are revealed, separating orchestration ability from candidate-pool strength and complementarity.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "fairamo2026:frozen-bank-protocol",
+   "name": "Frozen forecast bank with commit-before-reveal orchestration",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback",
+    "Memory and Context"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "The cached state is candidate quantile forecasts per rolling origin and the committed action is a model selection or combination weights scored by forecast error, so it is tied to the forecasting output contract.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"we introduce FairAMO, a controlled\"",
+    "PDF p.3; passage beginning \"Before any test label is\""
+   ]
+  },
+  {
+   "id": "fairamo2026:headroom-realization",
+   "name": "Pool headroom and realization decomposition",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "Headroom, gain and realization are defined from forecast losses of the best single TSFM, the window-level oracle and the orchestrator, so the metric is bound to forecast selection and combination.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.7; passage beginning \"• Headroom H(P ) =\""
+   ]
+  }
+ ]
+}

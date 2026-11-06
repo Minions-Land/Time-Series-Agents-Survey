@@ -1,0 +1,100 @@
+{
+ "citation_key": "wang2026large",
+ "title": "Large-model-based smart agent for time series anomaly detection in power systems",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "SLEP combines temporal preprocessing, reflection-guided prompt improvement, and history/statistics/feature-enhanced power-series anomaly judgments around pretrained LLMs.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Anomaly detection and diagnosis",
+  "axes": [
+   "anomaly_detection_diagnosis"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "wang2026large:temporal_preprocessing",
+   "name": "Differencing and sliding-window preprocessing",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "tasks": [],
+   "role": "method",
+   "scope_reason": "Differencing and windowing encode ordered numerical-series structure and can serve temporal tasks beyond anomaly detection.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; 3.2.1 S for series"
+   ]
+  },
+  {
+   "id": "wang2026large:reflection_library",
+   "name": "Stored self-reflections for iterative prompt improvement",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "role": "method",
+   "scope_reason": "The stored answer/prompt critique and subsequent prompt revision do not require temporal or anomaly semantics.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.5; 3.2.3 Enhancing: Reflection Library"
+   ]
+  },
+  {
+   "id": "wang2026large:detection_prompt",
+   "name": "History-, statistics-, and feature-enhanced anomaly judgment",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Memory and Context",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "role": "method",
+   "scope_reason": "The prompt specifies power-system anomaly judgment and a Normal/Abnormal output; enhancement policies supply evidence for that detection contract.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.5; 3.2.3 Enhancing Policy; 3.3 BRIDOR"
+   ]
+  }
+ ]
+}

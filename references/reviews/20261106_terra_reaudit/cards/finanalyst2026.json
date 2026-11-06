@@ -1,0 +1,74 @@
+{
+ "citation_key": "finanalyst2026",
+ "title": "Fin-Analyst at FinMMEval 2026 Task 3: A Live Hybrid Trading Agent with LLM Specialists and Rule-Based Signals",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "Fin-Analyst aggregates eight TSLA specialist verdicts and uses a separate rule-based BTC branch in a live daily trading service.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support",
+  "axes": [
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "finanalyst2026:specialist-trading",
+   "name": "Recency-weighted specialist trading aggregation",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Coordination and Scaling"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Specialists and overrides are defined around dated financial disclosures and BUY/HOLD/SELL decisions.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.3; method passage beginning We propose a hierarchical agent"
+   ]
+  },
+  {
+   "id": "finanalyst2026:inference-cache",
+   "name": "Prompt-keyed specialist response cache",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Caching unchanged requests reduces repeated model calls independently of trading semantics.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.4; method passage beginning To bound latency and cost"
+   ]
+  }
+ ]
+}

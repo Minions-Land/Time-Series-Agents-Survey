@@ -1,0 +1,114 @@
+{
+ "citation_key": "giftevalctx2026",
+ "title": "GIFT-Eval-CTX: A Benchmark For Contextual Forecasting Model Evaluation",
+ "review_status": "paper_verified",
+ "work_type": "Benchmark",
+ "claim": {
+  "summary": "GIFT-Eval-CTX builds 10,000 hard GIFT-Eval test windows annotated with structured Macro and Micro future effects through validator-gated discovery agents and a blind-first critic, and measures how well forecasters convert that verified context into numerical trajectories.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; time series annotation",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": "time_series_annotation",
+  "other_labels": [
+   "time_series_annotation"
+  ],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "giftevalctx2026:validated-effect-annotation",
+   "name": "Validator-gated structured temporal effect annotation",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback",
+    "Interface and Interaction"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_annotation"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "Agents propose trend, seasonality and interval-bounded excursion, mean-shift or seasonal-change effects that deterministic validators recompute from the raw series; the schema and checks describe any series segment and would survive a change of task family, although the residual overview tool here uses TSFM forecasts.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "time_series_annotation"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "data_management",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"the pipeline first runs independent\"",
+    "PDF p.3; passage beginning \"Free-form descriptions confound the information\""
+   ]
+  },
+  {
+   "id": "giftevalctx2026:blind-first-critic",
+   "name": "Blind-first joint critic review",
+   "layer": "GH",
+   "dimensions": [
+    "Coordination and Scaling",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_annotation"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "Forming an independent reading before viewing other agents' proposals, then supporting, revising or excluding them, is a domain-independent multi-agent review order.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "time_series_annotation"
+    ],
+    "basis": "module"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"Blind-first Joint Critic Agent. After\""
+   ]
+  },
+  {
+   "id": "giftevalctx2026:paired-context-evaluation",
+   "name": "Paired history-only and structured-context forecasting evaluation",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "Each instance pairs a history with a future target and effects, and scoring compares the same forecaster's MASE with and without the effects, so the resource is bound to the forecasting output.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "resource_level",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"GIFT-Eval-CTX supports a paired evaluation\""
+   ]
+  }
+ ]
+}

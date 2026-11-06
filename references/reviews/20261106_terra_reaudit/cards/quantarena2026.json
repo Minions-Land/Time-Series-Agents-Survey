@@ -1,0 +1,81 @@
+{
+ "citation_key": "quantarena2026",
+ "title": "Quant-Arena: Benchmarking LLM Agents for Quantitative Trading Research",
+ "review_status": "paper_verified",
+ "work_type": "Benchmark",
+ "claim": {
+  "summary": "Quant-Arena has LLMs write feature and stock-scoring code over raw daily and Level-2 A-share data, revise it with bounded research-period feedback, and freeze one strategy that a cash-account evaluator assesses on a sealed out-of-sample year.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support",
+  "axes": [
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "quantarena2026:date-scoped-data-interface",
+   "name": "Date-scoped market data interface",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Memory and Context"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "Access is gated by decision date, instrument and field with identical rules in research and assessment, a point-in-time availability constraint that would serve a forecasting or other market-series task without redesign.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "data_management",
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"Missing observations and delisted stocks\""
+   ]
+  },
+  {
+   "id": "quantarena2026:sealed-research-protocol",
+   "name": "Bounded research loop with sealed-year assessment",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback",
+    "Planning and Workflow"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "Feedback, the frozen deliverable and the sealed evaluator are defined around a stock-scoring program converted to a top-75 equal-weight cash-account portfolio, so the protocol is bound to the trading-strategy output contract.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"Models may evaluate candidate strategies\"",
+    "PDF p.4; passage beginning \"At the end of research,\""
+   ]
+  }
+ ]
+}

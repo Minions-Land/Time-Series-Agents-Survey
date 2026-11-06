@@ -1,0 +1,75 @@
+{
+ "citation_key": "physiologicalagent2025",
+ "title": "An LLM-Powered Agent for Physiological Data Analysis: A Case Study on PPG-based Heart Rate Estimation",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "An OpenCHA-based LLM agent plans physiological queries,retrieves wearable data,and invokes an established PPG processing pipeline for heart-rate estimation.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "physiological signal estimation",
+  "axes": [],
+  "other": "physiological_signal_estimation",
+  "other_labels": [
+   "physiological_signal_estimation"
+  ],
+  "original_values": {
+   "other": "physiological_signal_estimation",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "physiologicalagent2025:orchestrator",
+   "name": "Planner–executor orchestration and replanning",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Workflow",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Query decomposition,execution feedback and extensible tool registration are generic orchestration features.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "physiological_signal_estimation"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"The Orchestrator consists of four\""
+   ]
+  },
+  {
+   "id": "physiologicalagent2025:ppg-pipeline",
+   "name": "Integrated PPG quality/reconstruction/peak pipeline",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "physiological_signal_estimation"
+   ],
+   "role": "method",
+   "scope_reason": "The external pipeline is bound to PPG signal quality and heart-rate estimation;the contribution is integration of existing analysis methods.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"PPG processing pipeline:\""
+   ]
+  }
+ ]
+}

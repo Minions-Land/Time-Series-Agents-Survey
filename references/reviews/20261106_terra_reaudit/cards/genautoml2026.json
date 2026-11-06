@@ -1,0 +1,111 @@
+{
+ "citation_key": "genautoml2026",
+ "title": "GenAutoML: An Agentic Framework for Dynamic Architecture Generation and Optimization in Time-Series Analysis",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "GenAutoML generates PyTorch time-series architectures, validates their execution, loads them into a live optimization registry and wraps numerical models with adopted reversible normalization.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; Anomaly detection and diagnosis",
+  "axes": [
+   "forecasting_prediction",
+   "anomaly_detection_diagnosis"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "genautoml2026:dynamic-architecture-registry",
+   "name": "Runtime architecture discovery and hot-swapping",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "Class introspection, module reload and Optuna registration are generic executable-model integration mechanisms.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"3.3 Just-In-Time (JIT) Architectural Integration\""
+   ]
+  },
+  {
+   "id": "genautoml2026:forecast-shape-contract",
+   "name": "Forecasting shape-contract validation",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The validation contract fixes lookback input and forecast-horizon output tensors; repair targets these output requirements.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"In order to ensure the generated code is compatible\""
+   ]
+  },
+  {
+   "id": "genautoml2026:revin-wrapper",
+   "name": "Adopted temporal normalization wrapper",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Per-instance temporal statistics normalize and restore numerical scale across the forecasting and reconstruction pipelines.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"To address this, we integrate a Dynamic Reversible Instance Normalization\""
+   ]
+  }
+ ]
+}

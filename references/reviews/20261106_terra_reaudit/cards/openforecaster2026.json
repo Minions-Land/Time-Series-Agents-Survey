@@ -1,0 +1,70 @@
+{
+ "citation_key": "openforecaster2026",
+ "title": "Scaling Open-Ended Reasoning to Predict the Future",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "OpenForecaster trains a language model with accuracy-plus-calibration rewards on news-derived open-ended future-event questions.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "openforecaster2026:event-rl",
+   "name": "Open-ended forecast policy training",
+   "layer": "LLM",
+   "dimensions": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "GRPO updates the LLM to output a textual event answer with calibrated confidence.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.9; method passage beginning We train the Qwen3-8B thinking model"
+   ]
+  },
+  {
+   "id": "openforecaster2026:dated-news-retrieval",
+   "name": "Resolution-date-bounded static news retrieval",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Retrieval excludes the month before resolution to form the forecasting information set.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.9; method passage beginning To prevent leakage issues"
+   ]
+  }
+ ]
+}

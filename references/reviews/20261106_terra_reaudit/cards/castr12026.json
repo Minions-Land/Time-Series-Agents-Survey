@@ -1,0 +1,92 @@
+{
+ "citation_key": "castr12026",
+ "title": "Cast-R1: Learning Tool-Augmented Sequential Decision Policies for Time Series Forecasting",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "Cast-R1 learns tool-augmented forecasting decisions with state memory, feature/model calls and forecast revision, using supervised and reinforcement training.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "castr12026:state-memory",
+   "name": "Incremental decision-state memory",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "tasks": [],
+   "role": "method",
+   "scope_reason": "Summarizing tool outputs and past actions into subsequent states is domain-independent context management; no temporal-specific retrieval rule is specified.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.4; 3.2 Memory-based State Management"
+   ]
+  },
+  {
+   "id": "castr12026:forecast-workflow",
+   "name": "Preparation-forecasting-refinement workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Workflow",
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "role": "method",
+   "scope_reason": "The action sequence selects forecast models and revises a target-horizon prediction.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.5; 3.4 Tool-augmented Agentic Workflow"
+   ]
+  },
+  {
+   "id": "castr12026:forecast-policy-training",
+   "name": "Two-stage forecasting-policy training",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "role": "model_training",
+   "scope_reason": "Supervised and reinforcement stages change the model policy for tool use and sequential forecasting.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.5; 3.5 Learning and Training Strategy"
+   ]
+  }
+ ]
+}

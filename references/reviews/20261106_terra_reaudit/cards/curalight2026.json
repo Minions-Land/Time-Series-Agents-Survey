@@ -1,0 +1,70 @@
+{
+ "citation_key": "curalight2026",
+ "title": "CuraLight: Debate-Guided Data Curation for LLM-Centered Traffic Signal Control",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "CuraLight uses an RL traffic assistant and multi-LLM deliberation to curate phase-duration decisions, then adapts a Gemma language model using priority-aware LoRA imitation.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support",
+  "axes": [
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "curalight2026:priority-lora",
+   "name": "Priority-aware traffic-controller adaptation",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "Updates the language model adapters on intersection-state reasoning and phase-duration responses.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"Priority Aware LoRA Imitation Fine Tuning:\""
+   ]
+  },
+  {
+   "id": "curalight2026:traffic-debate-curation",
+   "name": "RL-filtered traffic-action debate and data selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback",
+    "Coordination and Scaling"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "Candidate selection, arguments and priorities are tied to queues, congestion and signal-control outcomes.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"RL based pre-filtering.\""
+   ]
+  }
+ ]
+}

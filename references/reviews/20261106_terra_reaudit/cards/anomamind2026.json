@@ -1,0 +1,69 @@
+{
+ "citation_key": "anomamind2026",
+ "title": "AnomaMind: Agentic Time Series Anomaly Detection with Tool-Augmented Reasoning",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "AnomaMind localizes suspicious intervals, gathers diagnostic evidence and refines anomaly decisions, with a separately trained detector policy.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Anomaly detection and diagnosis",
+  "axes": [
+   "anomaly_detection_diagnosis"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "anomamind2026:anomaly-workflow",
+   "name": "Coarse-to-fine tool-guided interval diagnosis",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Workflow",
+    "Coordination and Scaling"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Locator/actor/detector/evaluator roles are defined around anomaly intervals and their evidence.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.5; method passage beginning AnomaMind instantiates"
+   ]
+  },
+  {
+   "id": "anomamind2026:detector-rl",
+   "name": "Anomaly detector SFT and reinforcement learning",
+   "layer": "LLM",
+   "dimensions": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "Only the dedicated detection policy is trained with parsing, F1 and false-positive rewards.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.6; method passage beginning Before reinforcement learning"
+   ]
+  }
+ ]
+}

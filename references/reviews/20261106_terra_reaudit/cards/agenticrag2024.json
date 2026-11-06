@@ -1,0 +1,116 @@
+{
+ "citation_key": "agenticrag2024",
+ "title": "Agentic Retrieval-Augmented Generation for Time Series Analysis",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "Hierarchical routing selects task-specialized, instruction-tuned SLMs; differentiable prompt pools retrieve historical temporal patterns.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; Anomaly detection and diagnosis; imputation; time series classification",
+  "axes": [
+   "forecasting_prediction",
+   "anomaly_detection_diagnosis"
+  ],
+  "other": "imputation; time_series_classification",
+  "other_labels": [
+   "imputation",
+   "time_series_classification"
+  ],
+  "original_values": {
+   "other": "imputation; time_series_classification",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "agenticrag2024:slm-adaptation",
+   "name": "Task-specific PEFT and direct preference optimization",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "model_training",
+   "scope_reason": "The paper updates SLM parameters for temporal tasks; this is model adaptation, not generic runtime optimization.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"We perform instruction-tuning\""
+   ]
+  },
+  {
+   "id": "agenticrag2024:master-router",
+   "name": "ReAct master-agent routing",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Workflow",
+    "Coordination and Scaling"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "Routing queries to independently specialized agents is domain-independent orchestration; subagents are distinct from their trained models.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "imputation",
+     "time_series_classification"
+    ],
+    "basis": "module"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"The master agent for sub-agent\""
+   ]
+  },
+  {
+   "id": "agenticrag2024:pattern-prompt-pool",
+   "name": "Differentiable temporal prompt-pool conditioning",
+   "layer": "LLM",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "model_interface",
+   "scope_reason": "The pool supplies continuous prompt embeddings, concatenated with the numerical input and projected by a learnable W; this is a differentiable model-facing adaptation, not an external episodic store. Move to LLM.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"The dynamic prompting approach\"",
+    "PDF p.3; Section 3.1, equation projecting concatenated prompt and temporal embeddings"
+   ]
+  }
+ ]
+}

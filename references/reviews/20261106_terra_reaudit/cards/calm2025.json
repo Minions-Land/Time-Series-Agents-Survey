@@ -1,0 +1,99 @@
+{
+ "citation_key": "calm2025",
+ "title": "CALM: A Framework for Continuous, Adaptive, and LLM-Mediated Anomaly Detection in Time-Series Streams",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "CALM combines event-time streaming preparation with forecasting-based anomalies and LLM-guided TimesFM adaptation.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Anomaly detection and diagnosis",
+  "axes": [
+   "anomaly_detection_diagnosis"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "calm2025:event-windowing",
+   "name": "Ordered event-time window construction",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Timestamp ordering, watermarks and missing-time repair define a reusable temporal ingestion component.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "functions": [
+    "data_management"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.6; method passage beginning Handling Out-of-Order Data"
+   ]
+  },
+  {
+   "id": "calm2025:stream-model-swap",
+   "name": "In-flight model-artifact swapping",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Side-input artifact watching and weight reload do not require time-series task semantics.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.8; method passage beginning The pipeline monitors"
+   ]
+  },
+  {
+   "id": "calm2025:drift-curation",
+   "name": "Semantic drift curation for anomaly adaptation",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback",
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "KEEP/REMOVE judgments curate anomalous windows for TimesFM fine-tuning.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.8; method passage beginning Once an outlier is detected"
+   ]
+  }
+ ]
+}

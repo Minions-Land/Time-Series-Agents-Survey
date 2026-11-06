@@ -1,0 +1,49 @@
+{
+ "citation_key": "lineuprl2026",
+ "title": "LineupRL: Verifiable Reinforcement Learning for Time Series Captioning via Caption-to-Series Identification",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "LineupRL post-trains a VLM time series captioner with RLOO, rewarding each caption by how often a frozen text-only LLM verifier picks the described series, printed as raw values, out of statistic-matched real distractors.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "time series captioning",
+  "axes": [],
+  "other": "time_series_captioning",
+  "other_labels": [
+   "time_series_captioning"
+  ],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "lineuprl2026:identification-rlvr",
+   "name": "Caption-to-series identification RLVR",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_captioning"
+   ],
+   "role": "model_training",
+   "scope_reason": "RLOO updates the captioner's weights under a frozen-verifier identification reward, so the contribution changes the model policy; the verifier acts only during training, not as a runtime check.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"In this work, we propose\"",
+    "PDF p.3; passage beginning \"The reward is caption-to-series identification\""
+   ]
+  }
+ ]
+}

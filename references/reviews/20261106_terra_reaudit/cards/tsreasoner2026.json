@@ -1,0 +1,114 @@
+{
+ "citation_key": "tsreasoner2026",
+ "title": "TS-Reasoner: Domain-Oriented Time Series Inference Agents for Reasoning and Automated Analysis",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "An LLM decomposes analytical instructions into executable time-series operators and revises failed plans.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; Anomaly detection and diagnosis; imputation; temporal causal analysis",
+  "axes": [
+   "forecasting_prediction",
+   "anomaly_detection_diagnosis"
+  ],
+  "other": "imputation; temporal_causal_analysis",
+  "other_labels": [
+   "imputation",
+   "temporal_causal_analysis"
+  ],
+  "original_values": {
+   "other": "imputation; temporal_causal_analysis",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "tsreasoner2026:execution-feedback",
+   "name": "Execution-error plan revision",
+   "layer": "GH",
+   "dimensions": [
+    "Control, Verification, and Feedback",
+    "Planning and Workflow"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Retrying a failed executable plan using the error message is independent of forecasting/anomaly semantics.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "imputation",
+     "temporal_causal_analysis"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.5; method passage beginning Once the task decomposer"
+   ]
+  },
+  {
+   "id": "tsreasoner2026:temporal-toolkit",
+   "name": "Unified time-series operator suite",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "temporal_causal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "Model and numerical time-series operators support heterogeneous temporal analyses.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "imputation",
+     "temporal_causal_analysis"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; method passage beginning TS-Reasoner relies on a suite"
+   ]
+  },
+  {
+   "id": "tsreasoner2026:forecast-holdout",
+   "name": "Within-instance forecast selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The last 10% pseudo-holdout supplies forecast-quality feedback, binding this module to prediction.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.5; method passage beginning Feedback is obtained"
+   ]
+  }
+ ]
+}

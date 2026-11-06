@@ -1,0 +1,112 @@
+{
+ "citation_key": "timeart2026",
+ "title": "TimeART: Towards Agentic Time Series Reasoning via Tool-Augmentation",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "TimeART combines a ReAct-style temporal analysis toolkit with a trained tool-use reasoner and TimeToolBench trajectories.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; Anomaly detection and diagnosis; temporal question answering",
+  "axes": [
+   "forecasting_prediction",
+   "anomaly_detection_diagnosis"
+  ],
+  "other": "temporal_question_answering",
+  "other_labels": [
+   "temporal_question_answering"
+  ],
+  "original_values": {
+   "other": "temporal_question_answering",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "timeart2026:react-runtime",
+   "name": "Thought-action-observation tool loop",
+   "layer": "GH",
+   "dimensions": [
+    "Interface and Interaction",
+    "Planning and Workflow",
+    "Tools and Execution"
+   ],
+   "tasks": [],
+   "role": "method",
+   "scope_reason": "The state-machine and external output/tool constraints are general runtime mechanisms.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "temporal_question_answering"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.3; 2.1 TimeART framework"
+   ]
+  },
+  {
+   "id": "timeart2026:atomic-time-tools",
+   "name": "Atomic temporal analysis toolkit",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "Statistical and correlation operations compose across temporal questions; the inventory also contains specific forecasting/detection tools. Count the shared interface once.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.3; 2.1 TimeART framework"
+   ]
+  },
+  {
+   "id": "timeart2026:tool-reasoner-training",
+   "name": "Experience and reflection-supervised temporal reasoner",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "model_training",
+   "scope_reason": "LoRA training alters the Qwen temporal reasoning/tool-use policy through expert and self-reflection examples.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.5; 3.1 Experimental Settings"
+   ]
+  }
+ ]
+}

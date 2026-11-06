@@ -1,0 +1,100 @@
+{
+ "citation_key": "swingguard2026",
+ "title": "SwingGuard: Risk-Conditioned Multi-Agent Swing Trading with Dual-Timescale Governance",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "SwingGuard runs daily analyst, bull-bear and Portfolio Architect agents conditioned on a System Risk Context that a five-minute Risk Controller maintains through staged diagnosis and persistent risk states, then audits each proposal and caps executed exposure between revisions.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support",
+  "axes": [
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "swingguard2026:risk-conditioned-generation",
+   "name": "Risk-conditioned multi-agent strategy generation",
+   "layer": "TSK",
+   "dimensions": [
+    "Coordination and Scaling",
+    "Planning and Workflow",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The current risk context enters the analyst, debate and Portfolio Architect stages to bound a long-only target position with entry, stop, take-profit, validity and size parameters, a trading output contract.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"The Portfolio Architect internally uses\"",
+    "PDF p.2; passage beginning \"Risk-conditioned strategy generation: the current\""
+   ]
+  },
+  {
+   "id": "swingguard2026:risk-governance",
+   "name": "Five-minute staged risk diagnosis with persistent risk states",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback",
+    "Memory and Context"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Bar-level screening, six-hour accumulation, same-symbol snapshot retrieval and hysteretic NORMAL/ALERT/SURVIVAL/RECOVERY states are defined to output position caps for the traded asset, so the mechanism keeps the trading contract.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"As summarized in Figure 2\"",
+    "PDF p.4; passage beginning \"NORMAL permits the standard cap\""
+   ]
+  },
+  {
+   "id": "swingguard2026:audit-trace",
+   "name": "Hard-boundary audit and risk-to-execution trace",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback",
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The auditor checks long-only direction, size, stop and validity horizon against controller limits, and the trace records each trading proposal through to the executed position.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"After proposal generation, a hard-boundary\"",
+    "PDF p.2; passage beginning \"Dual-timescale risk governance: daily structural\""
+   ]
+  }
+ ]
+}

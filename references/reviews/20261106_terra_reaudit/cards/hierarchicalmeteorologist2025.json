@@ -1,0 +1,107 @@
+{
+ "citation_key": "hierarchicalmeteorologist2025",
+ "title": "Hierarchical AI-Meteorologist: LLM-Agent System for Multi-Scale and Explainable Weather Forecast Reporting",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "Hierarchical AI-Meteorologist aggregates weather forecasts across hourly/six-hour/daily scales and separates factual meteorological interpretation from user-facing report writing.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; time series reporting",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": "time_series_reporting",
+  "other_labels": [
+   "time_series_reporting"
+  ],
+  "original_values": {
+   "other": "time_series_reporting",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "hierarchicalmeteorologist2025:multiscale-context",
+   "name": "Variable-aware multiscale temporal aggregation",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Memory and Context"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The non-LLM Assistant implements variable-aware windowed means, extrema, sums and circular means before report generation. This module denotes that numerical aggregation operation; the forecast-lead-time context selection and report schema belong to the downstream reporting procedure.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "time_series_reporting"
+    ],
+    "basis": "work"
+   },
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"To enable interpretation at multiple time scales\"",
+    "PDF p.2; Hierarchical temporal aggregation"
+   ]
+  },
+  {
+   "id": "hierarchicalmeteorologist2025:weather-report",
+   "name": "Evidence-linked weather reporting",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Coordination and Scaling"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_reporting"
+   ],
+   "role": "method",
+   "scope_reason": "The meteorologist/writer stages interpret supplied forecast tables and adapt reports to user domains; they do not generate the baseline forecast.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"The Meteorologist block\""
+   ]
+  },
+  {
+   "id": "hierarchicalmeteorologist2025:api-reliability",
+   "name": "Cached REST artifacts and API fallback",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Caching, retries, schema validation and completeness checks are reusable service mechanisms.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "time_series_reporting"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"Caching of\""
+   ]
+  }
+ ]
+}

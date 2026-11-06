@@ -1,0 +1,158 @@
+{
+ "citation_key": "siren2026",
+ "title": "SIREN: Towards End-to-End Extreme-Weather Early Warning with Experience-Grounded LLM Agents",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "SIREN provides an executable extreme-weather environment and experience-grounded agent variants covering hazard analysis, prediction, impacts and warning decisions.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; Decision support",
+  "axes": [
+   "forecasting_prediction",
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "siren2026:guarded-code-server",
+   "name": "Guarded Python execution server",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Tool/path validation and isolated workspaces are generic code-execution mechanisms.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"We therefore route every Python\""
+   ]
+  },
+  {
+   "id": "siren2026:case-analogy",
+   "name": "Case-retrieval instruction template",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Appendix K.2 supplies the actual instruction: inspect a collection, rank by task intent/conditions and case metadata, retain at most six question-answer examples, then resume solving. Target task and historical collection are placeholders; no warning-specific score or temporal eligibility calculation is implemented in this retrieval template. Retain temporal/event fields as case metadata and task tags, while classifying this concrete orchestration pattern as GH.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"SIREN-RAG augments\"",
+    "Appendix K.2, PDF p.16"
+   ]
+  },
+  {
+   "id": "siren2026:warning-chain-benchmark",
+   "name": "End-to-end warning-chain evaluation",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "Evaluation follows hazard-specific predictive and responsive outputs with per-stage metrics and execution pass rates.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"For chained tasks\""
+   ]
+  },
+  {
+   "id": "siren2026:warning-skill-rehearsal",
+   "name": "Reference-guided rehearsal and skill refinement",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The complete rehearsal/refinement prompts hide the reference answer, execute a selected example, reveal the answer, compare reasoning/tool choices, and retain short procedures while excluding event-specific answers and facts. These are task-placeholder instructions with a reusable procedural-update contract; the implemented update pattern is GH. Unlike FinCon’s fixed investment analyst outputs, this prompt does not require a financial/weather decision variable or task score.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"3.2.3 SIREN-Skill.\"",
+    "PDF p.17; Appendix K.2 Skill Refinement Prompt"
+   ]
+  },
+  {
+   "id": "siren2026:hazard-model-development",
+   "name": "Task-specific hazard-predictor development",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Historical hazard cases are converted into supervised train/validation samples and a numerical predictor for the target operational judgment.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.6; passage beginning \"Guided by a modeling instruction\""
+   ]
+  }
+ ]
+}

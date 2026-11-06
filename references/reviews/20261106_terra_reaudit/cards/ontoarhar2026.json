@@ -1,0 +1,101 @@
+{
+ "citation_key": "ontoarhar2026",
+ "title": "OntoAR-HAR: Ontology-Guided Agentic RAG with Personalized Memory for Human Activity Recognition",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "OntoAR-HAR has an LLM descend a confusion-guided activity ontology, choosing a child at each node from node-constrained population and personal retrieval plus executable feature reports, and adds accepted query windows to a per-user memory through an agreement gate.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "time series classification",
+  "axes": [],
+  "other": "time_series_classification",
+  "other_labels": [
+   "time_series_classification"
+  ],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "ontoarhar2026:ontology-traversal",
+   "name": "Ontology-guided node-constrained retrieval and traversal",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Workflow",
+    "Memory and Context"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "The decision path, retrieval mask and node instructions are defined by the activity-label ontology, so the mechanism is tied to the HAR label output.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"For each sensor view, the\"",
+    "PDF p.5; passage beginning \"At node v, the context\""
+   ]
+  },
+  {
+   "id": "ontoarhar2026:personal-memory",
+   "name": "Gated personalized episodic memory",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "The store keeps a user's earlier windows paired with accepted activity labels and admits them through label- and node-feature agreement checks, so memory content and gate are bound to the classification output.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"The personalized store Dp has\"",
+    "PDF p.5; passage beginning \"After prediction, a prompt-based gate\""
+   ]
+  },
+  {
+   "id": "ontoarhar2026:feature-construction",
+   "name": "LLM iterative executable feature construction",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "Proposed signal features are executed and scored by how well they separate child activities on retrieval-only misclassifications, so the loop's objective is tied to activity-node decisions.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"At each ambiguous node, an\""
+   ]
+  }
+ ]
+}

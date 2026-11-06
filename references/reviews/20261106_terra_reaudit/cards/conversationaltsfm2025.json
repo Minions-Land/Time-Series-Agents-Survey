@@ -1,0 +1,94 @@
+{
+ "citation_key": "conversationaltsfm2025",
+ "title": "Conversational Time Series Foundation Models: Towards Explainable and Effective Forecasting",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "TSOrchestra uses a fine-tuned language-model judge to iteratively assess constrained ensemble weights over existing forecasting foundation models and explain accept/continue decisions.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "conversationaltsfm2025:forecast-judge-adaptation",
+   "name": "SFT and GRPO adaptation of the ensemble judge",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "Qwen is trained on optimization-state decision traces and composite decision/confidence/explanation rewards.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"3.4 R1-Style Fine-tuning for Reasoning and Decision Capability\""
+   ]
+  },
+  {
+   "id": "conversationaltsfm2025:forecast-ensemble-control",
+   "name": "Forecasting ensemble optimization and continuation control",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback",
+    "Planning and Workflow"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "SLSQP weights and metric selection are optimized for a foundation-model forecast ensemble; the LLM decides whether to continue.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"Therefore, we employ Sequential Least Squares Programming\""
+   ]
+  },
+  {
+   "id": "conversationaltsfm2025:ensemble-audit-reflection",
+   "name": "Weight-optimization audit and reflective explanation",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The audit stores ensemble weights, validation metrics, confidence and explanation faithfulness for retrospective interpretation.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.6; passage beginning \"3.5 Interpretability Through Reflective Explanation\""
+   ]
+  }
+ ]
+}

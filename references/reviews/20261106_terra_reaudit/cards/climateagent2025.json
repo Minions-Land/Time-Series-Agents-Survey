@@ -1,0 +1,103 @@
+{
+ "citation_key": "climateagent2025",
+ "title": "CLIMATEAGENT: Multi-Agent Orchestration for Complex Climate Data Science Workflows",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "ClimateAgent coordinates planning, API acquisition and coding with persistent artifacts and recovery, and supplies an 85-task climate-workflow benchmark.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Anomaly detection and diagnosis; scientific temporal analysis",
+  "axes": [
+   "anomaly_detection_diagnosis"
+  ],
+  "other": "scientific_temporal_analysis",
+  "other_labels": [
+   "scientific_temporal_analysis"
+  ],
+  "original_values": {
+   "other": "scientific_temporal_analysis",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "climateagent2025:persistent-workflow",
+   "name": "Shared workflow state and checkpoint serialization",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context",
+    "Coordination and Scaling"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Plans, scripts, files, results and logs persist across subtasks and restarts.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "anomaly_detection_diagnosis",
+     "scientific_temporal_analysis"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.6; method passage beginning Serialization and Persistence."
+   ]
+  },
+  {
+   "id": "climateagent2025:task-planning",
+   "name": "Plan-to-specialist execution orchestration",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Workflow",
+    "Coordination and Scaling"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Ordered subtask delegation and shared execution state are generic workflow mechanisms.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "anomaly_detection_diagnosis",
+     "scientific_temporal_analysis"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.5; method passage beginning The PLAN-AGENT decomposes"
+   ]
+  },
+  {
+   "id": "climateagent2025:climate-workflows",
+   "name": "Climate analysis workflow benchmark",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "scientific_temporal_analysis"
+   ],
+   "role": "evaluation",
+   "scope_reason": "CLIMATE-AGENT-BENCH-85 specifies scientific analysis/report workflows, including named phenomenon detectors, derived indices, visualisations and rubric-based outputs. It is an evaluation task suite, not a reusable cross-task temporal operation; domain diversity alone does not warrant GTS. Keep scientific_temporal_analysis as the explicit task value.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.8; method passage beginning CLIMATE-AGENT-BENCH-85 spans"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,105 @@
+{
+ "citation_key": "tsqbench2026",
+ "title": "TSQAgent: Rating Time Series Data Quality via Dedicated Agentic Reasoning",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "TSQAgent selects temporal quality dimensions, gathers tool evidence and adjudicates pairwise quality; TSQBench supplies controlled comparisons and a GRPO-trained perceiver.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "data quality assessment",
+  "axes": [],
+  "other": "data_quality_assessment",
+  "other_labels": [
+   "data_quality_assessment"
+  ],
+  "original_values": {
+   "other": "data_quality_assessment",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "tsqbench2026:quality-assessment",
+   "name": "Dimension-wise temporal quality assessment",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback",
+    "Coordination and Scaling"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "data_quality_assessment"
+   ],
+   "role": "method",
+   "scope_reason": "Missingness, frequency, trend and pattern quality are assessed before downstream forecasting/classification.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "data_quality_assessment"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; 3.1 Overview"
+   ]
+  },
+  {
+   "id": "tsqbench2026:perceiver-training",
+   "name": "Temporal quality-dimension policy training",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "data_quality_assessment"
+   ],
+   "role": "model_training",
+   "scope_reason": "GRPO updates LLM dimension-selection reasoning rather than only an external selection workflow.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.5; 3.2 Perceiver"
+   ]
+  },
+  {
+   "id": "tsqbench2026:quality-benchmark",
+   "name": "Controlled temporal quality comparison benchmark",
+   "layer": "GTS",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "data_quality_assessment"
+   ],
+   "role": "evaluation",
+   "scope_reason": "Synthetic paired degradations evaluate time-series quality independently of downstream task metrics.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "data_quality_assessment"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.3; 2 Measuring LLM Capabilities"
+   ]
+  }
+ ]
+}

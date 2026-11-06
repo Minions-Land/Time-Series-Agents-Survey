@@ -1,0 +1,75 @@
+{
+ "citation_key": "agrischolar2026",
+ "title": "Agri-SCHOLAR: Simulation-Grounded In-Season Rolling Advisories for Agricultural Crops Using LLM-Bounded Optimization",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "Agri-SCHOLAR issues weekly in-season irrigation and fertilizer advisories in which LLM agents set agronomically feasible action bounds and an optimizer searches within them, scoring each candidate with APSIM on a weather trajectory restricted to information available at the decision date.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support",
+  "axes": [
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "agrischolar2026:llm-bounded-optimization",
+   "name": "LLM-bounded simulator-scored weekly optimization",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Workflow",
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The action space (urea and irrigation amounts per week), the profit-minus-sustainability-penalty reward and the APSIM oracle are tied to the crop-management advisory output, so the loop would need redesign for another task family.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"The key component of Agri-SCHOLAR\"",
+    "PDF p.6; passage beginning \"The VFA translates each candidate\""
+   ]
+  },
+  {
+   "id": "agrischolar2026:asof-weather-trajectory",
+   "name": "As-of weather trajectory with analog-year tail",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Observed weather to date, a lead-time-perturbed seven-day forecast and an analog season drawn only from earlier years enforce availability time, but the construction is defined as the season weather file feeding the crop simulator for the advisory and is not shown to transfer to another task family.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.6; passage beginning \"To emulate the information available\"",
+    "PDF p.7; passage beginning \"The weather beyond the 7-day\""
+   ]
+  }
+ ]
+}

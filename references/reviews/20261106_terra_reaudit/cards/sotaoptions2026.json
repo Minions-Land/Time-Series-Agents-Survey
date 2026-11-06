@@ -1,0 +1,97 @@
+{
+ "citation_key": "sotaoptions2026",
+ "title": "SOTA: Stock Options Trading Agents Guided by Option-Implied Return Distributions",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "SOTA post-trains Qwen3.8-27B with teacher-trajectory SFT and GRPO to choose among nine option-strategy families from a point-in-time option-implied market state, while deterministic resolvers turn each choice into contracts, position sizes and delta hedges.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support",
+  "axes": [
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "sotaoptions2026:strategy-resolvers",
+   "name": "Option-strategy actions with deterministic resolvers",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The action space is nine option-strategy families with tenor and delta-grid parameters, and resolvers map them to contracts, sizes and hedges, a contract tied to the option-trading output.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"We formulate option trading as\"",
+    "PDF p.5; passage beginning \"To avoid querying prices for\""
+   ]
+  },
+  {
+   "id": "sotaoptions2026:point-in-time-state",
+   "name": "Point-in-time option-implied market state",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "The state derives trailing realized volatility, implied-volatility level, change, term structure, skew and curvature per underlying at each decision date, features chosen for option-return trading rather than reusable across task families.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"For each underlying, the state\""
+   ]
+  },
+  {
+   "id": "sotaoptions2026:policy-training",
+   "name": "Anonymized teacher-trajectory SFT and portfolio-return GRPO",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "Supervised fine-tuning on frontier-teacher trajectories and GRPO on log portfolio-value reward update the language model policy itself.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"We train the policy in\"",
+    "PDF p.7; passage beginning \"To reduce temporal and identity\""
+   ]
+  }
+ ]
+}

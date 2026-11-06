@@ -1,0 +1,133 @@
+{
+ "citation_key": "epicoach2026",
+ "title": "The Athlete as a Scientist of One: Agentic Bayesian Experimental Design for Individualized Physiology from Consumer Wearables",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "EpiCoach runs a weekly agent cycle in which LLM agents propose hypotheses, template-constrained model refinements and workouts while deterministic tools fit a wrist-only digital twin, move beliefs only through logged fits and sealed predictions, and enforce training-load safety constraints.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; Decision support; scientific temporal analysis",
+  "axes": [
+   "forecasting_prediction",
+   "decision_support"
+  ],
+  "other": "scientific_temporal_analysis",
+  "other_labels": [
+   "scientific_temporal_analysis"
+  ],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "epicoach2026:sealed-prediction-registry",
+   "name": "Evidence-gated hypothesis registry with sealed prediction ledger",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "scientific_temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "Hypotheses must register a predictive distribution timestamped before the outcome, beliefs move only through logged fits, and refits are ordered after scoring; these availability-time rules apply to any claim about an evolving series rather than to one task output.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "scientific_temporal_analysis"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.1; passage beginning \"Claims about the athlete live\"",
+    "PDF p.7; passage beginning \"Before every instrument ride the\""
+   ]
+  },
+  {
+   "id": "epicoach2026:information-directed-design",
+   "name": "Information-directed, safety-gated workout design",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Workflow",
+    "Control, Verification, and Feedback",
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The design space is a menu of training-load patterns scored by expected information gain against expected performance gain, with workload-ratio, heart-rate-cap and readiness constraints enforced in code, so state, actions and constraints are tied to the training-prescription output.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.1; passage beginning \"The agent prescribes the next\"",
+    "PDF p.7; passage beginning \"What the agent designs is\""
+   ]
+  },
+  {
+   "id": "epicoach2026:wrist-digital-twin",
+   "name": "Wrist-only mechanistic physiological twin",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The heart-rate response, fitness-fatigue and descent-skill components are specified for one mountain biker's segment outcomes and serve as the deterministic forecasting tool behind ledger predictions, so they are bound to that forecast contract.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.1; passage beginning \"Predictions come from a mechanistic\""
+   ]
+  },
+  {
+   "id": "epicoach2026:rolling-origin-replay",
+   "name": "Rolling-origin replay benchmark for individualized physiology",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "Targets are next-week segment times, conditional climb heart rate, drift slope and VO2 max change for one athlete, scored by CRPS and Diebold-Mariano tests, so the resource is bound to that forecasting contract.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.8; passage beginning \"TABLE I: Rolling-origin replay, 60\"",
+    "PDF p.8; passage beginning \"b) Agentic replay.: With the\""
+   ]
+  }
+ ]
+}

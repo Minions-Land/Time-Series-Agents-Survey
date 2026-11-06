@@ -1,0 +1,95 @@
+{
+ "citation_key": "argos2025",
+ "title": "Argos: Agentic Time-Series Anomaly Detection with Autonomous Rule Generation via Large Language Models",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "ARGOS synthesizes executable anomaly rules, repairs code, reviews validation errors, and combines rules with a deployed base detector.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Anomaly detection and diagnosis",
+  "axes": [
+   "anomaly_detection_diagnosis"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "argos2025:python-rule-synthesis",
+   "name": "Executable anomaly-rule generation",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Generated code implements anomaly labels and is optimized for detection performance.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.6; passage beginning \"The Detection Agent is tasked\""
+   ]
+  },
+  {
+   "id": "argos2025:syntax-repair",
+   "name": "Execution-feedback syntax repair",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Dummy-data execution, stack traces and iterative code correction are reusable code-agent mechanics independent of the anomaly objective.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.6; passage beginning \"Repair Agent. Upon receiving\""
+   ]
+  },
+  {
+   "id": "argos2025:detector-fusion",
+   "name": "False-positive and false-negative detector correction",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Separate correction rules modify positive and negative labels of a base anomaly detector.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.7; passage beginning \"Aggregator. Algorithm 1\""
+   ]
+  }
+ ]
+}

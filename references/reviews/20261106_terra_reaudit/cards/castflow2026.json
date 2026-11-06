@@ -1,0 +1,97 @@
+{
+ "citation_key": "castflow2026",
+ "title": "CastFlow: Learning Role-Specialized Agentic Workflows for Time Series Forecasting",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "CastFlow separates frozen planning/reflection from a trainable forecasting reasoner, combining diagnostic tools, retrieved successful strategies and an ensemble forecast anchor.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "castflow2026:temporal-profiler",
+   "name": "Statistical and spectral temporal profiling",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Interface and Interaction"
+   ],
+   "tasks": [],
+   "role": "method",
+   "scope_reason": "Distribution statistics, spectral entropy and temporal diagnostics describe observed data independently of a target forecast.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.5; IV.B.2 Statistical and Spectral Profiler"
+   ]
+  },
+  {
+   "id": "castflow2026:forecast-strategies",
+   "name": "Validated forecast-strategy memory and workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Workflow",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "role": "method",
+   "scope_reason": "Strategies are selected by horizon MSE and drive baseline selection, diagnostic scheduling and forecast refinement.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.6; IV.C Memory and workflow"
+   ]
+  },
+  {
+   "id": "castflow2026:forecast-reasoner",
+   "name": "Specialized evidence-guided forecast LLM",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "role": "model_training",
+   "scope_reason": "Only the forecasting language module receives SFT/GRPO; planner and reflection models are frozen.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.6; IV.D Role-Specialized Reasoning Architecture"
+   ]
+  }
+ ]
+}

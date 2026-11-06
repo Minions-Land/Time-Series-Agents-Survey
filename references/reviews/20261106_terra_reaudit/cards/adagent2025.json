@@ -1,0 +1,96 @@
+{
+ "citation_key": "adagent2025",
+ "title": "AD-AGENT: A Multi-agent Framework for End-to-end Anomaly Detection",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "AD-AGENT automates anomaly-detection pipelines across tabular, graph and time-series libraries using model selection, documentation retrieval, code generation/review and shared/cache memories.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Anomaly detection and diagnosis",
+  "axes": [
+   "anomaly_detection_diagnosis"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "adagent2025:code-review",
+   "name": "Executable code generation and dry-run repair",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback",
+    "Coordination and Scaling"
+   ],
+   "tasks": [],
+   "role": "method",
+   "scope_reason": "Generator/reviewer repair execution errors through synthetic dry runs; mechanism is not anomaly-specific.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.3; 2.1 Agents"
+   ]
+  },
+  {
+   "id": "adagent2025:documentation-memory",
+   "name": "Shared task state and cached model documentation",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context",
+    "Coordination and Scaling"
+   ],
+   "tasks": [],
+   "role": "method",
+   "scope_reason": "Short-term inter-agent state and periodically refreshed documentation cache generalize across tools and modalities.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.3; 2.2 Agent Collaboration and Workflow"
+   ]
+  },
+  {
+   "id": "adagent2025:detector-pipeline",
+   "name": "Anomaly-library pipeline construction",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Workflow",
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "Model and optional hyperparameter selection target anomaly detection using PyOD, PyGOD and TSLib.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.2; 2 Methodology"
+   ]
+  }
+ ]
+}

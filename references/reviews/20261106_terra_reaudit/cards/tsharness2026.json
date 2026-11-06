@@ -1,0 +1,113 @@
+{
+ "citation_key": "tsharness2026",
+ "title": "Zero-Shot Time-Series Question Answering via Decoupled Perception and Reasoning",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "TSHarness decouples numerical perception from question answering: a Perceiver populates a tool-grounded Time-Series Perception State, an Answerer reasons over it and requests targeted re-perception, and a PPO-trained selector prunes tool calls, all built on one source benchmark and frozen for zero-shot transfer.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "temporal question answering",
+  "axes": [],
+  "other": "temporal_question_answering",
+  "other_labels": [
+   "temporal_question_answering"
+  ],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "tsharness2026:perception-state",
+   "name": "Tool-grounded time series perception state",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution",
+    "Interface and Interaction"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "The state stores valid temporal spans, statistical summaries and temporal primitives such as trend, dominant frequencies and changepoints copied from tool records with provenance, a task-agnostic temporal representation that would serve other task families without redesign.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"The TPS defines a standardized\"",
+    "PDF p.5; passage beginning \"Evidence grounding. Within the core\""
+   ]
+  },
+  {
+   "id": "tsharness2026:re-perception-loop",
+   "name": "Evidence-gap re-perception loop",
+   "layer": "GH",
+   "dimensions": [
+    "Control, Verification, and Feedback",
+    "Planning and Workflow"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "Checking required evidence against what the state covers, issuing validated targeted requests and stopping on sufficiency or budget is a domain-independent answer-evidence control loop.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"The A NSWERER then reasons\"",
+    "PDF p.5; passage beginning \"Unsupported, duplicate, or out-of-budget requests\""
+   ]
+  },
+  {
+   "id": "tsharness2026:rl-tool-selector",
+   "name": "Cost-aware RL tool selector",
+   "layer": "GH",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Tools and Execution"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "A small PPO-trained network shifts the LLM's proposed tool-inclusion probabilities to trade answer correctness against tool-call count, a domain-independent tool-use optimisation that leaves the LLM frozen.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"Furthermore, to mitigate redundant computational\"",
+    "PDF p.6; passage beginning \"Once trained on source tasks,\""
+   ]
+  }
+ ]
+}

@@ -1,0 +1,99 @@
+{
+ "citation_key": "epiworld2026",
+ "title": "EpiWorld: Grounding LLM Policy Agents in Epidemiological World Models",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "EpiWorld grounds an LLM policy actor in a graph-structured, action-conditioned epidemiological world model and a tiered skill library of protocol constraints, surveillance estimators and after-action lessons, using counterfactual rollouts to evaluate and refine weekly regional intervention policies.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support; Forecasting and prediction",
+  "axes": [
+   "forecasting_prediction",
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "epiworld2026:action-conditioned-world-model",
+   "name": "Action-conditioned epidemic world-model rollout",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "decision_support",
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Interventions enter as per-region FiLM modulation of the latent state and rollouts score candidate policies by projected hospitalisation burden, so the action interface and feedback signal are tied to the epidemic-intervention output rather than reusable across task families.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"Candidate policies are then evaluated through\"",
+    "PDF p.3; passage beginning \"We propose an epidemiological world model\""
+   ]
+  },
+  {
+   "id": "epiworld2026:tiered-skill-library",
+   "name": "Protocol-constrained tiered epidemiological skill library",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Memory and Context",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Protocol predicates fix an admissible intervention envelope and surveillance estimators (Rt, severity ratios, stringency index) condition the proposed action, so the state and action space are defined by the epidemic-policy output.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"Protocol Constraints are deterministic procedures\"",
+    "PDF p.6; passage beginning \"Adaptive Lessons can refine Surveillance Skill\""
+   ]
+  },
+  {
+   "id": "epiworld2026:after-action-lessons",
+   "name": "After-action lesson distillation with supersession",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Memory and Context"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The insert-and-supersede bank update is generic, but each lesson is a confidence-weighted adjustment to surveillance-skill parameters indexed by behavioural and regional tags and distilled from intervention failures such as capacity-limit violations, so the lesson content is bound to the epidemic decision task.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.6; passage beginning \"a teacher module performs retrospective analysis\""
+   ]
+  }
+ ]
+}

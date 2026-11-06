@@ -1,0 +1,79 @@
+{
+ "citation_key": "timersi2026",
+ "title": "TimeRSI: Towards Self-Improved Agentic Deployment for Time-Series Foundation Models",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "TimeRSI has a coding agent revise preprocessing, feature, context-selection and post-processing code around a frozen TSFM using window-level forecast errors, then selects among retained pipelines per origin from their errors on similar completed windows.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "timersi2026:pipeline-revision",
+   "name": "Origin-aligned deployment-pipeline revision",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback",
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The agent edits a four-stage pipeline whose output is point and quantile forecasts for the next H steps, revised from forecast errors on historical windows.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"The loop starts from direct\"",
+    "PDF p.7; passage beginning \"The evaluator supplies the same\""
+   ]
+  },
+  {
+   "id": "timersi2026:adaptive-selection",
+   "name": "Similarity-weighted historical pipeline selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Pipelines are ranked by MASE relative to the reference forecast on similar completed windows, so the selector is tied to forecast outputs.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"T IME RSI therefore selects\"",
+    "PDF p.8; passage beginning \"For each candidate and historical\""
+   ]
+  }
+ ]
+}

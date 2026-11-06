@@ -1,0 +1,92 @@
+{
+ "citation_key": "timerlm2026",
+ "title": "TimeRLM: Recursive Language Models Enable Precise Anomaly Localization in Long-Context Time-Series",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "TimeRLM accesses long signals through a Python execution environment with optional recursive model calls; AnomalyXL evaluates precise localization and supports RL post-training.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Anomaly detection and diagnosis",
+  "axes": [
+   "anomaly_detection_diagnosis"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "timerlm2026:recursive-sandbox",
+   "name": "External-context recursive Python sandbox",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Memory and Context",
+    "Coordination and Scaling"
+   ],
+   "tasks": [],
+   "role": "method",
+   "scope_reason": "External context inspection, code execution and recursive delegation do not require a temporal-specific operator.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.3; 3.1 TimeRLM Formulation"
+   ]
+  },
+  {
+   "id": "timerlm2026:anomaly-benchmark",
+   "name": "Long-signal anomaly localization evaluation",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "role": "evaluation",
+   "scope_reason": "Ground truth and reward score anomaly intervals, types, magnitude and channels.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.4; 3.2 The AnomalyXL Benchmark"
+   ]
+  },
+  {
+   "id": "timerlm2026:anomaly-rl",
+   "name": "Verifiable anomaly-reward policy training",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "role": "model_training",
+   "scope_reason": "Full-parameter GRPO updates Qwen3.5-4B using generated localization episodes.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.5; 4.1 Reinforcement Learning"
+   ]
+  }
+ ]
+}

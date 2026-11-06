@@ -1,0 +1,102 @@
+{
+ "citation_key": "timefore2026",
+ "title": "ODTQA-FoRe: An Open-Domain Tabular Question Answering Dataset for Future Data Forecasting and Reasoning",
+ "review_status": "paper_verified",
+ "work_type": "Benchmark",
+ "claim": {
+  "summary": "ODTQA-FoRe evaluates retrieval, forecasting and reasoning over real-estate tables; TimeFore retrieves SQL data, imputes history and invokes a numerical forecaster.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; temporal question answering",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": "temporal_question_answering",
+  "other_labels": [
+   "temporal_question_answering"
+  ],
+  "original_values": {
+   "other": "temporal_question_answering",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "timefore2026:sql-repair",
+   "name": "Execution-feedback SQL repair",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "SQL error correction and bounded retries are independent of temporal forecasting.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "temporal_question_answering"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.6; method passage beginning To ensure robustness and ad-"
+   ]
+  },
+  {
+   "id": "timefore2026:forecast-tool",
+   "name": "Imputation-then-prediction tool workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Workflow"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Historical 24-month prices are imputed with TimesNet and predicted with TimeXer over 12 months.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.6; method passage beginning Its core action"
+   ]
+  },
+  {
+   "id": "timefore2026:future-table-evaluation",
+   "name": "Future-table forecasting and reasoning benchmark",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "evaluation",
+   "scope_reason": "The benchmark isolates future-year tables as hidden targets and evaluates answers built from forecasts.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.7; method passage beginning ODTQA-FoRe consists"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,71 @@
+{
+ "citation_key": "finrldeepseek2025",
+ "title": "FinRL-DeepSeek: LLM-Infused Risk-Sensitive Reinforcement Learning for Trading Agents",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "FinRL-DeepSeek injects LLM-derived financial-news recommendation and risk scores into PPO/CVaR-PPO stock trading rather than training the LLM or replacing the RL policy with an LLM planner.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support",
+  "axes": [
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "finrldeepseek2025:news-action-modulation",
+   "name": "News-conditioned trading-action scaling",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "LLM news scores multiply stock trading actions according to recommendation polarity.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"In LLM-infused PPO, we compute stock-specific\""
+   ]
+  },
+  {
+   "id": "finrldeepseek2025:risk-return-modulation",
+   "name": "News-conditioned portfolio-risk return modulation",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback",
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Stock-level language risk scores are portfolio-weighted and multiply trajectory returns in CVaR-PPO.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"Financial news from the FNSPID dataset is processed with an LLM to generate risk scores\""
+   ]
+  }
+ ]
+}

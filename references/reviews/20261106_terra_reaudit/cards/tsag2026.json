@@ -1,0 +1,88 @@
+{
+ "citation_key": "tsag2026",
+ "title": "Time Series Augmented Generation for Financial Applications",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "TSAG evaluates natural-language financial queries routed to typed temporal analysis tools, using deterministic tool stubs in its benchmark.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; Anomaly detection and diagnosis; temporal question answering",
+  "axes": [
+   "forecasting_prediction",
+   "anomaly_detection_diagnosis"
+  ],
+  "other": "temporal_question_answering",
+  "other_labels": [
+   "temporal_question_answering"
+  ],
+  "original_values": {
+   "other": "temporal_question_answering",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "tsag2026:temporal-tool-interface",
+   "name": "Financial temporal-tool invocation interface",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "Tools expose temporal windows, granularities, statistics and prediction interfaces across analytical requests; actual benchmark uses stubs.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.3; method passage beginning The initial tool set"
+   ]
+  },
+  {
+   "id": "tsag2026:stub-evaluation",
+   "name": "Deterministic tool-call evaluation",
+   "layer": "GH",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "Expected tool outputs test routing/argument extraction, not the numerical algorithms.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "temporal_question_answering"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.3; method passage beginning The stubs of the functions"
+   ]
+  }
+ ]
+}

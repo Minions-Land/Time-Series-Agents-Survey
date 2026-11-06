@@ -1,0 +1,75 @@
+{
+ "citation_key": "chear2026",
+ "title": "CHEAR: Confusion-Hierarchy Evidence-Aware Reasoning for Cost-Efficient Human Activity Recognition",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "CHEAR builds an activity-confusion hierarchy and activity-pair feature knowledge offline from source-domain retrieval errors, then has an LLM retain variable-size candidate sets level by level and read pairwise feature reports only for surviving pairs before choosing an activity label.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "time series classification",
+  "axes": [],
+  "other": "time_series_classification",
+  "other_labels": [
+   "time_series_classification"
+  ],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "chear2026:hierarchical-retention",
+   "name": "Confusion-hierarchy variable-size candidate retention",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Workflow",
+    "Memory and Context"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "Groups are built from directed confusions among activity labels and the LLM prunes label candidates level by level, so the workflow is tied to the classification label space.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"Inference starts from root candidate\"",
+    "PDF p.4; passage beginning \"Meaning of the activity-confusion hierarchy.\""
+   ]
+  },
+  {
+   "id": "chear2026:pair-feature-knowledge",
+   "name": "On-demand activity-pair feature knowledge",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "Feature knowledge is registered for confusable activity pairs and can only favour one of its two label endpoints, so it is bound to the classification output.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.7; passage beginning \"Meaning of activity-pair feature knowledge.\"",
+    "PDF p.7; passage beginning \"At the activity-pair stage, the\""
+   ]
+  }
+ ]
+}

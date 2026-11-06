@@ -1,0 +1,71 @@
+{
+ "citation_key": "hydroagentcalibration2026",
+ "title": "HydroAgent: Closing the Gap Between Frontier LLMs and Human Experts in Hydrologic Model Calibration via Simulator-Grounded RL",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "HydroAgent calibrates CREST/EF5 through tool-mediated simulator trials and trains a small LLM with supervised trajectories and simulation-feedback RL.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "hydrologic model calibration",
+  "axes": [],
+  "other": "hydrologic_model_calibration",
+  "other_labels": [
+   "hydrologic_model_calibration"
+  ],
+  "original_values": {
+   "other": "hydrologic_model_calibration",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "hydroagentcalibration2026:calibration-tools",
+   "name": "Hydrologic parameter-simulation-evaluation episode",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback",
+    "Planning and Workflow"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "hydrologic_model_calibration"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "Action parameters and NSE goals calibrate a hydrologic simulator, rather than directly forecasting a new time-series horizon.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.4; 2.2 Calibration Environment"
+   ]
+  },
+  {
+   "id": "hydroagentcalibration2026:simulator-rl",
+   "name": "Hydrologic simulator-grounded LLM post-training",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "hydrologic_model_calibration"
+   ],
+   "role": "model_training",
+   "scope_reason": "Qwen3-4B is fully fine-tuned with SFT and GRPO over simulator feedback.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.5; 2.4 Reinforcement Learning with Simulation Feedback"
+   ]
+  }
+ ]
+}

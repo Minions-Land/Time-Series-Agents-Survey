@@ -1,0 +1,113 @@
+{
+ "citation_key": "tsagent2025",
+ "title": "TS-Agent: Understanding and Reasoning Over Raw Time Series via Iterative Insight Gathering",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "TS-Agent iteratively gathers numerical evidence using callable time-series operators and checks reasoning with a critic and final evidence gate.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; Anomaly detection and diagnosis; temporal question answering",
+  "axes": [
+   "forecasting_prediction",
+   "anomaly_detection_diagnosis"
+  ],
+  "other": "temporal_question_answering",
+  "other_labels": [
+   "temporal_question_answering"
+  ],
+  "original_values": {
+   "other": "temporal_question_answering",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "tsagent2025:evidence-loop",
+   "name": "Iterative reasoner and evidence log",
+   "layer": "GH",
+   "dimensions": [
+    "Interface and Interaction",
+    "Memory and Context",
+    "Planning and Workflow"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Thought/action/observation and accumulating structured observations are reusable agent mechanisms.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "temporal_question_answering"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"At the core of our framework\""
+   ]
+  },
+  {
+   "id": "tsagent2025:analytical-operators",
+   "name": "Numeric time-series analytical operators",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "Operators directly inspect, extract, compare and predict temporal sequences across question types.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"To support fine-grained\""
+   ]
+  },
+  {
+   "id": "tsagent2025:intent-evidence-gate",
+   "name": "Intent-specific temporal QA evidence gate",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "The implemented gate maps question keywords to fixed intent classes, required predicates and answer schemas, including MCQ anomaly-location options. This concrete validator is bound to temporal question answering, so its deepest scope is TSK.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"In practice (detect_question_intents())\""
+   ]
+  }
+ ]
+}

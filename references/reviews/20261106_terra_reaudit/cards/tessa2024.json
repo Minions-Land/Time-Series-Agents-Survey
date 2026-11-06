@@ -1,0 +1,77 @@
+{
+ "citation_key": "tessa2024",
+ "title": "Decoding Time Series with LLMs: A Multi-Agent Framework for Cross-Domain Annotation",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "TESSA extracts numerical and textual features, selects salient features, and generates general then domain-specific temporal annotations.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "time series annotation",
+  "axes": [],
+  "other": "time_series_annotation",
+  "other_labels": [
+   "time_series_annotation"
+  ],
+  "original_values": {
+   "other": "time_series_annotation",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "tessa2024:temporal-features",
+   "name": "Multichannel temporal feature extraction",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Interface and Interaction"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_annotation"
+   ],
+   "role": "method",
+   "scope_reason": "Numerical time-series features and inter-variable correlations are shared inputs to annotation and downstream forecasting/imputation.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "time_series_annotation"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; 3.1 Multi-modal Feature Extraction"
+   ]
+  },
+  {
+   "id": "tessa2024:annotation-review",
+   "name": "Domain annotation generation and review",
+   "layer": "TSK",
+   "dimensions": [
+    "Coordination and Scaling",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_annotation"
+   ],
+   "role": "method",
+   "scope_reason": "Term extraction and review optimize annotation relevance and alignment, not a generic forecast loop.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.6; 3.3 Domain-specific annotation"
+   ]
+  }
+ ]
+}

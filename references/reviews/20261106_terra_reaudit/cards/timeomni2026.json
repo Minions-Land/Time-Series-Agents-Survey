@@ -1,0 +1,80 @@
+{
+ "citation_key": "timeomni2026",
+ "title": "TimeOmni-1: Incentivizing Complex Reasoning with Time Series in Large Language Models",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "TimeOmni-1 uses temporal reasoning priors in SFT followed by task-grounded GRPO, supported by TSR-SUITE.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; Decision support; causal discovery; temporal question answering",
+  "axes": [
+   "forecasting_prediction",
+   "decision_support"
+  ],
+  "other": "causal_discovery; temporal_question_answering",
+  "other_labels": [
+   "causal_discovery",
+   "temporal_question_answering"
+  ],
+  "original_values": {
+   "other": "causal_discovery; temporal_question_answering",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "timeomni2026:temporal-reasoning-training",
+   "name": "Temporal-prior SFT and task-grounded RL",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "causal_discovery"
+   ],
+   "role": "model_training",
+   "scope_reason": "The contribution modifies language-model reasoning through supervised and reinforcement learning.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.7; passage beginning \"Stage 2: Refining Reasoning\""
+   ]
+  },
+  {
+   "id": "timeomni2026:tsr-suite",
+   "name": "TSR-SUITE reasoning task construction",
+   "layer": "LLM",
+   "dimensions": [],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "causal_discovery"
+   ],
+   "role": "training_data",
+   "scope_reason": "TSR-SUITE is explicitly constructed to develop temporal reasoning models: hierarchical human-reviewed CoT examples become SFT and RL data. As a single existing data-construction record its primary contribution is training_data, consistent with ChatTS; multiple task labels alone do not make it a reusable runtime module. The test split remains recorded as evaluation evidence.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"To mitigate the scarcity\"",
+    "PDF p.6; Section 3.3 Stage 1 temporal priors"
+   ]
+  }
+ ]
+}

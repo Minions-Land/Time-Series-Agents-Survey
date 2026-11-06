@@ -1,0 +1,101 @@
+{
+ "citation_key": "ji2025lemad",
+ "title": "LEMAD: LLM-Empowered Multi-Agent System for Anomaly Detection in Power Grid Services",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "LEMAD combines timestamp-aligned metric/log streams, asynchronous processing and LLM explanations in a service-anomaly diagnosis workflow.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Anomaly detection and diagnosis",
+  "axes": [
+   "anomaly_detection_diagnosis"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "ji2025lemad:stream-normalization",
+   "name": "Timestamp and heterogeneous-stream normalization",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Alignment, normalization and missingness handling are temporal data preparation independent of alert outcome.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.8; method passage beginning Data Preprocessing Module:"
+   ]
+  },
+  {
+   "id": "ji2025lemad:stream-checkpoint",
+   "name": "Offset-based log collection recovery",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Compression and checkpoint offsets provide task-independent restart recovery.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.7; method passage beginning Compression and Checkpointing Module:"
+   ]
+  },
+  {
+   "id": "ji2025lemad:anomaly-diagnosis",
+   "name": "Metric/log alert-to-diagnosis workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback",
+    "Planning and Workflow",
+    "Coordination and Scaling"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Agents detect suspicious service events, localize root causes and produce operational recommendations.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.5; method passage beginning Second, the real-time analysis agent"
+   ]
+  }
+ ]
+}

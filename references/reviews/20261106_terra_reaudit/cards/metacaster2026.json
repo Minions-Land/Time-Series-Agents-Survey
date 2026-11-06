@@ -1,0 +1,95 @@
+{
+ "citation_key": "metacaster2026",
+ "title": "MetaCaster: Meta-Harness-Optimized Agent for End-to-End Few-Shot Learning of Lightweight Time Series Forecasters",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "Few-shot generation of training series and harness optimization for lightweight forecaster quality.",
+  "evidence_basis": "Primary-source method passages; locators in source_evidence_json and reviewed_modules_json",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; Augmentation and synthesis",
+  "axes": [
+   "forecasting_prediction",
+   "data_augmentation_synthesis"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "metacaster2026:job-execution",
+   "name": "Training-job scheduling and recovery",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "role": "method",
+   "scope_reason": "Queue scheduling, process monitoring and interruption recovery are reusable execution mechanisms, separate from the forecasting objective.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "data_augmentation_synthesis"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.5; Section 3.5, FTAgent execution paragraph"
+   ]
+  },
+  {
+   "id": "metacaster2026:generation",
+   "name": "Few-shot training-series generation",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "role": "method",
+   "scope_reason": "Generated training data are designed to train lightweight forecasters; one module has two task memberships.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.2; Introduction, deployment-time pipeline"
+   ]
+  },
+  {
+   "id": "metacaster2026:harness-optimization",
+   "name": "Forecast-utility-driven harness optimization",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "role": "method",
+   "scope_reason": "The optimized harness is scored by the error gap between authentic-data and generated-data forecasters.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.5; Section 3.6, Eq. (4) interpretation"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,104 @@
+{
+ "citation_key": "steward2026",
+ "title": "Governed Self-Evolution for Autonomous Investing: A Multi-Agent LLM System with an Invariant Core",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "Steward has analyst agents, a Portfolio Manager and a protected Risk Manager trade from typed reports and a code-assembled seven-layer memory, while evening code grading and a gated, replay-verified quarterly prompt-learning loop evolve the periphery around an invariant order-and-risk core.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support",
+  "axes": [
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "steward2026:graded-memory",
+   "name": "Code-assembled seven-layer memory with outcome grading",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Layers hold holdings context, recent technical ratings, regime narrative, a size-bucket calibration and risk verdicts, and grades are computed from fills and later prices, all defined around portfolio decisions.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"They share a memory that\"",
+    "PDF p.5; passage beginning \"The labels the Evening Analyst\""
+   ]
+  },
+  {
+   "id": "steward2026:governed-evolution",
+   "name": "Typed, gated and replay-verified prompt evolution",
+   "layer": "GH",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Typed prompt-learning proposals, an allow-listed append-only gate with tripwire, similarity and cap invariants, one-step revert and recorded-input replay carry no temporal semantics and would work unchanged for non-temporal agents.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"Edits are append-only into\"",
+    "PDF p.5; passage beginning \"A decision-replay harness passes\""
+   ]
+  },
+  {
+   "id": "steward2026:invariant-core",
+   "name": "Invariant order-construction and blocking risk core",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback",
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Deterministic order arithmetic, ATR-based stops, position, sector and exposure caps and a daily-loss breaker are rules on trading orders and cannot transfer to another task family without redesign.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"Hard rules run before the\"",
+    "PDF p.4; passage beginning \"No LLM number reaches the\""
+   ]
+  }
+ ]
+}

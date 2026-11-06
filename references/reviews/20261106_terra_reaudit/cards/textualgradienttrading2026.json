@@ -1,0 +1,78 @@
+{
+ "citation_key": "textualgradienttrading2026",
+ "title": "Trading Strategy Optimization via Textual Gradient",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "TradeGrad samples archived strategy programs, has an LLM estimate textual gradients from their backtests and a periodically distilled optimization memory, applies structural rewrites or diff-based edits, and scores candidates with a lower-tail cross-period robust objective.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support",
+  "axes": [
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "textualgradienttrading2026:experience-gradient",
+   "name": "Experience-guided multi-scale textual-gradient revision",
+   "layer": "GH",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Memory and Context"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Rank-biased archive sampling, periodically distilled success and failure memory, textual-gradient estimation and full-rewrite versus diff-edit revision operate on any scored program and carry no temporal semantics.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"As optimization proceeds, evaluated strategies\"",
+    "PDF p.5; passage beginning \"When ηk = ηlarge\""
+   ]
+  },
+  {
+   "id": "textualgradienttrading2026:cpro",
+   "name": "Cross-period lower-tail robust objective",
+   "layer": "TSK",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Calendar-year window scores combine annualized return, maximum drawdown and a trading-frequency gate, tying the window-wise lower-tail aggregation to a trading-strategy output.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"Cross-Period Robust Objective (CPRO) promotes\"",
+    "PDF p.5; passage beginning \"By emphasizing lower-tail performance\""
+   ]
+  }
+ ]
+}

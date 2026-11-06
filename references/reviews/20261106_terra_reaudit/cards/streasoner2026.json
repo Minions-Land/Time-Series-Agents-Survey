@@ -1,0 +1,73 @@
+{
+ "citation_key": "streasoner2026",
+ "title": "STReasoner: Empowering LLMs for Spatio-Temporal Reasoning in Time Series via Spatial-Aware Reinforcement Learning",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "Network-SDE multi-agent synthesis produces aligned graph/sequence QA; an encoded TS-LM receives alignment, SFT and spatial-aware RL.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; Augmentation and synthesis; temporal question answering",
+  "axes": [
+   "forecasting_prediction",
+   "data_augmentation_synthesis"
+  ],
+  "other": "temporal_question_answering",
+  "other_labels": [
+   "temporal_question_answering"
+  ],
+  "original_values": {
+   "other": "temporal_question_answering",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "streasoner2026:sde-synthesis",
+   "name": "Scenario-constrained network-SDE synthesis",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Coordination and Scaling"
+   ],
+   "tasks": [
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "Agents instantiate graph coupling, propagation delays and dynamics to generate controlled sequences.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.3; method passage beginning Network SDEs-based multi-agent"
+   ]
+  },
+  {
+   "id": "streasoner2026:spatial-tslm",
+   "name": "Graph-conditioned temporal alignment and reasoning training",
+   "layer": "LLM",
+   "dimensions": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "model_training",
+   "scope_reason": "Learned temporal embeddings and three-stage training modify the TS-LM.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.5; method passage beginning Model Architecture"
+   ]
+  }
+ ]
+}

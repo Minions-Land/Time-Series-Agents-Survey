@@ -1,0 +1,77 @@
+{
+ "citation_key": "seer2026",
+ "title": "SEER: Self-Evolving Event Reasoning and Retrieval for Time Series Forecasting",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "SEER conditions a frozen LLM forecaster on retrieved events and turns forecast residuals into two decoupled textual updates, a retrieval/selection memory and a persistent causal knowledge base, both indexed up to the forecast cut-off.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "seer2026:reflective-retrieval-memory",
+   "name": "Error-driven reflective retrieval memory",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Retrieval and selection memories are revised by diagnosing forecast residuals against realized outcomes, so the memory state is tied to the forecasting output contract.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"Memory-Guided Expansion and Filtering: The\"",
+    "PDF p.6; passage beginning \"Notably, all retrieved exogenous events\""
+   ]
+  },
+  {
+   "id": "seer2026:causal-knowledge-base",
+   "name": "Forecast-error causal knowledge distillation",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Persistent causal rules are derived from past forecast errors and condensed to condition later forecasts; the update signal is forecast loss on realized outcomes.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"Here, Φmem updates M𝑡 to\""
+   ]
+  }
+ ]
+}

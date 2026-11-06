@@ -1,0 +1,109 @@
+# Classification tree for re-auditing Paper Cards (2026-11-06).
+# Every rule below restates the CURRENT manuscript (main.tex, Sections 1.2, 2, 3, 4, 5, 6, 7). Where the manuscript
+# and an older Paper Card disagree, the manuscript wins. Nodes are applied in order; each module records the node ids
+# it passed through (rubric_path), so every decision can be traced to a rule.
+version: "2026-11-06"
+source: "main.tex at commit 6c69b30 (Sections 2 'What Is a Time Series Agent?', 3, 4, 5, 6, 7.1)"
+
+R0_work:
+  question: "What role does the whole work play, and can its contribution be verified from the packet?"
+  role_of_work:              # main.tex Section 2, 'Scope of inclusion'
+    llm_side_technique: "Supplies temporal encoding, understanding, reasoning, or prediction to the LLM (e.g. Time-LLM, ChatTS); reviewed for the capability it gives the LLM side."
+    fixed_workflow: "Executes a predetermined sequence of model and tool calls; returned outputs do not change which action comes next."
+    feedback_driven_agent: "Selects or revises subsequent actions according to observations returned by tools or environments. Defining condition: returned feedback changes later actions."
+    resource: "Benchmark, environment, workbench, dataset or infrastructure whose contribution is to evaluate or host Time Series Agents."
+    background: "Relevant context but contributes no module of its own (e.g. a position paper, or a work whose mechanism is out of scope)."
+  status:                    # references/taxonomy_schema.json review_states
+    paper_verified: "Packet is the paper's own text and supports every module."
+    repository_verified: "Only an official repository/README is available; never upgrade this to paper_verified."
+    out_of_scope: "No module satisfies R1 (time series is incidental, or no LLM/Agent runtime is involved)."
+    blocked: "Packet is missing, truncated or unreadable for the passages needed."
+  scope_test: "In scope only if time series data (ordered numerical observations) are a primary input or output AND an LLM operates through a runtime, or the work trains/supplies an LLM capability for such data, or it evaluates such systems."
+
+R1_module_unit:
+  question: "Which concrete modules does the work CONTRIBUTE?"
+  definition: "A module is a concrete mechanism the work designs, trains, or substantively modifies, described in a locatable passage. The unit of counting is the module; one paper can contribute several modules at different layers (Section 1.2)."
+  include:
+    - "A new component, procedure, interface, memory design, tool, validator, training recipe, dataset built for the LLM, or benchmark the work introduces."
+    - "An existing component the work materially redesigns (state what changed)."
+  exclude:
+    - "Off-the-shelf components used unchanged (calling GPT-4o, a Prophet baseline, a standard RAG library) unless the integration itself is the contribution."
+    - "Future-work, vision or 'can be extended to' statements."
+    - "Baselines, ablation-only variants and evaluation datasets of a method paper."
+  split_merge: "Split mechanisms that can be reused separately; merge steps that only function together. Keep an existing module id whenever the mechanism is the same, even if its layer or labels change."
+
+R2_locus:
+  question: "Is the module on the LLM side or in the Harness?"
+  LLM: "Changes how the model represents temporal inputs, produces analytical responses, or selects actions from workflow feedback: encoders/tokenizers/alignment layers, SFT, RL, preference optimization, distillation, or training data built to train the model (Sections 2 and 3)."
+  Harness: "Everything executed around the model: interfaces, state, memory, tools, plans, validators, workflows, environments."
+  boundary: "A prompt template or in-context procedure that does not update model parameters is Harness. A trained policy is LLM side even if it is used inside a workflow; the workflow around it is a separate Harness module."
+
+R3_layer:                    # Table tab:layer-rules, applied from top to bottom; first match wins
+  question: "Which Harness layer is the most specific one whose condition the module meets?"
+  R3_1_TSK:
+    condition: "The core logic embeds the output requirement, objective, or validation criterion of a task family."
+    counterfactual: "If the temporal state, action space, tool semantics, reward, or verifier must be redesigned when the task family changes, it is TSK."
+    example: "Selecting a forecasting model by validation error over the declared horizon."
+  R3_2_GTS:
+    condition: "The module depends on temporal order, windows, frequency, units, or information availability, without binding to one task."
+    example: "Timestamp alignment, data versioning, information cutoff checks."
+  R3_3_GH:
+    condition: "The module manages execution, scheduling, or state without temporal semantics or a task objective."
+    example: "General task scheduling and error recovery."
+  notes:
+    - "A layer describes the scope implied by the module's inputs, state and assumptions, not how often it was reused."
+    - "A module keeps its layer when another task calls it; a new task objective motivates a distinct specialized module."
+    - "Task membership does not determine scope: a GTS module evaluated only on forecasting is still GTS if it is not bound to forecasting."
+
+R4_dimension:                # Table tab:component-vocab: FIVE dimensions (Harness modules only; one or more)
+  question: "Which General Harness mechanism dimensions does the module implement?"
+  values:
+    Interface and Interaction: "How the Agent receives state and acts on its environment: reasoning/action interfaces, environment modeling, user interaction, state-action loops."
+    Memory and Context: "How information is preserved and organized across steps: context management, working and long-term memory, state stores, retrieval, experience reuse."
+    Tools and Execution: "How external capabilities are invoked: tool registries, APIs, retrieval, code execution, databases, forecasting models, simulators."
+    Planning and Orchestration: "How actions are planned, organized and coordinated: decomposition, planning, search, workflow orchestration, execution control, verification checkpoints, delegation, multi-agent coordination."
+    Optimization and Evolution: "How the Agent or Harness improves from experience: prompt, tool, memory, policy and Harness optimization; reflection and trajectory-driven evolution across episodes."
+  legacy_mapping:            # the seven-dimension vocabulary of earlier cards is retired
+    "Planning and Workflow": "Planning and Orchestration"
+    "Coordination and Scaling": "Planning and Orchestration"
+    "Control, Verification, and Feedback": "Planning and Orchestration when it controls or checks execution within an episode; Optimization and Evolution when feedback updates reusable assets across episodes; decide from the source."
+
+R5_temporal_function:        # Section 5; non-exclusive reading view (schema temporal_function_view)
+  question: "Which temporal functions does the module implement? Required for GTS; record for TSK when it embeds one."
+  values:
+    data_management: "Managing temporal data: timestamps, frequency, units, channels, missingness, provenance and versions, storage and interfaces that keep numerical state addressable."
+    processing: "Operating on the series: windowing, resampling, alignment, decomposition, transforms, statistical or numerical analysis, feature extraction."
+    context_memory: "Retrieving or retaining temporal context: aligned events, documents, past cases or experience, memory that must respect when information became available."
+    validation: "Checking temporal evidence: chronology and leakage guards, information cutoff (v <= tau), temporal consistency checks, admission of evidence."
+  view_status:
+    mapped: "GTS module with at least one function."
+    task_procedure: "TSK module; list functions only if the task procedure itself implements one of the four."
+    general_runtime: "GH module (no temporal function)."
+    model_side: "LLM-side module."
+    resource_level: "Benchmark/infrastructure module whose temporal role is to host or test others."
+
+R6_llm_route:                # Section 3 subsections; LLM-side modules only (one or more)
+  values:
+    representation_alignment: "Temporal representation and alignment: how numerical series reach the language space (encoders, patch reprogramming, tokenization, alignment)."
+    instruction_reasoning: "Temporal instruction and reasoning: supervision that shapes analytical responses (instruction data, CoT, RL for reasoning, distillation)."
+    workflow_learning: "Learning to operate temporal workflows: training the policy that selects tools/actions from workflow feedback."
+
+R7_tasks:
+  question: "On which task families does the SOURCE apply the module?"
+  families: [forecasting_prediction, data_augmentation_synthesis, anomaly_detection_diagnosis, decision_support]
+  other_tasks: "Any other source-supported output (time_series_classification, imputation, temporal_question_answering, time_series_annotation, temporal_analysis, data_quality, ...). A TSK module needs at least one task or other task."
+
+R8_reuse_evidence:           # Section 2; schema reuse_evidence; GH and GTS only
+  demonstrated: "The source applies this module to two or more task families (module tasks; else work tasks, basis=work)."
+  inferred: "The source applies it to one task family; cross-task reuse is inferred from inputs, state and interface."
+  not_applicable: "LLM-side and TSK modules."
+
+R9_role:
+  values: [method, model_training, training_data, infrastructure, evaluation]
+
+R10_evaluation_evidence:     # Section 7.1 evaluation contract; WORK level; new field in this audit
+  question: "Which kinds of evidence do the work's own experiments report? Mark each true only with a quote."
+  process_validity: "Did the runtime execute the intended operations and handle failures? (tool-call success, trace or artifact checks, execution validity)"
+  temporal_validity: "Did the system preserve the data window, numerical meaning and information availability? (chronological splits, leakage control, information cutoff, availability-time checks)"
+  task_performance: "Accuracy of the task output (forecast error, detection F1, fidelity of synthetic data, QA accuracy)."
+  decision_utility: "Value of a downstream action (cost, profit, risk, utility of a decision or policy)."

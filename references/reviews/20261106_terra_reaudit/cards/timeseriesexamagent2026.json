@@ -1,0 +1,72 @@
+{
+ "citation_key": "timeseriesexamagent2026",
+ "title": "TimeSeriesExamAgent: Creating Time Series Reasoning Benchmarks at Scale",
+ "review_status": "paper_verified",
+ "work_type": "Benchmark",
+ "claim": {
+  "summary": "TimeSeriesExamAgent generates executable question templates for user datasets and iteratively filters their execution, content and capability discrimination.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "temporal question answering",
+  "axes": [],
+  "other": "temporal_question_answering",
+  "other_labels": [
+   "temporal_question_answering"
+  ],
+  "original_values": {
+   "other": "temporal_question_answering",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "timeseriesexamagent2026:exam-template-generation",
+   "name": "Temporal question-template generation",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "evaluation",
+   "scope_reason": "Templates encode question logic, options, selection of instances and answer computation. The produced artifact is a QA exam, so multiple concept/domain coverage does not make it task-independent; move GTS to TSK.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "resource_level",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"We propose TimeSeriesExamAgent\""
+   ]
+  },
+  {
+   "id": "timeseriesexamagent2026:capability-filter",
+   "name": "Capability-aligned template filtering",
+   "layer": "GH",
+   "dimensions": [
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "Relative accuracy of weaker and stronger test-takers provides a general template-quality filter, separate from temporal question content.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "temporal_question_answering"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.6; passage beginning \"Capability-Aligned Filtering\""
+   ]
+  }
+ ]
+}

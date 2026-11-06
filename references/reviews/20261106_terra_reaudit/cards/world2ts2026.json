@@ -1,0 +1,126 @@
+{
+ "citation_key": "world2ts2026",
+ "title": "World2TS: Real-World Event Context for Time-Series Forecasting",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "World2TS uses an agent-led, CLI-validated and human-gated workflow to discover, consolidate and ground real-world events to individual series, producing a 31-dataset forecasting corpus with 1,159 events and 56,846 event-series links.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction; time series annotation",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": "time_series_annotation",
+  "other_labels": [
+   "time_series_annotation"
+  ],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "world2ts2026:agent-cli-human-workflow",
+   "name": "Agent-CLI-Human workflow with artifact-bound approval gates",
+   "layer": "GH",
+   "dimensions": [
+    "Coordination and Scaling",
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_annotation"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "Separating agent judgment from a CLI that executes, validates and keeps resumable state, with human approvals invalidated by later artifact changes, is a domain-independent curation runtime.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "time_series_annotation"
+    ],
+    "basis": "module"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"The CLI tool serves as\"",
+    "PDF p.5; passage beginning \"Before publication, they examine the\""
+   ]
+  },
+  {
+   "id": "world2ts2026:windowed-event-discovery",
+   "name": "Window-partitioned feedback-driven event discovery",
+   "layer": "GTS",
+   "dimensions": [
+    "Planning and Workflow",
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_annotation"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "Search is organised over windows partitioning each dataset's temporal coverage and refined from per-window evidence gaps, producing dated event context that could serve forecasting, explanation or anomaly analysis without redesign.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "time_series_annotation"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "data_management"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"In detail, the workflow partitions\"",
+    "PDF p.5; passage beginning \"If refinement is needed, the\""
+   ]
+  },
+  {
+   "id": "world2ts2026:event-series-grounding",
+   "name": "Canonical event records with temporal-scope series grounding",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "time_series_annotation"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "Events are linked to series only through explicit semantic rules plus a check that the event interval overlaps each series' temporal coverage, a reusable temporal context alignment independent of the forecasting output.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "time_series_annotation"
+    ],
+    "basis": "module"
+   },
+   "functions": [
+    "context_memory",
+    "data_management"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"On the other hand, for\""
+   ]
+  }
+ ]
+}

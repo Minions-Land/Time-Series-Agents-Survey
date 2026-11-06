@@ -1,0 +1,93 @@
+{
+ "citation_key": "collmllight2026",
+ "title": "CoLLMLight: Cooperative Large Language Model Agents for Network-Wide Traffic Signal Control",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "CoLLMLight coordinates traffic signal agents using neighboring lane histories, complexity-adaptive reasoning and simulation-derived fine-tuning.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support",
+  "axes": [
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "collmllight2026:traffic-coordination",
+   "name": "Spatiotemporal cooperative signal selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Planning and Workflow",
+    "Coordination and Scaling"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Lane occupancy,queue states,road connectivity and prior signal actions determine network traffic control decisions.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"To capture the temporal pattern\""
+   ]
+  },
+  {
+   "id": "collmllight2026:complexity-routing",
+   "name": "Congestion-conditioned reasoning-depth selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Workflow"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The number of critical neighboring lanes gates whether local analysis,prediction or full cooperation is performed.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"We first classify the reasoning complexity\""
+   ]
+  },
+  {
+   "id": "collmllight2026:simulation-sft",
+   "name": "Simulation-derived signal-policy fine-tuning",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "CityFlow counterfactual rollouts and selected reasoning chains supervise the LLM control policy.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"To further enhance the reasoning capability\""
+   ]
+  }
+ ]
+}

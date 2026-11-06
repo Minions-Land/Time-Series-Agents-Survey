@@ -1,0 +1,74 @@
+{
+ "citation_key": "chow2024tsreasoning",
+ "title": "Towards Time-Series Reasoning with LLMs",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "A lightweight time-series encoder projects normalized patches into Mistral embeddings,followed by curriculum warmup and CoT-supervised LoRA reasoning adaptation.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "temporal question answering; time series captioning; time series classification",
+  "axes": [],
+  "other": "temporal_question_answering; time_series_captioning; time_series_classification",
+  "other_labels": [
+   "temporal_question_answering",
+   "time_series_captioning",
+   "time_series_classification"
+  ],
+  "original_values": {
+   "other": "temporal_question_answering; time_series_captioning; time_series_classification",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "chow2024tsreasoning:ts-encoder",
+   "name": "Time-series encoder and embedding projection",
+   "layer": "LLM",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering",
+    "time_series_classification",
+    "time_series_captioning"
+   ],
+   "role": "model_training",
+   "scope_reason": "The trainable encoder and projection change model-side temporal perception;not an external tool interface.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"We first divide the input\""
+   ]
+  },
+  {
+   "id": "chow2024tsreasoning:cot-sft",
+   "name": "CoT-supervised multimodal adaptation",
+   "layer": "LLM",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering",
+    "time_series_classification"
+   ],
+   "role": "model_training",
+   "scope_reason": "The encoder,projection and LLM are jointly fine-tuned through LoRA on reasoning tasks.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "model_side",
+   "evidence_locators": [
+    "PDF p.3; passage beginning \"Stage 2: Supervised fine-tuning\""
+   ]
+  }
+ ]
+}

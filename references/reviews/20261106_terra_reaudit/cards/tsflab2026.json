@@ -1,0 +1,178 @@
+{
+ "citation_key": "tsflab2026",
+ "title": "TSFLab: A Self-Improving Agent-Agnostic Workbench for Time Series Forecasting Research",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "TSFLab is an agent-agnostic workbench for time series forecasting research: compatible coding agents share a forecasting research guide, layered knowledge cards for 323 methods, 93 datasets and 71 reusable units, a declarative experiment runner under shared protocols, and a recursive improver that verifies and merges new resources.",
+  "evidence_basis": "primary_source_module_review_20261102",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Forecasting and prediction",
+  "axes": [
+   "forecasting_prediction"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "tsflab2026:agent-agnostic-workbench",
+   "name": "Agent-agnostic research workbench",
+   "layer": "GH",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Shared resources and tools are placed outside the agent and exposed to any compatible coding agent without altering it; the mechanism does not depend on temporal semantics or on a task objective.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.2; passage beginning \"In contrast, a workbench is plug-and-pla\"",
+    "PDF p.1; passage beginning \"we propose TSFLab, a self-improving agen\""
+   ]
+  },
+  {
+   "id": "tsflab2026:domain-guide",
+   "name": "Forecasting research guide with task-specific skills",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Workflow"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Entry instructions and skills encode forecasting workflows, evaluation settings, and pitfalls such as the forecast target and metric choice, so the guidance is bound to the forecasting task contract.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"TSF-Domain Guide connects this knowledge\"",
+    "PDF p.4; passage beginning \"The skill also requires checking whether\""
+   ]
+  },
+  {
+   "id": "tsflab2026:knowledge-cards",
+   "name": "Layered knowledge cards and shared model units",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Method and unit cards describe forecasting models, their configurations, and reusable forecasting blocks such as RevIN, so the knowledge structure is organized around forecasting methods.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.4; passage beginning \"It provides a knowledge card for each me\"",
+    "PDF p.5; passage beginning \"Knowledge Structurer also extracts commo\""
+   ]
+  },
+  {
+   "id": "tsflab2026:shared-data-protocol",
+   "name": "Shared temporal data registration and leakage-safe splitting",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Dataset cards and shared routines record time fields, sampling frequency, splits, and scaling, and fit scaling on training data only; these temporal data operations are reusable beyond one forecasting method.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "functions": [
+    "data_management",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"Dataset cards record data characteristic\"",
+    "PDF p.5; passage beginning \"Shared routines split data as configured\""
+   ]
+  },
+  {
+   "id": "tsflab2026:experiment-workflower",
+   "name": "Declarative experiment runner under shared protocols",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Workflow",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Agents declare experiments with lookback, horizon, and training budget, and results are compared only under the same forecasting protocol, which binds the runner to the forecasting evaluation contract.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"For new-data benchmarking, an agent comb\"",
+    "PDF p.5; passage beginning \"Result summaries compare methods only un\""
+   ]
+  },
+  {
+   "id": "tsflab2026:recursive-improver",
+   "name": "Verified self-maintenance of shared resources",
+   "layer": "GH",
+   "dimensions": [
+    "Optimization and Evolution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Verified outputs and fixes from any session are merged into the shared workbench after usability, complexity, and consistency checks; the improvement mechanism is domain-independent.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.5; passage beginning \"Here, self-improvement means incorporati\"",
+    "PDF p.5; passage beginning \"Recursive Improver brings external resou\""
+   ]
+  }
+ ]
+}

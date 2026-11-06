@@ -1,0 +1,101 @@
+{
+ "citation_key": "wxcrop2026",
+ "title": "From extreme weather to agricultural consequences with agentic AI",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "WxCrop is an LLM assistant that routes plain-language questions to tools computing causally selected daily county hazard indices from weather records and forecasts and a payout-calibrated crop-loss model, assembling every reported number from tool receipts.",
+  "evidence_basis": "primary_source_module_review_20261031",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Decision support",
+  "axes": [
+   "decision_support"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "wxcrop2026:receipt-grounded-tools",
+   "name": "Receipt-grounded tool answering",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Control, Verification, and Feedback",
+    "Interface and Interaction"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Structured tool requests, receipts that carry value, unit, data version and filters, and replies assembled only from receipts with explicit refusal outside tool coverage would work unchanged for a non-temporal assistant.",
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "functions": [],
+   "view_status": "general_runtime",
+   "evidence_locators": [
+    "PDF p.27; passage beginning \"From a question it writes a\"",
+    "PDF p.27; passage beginning \"The reply is then assembled by\""
+   ]
+  },
+  {
+   "id": "wxcrop2026:daily-hazard-index",
+   "name": "Causally selected daily compound hazard indices",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Each index combines hazard-specific weather drivers per county and day (for hurricanes a wind load multiplied by a rainfall amplifier) with tiers anchored on insured crop-loss frequency, so its form and thresholds are selected for the agricultural hazard-assessment output.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.7; passage beginning \"Wind and rainfall mattered, and so\"",
+    "PDF p.15; passage beginning \"The study covers the 67 counties\""
+   ]
+  },
+  {
+   "id": "wxcrop2026:payout-calibrated-loss",
+   "name": "Growth-stage-aware, payout-calibrated crop-loss model",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Workflow"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Expected loss per crop group combines the index with crop susceptibility and date-dependent growth-stage vulnerability and is calibrated by inverting insurance payouts, and the hazard tier gates whether it runs, so it is bound to the crop-loss output contract.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.9; passage beginning \"If the index is higher, the\"",
+    "PDF p.13; passage beginning \"the damage fraction is recovered from\""
+   ]
+  }
+ ]
+}

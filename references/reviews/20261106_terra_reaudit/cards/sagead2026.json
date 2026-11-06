@@ -1,0 +1,101 @@
+{
+ "citation_key": "sagead2026",
+ "title": "Detecting Time Series Anomalies Like an Expert: A Multi-Agent LLM Framework with Specialized Analyzers",
+ "review_status": "paper_verified",
+ "work_type": "System-Method",
+ "claim": {
+  "summary": "SAGE performs anomaly-family analysis with numerical and visual evidence, then scores candidate intervals using a detector and retrieved synthetic examples.",
+  "evidence_basis": "primary_source_module_review_20261015",
+  "review_status": "paper_verified"
+ },
+ "tasks": {
+  "source_label": "Augmentation and synthesis; Anomaly detection and diagnosis",
+  "axes": [
+   "data_augmentation_synthesis",
+   "anomaly_detection_diagnosis"
+  ],
+  "other": null,
+  "other_labels": [],
+  "original_values": {
+   "other": "",
+   "module_tasks": {}
+  }
+ },
+ "modules": [
+  {
+   "id": "sagead2026:dual-representation",
+   "name": "Precise-tool and compressed-LLM temporal views",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Memory and Context"
+   ],
+   "tasks": [],
+   "role": "method",
+   "scope_reason": "Separating full-precision tool inputs from temporal summaries preserves numerical structure across analysis operations.",
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "data_augmentation_synthesis",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "functions": [
+    "data_management"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.4; 3.2 Dual Representation Strategy"
+   ]
+  },
+  {
+   "id": "sagead2026:anomaly-evidence",
+   "name": "Anomaly-family analysis and evidence aggregation",
+   "layer": "TSK",
+   "dimensions": [
+    "Coordination and Scaling",
+    "Tools and Execution",
+    "Control, Verification, and Feedback"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "role": "method",
+   "scope_reason": "Point, structural, seasonal and waveform analyzers produce anomaly candidates and diagnosis evidence.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [],
+   "view_status": "task_procedure",
+   "evidence_locators": [
+    "PDF p.5; 3.4 Evidence-Grounded Detector"
+   ]
+  },
+  {
+   "id": "sagead2026:synthetic-icl",
+   "name": "Normal-reference anomaly injection for ICL",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "data_augmentation_synthesis"
+   ],
+   "role": "training_data",
+   "scope_reason": "Synthetic anomaly pairs are generated specifically to support anomaly detection, and are not language-model fine-tuning.",
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "evidence_locators": [
+    "PDF p.5; 3.5 Synthetic In-Context Learning"
+   ]
+  }
+ ]
+}
