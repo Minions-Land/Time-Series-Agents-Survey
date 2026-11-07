@@ -417,7 +417,11 @@ def slide_box(shape, x0=None, x1=None):
 
 def ink_boxes(t):
     """Slide-space boxes of what a tag actually draws: its logo, and its name and year text at their measured widths."""
-    out = [slide_box(k) for k in walk(t.shapes) if k.shape_type == 13]
+    out = []
+    for k in walk(t.shapes):                               # logos: trimmed by their usual transparent margin
+        if k.shape_type != 13: continue
+        x0, y0, x1, y1 = slide_box(k); dx, dy = 0.12 * (x1 - x0), 0.12 * (y1 - y0)
+        out.append((x0 + dx, y0 + dy, x1 - dx, y1 - dy))
     texts_ = [k for k in walk(t.shapes) if k.shape_type == 17 and k.text_frame.text.strip()]
     texts_.sort(key=lambda k: k.text_frame.text.strip().isdigit())          # name first, year last
     for k in texts_:
@@ -460,27 +464,25 @@ SHORT = {'timeclaw2026harness': 'TC-Harness', 'timeclaw2026explore': 'TimeClaw',
          'timeseriesexamagent2026': 'TS-Exam Agent'}               # last resort when the full name cannot be placed
 
 
-def fit_tag(t, others, edges, gap_in=0.06, min_pt=12.5, margin_in=0.05):
+def fit_tag(t, others, inside, gap_in=0.06, min_pt=12.5):
     """Place a rewritten tag whose name overruns its year column. The overrun is absorbed by moving the whole tag
     left (inside its wedge) and the year right, as far as each stays clear of the other tags and the wedge spokes;
     the name shrinks (down to min_pt) only if that is not enough. Returns False if no placement is clear.
-    `edges(y)` gives the slide x of the wedge's left and right spokes at slide height y."""
+    `inside(boxes, side)` tells whether slide boxes stay inside the wedge on that side (-1 left/outer-angle spoke,
+    +1 right spoke)."""
     name, year, pt = tag_parts(t)
     if year is None: return True
     text = name.text_frame.text.strip()
     at, _ = x_map(t); ay, _ = x_map(year)
-    m = margin_in * E
     hit = lambda bx: any(bx[0] < o[2] and o[0] < bx[2] and bx[1] < o[3] and o[1] < bx[3] for o in others)
     def ok_left(s_):                                       # whole tag moved left by s_ (slide EMU)
-        for b in ink_boxes(t):
-            bx = (b[0] - s_, b[1], b[2] - s_, b[3])
-            if hit(bx) or bx[0] < max(edges(b[1])[0], edges(b[3])[0]) + m: return False
-        return True
+        orig = ink_boxes(t)
+        bxs = [(b[0] - s_, b[1], b[2] - s_, b[3]) for b in orig]
+        return not any(hit(bx) for bx in bxs) and (s_ == 0 or inside(bxs, -1, orig))
     def ok_right(s_left, s_right):                         # year moved right by s_right after the tag moved left
-        yb = next(b for b in ink_boxes(t) if True and b is not None)
-        ys = [b for b in ink_boxes(t)][-1]                 # the year's text box is the last text box drawn
+        ys = ink_boxes(t)[-1]                              # the year's text box is the last box
         bx = (ys[0] - s_left + s_right, ys[1], ys[2] - s_left + s_right, ys[3])
-        return not hit(bx) and bx[2] < min(edges(ys[1])[1], edges(ys[3])[1]) - m
+        return not hit(bx) and inside([bx], +1, [ys])
     while True:
         deficit = -slot_room(t, text, gap_in)
         if deficit <= 0: return True
@@ -535,18 +537,24 @@ def ledger_tags(g, outer, kx):
     assert len(spokes) == len(WEDGES) - 1, spokes
     centre = lambda x: ((x.left + x.width / 2) / E, (x.top + x.height / 2) / E)
     texts = lambda t: [k for k in walk(t.shapes) if k.shape_type == 17 and k.text_frame.text.strip()]
-    def edges_at(w, t, y_slide):
-        """Slide x of wedge w's left and right spokes at slide height y (t: any shape whose parent is the fan group)."""
-        (ax_, bx_), (ay_, by_) = axis_map(t, 'x'), axis_map(t, 'y')
-        yc = (y_slide - by_) / ay_ / E                                  # fan-group child inches
+    def within(t, w, boxes, side, ref=None, margin_deg=0.6):
+        """Boxes (slide EMU) stay inside wedge w on one side: side -1 checks the spoke at the larger angle (left),
+        +1 the spoke at the smaller angle (right), using the box corners on that side."""
         i = WEDGES.index(w)
-        out = []
-        for a_ in ((spokes[i] if i < len(spokes) else 180.0), (spokes[i - 1] if i > 0 else 0.0)):
-            s_ = math.sin(math.radians(a_))
-            if abs(s_) < 1e-6: out.append(-1e12 if a_ > 90 else 1e12); continue
-            r_ = (CY - yc) / (RINGS[3][1] * s_)
-            out.append(ax_ * (CX + r_ * RINGS[3][0] * math.cos(math.radians(a_))) * E + bx_)
-        return out
+        hi = spokes[i] if i < len(spokes) else 180.0
+        lo = spokes[i - 1] if i > 0 else 0.0
+        (ax_, bx_), (ay_, by_) = axis_map(t, 'x'), axis_map(t, 'y')
+        ang_ = lambda X, Y: angle((X - bx_) / ax_ / E, (Y - by_) / ay_ / E)
+        if ref:                                            # never worse than where the designer placed the tag
+            ra = [ang_(b[0] if side < 0 else b[2], Y) for b in ref for Y in (b[1], b[3])]
+            hi = max(hi - margin_deg, max(ra)) + margin_deg; lo = min(lo + margin_deg, min(ra)) - margin_deg
+        for b in boxes:
+            xs_ = b[0] if side < 0 else b[2]
+            for Y in (b[1], b[3]):
+                a_ = ang_(xs_, Y)
+                if side < 0 and a_ > hi - margin_deg: return False
+                if side > 0 and a_ < lo + margin_deg: return False
+        return True
     tags = []
     for t in g.shapes:
         if t.shape_type != 6: continue
@@ -574,7 +582,8 @@ def ledger_tags(g, outer, kx):
             new = k
         else:
             cands = [c for c in logo if valid(c, w) and c not in in_wedge[w] and uses.get(c, 0) < MAX_USES] or \
-                    [c for c in logo if valid(c, w) and c not in in_wedge[w] and uses.get(c, 0) < MAX_USES + 1]   # rather than an empty slot
+                    [c for c in logo if valid(c, w) and c not in in_wedge[w] and uses.get(c, 0) < MAX_USES + 1] or \
+                    [c for c in logo if valid(c, w) and c not in in_wedge[w]]                  # rather than an empty slot
             # names that fit the slot's year column first, so a longer name does not run into the next column
             cands.sort(key=lambda c: (slot_room(t, name_of[c]) < -0.04 * E, -count(c, w), uses.get(c, 0),
                                       -int(recs[c]['publication']['public_month'][:4]), c))
@@ -607,12 +616,12 @@ def ledger_tags(g, outer, kx):
                 old._element.addnext(pic); old._element.getparent().remove(old._element); cur_logo[0] = c
             if name_of[c] == old_text: return True
             others = [b_ for o, _, _ in tags if o is not t and o._element.getparent() is not None for b_ in ink_boxes(o)]
-            if fit_tag(t, others, lambda y: edges_at(w, t, y)): return True
+            if fit_tag(t, others, lambda bxs, side, ref=None: within(t, w, bxs, side, ref)): return True
             if c in SHORT and SHORT[c] != name_of[c]:          # abbreviated name, same work
                 nm_box.text_frame.paragraphs[0].runs[0].text = SHORT[c]
                 for r_, sz_ in zip(nm_box.text_frame.paragraphs[0].runs, saved[1]): r_.font.size = sz_
                 if yr_box is not None: yr_box.left = saved[0]
-                return fit_tag(t, others, lambda y: edges_at(w, t, y))
+                return fit_tag(t, others, lambda bxs, side, ref=None: within(t, w, bxs, side, ref))
             return False
         tries = ([new] if new == k else []) + [c for c in (cands if new != k else []) ]
         if new == k and not apply(k):                            # valid work, but its full name does not fit here
@@ -645,9 +654,8 @@ def ledger_tags(g, outer, kx):
         if not getattr(t, '_rewritten', False): continue           # designer-placed tags stay as they are
         others = [b for o, _ in live if o is not t for b in ink_boxes(o)]
         hit = lambda: any(b[0] < o[2] and o[0] < b[2] and b[1] < o[3] and o[1] < b[3] for b in ink_boxes(t) for o in others)
-        def inside(sign):                                          # only the spoke in the direction of the move
-            if sign < 0: return all(max(edges_at(w, t, b[1])[0], edges_at(w, t, b[3])[0]) < b[0] for b in ink_boxes(t))
-            return all(b[2] < min(edges_at(w, t, b[1])[1], edges_at(w, t, b[3])[1]) for b in ink_boxes(t))
+        orig_boxes = ink_boxes(t)
+        inside = lambda sign: within(t, w, ink_boxes(t), sign, orig_boxes)   # the spoke in the direction of the move
         if not hit(): continue
         at, _ = x_map(t); start = t.left; done = False
         for sign in (-1, 1):
