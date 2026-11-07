@@ -1,0 +1,258 @@
+{
+ "citation_key": "fromnewstoforecast2024",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "The work fine-tunes an LLM forecaster on time-series and contextual news, while forecast-specific agents select temporally relevant news and refine selection logic from validation errors.",
+ "claim_evidence": [
+  {
+   "line": 286,
+   "quote": "Our approach includes three main modules: a language model-based forecasting module (Sec 3.1), a reasoning agent for news filtering and inference, and an evaluation agent to assess and refine the forecasting model (Sec 3.2)."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "fromnewstoforecast2024:news-conditioned-lora",
+   "name": "News-conditioned forecasting fine-tuning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places parameter-updating supervised instruction tuning on the LLM side; the model learns conditional forecasts from textualized time series and context.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 345,
+     "quote": "we propose fine-tuning the language models to predict conditional probabilities. We employ a supervised instruction tuning method to train LLMs on historical time series data paired with corresponding news and supplementary information"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "fromnewstoforecast2024:news-temporal-pairing",
+   "name": "Temporal news and series pairing",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK is no: the pairing is not bound to a forecasting output criterion. R3_2 GTS is yes: it synchronizes news to series by frequency, horizon, and geography; changing temporal inputs requires redesign, while changing task objective does not.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - alignment does not encode forecast output objective",
+    "R3_2_GTS:yes - synchronization depends on temporal frequency, horizon, and geography",
+    "R4:Memory and Context",
+    "R5:processing,context_memory",
+    "R8:inferred"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 364,
+     "quote": "news is retrieved to align with time series data based on matching time frequencies, horizons, and geographical areas."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "fromnewstoforecast2024:news-selection",
+   "name": "Forecast-specific news reasoning and selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK is yes: news is selected for its effect on a specified forecast variable and horizon. Changing task family requires redesigning its relevance logic and impact categories; temporal news context is embedded in this procedure.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - selection logic is tied to forecasting impact",
+    "R4:Planning and Orchestration",
+    "R5:context_memory",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 435,
+     "quote": "We develop an understanding of time series influencers, sorting them by impact (positive/negative) and duration (short/long-term), considering economic, policy, seasonal, and technological factors;"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "fromnewstoforecast2024:news-reflection",
+   "name": "Validation-guided news logic refinement",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "validation",
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK is yes: the feedback criterion is forecast error and overlooked news for that task. Replacing forecasting with another task requires changing error analysis and the refinement objective; the loop evolves reusable selection logic across iterations.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - updates target forecast error and missed news",
+    "R4:Optimization and Evolution",
+    "R5:validation,context_memory",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 501,
+     "quote": "In the first phase, we input the forecasting task type, the time horizon, and background information, which the agent uses to generate the steps for evaluating the prediction outcomes."
+    },
+    {
+     "line": 504,
+     "quote": "we provide the ground truth, the discrepancies between predicted and actual series, as well as selected and historical news. The agent analyzes these inputs to identify overlooked news based on the distribution of prediction errors over time."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 406,
+   "quote": "Requirements: Include the region and time information of these news. The prediction date is {prediction date}. The news happened before and on the prediction include:{all news} ."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 651,
+   "quote": "The introduction of proper news and other supplementary information leads to significant performance improvements across all four domains."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "fromnewstoforecast2024:news-conditioned-lora",
+   "decision": "change",
+   "new_ids": [
+    "fromnewstoforecast2024:news-conditioned-lora"
+   ],
+   "changes": [
+    "remove Harness dimensions; add llm_route instruction_reasoning"
+   ],
+   "reason": "Supervised instruction tuning updates LLM parameters on time-series/news input-output pairs, so this is an LLM-side training module."
+  },
+  {
+   "existing_id": "fromnewstoforecast2024:news-reflection",
+   "decision": "split",
+   "new_ids": [
+    "fromnewstoforecast2024:news-reflection",
+    "fromnewstoforecast2024:news-selection",
+    "fromnewstoforecast2024:news-temporal-pairing"
+   ],
+   "changes": [
+    "retain ID for validation-guided refinement; add task-specific news selection and GTS temporal pairing"
+   ],
+   "reason": "The packet separately describes temporal pre-pairing by frequency, horizon, and geography, forecasting-specific selection logic, and validation feedback that updates later selection logic; these mechanisms can be reused separately."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The existing card combines temporal pairing, news selection, and feedback refinement. The packet supports separating them; temporal validity has an explicit pre-prediction news timestamp, while no independent leakage audit is reported.",
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "layer move news-reflection TSK->TSK (validation-guided refinement)",
+    "verdict": "accept",
+    "result": "TSK",
+    "reason": "Evaluation agent takes the forecasting task type, horizon and validation prediction errors to find overlooked news and update selection logic; its criterion is forecast error.",
+    "line": 501
+   },
+   {
+    "item": "split: news-selection as new TSK module",
+    "verdict": "accept",
+    "result": "TSK",
+    "reason": "Reasoning agent selects news by impact on the forecast target (impact and duration categories), tied to forecasting.",
+    "line": 425
+   },
+   {
+    "item": "split: news-temporal-pairing as GTS",
+    "verdict": "modify",
+    "result": "GTS; dimension Tools and Execution -> Memory and Context; functions data_management,context_memory -> processing,context_memory; role training_data -> method",
+    "reason": "Pre-pairing retrieves news aligned to the series by frequency, horizon and geography with no forecasting-specific criterion; it is retrieval of aligned events (context) via alignment (processing), not a tool or data store.",
+    "line": 364
+   }
+  ],
+  "summary": "Accepted the split into LLM fine-tuning, GTS temporal pairing, and two TSK news modules; the pairing module's dimension, functions and role were refined. No Codex/Haiku conflict beyond layers."
+ }
+}

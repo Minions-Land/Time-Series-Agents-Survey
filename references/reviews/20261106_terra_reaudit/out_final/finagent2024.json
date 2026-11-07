@@ -1,0 +1,320 @@
+{
+ "citation_key": "finagent2024",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "FinAgent is a feedback-driven financial trading agent whose multimodal market analysis, temporal memory and retrieval, dual-level reflection, and tool-augmented workflow select buy, hold, or sell actions.",
+ "claim_evidence": [
+  {
+   "line": 159,
+   "quote": "we present FinAgent, a multimodal foundation agent that integrates both textual and visual information for a comprehensive analysis of market dynamics and historical trading patterns."
+  },
+  {
+   "line": 168,
+   "quote": "FinAgent introduces a diversified memory retrieval system for the market intelligence and reflection modules, separating trading and retrieval tasks to enhance focus on their specific functions and minimize noise in the results."
+  },
+  {
+   "line": 182,
+   "quote": "Our duel-level reflection module combines a low-level reflection that analyzes market price movement for insights, while the highlevel reflection assesses past trading decisions for improvement, emulating the learning process in decision-making."
+  },
+  {
+   "line": 185,
+   "quote": "We employ a suite of tools in FinAgent, including expert guidance and technical indicator-based advanced trading strategies, to infuse domain knowledge in financial trading."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "finagent2024:market-intelligence",
+   "name": "Multimodal market intelligence",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "TSK because it summarizes multimodal market evidence, assigns sentiment and price-effect horizons, and emits retrieval queries for trading decisions; changing the task family changes those task criteria (R3_1_TSK).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - trading-oriented market intelligence outputs",
+    "R3_2_GTS:no - task objective is primary",
+    "R3_3_GH:no",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 431,
+     "quote": "To make profitable investment decisions, it is beneficial to collect, summarize, analyze, and extract key insights from various multimodal financial data sources. We design the market intelligence module to achieve this goal."
+    },
+    {
+     "line": 467,
+     "quote": "To address these challenges, diversified retrieval is implemented in FinAgent. Specifically, we have introduced an additional query text field to the output of the latest market intelligence component, which is dedicated to serving retrieval tasks"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "finagent2024:vector-memory",
+   "name": "Vector-indexed summaries and query retrieval",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "GH: summaries and a dedicated query text field are stored and matched by vector similarity; no timestamp, window, availability or cutoff logic is described, and no task objective is embedded (R3_1 and R3_2 fail, R3_3 holds).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - storage/retrieval has no trading action objective",
+    "R3_2_GTS:no - no temporal order, window or availability rule described",
+    "R3_3_GH:yes - generic vector memory state",
+    "R4:Memory and Context",
+    "R5:general_runtime",
+    "R7:decision_support",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 601,
+     "quote": "To realize the 3A superiority - Acuity, Adaptability, and Amendability - in the memory mechanism, our development of the memory module employed a vector storage architecture."
+    },
+    {
+     "line": 605,
+     "quote": "As shown in Figure 3, the summarize operation creates a query text field for each module, enhancing memory storage and retrieval. The market intelligence module uniquely retrieves past data through query text, using vector representations for efficient matching based on the vector similarity."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "finagent2024:market-reflection",
+   "name": "Low-level market reflection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "TSK because it relates market observations to past and future price changes over trading horizons; changing the task family changes the price-movement objective (R3_1_TSK).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - price-movement analysis for trading",
+    "R3_2_GTS:no - task objective is primary",
+    "R3_3_GH:no",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 617,
+     "quote": "The low-level reflection module involves reflecting on the relationship between the agent’s observations (e.g., news, financial reports, Kline chart and technical indicators) and the resultant price movements in the market, drawing connections between the provided information and the actual price changes."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "finagent2024:trade-outcome-reflection",
+   "name": "High-level trade-outcome reflection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "TSK because it evaluates past BUY/SELL/HOLD decisions and recommends trading corrections; changing the task family changes the action and outcome criterion (R3_1_TSK).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - trading decision outcome feedback",
+    "R3_2_GTS:no - task objective is primary",
+    "R3_3_GH:no",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 767,
+     "quote": "The initial phase assesses each trading decision’s correctness, identifying successes and mistakes. Subsequently, the module recommends improvements or corrective actions tailored to each identified mistake or success, fostering a continuous learning process."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "finagent2024:decision-making",
+   "name": "Tool-augmented trading decisions",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "TSK because it embeds the BUY/HOLD/SELL trading objective and current financial-position constraint; changing the task family changes the action space and objective (R3_1_TSK).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - final trading action objective",
+    "R3_2_GTS:no - task objective is primary",
+    "R3_3_GH:no",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 752,
+     "quote": "Decisions are derived from combining insights from these analyses, also considering the current financial position, leading to a final decision—whether to buy, sell, or hold the asset."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 836,
+   "quote": "For dataset split, the data from the latter half of the year is allocated for testing (2023-06-01 ∼ 2024-0101) purposes, while the data from the penultimate year is utilized for training (2022-06-01 ∼ 2023-06-01)."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1219,
+   "quote": "We compared FinAgent with 9 baseline methods in terms of 6 financial metrics. Table 4 and Figure 4 demonstrate our method significantly outperforms existing baselines, especially remarkable improvements in profitability, and setting a new benchmark in the field."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 187,
+   "quote": "With comprehensive experiments on 6 financial datasets, including stocks and Crypto, FinAgent significantly outperforms 12 stateof-the-art baselines in terms of 6 financial metrics with over 36% average improvement on profit."
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "finagent2024:vector-memory",
+   "decision": "keep",
+   "new_ids": [
+    "finagent2024:vector-memory"
+   ],
+   "changes": [
+    "tasks: [] -> [decision_support]"
+   ],
+   "reason": "Mechanism and layer unchanged; the candidate's GTS move rested on short/medium/long-term retrieval types, which are only a footnote on retrieval categories, not temporal availability handling."
+  },
+  {
+   "existing_id": "finagent2024:market-reflection",
+   "decision": "split",
+   "new_ids": [
+    "finagent2024:market-reflection",
+    "finagent2024:trade-outcome-reflection"
+   ],
+   "changes": [
+    "name: Market and trade-outcome reflection -> Low-level market reflection plus High-level trade-outcome reflection",
+    "dimensions: retired Control, Verification, and Feedback + Planning and Workflow -> Planning and Orchestration, with Optimization and Evolution for reusable outcome feedback",
+    "functions: context_memory -> processing for low-level and context_memory for high-level",
+    "view_status: mapped -> task_procedure"
+   ],
+   "reason": "The source gives low-level reflection a price-movement objective and high-level reflection a separate past-decision correction objective, with separate inputs, outputs, and reusable memory; R1 requires splitting separately reusable mechanisms."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Blind review found a paper-verified feedback-driven trading agent. The current card omitted the market-intelligence and tool-augmented decision modules and merged distinct low- and high-level reflection procedures; the packet supports separating them. No packet gaps affect these decisions.",
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "layer move vector-memory GH->GTS",
+    "verdict": "reject",
+    "result": "stay GH, no function, general_runtime",
+    "reason": "The memory description covers vector storage and query-text retrieval only; no temporal order, window, availability time or cutoff is specified, so R3_2 is not met.",
+    "line": 601
+   },
+   {
+    "item": "split of reflection into market-reflection and trade-outcome-reflection; added market-intelligence and decision-making TSK modules",
+    "verdict": "accept",
+    "result": "kept as in candidate",
+    "reason": "Low-level and high-level reflection have distinct inputs and objectives (L617-622).",
+    "line": 617
+   }
+  ],
+  "summary": "The vector-memory move to GTS was rejected because the packet shows no temporal semantics in the memory mechanism. The remaining TSK modules were accepted."
+ }
+}

@@ -1,0 +1,184 @@
+{
+ "citation_key": "openforecaster2026",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "The work trains LLMs for open-ended event forecasting using a curated news-derived dataset, calibrated outcome rewards, and date-bounded news retrieval.",
+ "claim_evidence": [
+  {
+   "line": 15,
+   "quote": "In this work, we train language models to make predictions on open-ended forecasting questions."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "openforecaster2026:event-rl",
+   "name": "Open-ended forecasting model training",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places GRPO model updates on the LLM side; no Harness layer applies.",
+   "rubric_path": [
+    "R1:contributed training method",
+    "R2:LLM-side model training",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 476,
+     "quote": "We train the Qwen3-8B thinking model with GRPO on OpenForesight"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "openforecaster2026:openforesight-dataset",
+   "name": "OpenForesight training dataset",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R2 treats data specifically constructed to train the model as LLM-side training data.",
+   "rubric_path": [
+    "R1:contributed dataset built for the LLM",
+    "R2:LLM-side training data",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 64,
+     "quote": "to create OpenForesight, a dataset of ∼ 50,000 open-ended forecasting questions for training."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "openforecaster2026:dated-news-retrieval",
+   "name": "Resolution-date-bounded static news retrieval",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because retrieval is bounded by each forecasting question's resolution date to construct its admissible evidence; the task-specific cutoff must be redesigned when forecast resolution semantics change.",
+   "rubric_path": [
+    "R1:contributed retrieval procedure",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast-specific resolution-date cutoff",
+    "R5:context_memory, validation",
+    "R7:forecasting_prediction"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 461,
+     "quote": "To prevent leakage issues (Paleka et al., 2025a), we use our offline CCNews corpus, and only use articles up to one month before the question’s resolution date."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 68,
+   "quote": "We take extensive measures to avoid the leakage of future information during training and evaluation."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 90,
+   "quote": "RL training on OpenForesight makes the predictions of our specialized 8B model competitive with much larger proprietary models in both accuracy and calibration."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "openforecaster2026:event-rl",
+   "decision": "keep",
+   "new_ids": [
+    "openforecaster2026:event-rl"
+   ],
+   "changes": [],
+   "reason": "The card correctly identifies the GRPO forecasting training mechanism as LLM-side model training."
+  },
+  {
+   "existing_id": "openforecaster2026:dated-news-retrieval",
+   "decision": "change",
+   "new_ids": [
+    "openforecaster2026:dated-news-retrieval"
+   ],
+   "changes": [
+    "view_status: mapped -> task_procedure",
+    "dimensions: add Tools and Execution"
+   ],
+   "reason": "Forecast resolution-date-bounded retrieval is a TSK procedure; it retrieves external news and injects retrieved context, while its temporal cutoff implements context_memory and validation."
+  },
+  {
+   "existing_id": "",
+   "decision": "keep",
+   "new_ids": [
+    "openforecaster2026:openforesight-dataset"
+   ],
+   "changes": [
+    "add contributed training-data module"
+   ],
+   "reason": "The work creates a dataset specifically for training; R1 counts this independently reusable training-data contribution separately from the trained policy."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Open-ended forecasting concerns discrete future world events rather than numerical time-series forecasting; the source explicitly describes training language models to predict future events."
+}

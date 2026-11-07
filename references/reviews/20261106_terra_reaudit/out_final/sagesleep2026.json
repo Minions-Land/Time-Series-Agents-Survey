@@ -1,0 +1,294 @@
+{
+ "citation_key": "sagesleep2026",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "SAGE is a sensor-grounded sleep care agent that normalizes wearable time-series data into a queryable store, translates user questions into executable KQL, and sends threshold-based monitoring notifications.",
+ "claim_evidence": [
+  {
+   "line": 28,
+   "quote": "SAGE normalizes continuous sleep, physiological, and activity data from the sensors into a queryable time-series layer"
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "temporal_question_answering"
+ ],
+ "modules": [
+  {
+   "id": "sagesleep2026:temporal-query",
+   "name": "Queryable time-series layer over sensor data",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "R3_1_TSK fails: the normalized store and its schema do not change when the task family changes. R3_2_GTS applies: timestamps are normalized to the user time zone, fields are cast to computable types, and session tables keep numerical state addressable.",
+   "rubric_path": [
+    "R0:paper_verified",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - storage schema is task-independent",
+    "R3_2_GTS:yes - time zone, units, typed temporal storage"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "anomaly_detection_diagnosis",
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 131,
+     "quote": "Raw data received via the Withings Cloud API in JSON format is automatically converted into structured tables via ADX update policies"
+    },
+    {
+     "line": 136,
+     "quote": "Importantly, this normalization defines the storage schema but does not restrict query resolution"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "sagesleep2026:nl-to-kql-grounded-qa",
+   "name": "Natural-language-to-KQL grounded question answering",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK chosen: the procedure embeds the Q&A output requirement (period, comparison and metric structure, answer grounded in retrieved facts). Counterfactual: a change to forecasting or anomaly detection would need a different action space, not only a different query. Borderline with GTS, see notes.",
+   "rubric_path": [
+    "R0:paper_verified",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - Q&A output requirement embedded; counterfactual changes action space",
+    "R3_2_GTS:not reached"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 156,
+     "quote": "The core of the user-initiated interaction is converting natural language questions into actionable data requests"
+    },
+    {
+     "line": 169,
+     "quote": "the query generator converts natural language inquiries into Kusto Query Language (KQL) executable on ADX"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "sagesleep2026:intent-routed-workflow",
+   "name": "Intent-routed LangGraph workflow",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "temporal_question_answering"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK no: the router classifies inputs into chat, data or unsupported without a task objective. R3_2_GTS no: routing has no temporal semantics. R3_3_GH yes: state-graph execution control.",
+   "rubric_path": [
+    "R0:paper_verified",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - routing has no task objective",
+    "R3_2_GTS:no - no temporal semantics in routing",
+    "R3_3_GH:yes - state-graph execution control"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 158,
+     "quote": "Controlled by a LangGraph-based state graph (Figure 2), user inputs are classified by an intent router into three categories: chat, data, or unsupported"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "sagesleep2026:sleep-monitor",
+   "name": "Selective deviation monitoring with scheduled templates",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK yes: the deviation criterion (more than 30 percent from the 7-day moving average, or critical sleep debt) is the anomaly-detection validation criterion. Counterfactual: changing the task would change the criterion and templates.",
+   "rubric_path": [
+    "R0:paper_verified",
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - deviation criterion is the validation objective"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 211,
+     "quote": "A daily scheduler executes predefined query templates to monitor data"
+    },
+    {
+     "line": 213,
+     "quote": "Notifications are triggered selectively only when significant deviations (e.g., >±30% change from the 7-day moving average) or critical sleep debts are detected"
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 231,
+   "quote": "M1 (Executable query rate): This measures whether the LLM-generated KQL executes in the ADX environment without syntax errors"
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 253,
+   "quote": "semantic errors (M2 error) were observed where the generated query range incorrectly extended into the future"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 238,
+   "quote": "M3 (Data retrieval correctness): Applied to queries that passed M1, this verifies the accuracy of numerical calculation"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "sagesleep2026:temporal-query",
+   "decision": "split",
+   "new_ids": [
+    "sagesleep2026:temporal-query",
+    "sagesleep2026:nl-to-kql-grounded-qa"
+   ],
+   "changes": [
+    "dimensions: Interface and Interaction, Tools and Execution, Memory and Context -> Memory and Context, Tools and Execution",
+    "question-to-KQL query generation and grounded answering moved to new TSK module sagesleep2026:nl-to-kql-grounded-qa",
+    "tasks: add anomaly_detection_diagnosis (the scheduled monitoring templates query this layer)"
+   ],
+   "reason": "The packet describes two mechanisms: the normalized ADX store (GTS, task-independent schema, Section 2.1) and the question-to-KQL procedure built around period, comparison and metric structure (Section 2.2, TSK). They are reusable separately, so the card's single GTS module is split. Interface and Interaction is dropped from the store because the WhatsApp/Twilio interface is off-the-shelf and the store exposes no interaction of its own."
+  },
+  {
+   "existing_id": "sagesleep2026:sleep-monitor",
+   "decision": "change",
+   "new_ids": [
+    "sagesleep2026:sleep-monitor"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback, Interface and Interaction -> Planning and Orchestration, Tools and Execution",
+    "tasks: decision_support -> anomaly_detection_diagnosis",
+    "functions: [] -> processing"
+   ],
+   "reason": "Same mechanism: a daily scheduler runs predefined query templates and triggers on deviations beyond 30 percent of the 7-day moving average (Section 2.3). The scheduling and execution control is Planning and Orchestration (legacy Control, Verification, and Feedback maps there because it controls execution within an episode, not reusable assets across episodes). The deviation test is anomaly detection, so the task changes. The 7-day moving average is a processing operation, and the TSK module lists it. decision_support was dropped as a module task because the packet gives no decision policy or downstream utility measure. Interface and Interaction is dropped as WhatsApp delivery is off-the-shelf."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Card ids kept where the mechanism is the same. New module: intent-routed LangGraph workflow (Figure 2), which the card omitted; medium confidence because its three-way chat, data or unsupported routing is fairly generic. Adjudicated: the KQL module is TSK because its grounding contract (answer only from retrieved facts, explicit null-data answer, out-of-scope refusal) is a question-answering output requirement; the storage layer is the GTS part. The temporal_validity item is inferred from the reported future-range failure and the M2 target-period check, not from a dedicated leakage test. Evaluation is preliminary: 30 synthetic questions per category, no real users, no baselines, no user study. No LLM module: commercial GPT-5.2 is used unchanged with prompting. Off-the-shelf Azure Data Explorer, Twilio, WhatsApp and Withings are excluded as modules.",
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "sagesleep2026:temporal-query layer GTS->GTS (and TSK split-off)",
+    "verdict": "accept",
+    "result": "Keep GTS for the normalized ADX store (functions: data_management); move question-to-KQL generation into a separate TSK module",
+    "reason": "Timestamps are normalized to the user time zone and fields cast to computable types; the schema does not depend on the task. The Q&A procedure is a separate mechanism.",
+    "line": 135
+   },
+   {
+    "item": "nl-to-kql-grounded-qa layer (TSK vs GTS)",
+    "verdict": "accept",
+    "result": "TSK, temporal_question_answering, medium confidence",
+    "reason": "The generator exists to produce grounded answers (retrieve value, compare to weekly average, state no records exist); this output contract would change with the task family.",
+    "line": 167
+   },
+   {
+    "item": "intent-routed-workflow as separate GH module",
+    "verdict": "accept",
+    "result": "GH, Planning and Orchestration",
+    "reason": "Three-way chat/data/unsupported routing in a LangGraph state graph has no temporal semantics or task objective.",
+    "line": 158
+   },
+   {
+    "item": "sleep-monitor task and dimensions",
+    "verdict": "accept",
+    "result": "TSK, anomaly_detection_diagnosis, Planning and Orchestration + Tools and Execution",
+    "reason": "Daily scheduled templates trigger on >30% deviation from the 7-day moving average; no decision policy or utility is evaluated, so decision_support is not claimed.",
+    "line": 213
+   },
+   {
+    "item": "temporal_validity evidence",
+    "verdict": "accept",
+    "result": "present, weak",
+    "reason": "The M2 intent check and the reported future-range queries are an availability-time check on generated queries.",
+    "line": 253
+   },
+   {
+    "item": "needs_human_review",
+    "verdict": "modify",
+    "result": "false",
+    "reason": "The packet decides the layer items; remaining doubt is a judgment on the TSK/GTS boundary, recorded in notes.",
+    "line": 167
+   }
+  ],
+  "summary": "The Haiku/merged record was accepted: the store stays GTS, the KQL question-answering procedure and the deviation monitor are TSK, and the router is GH. Human review flag cleared."
+ }
+}

@@ -1,0 +1,222 @@
+{
+ "citation_key": "promptevolutionforecast2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "The work evolves forecasting guidance from observed forecast traces, selects guidance using held-out temporal windows, and extends the learned policy into executable code that can use a TSFM tool.",
+ "claim_evidence": [
+  {
+   "line": 250,
+   "quote": "Nothing is fine-tuned and no gradient exists: learning is the reflector turning observed forecasting mistakes into written advice, and selection keeping only advice that measurably works on windows it was not written from."
+  },
+  {
+   "line": 354,
+   "quote": "Per window, the code emits a proposal; a final LLM pass sees the window, guidance, code, proposal, and default TabPFN forecast, and makes the final call."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "promptevolutionforecast2026:guidance-evolution",
+   "name": "Outcome-gated forecasting guidance evolution",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because reflection and selection optimize forecast output against per-window MASE; changing the task family would require redesigning the forecasting guidance and objective (counterfactual).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast-specific output and error objective",
+    "R4:Optimization and Evolution",
+    "R5:task_procedure; processing",
+    "R7:forecasting_prediction",
+    "R8:not_applicable"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 243,
+     "quote": "The reflector reads the minibatch’s full execution traces (raw histories, complete news context, forecast vs. realized paths, per-window MASE, rationales) and rewrites g freely; only ex-ante usability, generality, and the word cap bind."
+    },
+    {
+     "line": 250,
+     "quote": "Nothing is fine-tuned and no gradient exists: learning is the reflector turning observed forecasting mistakes into written advice, and selection keeping only advice that measurably works on windows it was not written from."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "promptevolutionforecast2026:cutoff-tiers",
+   "name": "Cutoff-postdating tiers with untouched monitor",
+   "layer": "GTS",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_2_GTS applies because tier admission depends on each model’s temporal knowledge cutoff and information availability; the same cutoff check on other time-indexed tasks would not require changing task logic (counterfactual).",
+   "rubric_path": [
+    "R1:contributed evaluation protocol",
+    "R2:Harness",
+    "R3_1_TSK:no - no forecast-output criterion in tier admission",
+    "R3_2_GTS:yes - temporal availability and cutoff",
+    "R4:Planning and Orchestration",
+    "R5:mapped; validation",
+    "R7:forecasting_prediction",
+    "R8:inferred"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 131,
+     "quote": "Cross-model experiments with Claude Opus 4.6 (Aug-2025 cutoff) use only origins after September 2025."
+    },
+    {
+     "line": 132,
+     "quote": "Optimization consumes data at three rates: a selection tier consulted every iteration (optimistic by construction); an untouched monitor never used for decisions, whose gap to selection measures overfitting; and final tiers set postdating every model’s cutoff touched exactly once for evaluation."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "promptevolutionforecast2026:guidance-compilation",
+   "name": "Guidance-to-code compilation with TSFM tool",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the compiled function and arbitration produce a task-specific forecast from series inputs; a different task family would require replacing its forecast logic and output contract (counterfactual).",
+   "rubric_path": [
+    "R1:contributed extension",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast procedure and output contract",
+    "R4:Tools and Execution; Planning and Orchestration",
+    "R5:task_procedure; processing",
+    "R7:forecasting_prediction",
+    "R8:not_applicable"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 350,
+     "quote": "compiles each candidate once into a deterministic forecast(window) function in an offline sandbox against a 12-window dev set"
+    },
+    {
+     "line": 354,
+     "quote": "Per window, the code emits a proposal; a final LLM pass sees the window, guidance, code, proposal, and default TabPFN forecast, and makes the final call."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 353,
+   "quote": "the harness independently re-runs the scorer on the final code, so implementation quality can neither block nor fake a candidate."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 131,
+   "quote": "Cross-model experiments with Claude Opus 4.6 (Aug-2025 cutoff) use only origins after September 2025."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 257,
+   "quote": "on the most recent, provably uncontaminated data, all four evolved cells beat all three zero-shot TSFMs overall (nominally best: Llama with the ∼900-word Gnum guidance, GM 0.776 vs. TabPFN-TS-3’s 0.898)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "promptevolutionforecast2026:guidance-evolution",
+   "decision": "change",
+   "new_ids": [
+    "promptevolutionforecast2026:guidance-evolution"
+   ],
+   "changes": [
+    "dimensions: remove retired Control, Verification, and Feedback; retain Optimization and Evolution",
+    "functions: context_memory -> processing",
+    "view_status: mapped -> task_procedure",
+    "reuse_evidence: not_applicable retained for TSK"
+   ],
+   "reason": "The packet grounds prompt mutation in forecasting traces and forecast-error gating, making the procedure task-specific under R3_1_TSK. Its guidance encodes numeric forecasting operations; it is a task procedure rather than a general GTS memory module."
+  },
+  {
+   "existing_id": "promptevolutionforecast2026:cutoff-tiers",
+   "decision": "change",
+   "new_ids": [
+    "promptevolutionforecast2026:cutoff-tiers"
+   ],
+   "changes": [
+    "dimension: retired Control, Verification, and Feedback -> Planning and Orchestration"
+   ],
+   "reason": "The packet supports an evaluation protocol that separates selection, untouched monitor, and cutoff-postdating final tiers. It remains GTS because it enforces temporal information availability without embedding a forecasting output objective."
+  },
+  {
+   "existing_id": "promptevolutionforecast2026:guidance-compilation",
+   "decision": "change",
+   "new_ids": [
+    "promptevolutionforecast2026:guidance-compilation"
+   ],
+   "changes": [
+    "dimensions: remove retired Interface and Interaction and Control, Verification, and Feedback; retain Tools and Execution and add Planning and Orchestration",
+    "functions: add processing",
+    "view_status: task_procedure retained"
+   ],
+   "reason": "The packet describes compiling forecasting guidance into code, invoking TabPFN, then using an LLM arbitration pass. This is a separately reusable forecasting procedure with tool use and coordinated execution, so the existing TSK module is retained with current labels."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The paper reports one executed re-adaptation cycle; the multi-period rolling deployment run is identified as future work."
+}

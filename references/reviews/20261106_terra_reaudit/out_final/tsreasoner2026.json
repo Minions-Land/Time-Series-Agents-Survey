@@ -1,0 +1,388 @@
+{
+ "citation_key": "tsreasoner2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TS-Reasoner contributes a feedback-driven agent that decomposes natural-language time-series queries into reusable operator workflows, executes them programmatically, and revises plans using execution and prediction feedback.",
+ "claim_evidence": [
+  {
+   "line": 37,
+   "quote": "In this work, we introduce TS-Reasoner, a domain-specialized agent designed for multi-step time series inference."
+  },
+  {
+   "line": 38,
+   "quote": "By integrating large language model (LLM) reasoning with domain-specific computational tools and error feedback loop, TS-Reasoner enables domain-informed, constraint-aware analytical workflows that combine symbolic reasoning with precise numerical analysis."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "imputation",
+  "temporal_causal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "tsreasoner2026:task-decomposer",
+   "name": "In-context task decomposer",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "temporal_causal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "The decomposer plans operator sequences for heterogeneous analyses without embedding one task objective or temporal-state rule; it is GH under R3_1_TSK:no, R3_2_GTS:no, R3_3_GH:yes.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - heterogeneous operator planning is not bound to one task objective",
+    "R3_2_GTS:no - the planning mechanism has no temporal-order or availability requirement",
+    "R3_3_GH:yes - it manages workflow decomposition"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 231,
+     "quote": "complex natural language instructions into structured operator execution plans."
+    },
+    {
+     "line": 234,
+     "quote": "problems into manageable subtasks. The in-context learning paradigm does not require expensive retraining"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsreasoner2026:execution-feedback",
+   "name": "Program execution and error-revision loop",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "temporal_causal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "The executor runs planned steps and retries after execution errors without temporal semantics or a task-specific objective; it is GH under R3_1_TSK:no, R3_2_GTS:no, R3_3_GH:yes.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - retry logic is task-agnostic",
+    "R3_2_GTS:no - error recovery does not depend on temporal order or availability",
+    "R3_3_GH:yes - it manages execution and error recovery"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 306,
+     "quote": "and executes each step accordingly. If an execution error is encountered, a feedback loop is initiated:"
+    },
+    {
+     "line": 309,
+     "quote": "This error correction process is allowed to retry up to k times, where k is a predefined maximum number of retry attempts."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsreasoner2026:explored-path-buffer",
+   "name": "Explored-path buffer",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "temporal_causal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "The buffer stores prior solution paths to avoid repeated evaluations and has no temporal semantics or task objective; it is GH under R3_1_TSK:no, R3_2_GTS:no, R3_3_GH:yes.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - path deduplication is task-agnostic",
+    "R3_2_GTS:no - stored paths are workflow state rather than temporal data",
+    "R3_3_GH:yes - it manages execution state"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 318,
+     "quote": "the program executor maintains a buffer memory of previously explored solution paths to prevent redundant evaluations."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsreasoner2026:temporal-toolkit",
+   "name": "Unified time-series operator suite",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "temporal_causal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "The suite operates on temporal series and time-indexed external data across tasks, without binding its core interface to one task; it is GTS under R3_1_TSK:no, R3_2_GTS:yes, R3_3_GH:no.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - the operator interface supports heterogeneous analyses",
+    "R3_2_GTS:yes - operators process time-series data and queried temporal ranges",
+    "R3_3_GH:no - temporal semantics make GTS the more specific layer"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 244,
+     "quote": "canonical time series analysis tasks such as forecasting, imputation, and anomaly detection using models like ARIMA"
+    },
+    {
+     "line": 252,
+     "quote": "wrapping API calls to available services that supply time series based on queries."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsreasoner2026:custom-operator",
+   "name": "LLM-generated custom operator",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK no: the operator takes an arbitrary natural-language prompt and returns code, so its interface does not change with the task family (forecast adjustment is only the cited example). R3_2_GTS no: no temporal order, window or availability rule is built in. R3_3_GH yes: on-demand tool generation and execution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - prompt-to-code interface is task-agnostic; forecasting is an example",
+    "R3_2_GTS:no - no temporal semantics in the mechanism",
+    "R3_3_GH:yes - generates and runs tools on demand"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 254,
+     "quote": "Custom Operators To address the impracticality of predefining all necessary time series tools, we introduce a LLM-generated custom operator. This is a single operator that accepts a natural language prompt"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "tsreasoner2026:forecast-holdout",
+   "name": "Within-instance forecast model selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "It selects a forecasting model by MAPE on a temporally valid pseudo-holdout, so changing the task changes the objective and validation criterion; it is TSK under R3_1_TSK:yes.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - model selection uses forecasting quality and horizon-specific validation",
+    "R3_2_GTS:no - forecasting objective is more specific than generic temporal dependence",
+    "R3_3_GH:no - the task objective determines selection"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 315,
+     "quote": "MAPE) to experiment with different model choices and select the best-performing one."
+    },
+    {
+     "line": 316,
+     "quote": "via within-instance, temporally valid self-evaluation, where the last 10% of each time series is used as a"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1149,
+   "quote": "achieves only a 58.7% success rate with the highest proportion of execution errors (33.8%) due to the complete lack of error feedback. The absence of execution errors in TS-Reasoner highlights the effectiveness of its"
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 316,
+   "quote": "via within-instance, temporally valid self-evaluation, where the last 10% of each time series is used as a"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1061,
+   "quote": "Percentage Error (MAPE) is chosen as the primary inference quality metric to ensure scale-invariant evaluation. TS-Reasoner outperforms baseline models in success rates while simultaneously achieving superior"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "tsreasoner2026:execution-feedback",
+   "decision": "change",
+   "new_ids": [
+    "tsreasoner2026:execution-feedback"
+   ],
+   "changes": [
+    "name: Program execution and error-revision loop",
+    "dimensions: Control, Verification, and Feedback + Planning and Workflow -> Planning and Orchestration",
+    "tasks and other_tasks populated from the demonstrated workflow use"
+   ],
+   "reason": "The packet explicitly combines program execution with error-triggered re-invocation and retry, while the current card uses retired dimension labels."
+  },
+  {
+   "existing_id": "tsreasoner2026:temporal-toolkit",
+   "decision": "split",
+   "new_ids": [
+    "tsreasoner2026:temporal-toolkit",
+    "tsreasoner2026:custom-operator"
+   ],
+   "changes": [
+    "standard reusable temporal operators retained as GTS",
+    "LLM-generated custom operator split out as GH (Tools and Execution)",
+    "functions: processing plus data_management for the suite"
+   ],
+   "reason": "The paper presents the custom operator as a distinct fourth operator group that generates code from a natural-language prompt; it is separately reusable and not bound to a task, so it is GH, while the standard suite stays GTS."
+  },
+  {
+   "existing_id": "tsreasoner2026:forecast-holdout",
+   "decision": "change",
+   "new_ids": [
+    "tsreasoner2026:forecast-holdout"
+   ],
+   "changes": [
+    "name: Within-instance forecast model selection",
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration",
+    "functions: validation",
+    "scope: forecasting-specific TSK"
+   ],
+   "reason": "The packet states that MAPE feedback selects the best forecasting model using a temporally valid last-10% pseudo-holdout."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The benchmark and its evaluators are evaluation resources excluded as method-paper evaluation datasets under R1; standard forecasting, anomaly, and statistical models wrapped unchanged are not counted as separate modules. Adjudication: custom operator moved TSK->GH since its mechanism is task-agnostic.",
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "temporal-toolkit layer GTS->GTS (keep)",
+    "verdict": "accept",
+    "result": "GTS, Tools and Execution, data_management+processing",
+    "reason": "Model, numerical and external-data retrieval operators act on time series and time-indexed queries across forecasting, imputation and anomaly detection.",
+    "line": 244
+   },
+   {
+    "item": "split of custom operator out of toolkit (new module)",
+    "verdict": "accept",
+    "result": "separate module id tsreasoner2026:custom-operator",
+    "reason": "Described as a distinct operator that generates code from a natural-language prompt, separately reusable.",
+    "line": 254
+   },
+   {
+    "item": "custom operator layer TSK (candidate)",
+    "verdict": "modify",
+    "result": "GH, Tools and Execution, inferred reuse on forecasting",
+    "reason": "Operator accepts any prompt and returns code for diverse task demands; forecasting constraint adjustment is just an example, so R3_1_TSK is not met and no temporal semantics apply.",
+    "line": 254
+   }
+  ],
+  "summary": "Toolkit stays GTS. The custom operator is kept as its own module but moved from TSK to GH because its interface is not tied to a task family."
+ }
+}

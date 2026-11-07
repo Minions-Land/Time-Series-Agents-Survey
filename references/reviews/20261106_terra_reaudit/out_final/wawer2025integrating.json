@@ -1,0 +1,312 @@
+{
+ "citation_key": "wawer2025integrating",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "ElliottAgents is a fixed seven-agent pipeline that detects Elliott Wave patterns in stock prices, validates them with DRL backtesting against stored historical outcomes, and synthesizes forecasts into trading recommendations.",
+ "claim_evidence": [
+  {
+   "line": 15,
+   "quote": "This paper introduces ElliottAgents, an multi-agent system that integrates the Elliott Wave Principle with AI for stock market forecasting."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "wawer2025integrating:multi-agent-workflow",
+   "name": "Coordinator-managed multi-agent execution flow",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 no: the coordinator, hierarchical roles, asynchronous parallel execution, task decomposition and memory identifiers (Sec. 4.5) do not embed a task objective or verifier; the stock-specific stage order is an instantiation of the flow, not the mechanism. R3_2 no: no temporal semantics. R3_3 yes: scheduling, delegation and state passing between agents.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - coordination mechanism has no task objective",
+    "R3_2_GTS:no - no temporal semantics",
+    "R3_3_GH:yes - coordinator scheduling, parallel execution and state",
+    "R4:Planning and Orchestration"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 307,
+     "quote": "The Coordinator agent orchestrates the entire process. It begins by receiving user input, including the desired stock symbol and analysis timeframe."
+    },
+    {
+     "line": 432,
+     "quote": "The coordinator is the agent who manages the whole flow of information in the system, distributes the tasks and ensures their execution, as presented on Fig. 6."
+    },
+    {
+     "line": 436,
+     "quote": "Asynchronous task execution enables agents to operate in parallel, mitigating bottlenecks and enhancing throughput (Li et al., 2024)."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "wawer2025integrating:wave-tools",
+   "name": "Elliott-wave detection and chart tools",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 no: the Elliott-wave reader identifies and classifies wave structure in ordered price series and feeds both the forecast and the advice; it carries no output requirement or verifier of either task family, so replacing the task does not force a redesign. R3_2 yes: detection depends on temporal order and multiple timeframes (daily, hourly).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - detector has no task objective",
+    "R3_2_GTS:yes - wave detection over ordered series and timeframes",
+    "R4:Tools and Execution",
+    "R5:processing"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 288,
+     "quote": "The platform implements algorithms for identifying Elliott Wave patterns across multiple timeframes as a tool for agents. Then results of this tool are interpreted by LLM-based agents."
+    },
+    {
+     "line": 405,
+     "quote": "Elliot waves reader: tool for technical analysis, helping the agent identify and interpret Elliot wave patterns in price movements."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "wawer2025integrating:drl-backtester",
+   "name": "DRL backtesting of wave patterns with stored outcome reuse",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 yes: the Backtester validates detected wave patterns against historical price outcomes with a DRL model and stores pattern-outcome records for later forecasts; its reward, verifier and stored state are defined by the price-prediction objective and would be redesigned for another task family. The DRL model is separate from the LLM, so it is Harness, not LLM side. The knowledge-base lookup and storage only function inside this procedure, so they are merged here.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness (DRL model is separate from the LLM)",
+    "R3_1_TSK:yes - validates forecasts against historical outcomes",
+    "R4:Tools and Execution; Memory and Context; Optimization and Evolution",
+    "R5:task_procedure with context_memory"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 312,
+     "quote": "The Backtester agent then receives the identified patterns and employs DRL to validate them against historical trends, assessing their effectiveness."
+    },
+    {
+     "line": 423,
+     "quote": "The Backtester’s workflow begins with a query to determine if relevant results are already available in the backtesting knowledge base."
+    },
+    {
+     "line": 424,
+     "quote": "These findings are then stored in the Neo4j graph database for future reference."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "wawer2025integrating:investment-synthesis",
+   "name": "Investment-strategy synthesis with price targets and stop-loss",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 yes: the Investment Advisor procedure embeds the decision output requirement (buy/sell/hold, entry and exit price targets, stop-loss, time frames); another decision task needs a different output and risk criterion. The generic orchestration moved to multi-agent-workflow.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness (prompt-defined role, no parameter update)",
+    "R3_1_TSK:yes - decision-output requirements embedded",
+    "R4:Planning and Orchestration"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 320,
+     "quote": "This agent synthesizes all the information, incorporating insights from a RAG tool, to formulate a comprehen-"
+    },
+    {
+     "line": 365,
+     "quote": "- Buy, sell, or hold recommendations - Price targets for entry and exit points - Stop-loss levels - Time frames for the transactions"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 484,
+   "quote": "The second phase of our experimentation was designed to assess the system’s pattern recognition capabilities and the accuracy of its predictions."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 509,
+   "quote": "we could simulate transactions and calculate theoretical investment returns, proving the effectiveness of predictions of future prices."
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "wawer2025integrating:wave-tools",
+   "decision": "change",
+   "new_ids": [
+    "wawer2025integrating:wave-tools"
+   ],
+   "changes": [
+    "layer TSK->GTS",
+    "reuse_evidence not_applicable->demonstrated",
+    "view_status stays mapped"
+   ],
+   "reason": "The detector has no task objective and depends on temporal order and timeframes; it serves both forecasting and advice. Same mechanism, id kept."
+  },
+  {
+   "existing_id": "wawer2025integrating:investment-synthesis",
+   "decision": "split",
+   "new_ids": [
+    "wawer2025integrating:investment-synthesis",
+    "wawer2025integrating:multi-agent-workflow"
+   ],
+   "changes": [
+    "dimensions: Coordination and Scaling, Planning and Workflow, Interface and Interaction -> Planning and Orchestration",
+    "generic coordinator/parallel-execution mechanism moved to new GH module multi-agent-workflow",
+    "layer kept TSK for synthesis",
+    "view_status task_procedure"
+   ],
+   "reason": "The card merged the Coordinator-managed flow (Sec. 4.5) with the Advisor's decision output. Orchestration has no task objective (GH); the Advisor prompt does (TSK)."
+  }
+ ],
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "role_of_work (Codex feedback_driven_agent vs Haiku fixed_workflow)",
+    "verdict": "modify",
+    "result": "fixed_workflow",
+    "reason": "The Coordinator runs a predetermined agent order (data, waves, backtest, expert, advisor, report); the only conditional is the backtest knowledge-base lookup, which does not change the action sequence of the agents.",
+    "line": 307
+   },
+   {
+    "item": "wave-tools layer TSK->GTS",
+    "verdict": "accept",
+    "result": "GTS, processing, reuse demonstrated",
+    "reason": "The wave reader identifies structure in ordered price series across timeframes and has no forecasting or advice output requirement; its output serves both task families.",
+    "line": 288
+   },
+   {
+    "item": "investment-synthesis TSK->TSK + GH split",
+    "verdict": "accept",
+    "result": "TSK investment-synthesis plus GH multi-agent-workflow",
+    "reason": "Coordinator, hierarchy, asynchronous execution and memory identifiers (L430-L450) are task-neutral scheduling; the Advisor prompt (L353-L371) embeds buy/sell/stop-loss outputs.",
+    "line": 432
+   },
+   {
+    "item": "Codex agent-workflow as TSK vs Haiku multi-agent-workflow as GH",
+    "verdict": "modify",
+    "result": "GH",
+    "reason": "R3_3 applies: the mechanism described in Sec. 4.5 does not embed a task objective; the stock stage order is only its instance.",
+    "line": 432
+   },
+   {
+    "item": "DRL backtester and backtest knowledge store (Haiku: TSK + GTS; Codex: one TSK)",
+    "verdict": "modify",
+    "result": "one TSK module drl-backtester",
+    "reason": "Sec. 4.4 describes the lookup, analysis and storage as one Backtester workflow whose records are forecasting pattern outcomes; the store has no cutoff or availability logic, so it does not stand alone as GTS.",
+    "line": 423
+   },
+   {
+    "item": "temporal_validity evidence (Codex present, Haiku absent)",
+    "verdict": "reject",
+    "result": "absent",
+    "reason": "The quoted wave non-overlap rule is a pattern definition, not a chronological split, leakage control or availability check; the cross-validation split is not described as chronological.",
+    "line": 490
+   },
+   {
+    "item": "investment-synthesis functions processing (Codex)",
+    "verdict": "reject",
+    "result": "functions empty",
+    "reason": "The Advisor prompt synthesizes text outputs and implements none of the four temporal functions.",
+    "line": 365
+   }
+  ],
+  "summary": "Role is a fixed workflow; the wave reader is GTS, orchestration is GH, and the DRL backtester with its knowledge store and the investment synthesis are TSK. Temporal validity evidence was removed."
+ },
+ "needs_human_review": false,
+ "notes": "GPT-4o-mini is used unchanged (L463) and fine-tuning is avoided (L419-L420), so no LLM-side module. Reuse for the workflow and wave reader rests on one stock pipeline serving two families (module tasks), a judgment call. Table 1 is garbled in the extraction."
+}

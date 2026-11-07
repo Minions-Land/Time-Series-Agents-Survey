@@ -1,0 +1,284 @@
+{
+ "citation_key": "aiaforecaster2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "The work contributes adaptive evidence search, a forecasting-specific supervisor and probability calibration, plus a cutoff-bias detector and market-based forecasting benchmarks.",
+ "claim_evidence": [
+  {
+   "line": 1118,
+   "quote": "This work describes a practical recipe for LLM-based judgmental forecasting: (i) prioritize evidence quality via agentic, adaptive search; (ii) reduce variance by ensembling independent runs; (iii) use a supervisor agent to actively reconcile disparate forecasts; and (iv) apply statistical calibration to counteract the behavioral biases of LLMs."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "aiaforecaster2025:adaptive-search",
+   "name": "Adaptive multi-step evidence search",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK no: the search procedure does not embed the binary forecast output criterion, and the search tool strategy can serve other task families. R3_2 GTS no: the mechanism iterates over retrieved evidence but does not require numerical-series order, windows, frequency, units, or information-availability semantics. R3_3 GH yes: it coordinates query execution based on prior results.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - task-independent search procedure",
+    "R3_2_GTS:no - no temporal data semantics in the search mechanism",
+    "R3_3_GH:yes - execution and query planning",
+    "R4:Tools and Execution; Planning and Orchestration",
+    "R5:general_runtime"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 290,
+     "quote": "Each forecasting agent is granted access to an external search provider, which it can query as needed. As described above, a key feature of this search procedure is that it is agentic and adaptive"
+    },
+    {
+     "line": 293,
+     "quote": "each agent is granted full discretion to determine whether and how to query the search provider, and can iteratively improve the quality of its evidence by conditioning each query on prior results."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aiaforecaster2025:forecast-reconciliation",
+   "name": "Agentic forecast disagreement supervisor",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK yes: the supervisor revises an event probability by resolving disagreements among forecasts and producing an updated forecast; changing task family changes the objective and output. GTS and GH do not match because the module is bound to the forecasting objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecasting probability objective",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 950,
+     "quote": "Finally, we propose the “agentic supervisor,” which proceeds in three steps. First, the supervisor model identifies disagreements among the 10 input forecasts. Second, the supervisor generates and executes a series of search queries intended to resolve these disagreements"
+    },
+    {
+     "line": 954,
+     "quote": "Finally, the supervisor generates an updated forecast along with its confidence that the forecast was updated in the correct direction"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aiaforecaster2025:statistical-calibration",
+   "name": "Forecast probability calibration",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK yes: Platt scaling transforms forecast probabilities to improve the binary forecasting score, so its criterion is tied to this task output. It is not general temporal-state management.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - probability forecast calibration objective",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 340,
+     "quote": "these pitfalls can be corrected rather easily with statistical corrections such as Platt scaling."
+    },
+    {
+     "line": 344,
+     "quote": "We explore popular statistical calibration methods, and demonstrate that Platt scaling and a certain class of extremization techniques are mathematically equivalent."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aiaforecaster2025:foreknowledge-checks",
+   "name": "Foreknowledge-bias detection pipeline",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1 TSK yes: the detector applies the forecasting-specific criterion of evidence beyond the intended forecast cutoff; its cutoff and verifier must be redesigned for another task family. GTS does not win because this is a task-specific validity check, not a general temporal data manager.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast information-cutoff validation",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure; validation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 679,
+     "quote": "Through manual analysis, we taxonomize sources of foreknowledge bias and provide examples in Appendix C. We then develop an LLM-as-a-judge pipeline that reviews search provider responses and flags those that exhibit foreknowledge bias."
+    },
+    {
+     "line": 683,
+     "quote": "For each query, we collect search provider snippets and any passages cited by the forecaster, prompt the judge to indicate whether the evidence implies knowledge beyond the intended date cutoff, and record a binary flag with a brief rationale."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aiaforecaster2025:market-benchmarks",
+   "name": "Market-based forecasting benchmarks",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "validation"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "R3_1 TSK yes: the introduced datasets embed binary event-forecast questions and evaluation against outcomes or market prices, so their content and scoring must change for another task family. GTS describes temporal properties but does not replace the task-specific benchmark objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness resource",
+    "R3_1_TSK:yes - benchmark embeds forecasting outputs and evaluation",
+    "R5:resource_level"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 398,
+     "quote": "Next, we curate a timely dataset of binary forecasting events sourced from a popular public prediction market platform."
+    },
+    {
+     "line": 803,
+     "quote": "To do this, we collected a dataset of live markets on a popular prediction market platform, filtered by relevance and liquidity."
+    },
+    {
+     "line": 806,
+     "quote": "We conducted this process nightly between August 15, 2025 and August 21, 2025, which yielded approximately 1500 questions per night."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 687,
+   "quote": "We manually audit n=502 search provider traces randomly sampled across both flagged and unflagged items."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 150,
+   "quote": "We build a custom pipeline for detecting foreknowledge bias and demonstrate its efficacy, confirming the integrity of our results."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 413,
+   "quote": "As is standard in the LLM forecasting literature (e.g., Halawi et al. (2024); Karger et al. (2024); Schoenegger et al. (2024)), we use the Brier score to evaluate forecasting performance"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "aiaforecaster2025:adaptive-search",
+   "decision": "change",
+   "new_ids": [
+    "aiaforecaster2025:adaptive-search"
+   ],
+   "changes": [
+    "dimensions: Planning and Workflow -> Planning and Orchestration",
+    "tasks: [] -> [forecasting_prediction]",
+    "functions remain empty; GH/general_runtime"
+   ],
+   "reason": "Retain the mechanism and GH scope: queries adapt to prior results, and the search process is not tied to a forecasting-specific output requirement. The current dimension label is retired."
+  },
+  {
+   "existing_id": "aiaforecaster2025:forecast-reconciliation",
+   "decision": "split",
+   "new_ids": [
+    "aiaforecaster2025:forecast-reconciliation",
+    "aiaforecaster2025:statistical-calibration"
+   ],
+   "changes": [
+    "name: Probability reconciliation and calibration -> Agentic forecast disagreement supervisor",
+    "dimensions: retired labels -> Planning and Orchestration",
+    "separate Platt scaling into aiaforecaster2025:statistical-calibration"
+   ],
+   "reason": "The supervisor actively resolves forecast disagreements with additional search, while Platt scaling is a separate, independently applicable probability correction. The packet supports distinct mechanisms and task-specific output criteria."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Added the independently described foreknowledge-bias detection pipeline and the introduced MarketLiquid/live-market benchmark resource. The card combined supervisor reconciliation and calibration, which are separable contributions in the packet. The benchmark is classified TSK because it embeds binary forecasting questions and their evaluation criterion."
+}

@@ -1,0 +1,195 @@
+{
+ "citation_key": "veritime2026",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "VeriTime contributes a process-verifiable time series reasoning dataset (TSRgen/TSRBench with a six-step CoT) and difficulty-scheduled SFT and GRPO training with process rewards to improve LLM reasoning.",
+ "claim_evidence": [
+  {
+   "line": 102,
+   "quote": "In this work, we propose VeriTime, a time series reasoning framework that enhances LLMs’ TS reasoning capabilities through process-verifiable reasoning data synthesis and tailored RL effectively exploiting time series-specific intermediate learning signals from the generated data."
+  }
+ ],
+ "task_memberships": [
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "temporal_question_answering",
+  "time_series_classification",
+  "temporal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "veritime2026:process-labelled-data",
+   "name": "TSRgen process-verifiable reasoning dataset with six-step temporal CoT",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "time_series_classification",
+    "temporal_analysis"
+   ],
+   "role": "training_data",
+   "scope_reason": "R2 places training data built to shape time series reasoning on the LLM side. The six-step CoT is the template TSRgen uses to generate trajectories and the structure that the process-level labels and rewards attach to; it is not a deployed runtime procedure and only functions together with the dataset, so it is merged here rather than split as a Harness module. Task coverage is not a Harness layer claim.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 280,
+     "quote": "In conclusion, the TSRgen is an automated TS-text dataset synthesis pipeline that integrates diverse reasoning tasks within a structured, TS–tailored reasoning dataset, named as TSRBench."
+    },
+    {
+     "line": 233,
+     "quote": "TSRgen constructs a TS-tailored reasoning process with six logically ordered steps illustrated in Figure 1."
+    },
+    {
+     "line": 242,
+     "quote": "Verifiable Process Annotation Extraction. To facilitate Reinforcement Learning (RL) for improving LLM time series reasoning performance, both the final label and the effective supervision of intermediate reasoning steps are crucial."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "veritime2026:scheduled-rft",
+   "name": "Difficulty-scheduled SFT and reinforcement fine-tuning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "time_series_classification",
+    "temporal_analysis"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 places SFT and RL that update model parameters on the LLM side. Scheduling assigns samples to SFT or GRPO based on difficulty, while process rewards supervise reasoning; it is not a deployment workflow or trained tool-selection policy.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 320,
+     "quote": "The training process consists of two stages, corresponding to the two subsets defined above."
+    },
+    {
+     "line": 311,
+     "quote": "we propose a selective RFT data rollout strategy that identifies learnable and representative samples based on the difficulty hierarchy of TSRBench"
+    },
+    {
+     "line": 474,
+     "quote": "Reliable intermediate reasoning steps are crucial for interpretable time series reasoning. To comprehensively assess the quality of the LLM reasoning trajectory, we further introduce four process-level rewards aligned with the TS-tailored reasoning steps."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 725,
+   "quote": "The performance of VeriTime compared to baselines on scenario-based reasoning tasks is presented in Table 1. The results show that general LLMs, including Qwen2.5 and Qwen3 in their base settings, perform equally unsatisfactorily"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "veritime2026:process-labelled-data",
+   "decision": "change",
+   "new_ids": [
+    "veritime2026:process-labelled-data"
+   ],
+   "changes": [
+    "removed retired dimension label; LLM training data has no dimensions",
+    "llm_route: instruction_reasoning",
+    "added temporal_analysis to other_tasks",
+    "six-step CoT folded in, not split out"
+   ],
+   "reason": "The dataset and its six-step CoT annotation structure are one training-data mechanism; layer stays LLM."
+  },
+  {
+   "existing_id": "veritime2026:scheduled-rft",
+   "decision": "change",
+   "new_ids": [
+    "veritime2026:scheduled-rft"
+   ],
+   "changes": [
+    "removed retired dimension label",
+    "llm_route: instruction_reasoning",
+    "added temporal_analysis to other_tasks"
+   ],
+   "reason": "Parameter-updating SFT and GRPO with difficulty allocation and process rewards are LLM-side instruction/reasoning training."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Role is llm_side_technique. The six-step CoT could be read as a prompt procedure (R2 boundary), but the packet uses it only for data generation and as the training target format. No forecasting contribution.",
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "process-labelled-data layer LLM -> LLM + GTS (new ts-tailored-cot GTS module)",
+    "verdict": "reject",
+    "result": "no GTS module; CoT merged into process-labelled-data (LLM, training_data)",
+    "reason": "The six-step CoT is the generation and annotation template of TSRBench (L233-L259) and the format the model is trained to produce; there is no runtime harness that executes it at deployment, and its steps only function together with the labels and rewards (R1 merge rule).",
+    "line": 233
+   },
+   {
+    "item": "process-labelled-data stays LLM",
+    "verdict": "accept",
+    "result": "LLM, instruction_reasoning, training_data",
+    "reason": "Data built to train the model's reasoning (R2).",
+    "line": 280
+   },
+   {
+    "item": "scheduled-rft",
+    "verdict": "accept",
+    "result": "LLM, instruction_reasoning",
+    "reason": "SFT warmup, normal-sample SFT and hard-sample GRPO update parameters (L274-L331).",
+    "line": 320
+   }
+  ],
+  "summary": "The proposed GTS six-step CoT module was rejected and merged into the training-data module, leaving two LLM-side modules. Other fields of the candidate were accepted."
+ }
+}

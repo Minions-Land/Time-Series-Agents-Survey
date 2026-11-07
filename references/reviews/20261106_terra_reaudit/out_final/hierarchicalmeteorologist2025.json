@@ -1,0 +1,269 @@
+{
+ "citation_key": "hierarchicalmeteorologist2025",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "The work contributes a fixed harness that prepares and aggregates weather forecast tables at multiple temporal scales, then generates structured weather narratives with keywords and supporting proof.",
+ "claim_evidence": [
+  {
+   "line": 63,
+   "quote": "• a hierarchical scheme for interpreting tabular forecasts\n(hourly → six-hourly → daily) and composing a causally\nconsistent cross-scale narrative;"
+  },
+  {
+   "line": 66,
+   "quote": "• the introduction of weather keywords as a semantic validation layer and concise summary, linked to the data\nthrough a structured proof-block;"
+  },
+  {
+   "line": 39,
+   "quote": "how can their tabular outputs be transformed into explainable and verifiable textual reports? In this paper we treat\nsuch models purely as sources of forecast tables and intentionally avoid the modeling details."
+  }
+ ],
+ "task_memberships": [],
+ "other_tasks": [
+  "time_series_reporting"
+ ],
+ "modules": [
+  {
+   "id": "hierarchicalmeteorologist2025:api-reliability",
+   "name": "Weather context acquisition, normalization and caching",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Memory and Context"
+   ],
+   "functions": [
+    "data_management",
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_reporting"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not apply: collecting timestamped, unit-bearing weather inputs and climatological background does not encode a report-quality objective. Under the counterfactual, another temporal task could consume the same normalized and cached context. R3_2_GTS applies because the context retains hourly forecasts and monthly climatology. This retained module ID denotes the source-specific frozen temporal context and climatology fallback; generic REST retries and JSON checks alone would be GH, but are not counted as a separate contributed mechanism under R1.",
+   "rubric_path": [
+    "R1:contributed integration of open sources and cached context",
+    "R2:Harness",
+    "R3_1_TSK:no - context collection and retention do not require a reporting objective",
+    "R3_2_GTS:yes - hourly observations and monthly climatology have temporal semantics",
+    "R4:Tools and Execution; Memory and Context",
+    "R5:data_management; context_memory",
+    "R7:other_tasks time_series_reporting",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 196,
+     "quote": "Climatology. The primary source is Meteostat (monthly\naggregates and normals). When services are unavailable,\nthe system returns back to monthly ERA5 climatology on\na 0.25◦ grid with nearest-neighbor extraction at the query\npoint. For each month we store {Tmin , Tmax , Ptot }."
+    },
+    {
+     "line": 201,
+     "quote": "Hourly forecast. From OpenWeather (One Call 2.5) we\nuse table data with ∆t = 1 h consisting a timestamp,"
+    },
+    {
+     "line": 220,
+     "quote": "Both modes are serialized into a single payload and cached\n(replay without repeated external API calls; ability to run\ndifferent “meteorologists” over the same frozen sample)."
+    },
+    {
+     "line": 181,
+     "quote": "The external-data processing block Assistant collects and\nnormalizes location-specific inputs across meteorology, climatology, and geodata, then builds aggregates (6-hour and\ndaily windows), and packages one of two context modes"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "hierarchicalmeteorologist2025:multiscale-context",
+   "name": "Hierarchical temporal aggregation and context selection",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Memory and Context"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_reporting"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not apply: windowed aggregates and horizon-dependent context packaging do not optimize or validate a forecast or narrative output. Under the counterfactual, the same means, extrema, sums and circular wind averages could support another temporal task. R3_2_GTS applies because 6-hour/daily windows and lead time determine the transformation.",
+   "rubric_path": [
+    "R1:contributed hierarchical context scheme",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-output objective or acceptance criterion",
+    "R3_2_GTS:yes - explicit temporal windows and lead-time-dependent context",
+    "R4:Tools and Execution; Memory and Context",
+    "R5:processing",
+    "R7:other_tasks time_series_reporting",
+    "R8:inferred",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 211,
+     "quote": "To enable interpretation at multiple time scales while controlling context length, the Assistant aggregates over nonoverlapping windows W ∈ {6h, 1d} using means/minima/maxima for T , means for RH and U , sums for P ."
+    },
+    {
+     "line": 215,
+     "quote": "• Hierarchical Context: location and climatology, a daily\ntable, and a 6-hour aggregate table for the location; when\nthe lead time H < 5 days, the hourly table is additionally\nincluded."
+    },
+    {
+     "line": 218,
+     "quote": "included. For H ∈ [5, 10] days the hourly grid is omitted to save tokens and reduce LLM attention bias toward\nlarge tables."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "hierarchicalmeteorologist2025:weather-report",
+   "name": "Keyword-proof weather report procedure",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_reporting"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies first: the Meteorologist-to-Writer procedure embeds the weather narrative's required summary, proof, keywords and warnings, followed by a fixed report format. Changing to another task family would require redesigning those output semantics and grounding requirements. This is an in-context harness procedure, with no parameter training or implemented independent temporal validator.",
+   "rubric_path": [
+    "R1:contributed keyword-proof narrative procedure and two-stage report integration",
+    "R2:Harness - prompts and structured outputs without training",
+    "R3_1_TSK:yes - task-specific report output and evidential requirements",
+    "R4:Interface and Interaction; Planning and Orchestration",
+    "R5:no separately executed temporal checking established",
+    "R7:other_tasks time_series_reporting",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 235,
+     "quote": "• keywords — 3–5 weather keywords summarizing\ndominant weather states and transitions over the time interval (e.g., “cooling; brief rain; wind strengthening”)."
+    },
+    {
+     "line": 237,
+     "quote": "Generation is performed by the LLM with a controlled\nvocabulary and guidance to rely on aggregates; each keyword is expected to correspond to at least one feature in\nthe proof;"
+    },
+    {
+     "line": 245,
+     "quote": "The Writer receives the structured analysis and user parameters (tone, length, application domain) and composes a report with a predefined JSON structure consisting:"
+    },
+    {
+     "line": 267,
+     "quote": "The system does not perform separate “tabular reasoning”\nwith programmatic hypothesis testing; verifiability is realized through the two-step textual rationale (summary +\nproof) and its linkage to keywords."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 316,
+   "quote": "(“humid and windy” → “cooler and drier”); the proof\nblock correctly relates these tags to elevated early P totals,\nrising U and a θ shift, and to decreasing daily T maxima."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 341,
+   "quote": "(4) The content of the summary remains aligned\nwith threshold-based weather labels in the forecast tables\nand no false descriptions are observed"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The blind task label temporal_analysis is refined to the current card's more specific, source-supported other task time_series_reporting. Supplied numerical forecasts are interpreted rather than newly predicted; remove forecasting_prediction. Four locations are not cross-task reuse. reuse_evidence.tasks is empty because no closed-vocabulary task family is demonstrated. Keep the current module IDs for the same mechanisms. Cached temporal payloads and climatology fallback are GTS; ordinary retries/schema checks would be GH, but are not counted separately without substantive redesign. Numerical/table consistency and report accuracy are evaluated qualitatively; there are no chronological-split/leakage tests, runtime-success statistics or measured decision utility. Keyword-proof grounding is a report requirement, not an independently executed validator. The critic-corrector, benchmark and ReAct tools are future work, and no LLM training is contributed. The API-version inconsistency does not affect the classification.",
+ "reconciliation": [
+  {
+   "existing_id": "hierarchicalmeteorologist2025:multiscale-context",
+   "decision": "change",
+   "new_ids": [
+    "hierarchicalmeteorologist2025:multiscale-context"
+   ],
+   "changes": [
+    "Retain GTS, processing and mapped; include the adjacent horizon-dependent context selection.",
+    "dimensions: Interface and Interaction; Memory and Context -> Tools and Execution; Memory and Context",
+    "reuse_evidence: demonstrated with work-level forecasting/reporting labels -> inferred; no cross-task demonstration",
+    "other_tasks: [] -> [time_series_reporting]"
+   ],
+   "reason": "Lines 211-219 describe numerical aggregation and temporal-resolution packaging without a task-output acceptance criterion, so R3_2_GTS applies. The four locations demonstrate the same reporting task, not two task families. The module remains the same aggregation mechanism and keeps its ID."
+  },
+  {
+   "existing_id": "hierarchicalmeteorologist2025:weather-report",
+   "decision": "change",
+   "new_ids": [
+    "hierarchicalmeteorologist2025:weather-report"
+   ],
+   "changes": [
+    "Retain TSK, task_procedure and the existing report mechanism ID.",
+    "dimensions: Coordination and Scaling -> Planning and Orchestration; retain Interface and Interaction",
+    "tasks: [forecasting_prediction] -> []; retain other_tasks [time_series_reporting]",
+    "Do not treat keyword-proof generation as an implemented independent temporal validator or feedback loop."
+   ],
+   "reason": "Lines 39-41 explicitly distinguish interpreting supplied forecasts from weather modeling. Lines 226-256 specify summary/proof/keyword outputs and a fixed Meteorologist-to-Writer sequence. Lines 267-269 limit verification to textual rationale; the critic-corrector and ReAct loops in lines 355-379 are future work."
+  },
+  {
+   "existing_id": "hierarchicalmeteorologist2025:api-reliability",
+   "decision": "change",
+   "new_ids": [
+    "hierarchicalmeteorologist2025:api-reliability"
+   ],
+   "changes": [
+    "Scope the module to weather-context acquisition, normalization, frozen-sample caching and climatology fallback.",
+    "layer: GH -> GTS",
+    "dimensions: Tools and Execution; Control, Verification, and Feedback -> Tools and Execution; Memory and Context",
+    "functions: [] -> [data_management, context_memory]; view_status: general_runtime -> mapped",
+    "reuse_evidence: demonstrated -> inferred; other_tasks: [] -> [time_series_reporting]",
+    "Do not count generic API retries and JSON validation as a separate module."
+   ],
+   "reason": "Lines 196-202 specify monthly climatological state, fallback and timestamped hourly input; lines 220-222 specify cached, frozen temporal samples. This temporal-context integration satisfies R3_2_GTS without embedding a reporting output objective. Lines 259-264 also list generic reliability practices, but no substantive redesign warrants an additional R1 module. Retain the ID because cached artifacts and source fallback remain the same mechanism."
+  }
+ ],
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "hierarchicalmeteorologist2025:api-reliability layer GH->GTS",
+    "verdict": "accept",
+    "result": "GTS, functions data_management + context_memory, scoped to temporal context acquisition, frozen-sample caching and climatology fallback",
+    "reason": "Lines 196-202 and 220-222 describe timestamped hourly inputs, monthly climatology with ERA5 fallback and cached replayable payloads (data versioning-like), which meets R3_2_GTS with no report objective; generic retries/JSON checks (L262-264) are not counted separately.",
+    "line": 220
+   }
+  ],
+  "summary": "The merged record was checked against the packet and the GH->GTS move is supported by the temporal caching and climatology fallback mechanism. No other changes were needed."
+ }
+}

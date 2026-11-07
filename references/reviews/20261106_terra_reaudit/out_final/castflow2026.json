@@ -1,0 +1,371 @@
+{
+ "citation_key": "castflow2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "CastFlow contributes a feedback-driven forecasting workflow with temporal diagnostics, a forecast anchor and strategy memory, plus a specialized LLM trained to refine the forecast from evidence.",
+ "claim_evidence": [
+  {
+   "line": 20,
+   "quote": "CastFlow organizes the forecasting process into planning, action, forecasting, and reflection, establishing an agentic workflow."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "castflow2026:forecast-workflow",
+   "name": "Feedback-driven forecast workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The planner schedules forecast diagnostics and the reflection gate returns failures to planning; forecasting criteria shape the procedure. For another task family the forecast horizon, baseline and output checks would change, so the core is TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast refinement and checks define the task objective",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 623,
+     "quote": "The workflow is closed by the reflection module, which functions as a quality gatekeeper for output reliability."
+    },
+    {
+     "line": 628,
+     "quote": "If any inconsistency is detected such that Iformat · Ilogic = 0, the module triggers a feedback loop that routes the process back to the planning phase for iterative refinement."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "castflow2026:forecast-anchorer",
+   "name": "Historical-case ensemble forecast anchorer",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "It selects an ensemble of forecasters by historical validation loss and produces the task's forecast baseline. Changing task family changes the forecast objective, model pool and horizon, so this is TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecast selection and baseline are task-specific",
+    "R4:Tools and Execution",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 428,
+     "quote": "The foundational anchorer establishes a dependable ensemble forecast baseline by utilizing the model auxiliary tool to extract reliable forecasting priors"
+    },
+    {
+     "line": 475,
+     "quote": "where fk (x) denotes the forecast of the k-th model associated with the retrieved cluster. The term Lk denotes the historical validation loss of model fk"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "castflow2026:temporal-profiler",
+   "name": "Statistical and spectral temporal profiling",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The profiler computes distribution statistics and spectral entropy over the observed series, without defining a task output criterion. If the task changed, the same temporal computations would still characterize the input series, so it is GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - profiling has no task output objective",
+    "R3_2_GTS:yes - it computes over temporal windows and frequencies",
+    "R4:Tools and Execution",
+    "R5:mapped"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 482,
+     "quote": "The statistical and spectral profiler delineates the macroscopic numerical boundaries and inherent predictability of the sequence through four specialized tools"
+    },
+    {
+     "line": 491,
+     "quote": "To evaluate the inherent predictability and noise level of the data, it computes the spectral entropy:"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "castflow2026:temporal-diagnostics",
+   "name": "Dynamics monitor and residual diagnoser",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "These tools compute time-dependent trends, changes, cross-channel dependencies and residual evidence. They operate on temporal sequence properties independently of task output criteria; the residual tool also guards against future-data leakage. Another task could reuse the same computations, so GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - diagnostics do not set task success criteria",
+    "R3_2_GTS:yes - tools depend on evolving temporal trajectories and leakage",
+    "R4:Tools and Execution",
+    "R5:mapped"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 517,
+     "quote": "The dynamics monitor captures evolving temporal trajectories, structural regime shifts, and multivariate dependencies using a suite of five tools"
+    },
+    {
+     "line": 567,
+     "quote": "to prevent unintended future-data leakage, this diagnostic tool is deployed only during the training phase and is strictly bypassed during testing."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "castflow2026:forecast-strategies",
+   "name": "Forecast-strategy memory",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The memory stores and retrieves forecast tool schedules, diagnostics and responses, with entries selected by horizon MSE. Its purpose embeds forecasting quality; another task would require a different stored trajectory and selection objective, so it is TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - memory entries are selected by forecast horizon error",
+    "R4:Memory and Context",
+    "R5:task_procedure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 585,
+     "quote": "We define each memory entry as a structural tuple e = ⟨x, A∗ , O∗ , τ ∗ ⟩, preserving the input sequence x, the optimal tool execution schedule A∗ , the corresponding diagnostic outputs O∗ , and the final model response τ ∗ ."
+    },
+    {
+     "line": 588,
+     "quote": "The optimal trajectory τ ∗ is selected by minimizing the overall mean squared error (MSE) over the entire future forecasting horizon H for each training instance:"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "castflow2026:forecast-reasoner",
+   "name": "Specialized evidence-guided forecast LLM",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "This is the parameter-tuned LLM that produces evidence-conditioned numerical forecasts, so its mechanism changes model responses on the LLM side (R2), rather than an external Harness module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 711,
+     "quote": "the forecasting module serves as the synthesis engine that converts retrieved strategies and diagnostic evidence into quantitative refinement under explicit domain-specific constraints."
+    },
+    {
+     "line": 713,
+     "quote": "We formalize this evidence-guided refinement as a conditional generation process optimizing the final numerical forecasting:"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "castflow2026:trajectory-sft-data",
+   "name": "Teacher-selected workflow trajectory SFT data",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "The work constructs teacher-generated input, reasoning-trace and forecast pairs to train the forecasting LLM. Since this is purpose-built model training data, it is on the LLM side under R2.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 765,
+     "quote": "The process begins with SFT to address the cold-start problem. We construct a high-quality dataset by extracting the optimal reasoning trajectories archived during the memory construction phase."
+    },
+    {
+     "line": 771,
+     "quote": "For each training instance, we capture the complete input context, including the ensemble forecast baseline and multi-view evidence, and pair it with the teacher model’s output, which comprises both the step-by-step reasoning trace and the final numerical answer."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1543,
+   "quote": "The most substantial performance degradation occurs when the reflective validation mechanism is removed. Fundamentally, without the structural safeguard of iterative self-correction, the agent occasionally produces formatting inconsistencies or sequence length mismatches."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 955,
+   "quote": "For rigorous evaluation, all multivariate time series datasets are strictly split chronologically into training, validation, and testing sets with a consistent ratio of 7:1:2."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1395,
+   "quote": "In long-term scenarios, the framework achieves the best results across all five datasets, effectively mitigating the error accumulation that plagues traditional autoregressive models, with particularly notable gains on WP and MOPEX."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "castflow2026:temporal-profiler",
+   "decision": "change",
+   "new_ids": [
+    "castflow2026:temporal-profiler"
+   ],
+   "changes": [
+    "dimensions: remove Interface and Interaction; retain Tools and Execution",
+    "tasks: add forecasting_prediction"
+   ],
+   "reason": "The packet describes statistical and spectral profiling as diagnostic tools over the temporal sequence, supporting GTS processing and tool execution; it is evaluated within forecasting, so reuse is inferred rather than demonstrated."
+  },
+  {
+   "existing_id": "castflow2026:forecast-strategies",
+   "decision": "split",
+   "new_ids": [
+    "castflow2026:forecast-strategies",
+    "castflow2026:forecast-workflow"
+   ],
+   "changes": [
+    "split forecast-strategy memory from the feedback-driven planning/action/forecasting/reflection workflow",
+    "dimensions: replace retired Planning and Workflow and Control, Verification, and Feedback with Memory and Context on the retained memory module"
+   ],
+   "reason": "The packet describes a retrievable trajectory memory selected by forecast MSE separately from a loop whose reflection feedback returns execution to planning. Both are contributed and independently identifiable; the new workflow module receives its own id."
+  },
+  {
+   "existing_id": "castflow2026:forecast-reasoner",
+   "decision": "change",
+   "new_ids": [
+    "castflow2026:forecast-reasoner"
+   ],
+   "changes": [
+    "remove LLM dimensions; add llm_route instruction_reasoning"
+   ],
+   "reason": "The packet trains only the specialized forecasting LLM to synthesize diagnostic evidence and strategies into numerical forecast corrections; the LLM route vocabulary is instruction_reasoning."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The card omits the task-specific historical-case ensemble anchorer, distinct dynamics and residual diagnostic tools, and teacher-selected SFT trajectory data described in the packet. The combined forecast-strategy memory/workflow card entry is split because the memory retrieval and feedback-driven workflow are separately reusable mechanisms. Experiments report chronological splits and forecast accuracy; no downstream decision-utility result is reported."
+}

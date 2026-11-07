@@ -1,0 +1,317 @@
+{
+ "citation_key": "structuredagenticworkflows2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TS-Agent contributes a case-guided, scaffolded financial time-series modeling workflow that records experiment context and uses performance feedback to refine forecasting and generation models.",
+ "claim_evidence": [
+  {
+   "line": 397,
+   "quote": "The TS-Agent consists of two stages: (1) the model pre-selection\nstage, and (2) the code refinement stage, depicted in Figure 1(a)."
+  },
+  {
+   "line": 399,
+   "quote": "The agent iteratively updates train.py by leveraging both external\nresources and the training performance from previous executions of\ntrain.py."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "data_augmentation_synthesis"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "structuredagenticworkflows2025:case-preselection",
+   "name": "Case-guided model preselection",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 does not match: retrieval and top-k recommendation consume a task description but do not implement its forecast horizon, generation objective, or numerical verifier. Changing task families requires different case/model entries, not a different retrieval procedure. R3_2 does not match: past cases are modeling reports, not timestamp-aligned or availability-checked temporal observations. R3_3 therefore assigns GH.",
+   "rubric_path": [
+    "R1:contributed - curated financial case-bank integration and top-k recommendation",
+    "R2:Harness - in-context case-based reasoning without model training",
+    "R3_1_TSK:no - task-conditioned retrieval does not embed a task-specific objective or verifier",
+    "R3_2_GTS:no - report retrieval has no temporal-order or information-cutoff logic",
+    "R3_3_GH:yes - generic retrieval and candidate orchestration",
+    "R4:Memory and Context; Planning and Orchestration",
+    "R5:general_runtime",
+    "R6:not_applicable",
+    "R7:forecasting_prediction; data_augmentation_synthesis",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "data_augmentation_synthesis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 486,
+     "quote": "At Stage 1, the agent performs Model Selection and applies casebased reasoning [10] to recommend the top-𝑘 model candidates for\nthe given task T ."
+    },
+    {
+     "line": 251,
+     "quote": "It comprises two types of cases: time-series forecasting and time-series\ngeneration."
+    },
+    {
+     "line": 488,
+     "quote": "models from the case bank 𝐸 case , it retrieves similar past problems\nand efficiently narrows down the most promising options in the\nmodel pool of the code base."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "structuredagenticworkflows2025:temporal-model-bank",
+   "name": "Scaffolded model and metric integration",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 matches: the contributed train.py integration exposes task models, evaluation measures, refinement code and training configurations to produce and score forecasts or synthetic series. A different task family requires redesigned model/output and metric semantics, even if the surrounding edit interface is reusable. Count the integration, not unchanged forecasting/generative models.",
+   "rubric_path": [
+    "R1:contributed - modular train.py integration with curated model and evaluation banks",
+    "R2:Harness - executable code interface around an unchanged LLM",
+    "R3_1_TSK:yes - task-model outputs and evaluation-measure semantics",
+    "R4:Interface and Interaction; Tools and Execution",
+    "R5:task_procedure - no temporal function implemented by the banks themselves",
+    "R6:not_applicable",
+    "R7:forecasting_prediction; data_augmentation_synthesis",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 354,
+     "quote": "• 𝐴model : select the models and measures in train.py;\n• 𝐴refinement : select training tips in train.py;\n• 𝐴fine-tune : select the hyper-parameter configurations;"
+    },
+    {
+     "line": 359,
+     "quote": "As the train.py is modular code template, the action of code\nediting Acode can be decomposed into the above first three submodules 𝐴model , 𝐴fine-tune and 𝐴refinement ."
+    },
+    {
+     "line": 366,
+     "quote": "Code Base. The code base includes the implementation of a model\nbank and an evaluation measure bank."
+    },
+    {
+     "line": 377,
+     "quote": "metrics and financial-specific test metrics. For example, for the\ngenerative task, it includes risk-aware tail metrics, temporal\ndependency measures, and distributional similarity metrics."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "structuredagenticworkflows2025:experiment-memory",
+   "name": "Experiment log and code memory",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 does not match: storing code, configurations, metric results and change rationales does not implement a task-family objective. R3_2 does not match: t indexes agent iterations, not observation timestamps or availability; experiment history has no temporal-data semantics. R3_3 assigns GH to this execution-context store.",
+   "rubric_path": [
+    "R1:contributed - dynamic memory combining experiment artifacts and external context",
+    "R2:Harness - state and context maintained outside the LLM",
+    "R3_1_TSK:no - experiment records are independent of the scoring objective",
+    "R3_2_GTS:no - execution iteration order is not time-series chronology",
+    "R3_3_GH:yes - generic experiment-state retention",
+    "R4:Memory and Context",
+    "R5:general_runtime",
+    "R6:not_applicable",
+    "R7:forecasting_prediction; data_augmentation_synthesis",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "data_augmentation_synthesis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 385,
+     "quote": "denote the train.py at time 𝑡. The memory of the agent at time 𝑡 is\ndefined as M𝑡 := (𝐼 𝑣 , S𝑣 )𝑣 ∈𝑡 , which dynamically incorporates the\nnew experiment results, the codes/configuration of each experiment\nand all the log information generated by the agents."
+    },
+    {
+     "line": 389,
+     "quote": "The context at time 𝑡, denoted by C𝑡 is defined as the union of the\ndynamic memory information M𝑡 and the static external library 𝐸,\ntask information T ."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "structuredagenticworkflows2025:code-search",
+   "name": "Performance-gated round-robin refinement",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 does not match: the round-robin search (warm-up, then accept-if-loss-decreases, else revert) takes the task evaluation criterion and loss as parameters (L421-L424, L503-L506) and is the same procedure for forecasting and generation; changing the task family changes the model/measure banks, not the search state, actions or acceptance rule. R3_2 does not match: no timestamps, windows or availability are used. R3_3 assigns GH (execution control and state).",
+   "rubric_path": [
+    "R1:contributed - two-phase search with empirical refinement and rollback",
+    "R2:Harness - prompted code/configuration edits and execution feedback",
+    "R3_1_TSK:no - search procedure is task-agnostic, criterion is an input",
+    "R3_2_GTS:no - no temporal semantics",
+    "R3_3_GH:yes - execution control and state",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:general_runtime",
+    "R6:not_applicable - fine-tuning concerns task-model configurations",
+    "R7:forecasting_prediction; data_augmentation_synthesis",
+    "R8:demonstrated",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "data_augmentation_synthesis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 503,
+     "quote": "Stage 2 employs a two-phase Round-Robin Search [21], consisting of the Warm-up Phase and the Optimization Phase."
+    },
+    {
+     "line": 505,
+     "quote": "Refinement and Fine-tuning . If a candidate script reduces the\nloss, it replaces the incumbent and serves as the starting point for"
+    },
+    {
+     "line": 421,
+     "quote": "Warm-up Phase. The agent first conducts Code Refinement in\nparallel on each model 𝑀𝑖 for a small number of iterations. The\nbest combination of model, refinement, and hyper-parameters is\nthen selected based on the evaluation criteria of the given task."
+    },
+    {
+     "line": 433,
+     "quote": "(2) Refinement . This step involves modifying the code related\nto refinement (𝐴refinement ) using knowledge from the refinement tip library 𝐸 refinement and the additional the training\nlog of numerical experiments 𝐼𝑡 ."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 910,
+   "quote": "and optimal hyperparameters. TS-Agent also establishes strong robustness in success rate across different LLMs, consistently achieving a 100% success rate, while the success rates of DS-Agent and\nResearch-Agent vary widely from 0% to 100%. Although all agents"
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 888,
+   "quote": "over five runs. Compared with AutoGluon, TSAgent cuts RMSE\nby more than 20% on Exchange and around 8% on Crypto."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "No LLM training is established: fine-tuning edits downstream task-model hyperparameters. Within-run reflective search is Planning and Orchestration, not cross-episode Optimization and Evolution. Unchanged model implementations, baselines and evaluation datasets are not separate contributions. Generic train/test separation and knowledge-bank entries mentioning leakage or walk-forward evaluation do not establish chronological/leakage-safe experiments. Sharpe/VaR/ES differences are prediction or synthesis fidelity measures, not evaluated downstream action utility, so decision_support is not added. Reconciliation adds the separately described case-preselection and experiment-memory modules omitted from the current card. Processing is included for the task-specific model/metric interface after checking the bank's numerical measures. The method also conditions hyperparameter edits on multiple test metrics (L437-L438), so the packet does not establish an untouched, leakage-safe evaluation holdout. Adjudication: code-search kept GH (see adjudication).",
+ "reconciliation": [
+  {
+   "existing_id": "structuredagenticworkflows2025:code-search",
+   "decision": "change",
+   "new_ids": [
+    "structuredagenticworkflows2025:code-search"
+   ],
+   "changes": [
+    "layer GH->GH (candidate GH->TSK rejected)",
+    "dimensions: replace Control, Verification, and Feedback with Planning and Orchestration; remove Optimization and Evolution; retain Tools and Execution",
+    "tasks: none -> both work tasks via reuse evidence"
+   ],
+   "reason": "Mechanism unchanged; search logic is task-agnostic (criterion is an input), reused across forecasting and generation with no redesign, so R3_1 fails and GH holds; no cross-episode update."
+  },
+  {
+   "existing_id": "structuredagenticworkflows2025:temporal-model-bank",
+   "decision": "change",
+   "new_ids": [
+    "structuredagenticworkflows2025:temporal-model-bank"
+   ],
+   "changes": [
+    "layer GTS->TSK",
+    "name: clarify contributed scaffolded model/metric integration",
+    "dimensions: replace Memory and Context with Interface and Interaction; retain Tools and Execution",
+    "view_status mapped->task_procedure",
+    "reuse_evidence demonstrated->not_applicable",
+    "functions: processing removed (TSK task_procedure; banks do not themselves implement a temporal function)"
+   ],
+   "reason": "Retain the ID for the same model/measure-bank mechanism, counting its integration into modular train.py actions rather than unchanged off-the-shelf model implementations (L354-L367). Forecast and generation outputs and their measures have task-specific semantics, meeting R3_1 before R3_2; serving two temporal tasks does not establish GTS scope. Retain processing because the implemented temporal-dependency and distributional measures perform numerical analysis (L377-L379), a source-supported refinement of the blind record."
+  }
+ ],
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "code-search layer move GH->TSK",
+    "verdict": "reject",
+    "result": "GH (Planning and Orchestration; Tools and Execution), reuse demonstrated on forecasting and generation",
+    "reason": "The warm-up picks the best combination 'based on the evaluation criteria of the given task' and edits are kept if loss falls; the criterion is an input, and the identical search runs on both task families, so the counterfactual for TSK fails.",
+    "line": 421
+   },
+   {
+    "item": "temporal-model-bank layer move GTS->TSK",
+    "verdict": "accept",
+    "result": "TSK, task_procedure, functions removed",
+    "reason": "The model bank and evaluation measure bank are organised per task family (forecasting vs generative models; generation-specific tail, temporal-dependency and distributional measures); a new task family requires different outputs and verifiers, so R3_1 matches before R3_2.",
+    "line": 375
+   }
+  ],
+  "summary": "Code-search is reverted to GH because its acceptance logic is task-agnostic and demonstrably reused across two task families; the model/measure bank is TSK because its outputs and measures are task-family specific. Other candidate modules are accepted unchanged."
+ }
+}

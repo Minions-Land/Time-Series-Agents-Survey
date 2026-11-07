@@ -1,0 +1,305 @@
+{
+ "citation_key": "smartenergyagent2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "The paper contributes an appliance-energy pipeline combining forecasting and calibrated anomaly detection with context-conditioned LLM diagnoses, safety rules, operator-feedback memory, and prioritized maintenance recommendations.",
+ "claim_evidence": [
+  {
+   "line": 618,
+   "quote": "We presented Smart Energy Agent, a hybrid pipeline combining deep forecasting, anomaly detection, retrievalaugmented LLM reasoning, and operator feedback for appliance-level energy management."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis",
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "smartenergyagent2026:forecasting-backbone",
+   "name": "SSA-LSTM appliance forecasting backbone",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R3_1 TSK applies because the module produces an appliance forecast for a defined horizon; changing task family requires changing the prediction objective and output. Its lagged temporal inputs do not make it task-general GTS infrastructure, so R3_2 does not apply.",
+   "rubric_path": [
+    "R1:contributed - custom global SSA-LSTM forecasting model",
+    "R2:Harness - a forecasting capability executed around the LLM",
+    "R3_1_TSK:yes - next-step forecasting objective",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:forecasting_prediction",
+    "R8:not_applicable - TSK",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 194,
+     "quote": "The forecasting backbone is a single global model with separate LSTM branches for each SSA component (trend, seasonality, residual) and an additional branch for exogenous features. A learned per-appliance embedding allows specialization without per-device training."
+    },
+    {
+     "line": 199,
+     "quote": "Inputs include lagged consumption values, rolling statistics, and cyclic time encodings. The model is trained once on a chronological 70/15/15 split and deployed in inferenceonly mode every 30 minutes."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "smartenergyagent2026:anomaly-detector",
+   "name": "Per-appliance LSTM-VAE detector and calibrated thresholds",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R3_1 TSK applies because reconstruction scores and appliance-specific thresholds directly define anomaly flags; another task family requires a different detector objective and decision threshold. Sliding windows and chronological calibration are temporal, but this is task-bound anomaly logic rather than general GTS infrastructure, so R3_2 does not apply.",
+   "rubric_path": [
+    "R1:contributed - per-appliance LSTM-VAE models and threshold calibration",
+    "R2:Harness - detector tools supplying evidence to the LLM workflow",
+    "R3_1_TSK:yes - anomaly detection criterion",
+    "R4:Tools and Execution",
+    "R5:processing; validation",
+    "R7:anomaly_detection_diagnosis",
+    "R8:not_applicable - TSK",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 179,
+     "quote": "Anomaly Detector: Seven independent LSTM-VAE models with multi-head attention and percentilebased thresholds."
+    },
+    {
+     "line": 234,
+     "quote": "The detection threshold τ is the p-th percentile of validation scores (chronological middle 15%, used solely for calibration),"
+    },
+    {
+     "line": 238,
+     "quote": "with p tuned per appliance: Microwave 97.0%, Printer 98.5%, Fridge/Kettle/Coffee Machine 99.0%, Water Dispenser 99.5%, and Tasmota 99.9%."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "smartenergyagent2026:context-retrieval",
+   "name": "Event-conditioned two-tier context retrieval",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK applies because source selection is conditioned on appliance-event ambiguity, severity, and baseline sparsity to support anomaly diagnosis and recommendations; changing task family requires redesigning its evidence sources and selection criteria. Although it uses temporal history and time-of-day context, it is task-bound rather than a general temporal service, so R3_2 does not apply.",
+   "rubric_path": [
+    "R1:contributed - two-tier conditional retrieval strategy",
+    "R2:Harness - prompt-time retrieval tools without model parameter updates",
+    "R3_1_TSK:yes - event-specific anomaly-diagnosis evidence selection",
+    "R4:Memory and Context; Tools and Execution; Planning and Orchestration",
+    "R5:context_memory",
+    "R7:anomaly_detection_diagnosis; decision_support",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 259,
+     "quote": "The first three are retrieved unconditionally — the agent must always know detector reliability, the time-of-day baseline, and domain knowledge before reasoning."
+    },
+    {
+     "line": 262,
+     "quote": "The remaining three are conditionally selected based on signal ambiguity, event severity, or baseline sparsity, keeping the diagnosis prompt focused and free of irrelevant context."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "smartenergyagent2026:appliance-diagnosis",
+   "name": "Reliability-aware appliance diagnosis and reporting",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK applies because the event coordinator, diagnostic routing, reliability caps, and urgency rules embed appliance-anomaly diagnosis criteria; changing task family requires redesigning the event states and verifiers. It uses temporal history and time-of-day rules but is task-bound, so it does not meet R3_2's general temporal-service condition.",
+   "rubric_path": [
+    "R1:contributed - hybrid rule/LLM diagnosis, safety nets, event coordination, and prioritized reporting",
+    "R2:Harness - runtime workflow around an unchanged LLM",
+    "R3_1_TSK:yes - anomaly diagnosis and recommendation criteria",
+    "R4:Tools and Execution; Planning and Orchestration",
+    "R5:validation",
+    "R7:anomaly_detection_diagnosis; decision_support",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 181,
+     "quote": "Coordinator: Groups events by time and appliance, filters borderline cases, and caps LLM calls per run."
+    },
+    {
+     "line": 265,
+     "quote": "The Diagnosis Agent routes each event through hybrid rule + LLM logic across three paths: Path 1 returns a deterministic “inspect now” diagnosis for devices completely inactive for several days"
+    },
+    {
+     "line": 271,
+     "quote": "urgency fallback, a confidence fallback, a reliability cap that lowers confidence for known noisy detectors, and a night-time hard rule that forces immediate urgency for fridge or water dispenser anomalies between 10 PM and 6 AM."
+    },
+    {
+     "line": 277,
+     "quote": "The Report Agent converts the structured JSON into a prioritized Markdown report grouped by urgency."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "smartenergyagent2026:feedback-memory",
+   "name": "Operator-feedback memory for future diagnoses",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 TSK applies because operator corrections are matched by appliance and anomaly pattern to revise future anomaly diagnoses; changing task family requires redesigning the match keys and correction semantics. The time-of-day window is temporal, but the memory is tied to this diagnosis task rather than a general temporal service, so R3_2 does not apply.",
+   "rubric_path": [
+    "R1:contributed - persistent operator corrections injected into future prompts",
+    "R2:Harness - memory augments prompts without changing LLM parameters",
+    "R3_1_TSK:yes - feedback memory is specific to anomaly diagnosis",
+    "R4:Memory and Context; Optimization and Evolution",
+    "R5:context_memory",
+    "R7:anomaly_detection_diagnosis; decision_support",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 281,
+     "quote": "Operator corrections are appended to feedback_log.csv via the dashboard feedback form."
+    },
+    {
+     "line": 283,
+     "quote": "corrections matching the current event by appliance, pattern type, and time-of-day window are injected into the diagnosis prompt, providing a reflective memory that progressively reduces repeated false alarms."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 340,
+   "quote": "All experiments are conducted on a chronological train/validation/test split of the appliance-level dataset. The validation set (the middle 15%) is used solely for threshold calibration; metrics are reported on the held-out test set."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 351,
+   "quote": "The model achieves an R2 of 0.9976 and a Weighted Absolute Percentage Error (WAPE) of 1.32%, indicating that variance is well captured at the aggregate level."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "smartenergyagent2026:appliance-diagnosis",
+   "decision": "split",
+   "new_ids": [
+    "smartenergyagent2026:appliance-diagnosis",
+    "smartenergyagent2026:context-retrieval"
+   ],
+   "changes": [
+    "Split event-conditioned context retrieval from diagnosis/reporting while retaining the existing id for the diagnosis/reporting mechanism.",
+    "dimensions: removed Memory and Context from the diagnosis module; replaced retired Planning and Workflow with Planning and Orchestration.",
+    "functions: [] -> [validation]"
+   ],
+   "reason": "The packet describes a distinct Context Agent that selects evidence before the Diagnosis Agent routes events and the Report Agent renders recommendations. These mechanisms are separable, so retrieval receives a new module id and the existing id remains on diagnosis/reporting. The separately described feedback memory and the forecasting and anomaly-detection models are also added as source-supported modules."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The operator-feedback memory is implemented, but its impact on accuracy is explicitly left unquantified (lines 493-498). The paper reports task-output performance, not downstream cost, profit, or utility of maintenance decisions."
+}

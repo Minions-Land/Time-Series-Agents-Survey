@@ -1,0 +1,294 @@
+{
+ "citation_key": "lastmile2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "An LLM agent revises a TimesFM baseline forecast over a shared forecast workspace through constrained, evidence-backed actions, with event-window map-reduce planning and outcome-grounded reflection memory.",
+ "claim_evidence": [
+  {
+   "line": 20,
+   "quote": "Our system maintains a unified forecast workspace, invokes tools to retrieve contextual evidence"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "lastmile2026:forecast-workspace",
+   "name": "Immutable baseline and constrained forecast-revision workspace",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "data_management",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 yes: the workspace state holds the immutable baseline forecast and the editable forecast Ft, and its action set and validity checks (revisions inside the forecast horizon, no overwriting baseline, no duplicate edits) are the forecast-revision output contract. Counterfactual: for another task family (e.g. anomaly diagnosis) the state fields, operators and verifier would be redesigned. Aligned index and immutable history alone would be GTS, but here they cannot be separated from the forecast-edit operators, which only function together with the state.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - state and operators encode forecast revision over the horizon"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 175,
+     "quote": "It keeps historical observations, the immutable baseline forecast, and the editable forecast in the same aligned time index"
+    },
+    {
+     "line": 190,
+     "quote": "Concretely, the workspace is instantiated as a tabular state with four fields:"
+    },
+    {
+     "line": 183,
+     "quote": "Revision actions modify Ft through a restricted set of forecast-editing operators, such as range-level adjustment or date-specific override."
+    },
+    {
+     "line": 185,
+     "quote": "enforces structural constraints: historical observations cannot be changed, the baseline forecast cannot be overwritten,"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "lastmile2026:evidence-tools",
+   "name": "Tool-based evidence acquisition over past windows, calendar and memory",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 no: retrieval and calendar-lookup tools do not embed a forecast objective. R3_2 yes: they depend on aligned past windows, same-period analogues and calendar information for event windows. Counterfactual: windowed retrieval would persist for other task families.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - retrieval and lookup tools do not encode the forecast objective",
+    "R3_2_GTS:yes - windowed retrieval and calendar information availability"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 300,
+     "quote": "The agent therefore uses tools to read different evidence sources, such as past windows in the same workspace, calendar events, external event descriptions, or"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "lastmile2026:event-mapreduce",
+   "name": "Event-window map-reduce revision planning",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 yes: the horizon is decomposed into forecast event windows and the reducer emits forecast revisions into the editable forecast. Counterfactual: the planner and its output contract would change for a non-forecast task. Event windowing is the processing function.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - event-window planning emits forecast revisions over the horizon"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 282,
+     "quote": "To keep the revision process focused, the framework decomposes a long horizon into identified event windows."
+    },
+    {
+     "line": 291,
+     "quote": "For each event window, a local reasoner examines the evidence relevant to that interval and proposes a structured list of revision actions."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "lastmile2026:revision-memory",
+   "name": "Outcome-grounded forecast revision memory",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 yes: reflection compares realized outcomes against the baseline and the revised forecast and writes forecast-calibration critiques. Counterfactual: the verifier (realized forecast error relative to baseline) must change for another task family. The availability of memory is incidental.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - reflection verifier compares realized forecast outcomes against baseline and revision"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 318,
+     "quote": "Once actual values become available for a previously forecast window, the framework compares the realized outcomes against both the baseline and the revised forecast."
+    },
+    {
+     "line": 328,
+     "quote": "In subsequent forecasting sessions, the agent queries this memory bank before making revision decisions."
+    }
+   ],
+   "confidence": "low"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 354,
+   "quote": "Beyond quantitative error, we discuss the behavior of our framework qualitatively, drawing on the recorded adjustment log and event-level revision records, since auditability and traceability are part of the target behavior."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 479,
+   "quote": "each forecast is produced from an origin one day before the window."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 373,
+   "quote": "Within the holiday window, our framework reduces MAE by 80.0% relative to Prophet and"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "Adjudicated: workspace state and constrained operators merged into one TSK module (keeps existing id). evidence-tools kept as GTS (windowed history retrieval and calendar lookup, no forecast objective), medium confidence; TimesFM forecast tool excluded as baseline.",
+ "reconciliation": [
+  {
+   "existing_id": "lastmile2026:forecast-workspace",
+   "decision": "change",
+   "new_ids": [
+    "lastmile2026:forecast-workspace"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback (retired) -> Planning and Orchestration; Memory and Context added",
+    "view_status mapped -> task_procedure",
+    "layer TSK kept"
+   ],
+   "reason": "Same mechanism; the workspace and its constrained operators function together and embed the forecast-revision contract."
+  },
+  {
+   "existing_id": "lastmile2026:revision-memory",
+   "decision": "change",
+   "new_ids": [
+    "lastmile2026:revision-memory"
+   ],
+   "changes": [
+    "view_status mapped -> task_procedure (TSK modules may not be mapped)",
+    "confidence low; needs human review for TSK vs GTS",
+    "evidence quotes added"
+   ],
+   "reason": "Same mechanism. TSK kept by the R3_1 counterfactual on the reflection verifier."
+  },
+  {
+   "existing_id": "lastmile2026:event-mapreduce",
+   "decision": "change",
+   "new_ids": [
+    "lastmile2026:event-mapreduce"
+   ],
+   "changes": [
+    "dimensions: Planning and Workflow, Coordination and Scaling (retired) -> Planning and Orchestration",
+    "functions: context_memory -> processing (event windowing)",
+    "view_status mapped -> task_procedure"
+   ],
+   "reason": "Same mechanism. Retired labels map to one dimension because local reasoners and the reducer form one planning procedure."
+  },
+  {
+   "existing_id": "(new)",
+   "decision": "keep",
+   "new_ids": [
+    "lastmile2026:evidence-tools"
+   ],
+   "changes": [
+    "new GTS module"
+   ],
+   "reason": "Section 4.4 contributes tool-based evidence acquisition."
+  }
+ ],
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "forecast-workspace layer TSK -> GTS (and split of constrained actions)",
+    "verdict": "modify",
+    "result": "single TSK module forecast-workspace (state + constrained operators)",
+    "reason": "The state carries Fbase and editable Ft, and the validity set enforces forecast-horizon rules; the state would be redesigned for another task family, so R3_1 applies before GTS; operators only work on this state.",
+    "line": 175
+   },
+   {
+    "item": "evidence-tools (Haiku/merged GTS, Codex absent)",
+    "verdict": "accept",
+    "result": "GTS, context_memory, medium",
+    "reason": "Section 4.4 tools read past windows and calendar events into Et without a forecast objective.",
+    "line": 300
+   },
+   {
+    "item": "revision-memory and event-mapreduce TSK",
+    "verdict": "accept",
+    "result": "TSK",
+    "reason": "Reflection compares realized outcomes to baseline and revised forecast; map-reduce reducer emits forecast revisions into the workspace.",
+    "line": 318
+   }
+  ],
+  "summary": "Codex's TSK-only view was too coarse because evidence tools are not forecast-bound, while Haiku's split of state and operators was unnecessary. Final record has four modules."
+ }
+}

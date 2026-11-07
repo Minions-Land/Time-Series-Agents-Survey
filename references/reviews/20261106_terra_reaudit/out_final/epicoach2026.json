@@ -1,0 +1,265 @@
+{
+ "citation_key": "epicoach2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "EpiCoach uses an evidence-gated temporal hypothesis loop and a wrist-only mechanistic twin to choose safety-constrained training experiments, with predictions sealed before rides and beliefs updated only from logged fits.",
+ "claim_evidence": [
+  {
+   "line": 68,
+   "quote": "Claims about the athlete live in an evidence-gated hypothesis registry: each must issue a probabilistic prediction about a future session before it occurs, and its belief moves only through computed evidence from a logged statistical fit."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "decision_support"
+ ],
+ "other_tasks": [
+  "temporal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "epicoach2026:sealed-prediction-registry",
+   "name": "Evidence-gated hypothesis registry and prediction ledger",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_analysis"
+   ],
+   "role": "method",
+   "scope_reason": "GTS: the registry preserves hypotheses, predictions, fits and lineage, and its timestamps and data cutoffs determine whether evidence is available; changing the task would not change this temporal availability logic.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - the registry does not embed a task output objective",
+    "R3_2_GTS:yes - it depends on timestamps, data cutoffs and information availability",
+    "R4:Memory and Context; Planning and Orchestration",
+    "R5:context_memory; validation",
+    "R8:inferred - cross-task reuse follows from its temporal state and interface",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 50,
+     "quote": "1) A prediction ledger, not a chat log. Every hypothesis in the registry must emit a probabilistic prediction about a specific future ride, timestamped before the ride. Beliefs move only through a tool that requires a logged statistical fit."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "epicoach2026:information-directed-design",
+   "name": "Information-directed, safety-gated workout design",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "TSK: the core objective is to prescribe the next training week by trading information gain against performance gain under workload, heart-rate, readiness and illness constraints; changing the task family changes the workout objective and feasible action space.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - it embeds the training-prescription objective and safety validation criterion",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 75,
+     "quote": "The agent prescribes the next training week as a constrained experiment maximizing information gain subject to load and safety constraints, around two instrument rides."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "epicoach2026:wrist-digital-twin",
+   "name": "Wrist-only mechanistic physiological twin",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "TSK: the heart-rate response, fitness-fatigue and descent-skill models produce the segment and ride outcomes used by the paper’s forecasting contract; changing the task family changes the modeled outcomes and instruments.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - the model embeds the physiological forecasting output and its instruments",
+    "R4:Tools and Execution",
+    "R5:processing",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 58,
+     "quote": "2) A mechanistic twin from a watch alone. We infer, from optical heart rate, GPS and barometric altitude only, a lagged heart-rate response with drift and heat interactions, a fitness–fatigue model whose time constants are estimated rather than assumed, and a latent technical-skill state"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "epicoach2026:rolling-origin-replay",
+   "name": "Rolling-origin replay benchmark for individualized physiology",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "evaluation",
+   "scope_reason": "TSK: the benchmark defines next-week physiological forecast targets and forecast-comparison scoring, so its temporal state and validation criterion must be redesigned for a different task family.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - targets and scores are bound to physiological forecasting",
+    "R4:Planning and Orchestration",
+    "R5:validation",
+    "R7:forecasting_prediction",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 77,
+     "quote": "We evaluate the system two ways over eighteen months of data. A rolling-origin replay benchmark shows the twin beats standard forecasters on heart rate but not segment time, and the agentic loop matches a static model."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 846,
+   "quote": "the gate was moved to the athlete’s lap-press point, the correction was logged as a registry event, and the forecast was changed from a historical median to the skill-model posterior."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 646,
+   "quote": "The twin is refit once per week, after all of that week’s predictions have been scored and before the next are sealed, so no prediction is ever made by a model that has seen the ride it predicts."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 822,
+   "quote": "Across 60 origins the agentic system matches the static twin on HR forecasting (CRPS 7.00 vs 7.03, p = 0.63) and segment time (0.050 vs 0.048, p = 0.007, marginally worse)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "epicoach2026:sealed-prediction-registry",
+   "decision": "change",
+   "new_ids": [
+    "epicoach2026:sealed-prediction-registry"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration",
+    "functions: validation -> context_memory, validation",
+    "other_tasks: scientific_temporal_analysis -> temporal_analysis",
+    "name: evidence-gated hypothesis registry with sealed prediction ledger -> evidence-gated hypothesis registry and prediction ledger"
+   ],
+   "reason": "The mechanism remains the same, but the retired dimension label is mapped to the current vocabulary and the packet explicitly supports temporal context retention and cutoff validation."
+  },
+  {
+   "existing_id": "epicoach2026:information-directed-design",
+   "decision": "change",
+   "new_ids": [
+    "epicoach2026:information-directed-design"
+   ],
+   "changes": [
+    "dimensions: Planning and Workflow -> Planning and Orchestration",
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration"
+   ],
+   "reason": "The training prescription is task-specific under R3_1_TSK; the two retired workflow/control labels map to Planning and Orchestration, while Tools and Execution remains supported by the candidate workout and write-back workflow."
+  },
+  {
+   "existing_id": "epicoach2026:wrist-digital-twin",
+   "decision": "change",
+   "new_ids": [
+    "epicoach2026:wrist-digital-twin"
+   ],
+   "changes": [
+    "functions: [] -> processing"
+   ],
+   "reason": "The twin is still the same task-specific forecasting mechanism, and the packet describes its numerical operation on heart-rate, GPS, altitude and segment series, which supports the processing temporal function."
+  },
+  {
+   "existing_id": "epicoach2026:rolling-origin-replay",
+   "decision": "change",
+   "new_ids": [
+    "epicoach2026:rolling-origin-replay"
+   ],
+   "changes": [
+    "layer: GTS -> TSK",
+    "view_status: mapped -> task_procedure",
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration",
+    "rubric_path: R3_1_TSK:yes",
+    "role: evaluation retained"
+   ],
+   "reason": "The replay benchmark is bound to next-week physiological forecasting targets and scores, so R3_1_TSK applies before the general temporal layer."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "All four existing mechanisms are supported and retained. The main card correction is the benchmark’s TSK scope and replacement of retired seven-dimension labels."
+}

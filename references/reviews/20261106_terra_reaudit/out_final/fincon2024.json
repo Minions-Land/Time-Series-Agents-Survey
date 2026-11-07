@@ -1,0 +1,263 @@
+{
+ "citation_key": "fincon2024",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "FinCon contributes a financial manager-analyst workflow, time-aware memory, daily CVaR risk control, and across-episode verbal updates for trading and portfolio decisions.",
+ "claim_evidence": [
+  {
+   "line": 72,
+   "quote": "Inspired by real-world investment roles, we introduce a novel Synthesized Manager-Analyst hierarchical communication structure with a risk-control component."
+  },
+  {
+   "line": 80,
+   "quote": "Across episodes, we introduced a verbal reinforcement mechanism, where investment beliefs are updated based on reasoning trajectories and profit-and-loss (PnL) trends, distilled into conceptual perspectives."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "fincon2024:manager-analyst",
+   "name": "Manager-analyst financial information synthesis",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The analyst-manager roles synthesize financial evidence into trading actions. This embeds the decision-support output and action objective; changing task family would require redesigning agent roles and action semantics, so it is TSK rather than GTS or GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - trading decision roles and actions are task-specific"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 183,
+     "quote": "Analyst agents distill concise investment insights from large volumes of multi-source market data, each focused on a specific trading target."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "fincon2024:directional-allocation",
+   "name": "Directional portfolio allocation",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The manager's buy/sell decisions constrain portfolio weights in a mean-variance optimizer over daily return sequences. Its objective and tool semantics are specific to portfolio decision support; another task family would require a different allocation procedure, so it is TSK rather than GTS or GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - directional trades constrain the portfolio allocation objective"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 105,
+     "quote": "The manager agent then makes trading decisions for each stock in the pool. Finally, the manager agent determines the portfolio weights for all stocks using an external optimization solver that applies the mean-variance optimization described below [39]:"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "fincon2024:risk-aware-portfolio",
+   "name": "Within-episode CVaR risk control",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The procedure computes daily PnL risk and changes the manager's trading stance. The risk criterion and action semantics must be redesigned for another task family, so it is TSK rather than GTS or GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - CVaR controls trading actions against a task-specific risk objective"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 217,
+     "quote": "The within-episode risk alert is triggered by a sudden drop in the CVaR value."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "fincon2024:verbal-reinforcement",
+   "name": "PnL-grounded conceptual prompt updates",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "CVRF compares consecutive trading episodes and revises prompts and beliefs using investment outcomes. Its reward and update semantics are trading-specific; another task family requires a different objective, so it is TSK rather than GTS or GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - prompt updates optimize task-specific trading outcomes"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 228,
+     "quote": "CVRF assesses the performance of consecutive training episodes by analyzing the information perspectives provided by analysts and reflected in the manager’s decision-making."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "fincon2024:time-aware-memory",
+   "name": "Timeliness-aware procedural and episodic memory",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Memory retrieval and decay depend on event recency and the timeliness of financial information, but the memory mechanism is not itself bound to a trading output criterion. It is GTS rather than TSK; the temporal event memory could serve another task with comparable time-indexed context, and differs from GH through explicit temporal semantics.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - memory retrieval is not tied to the decision output criterion",
+    "R3_2_GTS:yes - event recency and information timeliness define memory state"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 311,
+     "quote": "Each functional analyst agent has distinct procedural memory decay rates, reflecting the timeliness of various financial data sources, which is crucial for aligning multi-type data influencing specific time points and supporting informed decision-making."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 341,
+   "quote": "F IN C ON is trained from January 3, 2022, to October 4, 2022, and tested from October 5, 2022, to June 10, 2023."
+  },
+  "task_performance": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 330,
+   "quote": "F IN C ON and other state-of-the-art (SOTA) agents using metrics such as Cumulative Return (CR%), Sharpe Ratio (SR), and Max Drawdown (MDD%)."
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "fincon2024:manager-analyst",
+   "decision": "change",
+   "new_ids": [
+    "fincon2024:manager-analyst"
+   ],
+   "changes": [
+    "dimensions: Coordination and Scaling -> Planning and Orchestration",
+    "name: Manager–analyst information aggregation -> Manager-analyst financial information synthesis"
+   ],
+   "reason": "The packet supports the existing task-bound manager-analyst module. The legacy dimension maps to Planning and Orchestration; the module and ID remain the same."
+  },
+  {
+   "existing_id": "fincon2024:risk-aware-portfolio",
+   "decision": "split",
+   "new_ids": [
+    "fincon2024:risk-aware-portfolio",
+    "fincon2024:directional-allocation"
+   ],
+   "changes": [
+    "split within-episode CVaR control from directional portfolio allocation",
+    "rename retained module to Within-episode CVaR risk control"
+   ],
+   "reason": "The packet describes the CVaR trigger and trading response separately from the manager's buy/sell-constrained portfolio-weight calculation. They are independently reusable task procedures; retain the old ID for CVaR control and give allocation a new ID."
+  },
+  {
+   "existing_id": "fincon2024:verbal-reinforcement",
+   "decision": "keep",
+   "new_ids": [
+    "fincon2024:verbal-reinforcement"
+   ],
+   "changes": [],
+   "reason": "The existing module correctly captures CVRF's across-episode, PnL-grounded prompt and investment-belief updates; the packet supports its TSK scope and Optimization and Evolution dimension."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The directional allocation module captures FinCon’s task-specific integration of trading decisions with portfolio weights; the mean-variance solver itself is a standard external method. Reported trading return and risk metrics are decision-utility evidence, not correctness or accuracy of individual task outputs."
+}

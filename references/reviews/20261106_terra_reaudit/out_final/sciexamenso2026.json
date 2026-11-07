@@ -1,0 +1,182 @@
+{
+ "citation_key": "sciexamenso2026",
+ "status": "paper_verified",
+ "role_of_work": "resource",
+ "claim_summary": "SciExam for ENSO contributes a benchmark resource with a general phased workflow that freezes agent-written diagnostics and ENSO-specific hidden graders for statistics, variable reconstruction, and held-out forecasting.",
+ "claim_evidence": [
+  {
+   "line": 113,
+   "quote": "SciExam for ENSO, a long-horizon benchmark in which agents process real observations, freeze their"
+  },
+  {
+   "line": 114,
+   "quote": "own diagnostics, and build stochastic ENSO models that hidden graders evaluate against a published"
+  },
+  {
+   "line": 115,
+   "quote": "reference. Six of twelve agent systems score higher than the reference under the same tests."
+  },
+  {
+   "line": 229,
+   "quote": "Agents work through three phases that share a six-hour budget, as shown in Figure 2. The phases follow the"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "temporal_analysis"
+ ],
+ "modules": [
+  {
+   "id": "sciexamenso2026:frozen-diagnostics-workflow",
+   "name": "Phased workflow with frozen self-written diagnostics",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_analysis"
+   ],
+   "role": "evaluation",
+   "scope_reason": "Its core logic schedules phases, gates, checkpointing and frozen feedback; changing the task objective does not change the execution manager, and it has no series-specific temporal state/window semantics. R3_1_TSK:no (not bound to a task output or criterion); R3_2_GTS:no (no temporal-order/window/unit/information-availability dependency); R3_3_GH:yes.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - general execution protocol does not embed a task-family output criterion",
+    "R3_2_GTS:no - phases and feedback do not depend on series temporal order/windows/frequency/units/information availability",
+    "R3_3_GH:yes - manages execution, scheduling, and state",
+    "R4:Planning and Orchestration",
+    "R5:general_runtime",
+    "R7:forecasting_prediction; temporal_analysis",
+    "R8:inferred - one source task, cross-task reuse inferred",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 229,
+     "quote": "Agents work through three phases that share a six-hour budget, as shown in Figure 2. The phases follow the"
+    },
+    {
+     "line": 244,
+     "quote": "The diagnostics are frozen at the start of this phase, so they are the only feedback agents receive and their criteria cannot drift toward what the model already does."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "sciexamenso2026:hidden-scientific-graders",
+   "name": "Hidden period-split scientific graders",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_analysis"
+   ],
+   "role": "evaluation",
+   "scope_reason": "Its core logic embeds the ENSO model-output criteria—statistics, withheld-variable reconstruction and held-out forecasts—and changing the task family would require a new state/output contract and grading criteria; R3_1_TSK:yes, while R3_2_GTS:no and R3_3_GH:no.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - ENSO-specific output and validation criteria are embedded",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure; validation",
+    "R7:forecasting_prediction; temporal_analysis",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 84,
+     "quote": "First, hidden graders evaluate each model on three complementary aspects: whether its free-running simulations reproduce ENSO’s observed statistics, whether it captures variable dependence, and whether it forecasts the held-out years better than persistence."
+    },
+    {
+     "line": 297,
+     "quote": "Each test uses the period suited to it: a long record (1950–2019) for statistics, the reliably observed years 1980–2014 for reconstruction, and years the agents never saw (2015–2024) for prediction."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1038,
+   "quote": "A submission whose model fails to import, raises an error, or returns non-finite values fails the validity gate."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 297,
+   "quote": "Each test uses the period suited to it: a long record (1950–2019) for statistics, the reliably observed years 1980–2014 for reconstruction, and years the agents never saw (2015–2024) for prediction."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 115,
+   "quote": "reference. Six of twelve agent systems score higher than the reference under the same tests."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "sciexamenso2026:frozen-diagnostics-workflow",
+   "decision": "change",
+   "new_ids": [
+    "sciexamenso2026:frozen-diagnostics-workflow"
+   ],
+   "changes": [
+    "dimensions: Planning and Workflow + Control, Verification, and Feedback -> Planning and Orchestration",
+    "reuse_evidence: demonstrated -> inferred",
+    "other_tasks: scientific_temporal_analysis -> temporal_analysis",
+    "view_status retained as general_runtime",
+    "added rubric_path and line-based evidence"
+   ],
+   "reason": "The packet separates the task-specific ENSO materials from a general execution protocol (lines 132-135), so the module remains GH and general_runtime. The source evaluates one task family here, so reuse is inferred rather than demonstrated."
+  },
+  {
+   "existing_id": "sciexamenso2026:hidden-scientific-graders",
+   "decision": "change",
+   "new_ids": [
+    "sciexamenso2026:hidden-scientific-graders"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration",
+    "view_status: mapped -> task_procedure",
+    "other_tasks: scientific_temporal_analysis -> temporal_analysis",
+    "added rubric_path and line-based evidence"
+   ],
+   "reason": "The graders embed ENSO-specific output criteria for statistics, variable dependence/reconstruction and held-out forecasting (lines 84-91), so the first-match R3 layer is TSK and the temporal function is recorded as task_procedure."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The current card’s two mechanism identities are retained. Retired seven-dimension labels, the TSK view_status, reuse level, and locator-only evidence were reconciled to the current rubric and packet lines."
+}

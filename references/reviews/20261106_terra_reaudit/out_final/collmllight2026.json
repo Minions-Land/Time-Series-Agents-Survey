@@ -1,0 +1,272 @@
+{
+ "citation_key": "collmllight2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "CoLLMLight contributes task-specific cooperative traffic-signal decision procedures and simulation-based LLM training that use neighboring traffic histories, adaptive reasoning depth, and environmental feedback.",
+ "claim_evidence": [
+  {
+   "line": 136,
+   "quote": "To tackle these challenges, we propose CoLLMLight, a cooperative LLM agent framework tailored for TSC. To enable the LLM to comprehend intricate traffic interactions, we first collect real-time traffic state information from neighboring intersections over a recent time window."
+  },
+  {
+   "line": 151,
+   "quote": "To further enhance performance, we propose a fine-tuning strategy for building a lightweight LLM tailored for cooperative traffic signal control. Through an iterative simulation-driven data collection process, we synthesize task-specific reasoning chains"
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [
+  "traffic_signal_control"
+ ],
+ "modules": [
+  {
+   "id": "collmllight2026:traffic-coordination",
+   "name": "Spatiotemporal cooperative signal selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [
+    "traffic_signal_control"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 applies because the procedure predicts traffic states under candidate signal phases and selects a signal to optimize network traffic flow. Changing the task changes its signal action space and traffic objective, so it is TSK; the temporal graph/history alone does not make it a task-general GTS module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - traffic-signal action selection and network traffic objective are embedded",
+    "R4:Interface and Interaction; Planning and Orchestration",
+    "R5:processing; context_memory",
+    "R7:decision_support; traffic_signal_control",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 239,
+     "quote": "To enable the LLM to understand our constructed observations and spatiotemporal features, we generate a human-readable prompt that combines current traffic observations O𝑡 , the spatial relation graph G, historical traffic interactions T𝑡 , and task instructions D"
+    },
+    {
+     "line": 243,
+     "quote": "To scale the chainof-thought (CoT) process, the LLM follows a detailed three-step decision-making process: First, it analyzes the current traffic conditions at both the assigned and neighboring intersections. Next, it predicts neighboring future traffic states under different signal configurations. Finally, based on these predictions, it selects the signal configuration that is most likely to optimize network-wide traffic flow."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "collmllight2026:complexity-routing",
+   "name": "Congestion-conditioned reasoning-depth selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [
+    "traffic_signal_control"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 applies because the congestion-risk classification selects among procedures for traffic-signal optimization, including whether to predict candidate traffic states. If the task family changes, the critical-lane criterion and action procedure must change; it is TSK rather than GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - traffic congestion classification gates signal-control procedures",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure",
+    "R7:decision_support; traffic_signal_control",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 282,
+     "quote": "To address this, we propose a complexity-aware reasoning approach, enabling the LLM to automatically assess the complexity of decision-making at each intersection and adaptively select the most cost-efficient reasoning strategy without sacrificing performance."
+    },
+    {
+     "line": 284,
+     "quote": "We first classify the reasoning complexity at an intersection based on a congestion risk coefficient 𝑛𝑐 , which is the number of critical neighboring lanes that are either congested or at risk of congestion."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "collmllight2026:simulation-sft",
+   "name": "Simulation-derived reasoning-chain supervision",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [
+    "traffic_signal_control"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 places the supervised fine-tuning on the LLM side because it updates model parameters to generate traffic-analysis and reasoning chains; it is not a Harness prompt-only procedure.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning",
+    "R7:decision_support; traffic_signal_control",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 334,
+     "quote": "We first utilize the traffic simulator CityFlow [36] with a synthesized traffic flow dataset to generate diverse traffic scenarios spanning various congestion levels."
+    },
+    {
+     "line": 341,
+     "quote": "To derive congestion risk and traffic analysis, we utilize GPT-4o to generate a structured summary of traffic conditions at both the assigned intersection and its neighboring intersections:"
+    },
+    {
+     "line": 324,
+     "quote": "Given the required LLM outputs for each reasoning strategy employed, we synthesize the corresponding reasoning chain by a structured summarization of GPT-4o. To optimize the LLM, we apply supervised fine-tuning"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "collmllight2026:policy-refinement",
+   "name": "Environmental-feedback policy refinement",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [
+    "traffic_signal_control"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 places the iterative refinement on the LLM side because it selects and fine-tunes reasoning trajectories from simulator feedback to improve the model's control policy; this is learned workflow behavior, not only runtime orchestration.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:workflow_learning",
+    "R7:decision_support; traffic_signal_control",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 352,
+     "quote": "After optimizing the reasoning chain, the LLM can effectively follow our constructed reasoning process. However, its decision-making remains suboptimal due to potential hallucinations in traffic conditions and misinterpretations of spatiotemporal dependencies. To address this, we propose an iterative refinement process incorporating environmental feedback for further optimization."
+    },
+    {
+     "line": 356,
+     "quote": "Specifically, we simulate different traffic signal configurations based on the LLM’s decision-making and evaluate their effectiveness using an environment feedback function, 𝑄."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 513,
+   "quote": "We adopt Average Travel Time (ATT) and Average Waiting Time (AWT) [11, 28, 37] as evaluation metrics to evaluate the performance of various traffic signal control methods."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 438,
+   "quote": "The environment feedback function Q is defined as the inverse of the overall queue length at neighboring intersections after a five-timestep duration, ensuring that lower congestion is rewarded with higher feedback values."
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "collmllight2026:traffic-coordination",
+   "decision": "change",
+   "new_ids": [
+    "collmllight2026:traffic-coordination"
+   ],
+   "changes": [
+    "dimensions updated to current vocabulary",
+    "added temporal functions processing and context_memory",
+    "added other_tasks traffic_signal_control"
+   ],
+   "reason": "The packet supports the existing task-specific cooperative signal-selection mechanism. Its candidate signal phases and network traffic objective satisfy R3_1_TSK; the mechanism also processes traffic states and retains recent history."
+  },
+  {
+   "existing_id": "collmllight2026:complexity-routing",
+   "decision": "change",
+   "new_ids": [
+    "collmllight2026:complexity-routing"
+   ],
+   "changes": [
+    "Planning and Workflow -> Planning and Orchestration",
+    "added other_tasks traffic_signal_control"
+   ],
+   "reason": "The packet describes congestion-risk classification that chooses among traffic-signal reasoning procedures, which is a task-bound TSK mechanism under R3_1."
+  },
+  {
+   "existing_id": "collmllight2026:simulation-sft",
+   "decision": "split",
+   "new_ids": [
+    "collmllight2026:simulation-sft",
+    "collmllight2026:policy-refinement"
+   ],
+   "changes": [
+    "split reasoning-chain supervised fine-tuning from environmental-feedback policy refinement",
+    "removed harness dimension from LLM modules",
+    "LLM route instruction_reasoning for simulation-sft",
+    "LLM route workflow_learning for policy-refinement"
+   ],
+   "reason": "Sections 3.3.1 and 3.3.2 describe separately staged training mechanisms, and the ablation isolates reasoning-chain optimization and policy refinement. The original id remains with reasoning-chain supervision; the feedback-trained control policy receives a new id."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The historical-window sensitivity analysis tests performance and inference cost as the window changes, but does not report a chronology, leakage, information-cutoff, or availability-time validation check. The current card combined two separately described and ablated training stages."
+}

@@ -1,0 +1,233 @@
+{
+ "citation_key": "reasoncast2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "ReasonCast contributes a routed semantic intervention for demand forecasting: an LLM reasoner emits structured event fields, a three-action routing policy trained on forecast utility decides whether to intervene, and the fields are fused into a frozen Chronos-2 forecaster with gated additive and multiplicative corrections.",
+ "claim_evidence": [
+  {
+   "line": 130,
+   "quote": "We formulate event-enhanced demand forecasting as selective semantic intervention, shifting the focus from extracting more text to controlling its marginal influence on a strong numerical forecaster."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "reasoncast2026:reasoner-posttraining",
+   "name": "Structured event-semantics reasoner (schema SFT and semantic-field RL)",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 LLM: schema SFT and semantic-field RL train the reasoner that emits structured event fields. Forecast-utility RL is assigned to the routing policy module, not here.",
+   "rubric_path": [
+    "R0:fixed_workflow",
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 276,
+     "quote": "Reasoner supervision. We stratify 40,000 item–window candidates by trajectory regime and obtain 11,627 teacher generations."
+    },
+    {
+     "line": 1075,
+     "quote": "parseable and internally consistent outputs, and semantic-field RL improves forecast-critical judgments such as direction, amplitude, and peak intensity."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "reasoncast2026:skip-basic-tool-routing",
+   "name": "Forecast-utility trained routing policy (Skip, Basic, Tool)",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 LLM: the routing policy is trained with forecast-utility RL against a frozen forecaster and selects the action from forecast context. The fixed pipeline around it is not a separate harness module.",
+   "rubric_path": [
+    "R0:fixed_workflow",
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 118,
+     "quote": "Given event context, the no-text forecast, and its entropy, the agent selects Skip, low-cost Basic semantics, or tool-augmented Tool"
+    },
+    {
+     "line": 2190,
+     "quote": "Forecast-utility RL trains the agent policy—including route selection, tool use, and the final intervention decision—against realized downstream utility from the frozen forecaster"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "reasoncast2026:selective-fusion",
+   "name": "Event-selective dual-path fusion into the Chronos-2 forecaster",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R2 LLM: the event-semantic encoder/MLP aligner, orthogonal event-subspace grounding, contrastive alignment pretraining and gated dual-path fusion are trained layers that change how event tokens enter the forecaster representation; the Chronos-2 backbone is frozen. A TSK reading fails R2 because these are parameters, not harness procedure.",
+   "rubric_path": [
+    "R0:fixed_workflow",
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 292,
+     "quote": "The interface is applied to the Chronos-2 future-token representation before the prediction head. Thus, only the event component queries text"
+    },
+    {
+     "line": 444,
+     "quote": "changes but may have limited authority over large level shifts. We therefore introduce a complementary multiplicative correction:"
+    },
+    {
+     "line": 467,
+     "quote": "The property is enforced by the routing action and an explicit mask rather than learned approximately."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 840,
+   "quote": "SFT establishes parseability and improves direction and shape;"
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 545,
+   "quote": "To prevent temporal leakage, all textual descriptions and event information are restricted to records available before the corresponding forecast origin."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 595,
+   "quote": "ReasonCast obtains the lowest WMAPE on all six proprietary event slices and on M5 event windows"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "reasoncast2026:reasoner-posttraining",
+   "decision": "change",
+   "new_ids": [
+    "reasoncast2026:reasoner-posttraining"
+   ],
+   "changes": [
+    "add llm_route: instruction_reasoning",
+    "name: schema and semantic-field reasoner training",
+    "forecast-utility RL scope moved to the routing policy module"
+   ],
+   "reason": "Packet shows schema SFT and semantic-field RL train the reasoner; the packet states forecast-utility RL trains the agent policy (route selection, tool use, intervention), so that part is a separate LLM module. Layer LLM and role model_training are unchanged."
+  },
+  {
+   "existing_id": "reasoncast2026:selective-fusion",
+   "decision": "split",
+   "new_ids": [
+    "reasoncast2026:skip-basic-tool-routing",
+    "reasoncast2026:selective-fusion"
+   ],
+   "changes": [
+    "layer TSK -> LLM",
+    "dimensions: Tools and Execution, Planning and Workflow -> none (LLM module)",
+    "view_status: task_procedure -> model_side",
+    "llm_route: representation_alignment",
+    "new module reasoncast2026:skip-basic-tool-routing for the routing policy"
+   ],
+   "reason": "The card merges two mechanisms. The Skip/Basic/Tool routing policy is a trained LLM-side policy (workflow_learning). The gated additive and multiplicative fusion into the forecaster is a representation alignment mechanism that keeps the id. Planning and Workflow is a retired seven-dimension label and is removed because LLM modules carry no dimensions. The TSK assignment fails R3 as an LLM module, and the card's dimensions are not applicable."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Adjudicated. Fusion is a trained representation-alignment mechanism (LLM side, R2); the Skip/Basic/Tool policy is a trained policy (R2 boundary) so no separate Harness route-control module is kept, since the packet gives no non-learned harness mechanism beyond the hard mandatory-activation rule and mask. Reasoner SFT corpus is merged into the reasoner post-training module. process_validity rests on parseability of structured outputs (medium reading).",
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "selective-fusion layer TSK->LLM",
+    "verdict": "accept",
+    "result": "LLM, representation_alignment",
+    "reason": "Trained text encoder, MLP aligner and gated fusion inject event tokens into the Chronos-2 representation while the backbone is frozen (R2 LLM: alignment layers).",
+    "line": 292
+   },
+   {
+    "item": "split routing policy from fusion",
+    "verdict": "accept",
+    "result": "reasoncast2026:skip-basic-tool-routing, LLM workflow_learning",
+    "reason": "Forecast-utility RL trains route selection, tool use and intervention decision.",
+    "line": 2190
+   },
+   {
+    "item": "Codex extra TSK route-control module",
+    "verdict": "reject",
+    "result": "merged into the trained routing policy module",
+    "reason": "Route selection is a trained policy; R2 boundary makes it LLM side, and mandatory activation is a rule inside it, not a separable harness mechanism.",
+    "line": 263
+   },
+   {
+    "item": "Codex extra structured-reasoning-data module",
+    "verdict": "reject",
+    "result": "merged into reasoner-posttraining",
+    "reason": "The SFT corpus only functions with the SFT recipe; merge per R1.",
+    "line": 276
+   },
+   {
+    "item": "role of work",
+    "verdict": "modify",
+    "result": "feedback_driven_agent",
+    "reason": "Route choice depends on returned no-text forecast and entropy, and tool observations feed the reasoner, so returned feedback changes later actions.",
+    "line": 118
+   }
+  ],
+  "summary": "Three LLM-side modules from the merged record are kept; Codex's extra Harness and data modules are folded in. Role changed to feedback_driven_agent."
+ }
+}

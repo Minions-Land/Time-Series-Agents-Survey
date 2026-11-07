@@ -1,0 +1,274 @@
+{
+ "citation_key": "hydroagentcalibration2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "HydroAgent introduces a hydrologic calibration benchmark and tool-mediated simulator episode, then trains Qwen3-4B with expert-trajectory SFT and simulator-feedback GRPO so parameter actions can improve iteratively.",
+ "claim_evidence": [
+  {
+   "line": 152,
+   "quote": "Contributions. (1) The first systematic benchmark of nine frontier LLM agents on the calibration of an operational distributed hydrologic model, including a public release of all 9 × 20 trajectories for reproducibility (Section 3)."
+  },
+  {
+   "line": 156,
+   "quote": "(H YDROAGENT) that fine-tunes Qwen3-4B with SFT + GRPO using NSE as a verifiable simulatorgrounded reward, with full training configuration sufficient to reproduce the run on 4×H100 (Section 2)."
+  }
+ ],
+ "task_memberships": [],
+ "other_tasks": [
+  "hydrologic_model_calibration"
+ ],
+ "modules": [
+  {
+   "id": "hydroagentcalibration2026:calibration-tools",
+   "name": "Hydrologic calibration environment and episode",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "hydrologic_model_calibration"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "R3_1 TSK test: the episode embeds the hydrologic calibration objective, parameter action space, simulator semantics, and NSE verifier; changing task family would require redesigning those, so it is not GTS or GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - calibration objective and NSE verifier",
+    "R5:processing",
+    "R7:other hydrologic_model_calibration",
+    "R9:infrastructure"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 179,
+     "quote": "We instantiate one calibration episode per basin/event pair. Each episode exposes four tools to agents:"
+    },
+    {
+     "line": 188,
+     "quote": "the patched control file and parse the resulting time-series CSV, returning the full simulated/observed discharge series at hourly resolution along with a summary of multiple"
+    },
+    {
+     "line": 197,
+     "quote": "• evaluate: aggregate the latest simulation against the gauge time series. Returns the Nash–"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "hydroagentcalibration2026:frontier-benchmark",
+   "name": "Frontier-agent hydrologic calibration benchmark",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "hydrologic_model_calibration"
+   ],
+   "role": "evaluation",
+   "scope_reason": "R3_1 TSK test: the benchmark scores the calibration objective with NSE; changing task family would require a different action space, simulator/tool semantics, and verifier.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - benchmark objective and NSE verifier",
+    "R5:resource_level",
+    "R7:other hydrologic_model_calibration",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 152,
+     "quote": "Contributions. (1) The first systematic benchmark of nine frontier LLM agents on the calibration of an operational distributed hydrologic model, including a public release of all 9 × 20 trajectories for reproducibility (Section 3)."
+    },
+    {
+     "line": 357,
+     "quote": "We evaluate nine frontier LLM agents on the calibration of the four held-out gauges of Table 2"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "hydroagentcalibration2026:expert-trajectories",
+   "name": "Expert calibration trajectory corpus",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "hydrologic_model_calibration"
+   ],
+   "role": "training_data",
+   "scope_reason": "R2 LLM test: this trajectory corpus is built to train the Qwen3-4B model; it is model-side training data rather than an external runtime procedure.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 287,
+     "quote": "2,576 SFT trajectories by distilling a strong proprietary teacher (GPT-51 ) on 73 calibration runs across 29 U.S. gauges (excluding the 4 gauges in the test set)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "hydroagentcalibration2026:sft-stage",
+   "name": "Expert-trajectory supervised fine-tuning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "hydrologic_model_calibration"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 LLM test: supervised fine-tuning updates Qwen3-4B parameters; a prompt-only or in-context procedure would be Harness, but this contribution changes the model itself.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:instruction_reasoning",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 247,
+     "quote": "Phase 1: supervised fine-tuning (SFT) on 2,576 expert calibration trajectories distills tool-call format and basic hydrologic reasoning into Qwen3-4B."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "hydroagentcalibration2026:simulator-rl",
+   "name": "Simulator-feedback GRPO policy optimization",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [],
+   "other_tasks": [
+    "hydrologic_model_calibration"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 LLM test: GRPO updates the Qwen3-4B policy parameters from simulator rewards; the surrounding rollout environment is a separate Harness module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R6:workflow_learning",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 321,
+     "quote": "We refer to our RL stage as Reinforcement Learning with Simulation Feedback (RLSF) to distinguish it from human-feedback RL (Lee et al., 2024)"
+    },
+    {
+     "line": 324,
+     "quote": "is a numerical Earth-system simulator producing continuous physical-error metrics."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1282,
+   "quote": "The diagnostic columns confirm that the gains travel with restored interaction: simulation counts return to 12–17 per episode, the full 50-turn budget is consumed on every gauge, and parse failures fall to zero across the panel."
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1291,
+   "quote": "Relative to the untuned base, the full SFT + RLSF stack lifts panel-mean NSE from −0.14 to +0.20 and panel-median NSE from +0.09 to +0.50, and converts a third basin from negative to positive NSE."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "hydroagentcalibration2026:calibration-tools",
+   "decision": "change",
+   "new_ids": [
+    "hydroagentcalibration2026:calibration-tools"
+   ],
+   "changes": [
+    "mapped retired Planning and Workflow and Control, Verification, and Feedback dimensions to Planning and Orchestration",
+    "added the processing function",
+    "added hydrologic_model_calibration under other_tasks"
+   ],
+   "reason": "The parameter-setting, simulation, and NSE evaluation episode is a task-specific calibration procedure; keep its existing id and update its labels and task record. The benchmark is added separately because the packet identifies it as a distinct contribution."
+  },
+  {
+   "existing_id": "hydroagentcalibration2026:simulator-rl",
+   "decision": "split",
+   "new_ids": [
+    "hydroagentcalibration2026:expert-trajectories",
+    "hydroagentcalibration2026:sft-stage",
+    "hydroagentcalibration2026:simulator-rl"
+   ],
+   "changes": [
+    "split the combined post-training into the expert trajectory corpus, SFT stage, and simulator-feedback GRPO stage",
+    "removed retired harness dimensions and added current LLM routes",
+    "added model-side roles and packet evidence"
+   ],
+   "reason": "The packet describes a separately constructed trajectory corpus, an SFT stage, and a GRPO/RLSF stage, and its ablation isolates SFT-only from the full SFT plus RLSF stack."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Calibration is not one of the four closed task families, so it is recorded under other_tasks. The benchmark and trajectory corpus are separately reusable contributions. Evaluation is held out by gauge; the packet does not report a chronological split, leakage check, or information-cutoff test."
+}

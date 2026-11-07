@@ -1,0 +1,245 @@
+{
+ "citation_key": "flairr2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "FLAIRR-TS contributes a forecasting harness that retrieves historical analogues and revises frozen-LLM prompts using forecast-error feedback, alongside manually architected forecasting strategy prompts.",
+ "claim_evidence": [
+  {
+   "line": 96,
+   "quote": "forecaster. The core iterative cycle (Alg. 1, lines\n7-20) involves forecasting, evaluating the forecast\nagainst recent ground truth (e.g., via a metric like\nMAE), and refining the prompt."
+  },
+  {
+   "line": 66,
+   "quote": "prompts. Inspired by (Sahoo et al., 2025), we introduce Architected Strategy Prompts (ASPs), a set\nof specialized prompts, which include directives for\nspecific analytical procedures or induce particular\ncognitive approaches."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "flairr2025:refinement",
+   "name": "Forecast-error-driven prompt refinement",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies: the loop scores forecasts against horizon ground truth, retains prompt/error history, revises instructions, and stops or selects prompts by MAE. Changing task family requires redesigning the output, error criterion, and refiner instructions. Prompting without parameter updates is Harness under R2; refinement is within a session, not demonstrated evolution across episodes.",
+   "rubric_path": [
+    "R1:contributed - integrated forecasting/refinement procedure",
+    "R2:Harness - test-time prompts without weight updates",
+    "R3_1_TSK:yes - forecast-MAE objective and stopping rule",
+    "R4:Memory and Context; Planning and Orchestration",
+    "R5:task_procedure - no separate temporal evidence validator",
+    "R6:not_applicable",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 97,
+     "quote": "7-20) involves forecasting, evaluating the forecast\nagainst recent ground truth (e.g., via a metric like\nMAE), and refining the prompt."
+    },
+    {
+     "line": 100,
+     "quote": "can signal early termination if the forecast improvement falls below a defined threshold, τstop (e.g., a\n5% reduction in MAE). Otherwise, if maximum\niterations (Niter ) are reached, the system defaults\nto the prompt that yielded the best observed MAE."
+    },
+    {
+     "line": 118,
+     "quote": "Refiner-agent (R). Functioning as a metaoptimizer (Alg. 1, line 12), the Refiner Agent is\nstateful and analyzes the entire history of the current refinement session."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "flairr2025:analogue-retrieval",
+   "name": "Historical-window analogue retrieval",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not apply to the retrieval mechanism itself: it ranks past windows by Pearson similarity rather than a forecast objective. Under the task-change counterfactual, historical-window matching and return of observed historical context can remain intact. R3_2_GTS applies because ordered windows and historical availability define its inputs. Count the specified integration into the forecaster context, not RAFT as a separately invented method.",
+   "rubric_path": [
+    "R1:contributed - specified historical-retrieval integration",
+    "R2:Harness - external historical database and context augmentation",
+    "R3_1_TSK:no - similarity retrieval has no forecast-error objective",
+    "R3_2_GTS:yes - ordered historical windows and temporal context",
+    "R4:Memory and Context; Tools and Execution",
+    "R5:context_memory; mapped",
+    "R6:not_applicable",
+    "R7:forecasting_prediction",
+    "R8:inferred - one task family across multiple datasets",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 109,
+     "quote": "Forecaster Agent’s inputs by retrieving M historical time series segments (Sretr ) from a historical\ndatabase. This database is constructed by applying a sliding window of length L across the entire\ntraining split of the dataset."
+    },
+    {
+     "line": 112,
+     "quote": "the current context window (XCtx ) and the historical segments is measured using Pearson’s correlation, with the top-M most similar segments\nbeing retrieved."
+    },
+    {
+     "line": 113,
+     "quote": "being retrieved. These segments, along with their\nactual outcomes, provide illustrative examples of\npast pattern evolutions, directly augmenting the\ncontext (Caug ) given to the Forecaster-agent (see"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "flairr2025:strategy-prompts",
+   "name": "Architected forecasting strategy prompts",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies: these contributed in-context procedures instruct forecast decomposition, scenario generation, and recombination. Changing task family requires redesigning their forecast output and reasoning objectives. They remain Harness under R2 because they are prompt templates, not trained model capabilities. Processing is supported by the STL decomposition/recombination strategy.",
+   "rubric_path": [
+    "R1:contributed - explicitly introduced ASP library, not an unchanged baseline",
+    "R2:Harness - manually designed in-context instructions",
+    "R3_1_TSK:yes - forecast-generation procedures",
+    "R4:Planning and Orchestration",
+    "R5:processing; task_procedure",
+    "R6:not_applicable",
+    "R7:forecasting_prediction",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 185,
+     "quote": "manual prompt engineering is permitted, we aim to\nimprove accuracy further by carefully editing the\nbest prompts from FLAIRR. ASPs are developed\nby building upon the results achieved by FLAIRR."
+    },
+    {
+     "line": 191,
+     "quote": "Deep STL analysis: (inspired by (Zhou et al.,\n2024)) perform an STL decomposition, forecast\neach component, then recombine them via STL\naddition."
+    },
+    {
+     "line": 784,
+     "quote": "many-worlds-ensemble\nCreate forecasts for four parallel universes\n(A–D) shifted by −2σ, −1σ, +1σ, +2σ, each\n{sequence_length} steps long, then provide a\nconsensus median forecast."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 835,
+   "quote": "ensures that all data samples within the test set originate from dates strictly subsequent to the known\ntraining data cut-off date of the LLM employed\nfor inference. This chronological separation mitigates the risk of test data contamination, providing"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 399,
+   "quote": "Observations: Retrieval lowers error by grounding\nforecasts in analogous history, while IR refines outputs through on-the-fly prompt correction. Their\ncombination (FLAIRR-TS) delivers the lowest\nMAE across all three backbones."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "flairr2025:refinement",
+   "decision": "split",
+   "new_ids": [
+    "flairr2025:refinement",
+    "flairr2025:analogue-retrieval"
+   ],
+   "changes": [
+    "Preserve flairr2025:refinement for the TSK forecast-error-driven refinement loop; separate GTS historical-window retrieval as flairr2025:analogue-retrieval.",
+    "Replace Control, Verification, and Feedback with Planning and Orchestration for within-session scoring, stopping, and prompt selection.",
+    "Remove Optimization and Evolution: no cross-episode improvement of reusable assets is demonstrated.",
+    "Move context_memory to the retrieval module; refinement has functions=[] and view_status=task_procedure.",
+    "Add independently contributed flairr2025:strategy-prompts as a TSK method module."
+   ],
+   "reason": "Sections 2.1-2.2 distinguish forecast-MAE-driven prompt revision from Pearson-similarity historical retrieval; the separate retrieval and refinement ablations (lines 381-387) also support separability. Preserve the existing ID for the same refinement mechanism. The old mapped view conflated its task-specific MAE objective with the retrieved temporal context. Sections 2.3 and Appendix E explicitly contribute ASP procedures; these are proposed methods, not unchanged baselines. No model parameters are trained."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "No model training or learned temporal representation is contributed. StandardScaling and baseline forecasters are excluded; the forecaster call and prompt-synthesis steps are part of the refinement loop. Temporal-validity evidence concerns the ILINet/weather pretraining cutoff check, not a demonstrated guard for every retrieval or refinement sample. Algorithm 1 uses recent horizon ground truth and F.3 specifies three validation samples, but their separation from reported test targets is not fully specified. Appendix G proposes measuring refiner-feedback quality in future; this is not a reported process-validity evaluation. Reconciliation preserves the existing refinement ID while separating its retrieval integration. ASPs are included because the packet explicitly introduces and evaluates them as proposed methods (lines 66-82, 185-188, 271-272), despite their additional use as performance benchmarks.",
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "flairr2025:refinement layer move TSK -> TSK + GTS (split)",
+    "verdict": "accept",
+    "result": "refinement stays TSK; retrieval split out as GTS flairr2025:analogue-retrieval",
+    "reason": "The refinement loop is bound to forecast MAE, stopping threshold and best-MAE prompt selection (R3_1 yes). Retrieval ranks sliding windows by Pearson similarity of the context window and returns segments with outcomes, with no forecast-error objective (R3_1 no) and depends on windows and order (R3_2 yes); it is separable from the refinement loop.",
+    "line": 109
+   },
+   {
+    "item": "flairr2025:analogue-retrieval reuse evidence",
+    "verdict": "accept",
+    "result": "inferred (one task family)",
+    "reason": "Only forecasting is evaluated.",
+    "line": 109
+   },
+   {
+    "item": "flairr2025:strategy-prompts as a TSK module",
+    "verdict": "accept",
+    "result": "TSK, Planning and Orchestration, processing",
+    "reason": "ASPs are introduced as proposed forecasting procedures (STL decomposition, scenario ensembles) written as prompts without parameter updates.",
+    "line": 185
+   }
+  ],
+  "summary": "The candidate split of the old refinement module into a TSK refinement loop and a GTS historical-window retrieval is supported by Sections 2.1-2.2. No other change was needed."
+ }
+}

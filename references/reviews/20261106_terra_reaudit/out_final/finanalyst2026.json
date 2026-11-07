@@ -1,0 +1,233 @@
+{
+ "citation_key": "finanalyst2026",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "Fin-Analyst contributes a fixed live trading workflow that combines eight TSLA LLM specialists under a Meta-Agent with a separate three-signal BTC vote and temporal signal handling.",
+ "claim_evidence": [
+  {
+   "line": 13,
+   "quote": "focused on US equities with little evidence from live deployment. We present Fin-Analyst, a hybrid agent for"
+  },
+  {
+   "line": 80,
+   "quote": "• A rule-based BTC strategy that uses price trend, the Crypto Fear & Greed index, and momentum."
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "finanalyst2026:specialist-trading",
+   "name": "TSLA specialist and Meta-Agent trading aggregation",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The procedure directly maps specialist analyses to a BUY/HOLD/SELL trading action; changing the task objective would require new specialist prompts and aggregation weights, so the R3_1 task counterfactual is met.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - embeds the trading action objective"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "task-specific procedure"
+   },
+   "evidence": [
+    {
+     "line": 119,
+     "quote": "specialist is implemented as a single gpt-4o-mini call that produces an action, a confidence score, and"
+    },
+    {
+     "line": 121,
+     "quote": "prior work. The Meta-Agent applies a recency-weighted hierarchy in which today’s news carries the"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "finanalyst2026:btc-rule-vote",
+   "name": "BTC three-signal rule vote",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The rule vote embeds BTC BUY/HOLD/SELL thresholds, majority logic, and a trading tie-breaker; changing the task objective or action space would require redesign, so R3_1 selects TSK.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - embeds the trading action objective"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "task-specific procedure"
+   },
+   "evidence": [
+    {
+     "line": 167,
+     "quote": "Index, and the organizer-provided momentum label, with ties broken by the Fear & Greed score. The"
+    },
+    {
+     "line": 179,
+     "quote": "and bearish→SELL. The final action is the majority of the three votes, with the Fear & Greed score"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "finanalyst2026:temporal-signal-memory",
+   "name": "Temporal signal-card memory",
+   "layer": "GTS",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [
+    "data_management",
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The memory stores temporal corpora and admits the latest filing on or before the decision date; it does not emit a trading action, and the same temporal cutoff/state interface can serve another task, so R3_1 is negative and R3_2 selects GTS.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - stores temporal evidence without a task output",
+    "R3_2_GTS:yes - depends on temporal availability and cutoffs"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 110,
+     "quote": "We propose a hierarchical agent with three layers: (i) a persistent memory of seven pre-processed corpora"
+    },
+    {
+     "line": 123,
+     "quote": "disclosure-based specialist always operates on the most recent filing dated on or before the decision"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "finanalyst2026:inference-cache",
+   "name": "Prompt-keyed specialist response cache",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The MD5 prompt cache manages repeated model execution without temporal semantics or a trading objective, so R3_1 and R3_2 are negative and R3_3 selects GH.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task objective",
+    "R3_2_GTS:no - no temporal dependency",
+    "R3_3_GH:yes - manages execution state"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 186,
+     "quote": "To bound latency and cost, verdicts are cached by an MD5 hash of"
+    },
+    {
+     "line": 188,
+     "quote": "reuse a cached verdict rather than issuing a new API call. Any specialist or"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 189,
+   "quote": "endpoint exception returns a HOLD verdict, ensuring compliance with the task’s no-retry protocol and"
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 123,
+   "quote": "disclosure-based specialist always operates on the most recent filing dated on or before the decision"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 335,
+   "quote": "On TSLA, the multi-specialist LLM pipeline returns +13.51% against a −14.7% Buy-and-Hold"
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 336,
+   "quote": "(+28.33 points, Sharpe 4.10, 88% win rate), finishing first of all submitted agents. On BTC, the rulebased pipeline ends essentially flat at −5.30%, yet +17.63 points above a Buy-and-Hold that lost"
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The current card omitted the separately described BTC vote and persistent temporal signal memory; both are added with packet-supported evidence. The workflow is stateless across requests and contributes no trained LLM-side module.",
+ "reconciliation": [
+  {
+   "existing_id": "finanalyst2026:specialist-trading",
+   "decision": "change",
+   "new_ids": [
+    "finanalyst2026:specialist-trading"
+   ],
+   "changes": [
+    "dimensions: Memory and Context, Coordination and Scaling -> Planning and Orchestration",
+    "functions: context_memory -> []",
+    "view_status: mapped -> task_procedure"
+   ],
+   "reason": "The existing module is the same eight-specialist and Meta-Agent trading mechanism, but its retired dimension and temporal mapped view were incorrect; the temporal memory is a separate GTS module."
+  },
+  {
+   "existing_id": "finanalyst2026:inference-cache",
+   "decision": "keep",
+   "new_ids": [
+    "finanalyst2026:inference-cache"
+   ],
+   "changes": [],
+   "reason": "The prompt-hash response cache is the same independently reusable general execution component supported by the packet."
+  }
+ ]
+}

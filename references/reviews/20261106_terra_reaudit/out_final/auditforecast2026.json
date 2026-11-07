@@ -1,0 +1,77 @@
+{
+ "citation_key": "auditforecast2026",
+ "status": "out_of_scope",
+ "role_of_work": "background",
+ "claim_summary": "AUDITFORECAST proposes an agentic scaffold for binary future-event forecasts, deriving a quantitative base probability and mechanically applying evidence-based factor updates in odds space.",
+ "claim_evidence": [
+  {
+   "line": 242,
+   "quote": "represents each forecast through two explicit components: a base probability p0 derived from the expected trajectory, and a set of situational factor updates outside the scope of p0 ."
+  },
+  {
+   "line": 704,
+   "quote": "tion and its resolution rule, rather than a large volume of pre-processed time-series data. The task"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1162,
+   "quote": "evaluation datasets in detail. To avoid contamination, all forecasting questions in our evaluation set"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 617,
+   "quote": "Factor updates further calibrate the base probability and improve forecasting accuracy."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "auditforecast2026:auditable-odds",
+   "decision": "drop",
+   "new_ids": [],
+   "changes": [
+    "drop module: out_of_scope under R0"
+   ],
+   "reason": "The existing module is a concrete binary-event forecasting scaffold, but the agent's primary input is an event question and resolution criterion rather than ordered numerical observations. Historical time series are prepared for the TSFM comparison, not used as primary input to the scaffold; the work therefore fails R0's time-series scope test."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Out of scope under R0: the scaffold's input is a binary event question plus resolution rule, its output a probability, and retrieved quantities are scalars (spot price, implied volatility, thresholds); ordered series are prepared only for the Chronos-2/TimesFM baseline comparison (L704-714). The existing module is dropped; the TSFM comparison is a baseline, not a time series input to the scaffold.",
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "codex",
+  "items": [
+   {
+    "item": "scope: out_of_scope vs card's TSK forecasting module",
+    "verdict": "accept",
+    "result": "status out_of_scope, role background, module auditable-odds dropped",
+    "reason": "The paper says the task centers on a question and its resolution rule rather than pre-processed time series, and prepares historical series only to run TSFM baselines; the agent's primary input/output is not ordered numerical observations (R0 scope_test).",
+    "line": 704
+   },
+   {
+    "item": "human review flag",
+    "verdict": "modify",
+    "result": "needs_human_review false",
+    "reason": "The packet states the scope boundary explicitly (L704-723), so the item is decidable from the text.",
+    "line": 704
+   }
+  ],
+  "summary": "Kept the out-of-scope verdict and the dropped module. The packet itself states that the task does not rest on time series data, so no human review is needed."
+ }
+}

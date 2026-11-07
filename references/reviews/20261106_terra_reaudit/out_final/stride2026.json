@@ -1,0 +1,177 @@
+{
+ "citation_key": "stride2026",
+ "status": "paper_verified",
+ "role_of_work": "llm_side_technique",
+ "claim_summary": "STRIDE trains a student LLM to produce forecasting reasoning and projects its hidden-state prior into a TSFM for jointly reasoned numerical forecasts.",
+ "claim_evidence": [
+  {
+   "line": 71,
+   "quote": "In summary, our contributions are three folds: (i) a Novel Cross-Modal Framework that utilizes a generalized latent projection mechanism to natively inject LLM reasoning into TSFM embedding spaces, entirely bypassing discrete token bottlenecks; (ii) a Reasoning Distillation Pipeline enabling a lightweight student LLM to generate high-quality analytical strategies using strictly historical context"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "stride2026:latent-fusion",
+   "name": "Cross-modal latent projection and fusion",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R2 places the trainable projection and latent fusion on the LLM side because it changes how temporal inputs and model representations are aligned; the R3 Harness layer test is not applicable because this is part of the jointly trained model, not an around-model runtime module.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R3:LLM-side representation alignment",
+    "R6:representation_alignment",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 229,
+     "quote": "A trainable linear projection matrix 𝑊𝑝𝑟𝑜𝑗 maps ℎ𝑅 to the exact dimensionality of the target TSFM,"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "stride2026:reasoning-distillation",
+   "name": "Student LLM reasoning distillation",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2 places the causal-language-model supervision and LoRA updates on the LLM side because they train the model to generate forecasting analyses; the R3 Harness test is not applicable because no runtime action-selection procedure is trained.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM",
+    "R3:LLM-side parameter training",
+    "R6:instruction_reasoning",
+    "R7:forecasting_prediction",
+    "R9:model_training"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 208,
+     "quote": "Next, we distill this reasoning capability into a lightweight student LLM. Crucially, while the teacher utilizes 𝑌 and E to generate 𝑅𝑟𝑒𝑓, the student is tasked with predicting equivalent analytical insights relying strictly on the historical context 𝑋."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "stride2026:oracle-reasoning-corpus",
+   "name": "Oracle reasoning training corpus",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "training_data",
+   "scope_reason": "R2 includes training data built to train an LLM capability; the R3 Harness test is not applicable because this corpus supervises model-side reasoning rather than implementing a runtime workflow or task verifier.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM training data",
+    "R3:LLM-side training data",
+    "R6:instruction_reasoning",
+    "R7:forecasting_prediction",
+    "R9:training_data"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 200,
+     "quote": "First, we construct a high-quality reference reasoning dataset using the training splits of the GIFT-Eval (Aksu et al., 2024), partitioning sampled temporal windows into a historical context 𝑋 and a pseudo-future ground truth 𝑌."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 361,
+   "quote": "To avoid any seen data or leakage issue for in-domain evaluation on TFRBench, we excluded the samples, which are used during training of our framework."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 647,
+   "quote": "As illustrated in Figure 2, our approach establishes a new state-of-the-art, securing the top performance across both deterministic and probabilistic metrics. Specifically, our framework achieves a Mean Absolute Scaled Error (MASE) of 0.674 and a Continuous Ranked Probability Score (CRPS) of 0.454."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "stride2026:reasoning-distillation",
+   "decision": "change",
+   "new_ids": [
+    "stride2026:reasoning-distillation"
+   ],
+   "changes": [
+    "remove retired dimension labels; add llm_route instruction_reasoning"
+   ],
+   "reason": "The source supports student reasoning distillation as model training; the current card's Optimization and Evolution dimension is a retired Harness label and does not apply to an LLM module."
+  },
+  {
+   "existing_id": "stride2026:latent-fusion",
+   "decision": "change",
+   "new_ids": [
+    "stride2026:latent-fusion"
+   ],
+   "changes": [
+    "remove retired dimension labels; add llm_route representation_alignment"
+   ],
+   "reason": "The source supports mean-pooling, learned projection and fusion as a model-side representation alignment mechanism, not Harness Interface and Interaction or Optimization and Evolution dimensions."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The packet identifies an explicitly constructed oracle reasoning dataset separately from the student training procedure, so it is recorded as training_data. No Harness module is contributed."
+}

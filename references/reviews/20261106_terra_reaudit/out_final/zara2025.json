@@ -1,0 +1,223 @@
+{
+ "citation_key": "zara2025",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "ZARA contributes a parameter-frozen HAR harness that builds pairwise statistical priors, retrieves class-balanced sensor evidence, and adapts feature selection to evidence-pruned activity candidates.",
+ "claim_evidence": [
+  {
+   "line": 128,
+   "quote": "a novel agentic framework for HAR in a trainingfree inference setting via knowledge- and retrievalaugmented reasoning. ZARA bridges the signalto-language gap via three synergistic components."
+  },
+  {
+   "line": 486,
+   "quote": "The Feature Selector is then re-engaged on A′ to retrieve m fine-grained features, enabling the system"
+  },
+  {
+   "line": 477,
+   "quote": "Hierarchical Multi-Agent Reasoning. ZARA\norchestrates a hierarchical reasoning pipeline comprising three specialized agent roles executed in\nfour stages (Figure 3). Initially, a Feature Selector agent queries the pairwise knowledge base K"
+  }
+ ],
+ "task_memberships": [],
+ "other_tasks": [
+  "time_series_classification"
+ ],
+ "modules": [
+  {
+   "id": "zara2025:pairwise-knowledge",
+   "name": "Pairwise activity knowledge profiling",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches: permutation-ranked features and the knowledge registry encode discrimination between activity labels. Changing to forecasting or synthesis requires redesigning the pairwise classification objective and registry semantics; temporal statistics alone do not make the integrated mechanism GTS.",
+   "rubric_path": [
+    "R1:contributed - offline statistical profiling and pairwise registry",
+    "R2:Harness - external priors, no LLM parameter updates",
+    "R3_1_TSK:yes - activity-pair discrimination objective",
+    "R4:Memory and Context; Tools and Execution",
+    "R5:processing; context_memory",
+    "R6:not_applicable",
+    "R7:other_tasks=time_series_classification",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 303,
+     "quote": "Offline Statistical Profiling (Global Priors). To\nequip the LLM with structured, sensor-specific priors, we automatically construct a pairwise Activity\nFeature Importance Knowledge Base K through\noffline statistical analysis."
+    },
+    {
+     "line": 313,
+     "quote": "and cross-channel indicators (correlations, tilt angles). For each ordered activity pair (ai , aj ), we"
+    },
+    {
+     "line": 314,
+     "quote": "estimate an importance score s[f, (ai , aj )] for every f ∈ F using permutation-based feature ranking via AutoGluon (Erickson et al., 2020). Crossvalidation with fold-weighted averaging yields ro-"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "zara2025:classwise-retrieval",
+   "name": "Class-wise multi-sensor evidence retrieval",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches before GTS: retrieval is conditioned on candidate activity labels and supplies balanced evidence for each classification hypothesis. A different task family requires replacing the class-conditioned action space and evidence objective, although placement shards and synchronized window indices have temporal semantics.",
+   "rubric_path": [
+    "R1:contributed - class-conditioned placement retrieval and rank fusion integration",
+    "R2:Harness - external stores and frozen encoder calls",
+    "R3_1_TSK:yes - balanced evidence for activity-class hypotheses",
+    "R4:Memory and Context; Tools and Execution",
+    "R5:data_management; context_memory",
+    "R6:not_applicable",
+    "R7:other_tasks=time_series_classification",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 492,
+     "quote": "Class-Wise Multi-Sensor Retrieval. Given a\nquery window x with sensor placement tag loc and\ncandidate activities A = {a1 , . . . , aM }, we first\ncompute its normalized embedding u = g(x). We"
+    },
+    {
+     "line": 496,
+     "quote": "then perform class-conditional retrieval by scoring\nu against all historical vectors v ∈ Dloc labelled"
+    },
+    {
+     "line": 457,
+     "quote": "Since indices are time-synchronized across sensors, this summation naturally aligns and jointly\nreranks multi-sensor evidence, promoting time windows that are consistently salient across modalities."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "zara2025:activity-evidence",
+   "name": "Evidence-guided hierarchical activity reasoning",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK matches: feature selection, class-moment comparison, candidate pruning and final-label generation all optimize activity classification. Changing task family requires redesigning the candidate state, feature-selection objective and final-output criterion. These coupled four stages form one task procedure.",
+   "rubric_path": [
+    "R1:contributed - four-stage feature selection, pruning and classification procedure",
+    "R2:Harness - prompting and statistical tables, no policy training",
+    "R3_1_TSK:yes - activity-label selection and candidate pruning",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:processing",
+    "R6:not_applicable",
+    "R7:other_tasks=time_series_classification",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 481,
+     "quote": "n coarse-grained discriminative features. Subsequently, an Evidence Pruning agent synthesizes the\nretrieved class-wise evidence lists {Na (x)} into\na structured statistical comparison table (contrasting query values against class moments) based on\nthese features."
+    },
+    {
+     "line": 484,
+     "quote": "these features. It then filters out distributionally\nmismatched activities, yielding a refined set A′ .\nThe Feature Selector is then re-engaged on A′ to retrieve m fine-grained features, enabling the system"
+    },
+    {
+     "line": 488,
+     "quote": "candidates. Finally, a Decision Insight agent analyzes the updated statistics to derive the final label\na′ , producing a transparent natural-language rationale grounded in the selected statistical features\nand retrieved evidence. Appendix A.7 provides the"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1882,
+   "quote": "at 20 Hz. Accelerometer and gyroscope signals\nare aligned by timestamp, and we select 47 users\nwhose data show no alignment anomalies. Among"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 973,
+   "quote": "an average accuracy of 81.6% and a macro F1 of\n81.4%, substantially surpassing the strongest baseline, UniMTS. This advantage holds across backbone scales: ZARA variants powered by Qwen330B/80B and GPT-4.1-mini all outperform every"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The current card's classification task and TSK scope are supported, but its single module conflates three separately described mechanisms and uses retired dimensions and an incorrect mapped view. The original ID is retained for the hierarchical reasoning procedure. The blind work-role judgment is revised under literal R0: L477-L491 prescribe four stages; pruning changes the candidate and feature inputs, without evidence that returned feedback changes which stage executes next. Thus fixed_workflow is better supported than feedback_driven_agent. No LLM-side training is contributed; frozen encoders, FAISS and AutoGluon are not counted as standalone contributions. Temporal validity denotes experimental timestamp alignment and exclusion of alignment anomalies only; no chronological cutoff guarantee is claimed. Intermediate candidate-retention scores and token/latency measurements do not establish execution validity, and HAR labels/rationales are not downstream decision utility.",
+ "reconciliation": [
+  {
+   "existing_id": "zara2025:activity-evidence",
+   "decision": "split",
+   "new_ids": [
+    "zara2025:activity-evidence",
+    "zara2025:pairwise-knowledge",
+    "zara2025:classwise-retrieval"
+   ],
+   "changes": [
+    "Split the composite module into offline pairwise profiling, class-wise multi-sensor retrieval, and hierarchical activity reasoning; retain the existing ID for the reasoning procedure.",
+    "All three modules remain TSK with time_series_classification as an other task.",
+    "Replace retired dimensions with Planning and Orchestration for within-instance selection and pruning; assign Memory and Context and Tools and Execution to the separately described mechanisms.",
+    "Correct view_status from mapped to task_procedure; record module-specific temporal functions, empty llm_route, and complete reuse evidence."
+   ],
+   "reason": "L303-L314 and L440-L446 describe an independently constructed pairwise knowledge registry; L457-L476 and L492-L500 describe class-conditioned placement retrieval and synchronized rank fusion; L477-L491 describe their consuming four-stage reasoning procedure. Separate component ablations at L1286-L1313 further support distinct mechanisms. Each embeds a classification objective under R3_1_TSK. Pruning controls the current classification episode, with no evidence of reusable cross-episode optimization."
+  }
+ ]
+}

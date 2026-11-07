@@ -1,0 +1,259 @@
+{
+ "citation_key": "merit2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "MERIT contributes a feedback-driven three-agent harness that retrieves temporal context, selects adaptive augmentations, and reviews them before using approved views for time-series representation learning.",
+ "claim_evidence": [
+  {
+   "line": 17,
+   "quote": "The core of our MERIT is to utilize three LLM agents to collaboratively generate positive views for time series data. In particular,"
+  },
+  {
+   "line": 21,
+   "quote": "reliable augmentation strategies from an augmentation strategy library. We also design a review agent to evaluate the quality of generated"
+  },
+  {
+   "line": 22,
+   "quote": "views and stop the generation process."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "data_augmentation_synthesis",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "time_series_classification",
+  "imputation",
+  "transfer_learning",
+  "temporal_representation_learning"
+ ],
+ "modules": [
+  {
+   "id": "merit2025:temporal-context-retrieval",
+   "name": "Temporal Context Retrieval Agent",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution",
+    "Memory and Context"
+   ],
+   "functions": [
+    "processing",
+    "context_memory"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "time_series_classification",
+    "imputation",
+    "transfer_learning",
+    "temporal_representation_learning"
+   ],
+   "role": "method",
+   "scope_reason": "GTS: the module ranks time-series sequences and builds temporal reference context; it is not bound to one downstream task objective. If the task changed, sequence-similarity and temporal-context handling would remain, while no task-specific output validator is embedded.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-family objective or validator",
+    "R3_2_GTS:yes - temporal sequence similarity and reference context",
+    "R4:Tools and Execution; Memory and Context",
+    "R5:processing; context_memory",
+    "R7:forecasting_prediction; data_augmentation_synthesis; anomaly_detection_diagnosis; other downstream tasks",
+    "R8:demonstrated - used in representation learning supporting multiple downstream tasks",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "data_augmentation_synthesis",
+     "anomaly_detection_diagnosis"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 278,
+     "quote": "Our retrieval agent takes a twostep paradigm, which first selects a set of candidate"
+    },
+    {
+     "line": 294,
+     "quote": "Then, we adopt an LLM to further narrow down the scope by designing a prompt containing inference instructions, which semantically filter these"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "merit2025:positive-views",
+   "name": "Adaptive Augmentation Strategy Selection",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [
+    "temporal_representation_learning"
+   ],
+   "role": "method",
+   "scope_reason": "TSK: the procedure embeds the data-augmentation objective of choosing transformations that produce semantically reliable positive views. If the task family changed, the augmentation strategy library and positive-view objective would need redesign; it is not a generic temporal runtime.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - chooses transformations to create positive views for data augmentation",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:task_procedure; processing",
+    "R7:data_augmentation_synthesis",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 323,
+     "quote": "To address this, our augmentation agent utilizes contextual information provided by the retrieval agent to dynamically select appropriate augmentation strategies in a data-centric way."
+    },
+    {
+     "line": 330,
+     "quote": "we require an LLM to generate the set of augmentation strategies, which are applicable to the current data"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "merit2025:augmentation-review-feedback",
+   "name": "Augmentation Review and Feedback Gate",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation",
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "data_augmentation_synthesis"
+   ],
+   "other_tasks": [
+    "temporal_representation_learning"
+   ],
+   "role": "method",
+   "scope_reason": "TSK: the validator embeds the quality criterion for generated augmented views and controls whether the augmentation search continues. If the task family changed, its correctness criterion and rejection loop would need redesign; this is not a task-neutral temporal consistency service.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - validates the quality of generated augmentation views",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure; validation; context_memory",
+    "R7:data_augmentation_synthesis",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 358,
+     "quote": "actions and provide feedback. By carefully reviewing each augmented sample, we can ensure that"
+    },
+    {
+     "line": 367,
+     "quote": "where the output of quality assessment is ‘Correct’ or ‘Error’."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1611,
+   "quote": "Furthermore, the quality assessment success rate improves from 60% to over 90% during training (Figure 8 (Mid)), demonstrating the review agent’s increasing effectiveness in identifying high-quality augmentations"
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 855,
+   "quote": "During training, each time series is split into two halves according to time order, with the first half for training and the second for evaluation."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 840,
+   "quote": "We can observe that MERIT consistently outperforms all baseline methods across different prediction lengths, demonstrating its strong capability in capturing temporal dependencies."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "merit2025:positive-views",
+   "decision": "split",
+   "new_ids": [
+    "merit2025:temporal-context-retrieval",
+    "merit2025:positive-views",
+    "merit2025:augmentation-review-feedback"
+   ],
+   "changes": [
+    "split the combined retrieval, augmentation-selection and review mechanism into three independently locatable modules",
+    "layer: TSK -> GTS for temporal retrieval; TSK retained for task-specific augmentation selection and review",
+    "dimensions: Memory and Context and Tools and Execution -> current closed vocabulary",
+    "view_status: mapped -> mapped for retrieval and task_procedure for augmentation and review",
+    "functions assigned per mechanism: processing/context_memory for retrieval, processing for augmentation, validation/context_memory for review"
+   ],
+   "reason": "The packet separately specifies the retrieval agent's candidate and semantic filtering (L278-L313), the augmentation agent's strategy selection (L323-L348), and the review agent's quality gate and stopping loop (L357-L376). The older card merged these mechanisms and used a retired dimension label."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The paper's LLMs are used as prompted agents around a trainable time-series encoder; no parameter-updated LLM module is contributed. The review output changes whether the augmentation search repeats, establishing feedback-driven execution. The current card's single module was split because the three agents are separately specified and independently reusable.",
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "merit2025:positive-views layer move TSK->TSK (augmentation selection)",
+    "verdict": "accept",
+    "result": "TSK, data_augmentation_synthesis",
+    "reason": "The LLM picks strategies from a fixed augmentation library to produce semantically reliable positive views; library and objective are redesigned if the task changes (R3_1).",
+    "line": 323
+   },
+   {
+    "item": "merit2025:temporal-context-retrieval layer TSK->GTS",
+    "verdict": "accept",
+    "result": "GTS, processing+context_memory",
+    "reason": "Top-K similarity then LLM semantic filtering builds reference context for a target series without embedding any task output requirement or validator; fails R3_1, meets R3_2.",
+    "line": 278
+   },
+   {
+    "item": "merit2025:augmentation-review-feedback TSK",
+    "verdict": "accept",
+    "result": "TSK, Planning and Orchestration",
+    "reason": "Review verdict Correct/Error on augmented views decides whether the search restarts or stops; criterion is positive-view quality for augmentation (R3_1).",
+    "line": 373
+   }
+  ],
+  "summary": "The merged record's three-way split is supported by separate method sections 3.2-3.4. Only retrieval moves to GTS; augmentation selection and review remain TSK."
+ }
+}

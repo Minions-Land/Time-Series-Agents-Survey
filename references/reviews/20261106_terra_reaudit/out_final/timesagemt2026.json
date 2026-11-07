@@ -1,0 +1,245 @@
+{
+ "citation_key": "timesagemt2026",
+ "status": "paper_verified",
+ "role_of_work": "resource",
+ "claim_summary": "TimeSage-MT contributes a reproducible multi-turn benchmark and evaluation protocol, with a reusable time-series skill library and structured reference agent.",
+ "claim_evidence": [
+  {
+   "line": 66,
+   "quote": "TimeSage-MT contains 240 tasks and 2,680 dialog turns across 8 real-world domains, organized into 4 complexity levels: open exploration, multi-skill analysis, grounded synthesis, and full decision paths."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "data_augmentation_synthesis",
+  "anomaly_detection_diagnosis",
+  "decision_support"
+ ],
+ "other_tasks": [
+  "time_series_classification",
+  "imputation",
+  "temporal_question_answering",
+  "temporal_analysis",
+  "data_quality"
+ ],
+ "modules": [
+  {
+   "id": "timesagemt2026:workflow-evaluation",
+   "name": "Multi-turn temporal workflow benchmark",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis",
+    "anomaly_detection_diagnosis",
+    "decision_support"
+   ],
+   "other_tasks": [
+    "time_series_classification",
+    "imputation",
+    "temporal_question_answering"
+   ],
+   "role": "evaluation",
+   "scope_reason": "R3_1 TSK no: its evaluation spans task families and does not bind its core interface to one family; R3_2 GTS yes: ordered series, visible windows, and information availability govern the benchmark. If tasks changed, family-specific targets would vary, while the temporal visibility and trace protocol would remain.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - multi-task benchmark, no single-family objective",
+    "R3_2_GTS:yes - temporal visibility and information availability",
+    "R4:Tools and Execution",
+    "R5:validation/resource_level",
+    "R7:multiple task families",
+    "R8:demonstrated",
+    "R9:evaluation"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "data_augmentation_synthesis",
+     "anomaly_detection_diagnosis",
+     "decision_support",
+     "time_series_classification",
+     "imputation",
+     "temporal_question_answering"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 308,
+     "quote": "numerical ground truth, reasoning annotations, and level-specific output requirements."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timesagemt2026:orchestrated-runtime",
+   "name": "Planner-executor-validator reporting runtime",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [],
+   "role": "infrastructure",
+   "scope_reason": "R3_1 TSK no: orchestration does not implement one task-family objective; R3_2 GTS no: the planner/executor stage control can operate over different tools without temporal assumptions; R3_3 GH yes: it manages plans, execution, validation gates, and retries. If the task family changed, its generic control loop could remain while specialized skills changed.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no single-task objective",
+    "R3_2_GTS:no - general orchestration",
+    "R3_3_GH:yes - execution and retries",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:general_runtime",
+    "R8:demonstrated",
+    "R9:infrastructure"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "data_augmentation_synthesis",
+     "anomaly_detection_diagnosis",
+     "decision_support"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 775,
+     "quote": "The Planner decomposes each user turn into a workflow over the TimeSage skill library"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timesagemt2026:temporal-skill-library",
+   "name": "Temporal analytical skill library",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "data_augmentation_synthesis",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "infrastructure",
+   "scope_reason": "R3_1 TSK no: the library provides reusable operations across analytical objectives rather than one task-family criterion; R3_2 GTS yes: its tools operate on time-series data and temporal analyses. If a task family changed, only selected skill calls would change while the library interface and series-oriented operations remain.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - multi-purpose operation library",
+    "R3_2_GTS:yes - temporal data operations",
+    "R4:Tools and Execution",
+    "R5:processing/mapped",
+    "R7:multiple task families",
+    "R8:demonstrated",
+    "R9:infrastructure"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "data_augmentation_synthesis",
+     "anomaly_detection_diagnosis",
+     "imputation",
+     "time_series_classification"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 707,
+     "quote": "226 TS skills across 36 categories + Code skill"
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 643,
+   "quote": "Code correctness runs the agent’s Python code in a sandbox and compares its output with the reference."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 334,
+   "quote": "using only the visible window for construction and reserving the rest for evaluation."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 640,
+   "quote": "Numerical accuracy compares the agent’s stated values against gold targets that we extract at task construction"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "timesagemt2026:workflow-evaluation",
+   "decision": "change",
+   "new_ids": [
+    "timesagemt2026:workflow-evaluation"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Tools and Execution",
+    "add function: validation",
+    "tasks: include data_augmentation_synthesis and broader task coverage",
+    "update scope and evidence to packet passages"
+   ],
+   "reason": "The benchmark is a temporal evaluation resource across multiple task families; its visible/held-out contract and deterministic checks implement temporal validation. The retired dimension is replaced with current vocabulary."
+  },
+  {
+   "existing_id": "timesagemt2026:orchestrated-runtime",
+   "decision": "change",
+   "new_ids": [
+    "timesagemt2026:orchestrated-runtime"
+   ],
+   "changes": [
+    "dimensions: Planning and Workflow -> Planning and Orchestration; remove retired Control, Verification, and Feedback; retain Tools and Execution",
+    "scope_reason: explicitly apply R3 tests",
+    "update evidence to the six-stage TimeSage pipeline"
+   ],
+   "reason": "The Planner, Executor, deterministic validation stages, and Reporter form one coordinated runtime; its generic execution control belongs in GH."
+  },
+  {
+   "existing_id": "timesagemt2026:temporal-skill-library",
+   "decision": "keep",
+   "new_ids": [
+    "timesagemt2026:temporal-skill-library"
+   ],
+   "changes": [
+    "replace evidence locator with packet quote; clarify R3 scope reason"
+   ],
+   "reason": "The released library remains a reusable set of time-series operations across analytical task families, matching its existing GTS Tools and Execution classification."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The paper's main contribution is a benchmark resource, but it also introduces a structured reference agent and reusable time-series skills. The benchmark's temporal visibility contract is included in its evaluation resource; the paper does not report downstream decision utility."
+}

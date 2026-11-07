@@ -1,0 +1,397 @@
+{
+ "citation_key": "pandaai2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "PandaAI contributes market-regime state modeling, finance-specific LLM adaptation, constrained alpha search, trading procedures, and feedback-driven updates for quantitative decision support.",
+ "claim_evidence": [
+  {
+   "line": 59,
+   "quote": "We propose market regime latent variable modeling and a dual-channel adaptation mechanism, compressing high-dimensional market dynamics factors into continuous latent states zt to achieve unified market perception for LLM’s symbolic reasoning and the numerical optimization of quantitative modules."
+  },
+  {
+   "line": 64,
+   "quote": "We construct a closed-loop update system covering the full lifecycle of quantitative finance, combining fast logical constraint induction and slow parameter adaptation to realize continuous adaptation of the model to non-stationary financial markets"
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "pandaai2026:market-regime-state",
+   "name": "Market-regime state and numerical control adapters",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:no—the state transform and control scalars do not encode a task-family output objective, and the time-indexed regime representation can remain if a downstream objective changes. R3_2_GTS:yes—it compresses temporal market factors into a regime state used by downstream modules.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - state transform has no task-specific output criterion",
+    "R3_2_GTS:yes - compresses time-varying market data into regime state"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "decision_support"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 172,
+     "quote": "To retain numerical fidelity while reducing noise, a lightweight Autoencoder architecture is employed to obtain the low-dimensional zt that preserves the continuous dynamic properties of the market."
+    },
+    {
+     "line": 183,
+     "quote": "Numerical Adapter for Control (Channel 2): For modules requiring scalar inputs (Portfolio P and Execution E), a separate feature extraction network maps zt to specific control parameters (e.g., risk aversion λt , liquidity participation rate γt )."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "pandaai2026:regime-soft-token-adapter",
+   "name": "Market-regime soft-token adapter",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2: the projection maps a continuous temporal market state into trainable soft tokens prepended to the LLM input, changing model-side representation and alignment.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 179,
+     "quote": "Symbolic Adapter for LLM (Channel 1): To make the continuous vector zt comprehensible to the LLM, we employ a projection MLP that maps zt into k learnable soft tokens. These tokens are prepended to the LLM’s input embedding sequence."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "pandaai2026:regime-conditioned-cq2",
+   "name": "Finance-specific CQ2 instruction and reasoning tuning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2: SFT and preference training update CQ2 so its financial responses and reasoning are conditioned on market context.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 675,
+     "quote": "A financial instruction dataset DSFT is constructed where each sample v is tagged with the originating market state zt from Module M. Each sample v contains three components (x, y, zt ), where x denotes the question and y corresponds to the answer."
+    },
+    {
+     "line": 681,
+     "quote": "Chain-of-Thought Financial Reasoning A reasoning trace dataset VSF T QA is constructed, where each sample is a triplet v = (x, c, y)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "pandaai2026:constrained-alpha-mcts",
+   "name": "Financially constrained alpha-factor tree search",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:yes—the search objective generates formulaic factors under financial constraints and evaluates them by backtest; changing task family would require redesigning the factor action space and its financial objective and verifier.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - factor search embeds financial decision objectives and constraints"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 210,
+     "quote": "We implement an LLMguided Monte Carlo Tree Search (MCTS) framework to navigate this sparse solution space."
+    },
+    {
+     "line": 40,
+     "quote": "A formulaic alpha factor f is a symbolic expression mapping market history to a cross-sectional signal vector st ∈ RN where N represents the number of products in the panel."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "pandaai2026:portfolio-optimization",
+   "name": "Regime-conditioned portfolio optimization",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:yes—the solver chooses portfolio weights to trade off alpha returns and financial risk under portfolio constraints; a different task family would require a different action space, objective, and constraints.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - portfolio weights optimize a financial return-risk objective"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 243,
+     "quote": "Portfolio Optimization (P) We solve the regime-conditioned convex problem:"
+    },
+    {
+     "line": 247,
+     "quote": "where λ(zt ) automatically increases during high-volatility regimes to prioritize capital preservation."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "pandaai2026:regime-execution-control",
+   "name": "Regime-conditioned trade execution control",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:yes—the policy selects trading strategies to minimize implementation shortfall using portfolio weights and inferred liquidity; changing task family would require new trading actions and execution objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - execution policy is specific to financial trading"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 249,
+     "quote": "Execution Control (E) To minimize implementation shortfall (IS), the execution policy πexec (a|wt , zt ) selects strategies (e.g., TWAP, VWAP) isomorphic to the inferred liquidity profile."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "pandaai2026:feedback-rule-induction",
+   "name": "Trading-feedback symbolic constraint induction",
+   "layer": "TSK",
+   "dimensions": [
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1_TSK:yes—the induced rules encode financial alpha behavior and are appended to the trading constraint set; changing task family would require redesigning those predicates and criteria.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - induced predicates encode trading-specific constraints"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 254,
+     "quote": "Upon detecting statistically significant failure clusters in E, the system triggers symbolic induction. By contrastively prompting the LLM with failed samples (Sharpe < 0) against successful ones within regime zt , U extracts logical predicates"
+    },
+    {
+     "line": 257,
+     "quote": "These insights are formalized as symbolic rules (e.g., IF Trend(zt ) > τ THEN Ban(Reversal)) and immediately appended to C."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "pandaai2026:experience-replay-lora",
+   "name": "Experience-replay LoRA model adaptation",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "workflow_learning"
+   ],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "model_training",
+   "scope_reason": "R2: LoRA updates CQ2 parameters from successful temporal-workflow trajectories and profitable execution feedback, training the model policy used to generate factors.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 260,
+     "quote": "successful trajectories (verified CoT traces and profitable executions) are stored in an experience replay buffer. We periodically update θ via LoRA [8] with a 5% data replay ratio [18]."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 269,
+   "quote": "To ensure the integrity of our results against temporal data leakage (a common concern in LLM-based finance), we implement a strict time-series split:"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 298,
+   "quote": "Factor 1 generated by PandaAI outperforms all the neural networks, so our framework can mine the rational formulaic alpha factor from financial data."
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 291,
+   "quote": "Performance is evaluated via Information Coefficient (IC), Rank IC, ICIR, Annualized Return (AR), and Maximum Drawdown (MDD)."
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "pandaai2026:regime-conditioned-cq2",
+   "decision": "split",
+   "new_ids": [
+    "pandaai2026:regime-conditioned-cq2",
+    "pandaai2026:regime-soft-token-adapter"
+   ],
+   "changes": [
+    "LLM dimensions removed",
+    "split representation_alignment from instruction_reasoning"
+   ],
+   "reason": "The packet describes a distinct projection adapter for regime soft tokens and a CQ2 SFT/reasoning training pipeline; preserve the ID for the training module and create a separate adapter module."
+  },
+  {
+   "existing_id": "pandaai2026:constrained-alpha-mcts",
+   "decision": "change",
+   "new_ids": [
+    "pandaai2026:constrained-alpha-mcts"
+   ],
+   "changes": [
+    "dimensions: retired labels -> Planning and Orchestration",
+    "functions: [] -> [processing]",
+    "scope reason: task-specific alpha-search objective"
+   ],
+   "reason": "MCTS is a financial alpha-generation procedure whose factor search and backtest objective are task-bound; its market-history-to-signal operation implements processing."
+  },
+  {
+   "existing_id": "pandaai2026:regime-portfolio-execution",
+   "decision": "split",
+   "new_ids": [
+    "pandaai2026:regime-portfolio-execution",
+    "pandaai2026:regime-execution-control"
+   ],
+   "changes": [
+    "split portfolio weight optimization from trade execution control",
+    "replace retired dimension label with current dimensions"
+   ],
+   "reason": "Portfolio construction optimizes constrained weights, while execution separately chooses trade strategies to reduce implementation shortfall; both are independently described and reusable procedures."
+  },
+  {
+   "existing_id": "pandaai2026:feedback-rule-induction",
+   "decision": "change",
+   "new_ids": [
+    "pandaai2026:feedback-rule-induction"
+   ],
+   "changes": [
+    "dimensions: Memory and Context plus Optimization and Evolution -> Optimization and Evolution",
+    "scope reason: task-specific financial rule induction"
+   ],
+   "reason": "The fast loop updates reusable financial constraints from trading failures and successes; the packet supports Optimization and Evolution, while the TSK objective remains specific to alpha research."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Added the market-regime state and numerical control module and the slow-loop experience-replay LoRA update, both described in the packet but absent from the current card. The card's CQ2 module was split into the soft-token adapter and finance-reasoning tuning, and its portfolio/execution module was split into distinct procedures."
+}

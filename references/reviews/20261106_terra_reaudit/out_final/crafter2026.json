@@ -1,0 +1,232 @@
+{
+ "citation_key": "crafter2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "CRAFTER is a feedback-driven forecasting workflow that mines frozen-forecaster residuals with compositional search and LLM feature proposals, applies a source-blind validation gate, and selects a post-hoc corrector.",
+ "claim_evidence": [
+  {
+   "line": 185,
+   "quote": "C RAFTER mines the residual with two generators of different character. A compositional search composes the raw channels into new features, and an LLM names mechanisms the raw schema does not contain. Both feed candidates into the single gate of §3.3, which decides what survives."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "crafter2026:residual-feature-search",
+   "name": "Residual compositional feature search",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "TSK because the search reward and candidate selection target the unexplained forecasting residual and validation error; changing the task family would require a different feature objective and reward. It is not GTS because temporal handling is subordinate to the forecasting correction objective.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecasting-specific objective or validation criterion",
+    "R5:view_status:task_procedure",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 210,
+     "quote": "searches. It uses a Monte-Carlo tree search (Kocsis and Szepesvári, 2006) whose nodes are UCB1 bandits (Auer et al., 2002)."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "crafter2026:llm-feature-proposer",
+   "name": "LLM feature proposal roles",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "TSK because the planner, specifier, base proposer, and reflection procedure produces feature specifications for time-series forecasting from residual and coverage feedback; changing the task family changes the requested features and objective. It is not GTS because the temporal state is used within a forecasting-specific correction procedure.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecasting-specific objective or validation criterion",
+    "R5:view_status:task_procedure",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 347,
+     "quote": "LLM-proposed features. The search only recombines existing channels; the LLM invents features that name mechanisms the schema lacks. Organized into roles and queried a few times per"
+    },
+    {
+     "line": 342,
+     "quote": "round’s merged accepted set, family coverage, and rejected candidates condition the next LLM proposal, steering it toward thin families and away"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "crafter2026:source-blind-gate",
+   "name": "Source-blind residual acceptance gate",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "TSK because acceptance is defined by forecasting validation residual correlation, non-collinearity, and feature budgets; changing the task family requires a different validation criterion and verifier. It is not GTS because the gate validates task-specific correction candidates.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecasting-specific objective or validation criterion",
+    "R5:view_status:task_procedure",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 368,
+     "quote": "two pipelines. A candidate is accepted only if it explains validation error the corrector cannot already account for: the Spearman correlation between the candidate and the unexplained validation residual must exceed a threshold τ ,"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "crafter2026:corrector-selection",
+   "name": "Validation-selected post-hoc corrector",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "TSK because the corrector adjusts a forecast and selects among heads by forecasting validation wMAPE; changing the task family changes the output, objective, and validation criterion. It is not GTS because it is a task-specific forecast correction procedure.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecasting-specific objective or validation criterion",
+    "R5:view_status:task_procedure",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 410,
+     "quote": "The features that pass the gate feed a corrector. C RAFTER fits a small corrector set—an identity (N ONE) map plus an additive and a multiplicative gradient-boosted corrector—and keeps the one with the best validation wMAPE."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 2324,
+   "quote": "lower bound). The grid is two datasets (EPF, BIZ ITOBS) × five backbones × three split pairs (6 → 7, 7 → 8, 6 → 8) × {cov, self, xfer} = 90 cells, all completing. The self column at split S reproduces native C RAFTER closely, so the replay is faithful."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 397,
+   "quote": "on cached forecasts we re-cut three expanding train:val:test splits (6:1:1, 7:1:1, 8:1:1) with no test leakage, validate on three blocked CV windows, run R=3 rounds, and report last-round test wMAPE averaged over the three splits and three"
+  },
+  "task_performance": {
+   "present": true,
+   "line": 537,
+   "quote": "Under the shared harness of §4, both C RAFTER variants outperform each of the three dedicated feature-engineering systems, with per-baseline paired Wilcoxon tests significant at p<0.01."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The packet describes the compositional search, LLM proposal roles, source-blind gate, and validation-selected corrector as distinct reusable mechanisms within one forecasting-specific feedback loop.",
+ "reconciliation": [
+  {
+   "existing_id": "crafter2026:residual-feature-search",
+   "decision": "split",
+   "new_ids": [
+    "crafter2026:residual-feature-search",
+    "crafter2026:llm-feature-proposer",
+    "crafter2026:source-blind-gate"
+   ],
+   "changes": [
+    "split combined residual-feature-search/gate into compositional search, LLM proposal roles, and source-blind gate",
+    "layer remains TSK",
+    "dimension: Control, Verification, and Feedback -> Planning and Orchestration",
+    "view_status: mapped -> task_procedure"
+   ],
+   "reason": "The packet separately specifies the compositional generator, LLM roles, and source-blind gate; the gate also accepts external generators through the identical pipeline, so these mechanisms can be reused independently."
+  },
+  {
+   "existing_id": "crafter2026:corrector-selection",
+   "decision": "change",
+   "new_ids": [
+    "crafter2026:corrector-selection"
+   ],
+   "changes": [
+    "dimension: Control, Verification, and Feedback -> Planning and Orchestration",
+    "view_status: mapped -> task_procedure",
+    "functions: [] -> [processing, validation]"
+   ],
+   "reason": "The packet states that the corrector set is selected by validation wMAPE after accepted features feed it, so it remains a forecasting-specific TSK procedure with current vocabulary and temporal-function annotations."
+  }
+ ]
+}

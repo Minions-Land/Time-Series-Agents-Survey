@@ -1,0 +1,177 @@
+{
+ "citation_key": "physiologicalagent2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "The work contributes a feedback-driven LLM harness that orchestrates user queries, wearable PPG retrieval, and an HR-estimation pipeline to produce grounded physiological insights.",
+ "claim_evidence": [
+  {
+   "line": 167,
+   "quote": "We develop an LLM-powered agent to respond to users with reliable insights from physiological data."
+  },
+  {
+   "line": 217,
+   "quote": "The Orchestrator handles failures (e.g., in data retrieval or task execution) through iterative communication between the Task Planner and Task Executor. When a step fails, the orchestrator can dynamically replan by revisiting earlier stages or prompting the user for clarification."
+  }
+ ],
+ "task_memberships": [],
+ "other_tasks": [
+  "physiological_signal_estimation"
+ ],
+ "modules": [
+  {
+   "id": "physiologicalagent2025:orchestrator",
+   "name": "Physiological analysis orchestrator",
+   "layer": "GH",
+   "dimensions": [
+    "Interface and Interaction",
+    "Memory and Context",
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "physiological_signal_estimation"
+   ],
+   "role": "method",
+   "scope_reason": "The module manages interface, planning, execution, intermediate state and response generation; changing the task family would replace registered analytical tools rather than redesign temporal state or a task objective, so it is general harness execution.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - orchestration does not embed one output criterion",
+    "R3_2_GTS:no - runtime manages execution without temporal assumptions",
+    "R3_3_GH:yes - manages interface, execution, state and recovery",
+    "R4:Interface and Interaction; Memory and Context; Tools and Execution; Planning and Orchestration",
+    "R5:view_status=general_runtime",
+    "R8:inferred - one applied task; generic interface and tool registration imply cross-task reuse",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "physiological_signal_estimation"
+    ],
+    "basis": "work"
+   },
+   "evidence": [
+    {
+     "line": 184,
+     "quote": "Our LLM-based agent framework consists of three main components: Interface, Orchestrator, and External Sources (see Figure 1), which are outlined below."
+    },
+    {
+     "line": 201,
+     "quote": "The Orchestrator serves as the core component of our agent, responsible for problem-solving, strategic planning, task execution, and generating analytical responses based on user queries."
+    },
+    {
+     "line": 209,
+     "quote": "The Orchestrator consists of four key components: 1) Task Planner: Decomposes user queries into executable tasks, enabling strategic planning and decision-making. 2) Task Executor: Executes planned tasks, including retrieving users’ time-series data and performing analysis. 3) Data Pipe: Serves as a repository for acquired metadata and intermediate data for efficient processing. 4) Response Generator: Synthesizes analytical results, integrates them with LLM reasoning, and delivers a structured response."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "physiologicalagent2025:ppg-pipeline",
+   "name": "Integrated PPG quality, reconstruction and peak pipeline",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [],
+   "other_tasks": [
+    "physiological_signal_estimation"
+   ],
+   "role": "method",
+   "scope_reason": "The procedure embeds the HR-from-PPG output requirement and would need different signal steps and criteria for another task family, so it is TSK; its temporal processing is the task procedure's function.",
+   "rubric_path": [
+    "R1:contributed - integration of the established pipeline as the agent's external analytical source",
+    "R2:Harness",
+    "R3_1_TSK:yes - pipeline directly produces HR from PPG",
+    "R3_2_GTS:no - task-specific HR objective takes precedence",
+    "R4:Tools and Execution",
+    "R5:processing; view_status=task_procedure",
+    "R8:not_applicable",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": ""
+   },
+   "evidence": [
+    {
+     "line": 317,
+     "quote": "This component provides the data analysis models for HR estimation from PPG signals."
+    },
+    {
+     "line": 326,
+     "quote": "The pipeline consists of multiple processing stages:"
+    },
+    {
+     "line": 345,
+     "quote": "A deep-learningbased PPG peak detection algorithm [26] is applied to identify systolic peaks, which are critical for deriving vital signs from PPG waveforms. Once the peaks are identified, HR is computed in beats per minute (BPM)."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 354,
+   "quote": "These 12 participants were held out as a test set and were not used in any stage of model development or fine-tuning in the PPG processing pipeline."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 453,
+   "quote": "Table II presents the pairwise error metrics comparing HR values extracted from PPG using our agent and OpenAI models against the refrence ECG HR values. As shown, our agent achieves the lowest error rates, with an MAE of 2.83, RMSE of 5.47, MAPE of 0.04, and MAD of 1.90."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "needs_human_review": false,
+ "notes": "The PPG stages are described as previously proposed and validated; the counted contribution is their integration as the agent's task-specific external analytical source. The wearable dataset is used for evaluation and is not counted as a contributed module.",
+ "reconciliation": [
+  {
+   "existing_id": "physiologicalagent2025:orchestrator",
+   "decision": "change",
+   "new_ids": [
+    "physiologicalagent2025:orchestrator"
+   ],
+   "changes": [
+    "dimensions: Planning and Workflow plus Control, Verification, and Feedback -> Interface and Interaction, Memory and Context, Tools and Execution, and Planning and Orchestration",
+    "other_tasks: physiological_signal_estimation",
+    "rubric_path and evidence updated to current schema"
+   ],
+   "reason": "The packet supports the same orchestrator mechanism, so its id is retained. The current rubric maps the old dimensions to the five-dimension vocabulary and classifies the generic runtime as GH with inferred cross-task reuse."
+  },
+  {
+   "existing_id": "physiologicalagent2025:ppg-pipeline",
+   "decision": "change",
+   "new_ids": [
+    "physiologicalagent2025:ppg-pipeline"
+   ],
+   "changes": [
+    "dimensions: Tools and Execution plus Control, Verification, and Feedback -> Tools and Execution",
+    "view_status: mapped -> task_procedure",
+    "other_tasks retained as physiological_signal_estimation",
+    "rubric_path and evidence updated to current schema"
+   ],
+   "reason": "The packet supports the same integrated PPG mechanism, so its id is retained. Its core logic is explicitly HR estimation from PPG, making it TSK under the first-match layer test; processing is the applicable temporal function."
+  }
+ ]
+}

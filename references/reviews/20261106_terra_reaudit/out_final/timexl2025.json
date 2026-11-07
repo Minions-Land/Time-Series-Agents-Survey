@@ -1,0 +1,226 @@
+{
+ "citation_key": "timexl2025",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "TimeXL contributes a prototype-based multimodal encoder plus prediction, reflection, and refinement LLMs that iteratively improve multimodal time-series predictions and explanations.",
+ "claim_evidence": [
+  {
+   "line": 16,
+   "quote": "we introduce TimeXL, a multi-modal prediction framework that integrates a prototypebased time series encoder with three collaborating Large Language Models (LLMs) to deliver more accurate predictions and interpretable explanations."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "timexl2025:multimodal-prototype-encoder",
+   "name": "Multimodal prototype-based encoder",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R2: the encoder is a separate convolutional prototype classifier; the LLM never receives its embeddings, only selected prototype text, so it does not change how the model represents temporal inputs and is a Harness tool, not LLM side. R3_1_TSK: its objective is cross-entropy on discrete labels with class-wise prototypes; a different task family needs a different output head and loss.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness - model invoked beside the LLM, LLM sees only text",
+    "R3_1_TSK:yes - discrete-label prediction objective and class prototypes",
+    "R4:Tools and Execution",
+    "R5:task_procedure",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 220,
+     "quote": "We design a multi-modal prototype-based encoder that can generate predictions and explanations across different modalities in an end-to-end manner, as shown in Figure 2."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "timexl2025:prototype-fusion",
+   "name": "Prototype-conditioned prediction fusion",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Top-omega prototype-segment pairs are retrieved and added to the prediction LLM prompt, then encoder and LLM probabilities are linearly fused with alpha tuned on validation data; R3_1_TSK: fusion target is the task's prediction probability, and the retrieved cases are class prototypes.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness - prompt and fusion, no parameter update of the LLM",
+    "R3_1_TSK:yes - prediction output and validation-tuned fusion",
+    "R4:Memory and Context; Tools and Execution",
+    "R5:context_memory",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 367,
+     "quote": "We compile the final prediction based on a fusion of both the multi-modal encoder Menc and prediction LLM Mpred."
+    },
+    {
+     "line": 345,
+     "quote": "To improve prediction accuracy, the encoder Menc supplements s with case-based explanations."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timexl2025:context-refinement",
+   "name": "Reflection-driven context refinement",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Optimization and Evolution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The reflection compares prediction with ground truth and the refinement changes text and retrains the encoder for later prediction iterations; changing the prediction task changes the validation target and refinement objective, so R3_1_TSK applies.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - prediction/validation objective is embedded",
+    "R4:Planning and Orchestration; Optimization and Evolution",
+    "R5:task_procedure",
+    "R7:forecasting_prediction",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 383,
+     "quote": "the reflection agent Mrefl aims to understand the reasoning behind the implicit prediction logic of Mpred. Specifically, it generates a reflective feedback, Refl, by analyzing the input text s and its prediction ŷ LLM , against the ground truth y, to provide actionable insights for refinement"
+    },
+    {
+     "line": 390,
+     "quote": "Once the textual context is improved, it is used to retrain the multimodal prototype-based encoder Menc for the next iteration."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "task_performance": {
+   "present": true,
+   "line": 654,
+   "quote": "TimeXL constantly achieves the highest F1 and AUC scores, consistently surpassing both time series and multi-modal baselines by up to 8.9% of AUC (compared to TimeCAP on the Weather dataset)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "timexl2025:prototype-fusion",
+   "decision": "split",
+   "new_ids": [
+    "timexl2025:multimodal-prototype-encoder",
+    "timexl2025:prototype-fusion"
+   ],
+   "changes": [
+    "encoder split out as TSK Tools and Execution",
+    "fusion stays TSK",
+    "dimensions: Tools and Execution; Interface and Interaction -> Memory and Context; Tools and Execution",
+    "view_status mapped -> task_procedure"
+   ],
+   "reason": "The encoder is separately trained and reusable; the fusion/prototype-prompting procedure is distinct. Neither changes the LLM's parameters or input representation."
+  },
+  {
+   "existing_id": "timexl2025:context-refinement",
+   "decision": "change",
+   "new_ids": [
+    "timexl2025:context-refinement"
+   ],
+   "changes": [
+    "dimensions: retired Control, Verification, and Feedback plus Coordination and Scaling -> Planning and Orchestration plus Optimization and Evolution",
+    "view_status: mapped -> task_procedure",
+    "functions: context_memory -> []"
+   ],
+   "reason": "The reflection/refinement mechanism is task-bound, and its feedback changes later text and encoder retraining; the retired labels are replaced by current dimensions and the TSK temporal-function view."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The packet supports a feedback-driven prediction workflow; it does not report explicit execution-trace validity, leakage/availability checks, or downstream decision utility.",
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "layer move prototype-fusion TSK->LLM/TSK (encoder as LLM, representation_alignment)",
+    "verdict": "reject",
+    "result": "encoder is TSK (Harness tool); fusion stays TSK",
+    "reason": "Prediction LLM is queried as Mpred(s, expls) with prototype text only; the encoder never feeds embeddings to the LLM and no LLM is trained, so R2 LLM side and representation_alignment do not apply.",
+    "line": 365
+   },
+   {
+    "item": "fusion dimensions and function",
+    "verdict": "modify",
+    "result": "Memory and Context; Tools and Execution; context_memory",
+    "reason": "Retrieval of top-omega case prototypes into the prompt is context retrieval; the encoder is invoked as a predictive model.",
+    "line": 347
+   },
+   {
+    "item": "context-refinement",
+    "verdict": "accept",
+    "result": "TSK, Planning and Orchestration + Optimization and Evolution",
+    "reason": "Reflection against ground truth drives text refinement and encoder retraining across iterations.",
+    "line": 383
+   }
+  ],
+  "summary": "The candidate's LLM-side encoder was rejected: the encoder is a standalone prototype classifier whose outputs reach the LLM only as text. Modules are TSK with fusion and refinement labels adjusted."
+ }
+}

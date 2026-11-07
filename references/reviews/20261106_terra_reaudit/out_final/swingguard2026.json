@@ -1,0 +1,264 @@
+{
+ "citation_key": "swingguard2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "SwingGuard contributes a feedback-driven decision-support runtime that conditions daily trading proposals on point-in-time risk and governs executed exposure through a persistent five-minute controller.",
+ "claim_evidence": [
+  {
+   "line": 19,
+   "quote": "SwingGuard, a dual-timescale, long-only multi-agent framework for risk-conditioned strategy generation."
+  },
+  {
+   "line": 23,
+   "quote": "a five-minute Risk Controller performs conditional diagnosis, maintains persistent risk states with staged recovery"
+  }
+ ],
+ "task_memberships": [
+  "decision_support"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "swingguard2026:point-in-time-data-preparation",
+   "name": "Point-in-time evidence preparation",
+   "layer": "GTS",
+   "dimensions": [
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management",
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The mechanism aligns time-indexed evidence under an availability cutoff without encoding a trading output requirement, so it meets R3_2_GTS. If the task family changed, source adapters could change while point-in-time availability semantics remain reusable.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - source alignment does not encode a task output objective or trading verifier",
+    "R3_2_GTS:yes - point-in-time temporal availability is core",
+    "R4:Tools and Execution",
+    "R5:mapped - data_management, validation",
+    "R7:decision_support",
+    "R8:inferred - one task family, temporal interface generalizes",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 217,
+     "quote": "The deterministic Data Team aligns point-in-time sources"
+    },
+    {
+     "line": 505,
+     "quote": "All decision inputs obey a point-in-time availability boundary."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "swingguard2026:risk-conditioned-generation",
+   "name": "Risk-conditioned multi-agent strategy generation",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The procedure forms long-only trading targets and execution parameters under a trading risk context, embedding the decision_support output objective (R3_1_TSK). A different task family would require redesigning its trading target, sizing, stops, and risk constraints.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - it forms a trading target and executable parameters under trading constraints",
+    "R4:Planning and Orchestration",
+    "R5:task_procedure",
+    "R7:decision_support",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 243,
+     "quote": "Full SwingGuard supplies Rd,0 to both internal stages, so the risk state can alter the direction, feasible size, and parameters considered before finalization."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "swingguard2026:risk-governance",
+   "name": "Five-minute risk diagnosis and persistent state governance",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing",
+    "context_memory",
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The diagnosis and state machine produce trading exposure caps and staged recovery actions, embedding the trading objective (R3_1_TSK). If the task family changed, risk states, exposure actions, and their verifier would need redesign; its five-minute windows and earlier-snapshot cutoff are temporal functions within that task procedure.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - risk states govern trading exposure and recovery",
+    "R4:Memory and Context; Planning and Orchestration",
+    "R5:task_procedure - processing, context_memory, validation",
+    "R7:decision_support",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 248,
+     "quote": "for every completed five-minute bar, Stage 1 screens market, on-chain, and news anomalies with deterministic rules."
+    },
+    {
+     "line": 361,
+     "quote": "Hysteresis and minimum holds prevent a quiet bar from immediately erasing risk."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "swingguard2026:audit-trace",
+   "name": "Hard-boundary trade audit and execution trace",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "decision_support"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "The auditor validates trading direction, size, stops, and validity against controller limits, then maps the approved position to execution, embedding a trading-specific verifier (R3_1_TSK). A different task family would require redesigning the proposal contract and execution actions.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - validates and executes a trading-position contract",
+    "R4:Planning and Orchestration; Tools and Execution",
+    "R5:task_procedure - no temporal function is implemented by the audit itself",
+    "R7:decision_support",
+    "R8:not_applicable - TSK",
+    "R9:method"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 379,
+     "quote": "After proposal generation, a hard-boundary auditor h validates long-only direction, size, stop, validity horizon, and controller limits;"
+    },
+    {
+     "line": 407,
+     "quote": "This trace separates the LLM proposal, validated target, state-driven constraint, and realized position, linking risk evidence to execution."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 660,
+   "quote": "At 21:15 on December 18, the controller entered the survival response and closed the 30% exposure."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 505,
+   "quote": "All decision inputs obey a point-in-time availability boundary."
+  },
+  "task_performance": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "decision_utility": {
+   "present": true,
+   "line": 640,
+   "quote": "The synchronized, cost-adjusted portfolio returns 37.16% with 2.98 Sharpe and 6.44% drawdown, versus 30.11%, 1.19, and 28.47% for equal-weight buy-and-hold."
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "swingguard2026:risk-conditioned-generation",
+   "decision": "change",
+   "new_ids": [
+    "swingguard2026:risk-conditioned-generation"
+   ],
+   "changes": [
+    "dimensions: Coordination and Scaling, Planning and Workflow, Control, Verification, and Feedback -> Planning and Orchestration",
+    "scope_reason: make the R3_1_TSK trading-output test explicit",
+    "evidence: replace PDF locators with packet line quotations"
+   ],
+   "reason": "The packet supports the existing risk-conditioned strategy-generation mechanism, but the current card uses retired dimension labels and its scope rationale should cite the task-specific target and execution-parameter objective."
+  },
+  {
+   "existing_id": "swingguard2026:risk-governance",
+   "decision": "change",
+   "new_ids": [
+    "swingguard2026:risk-governance"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration; retain Memory and Context",
+    "functions: context_memory -> processing, context_memory, validation",
+    "scope_reason and evidence: rewrite with explicit R3 test and packet quotations"
+   ],
+   "reason": "The same five-minute risk chain remains task-specific because its persistent states and actions set trading exposure caps and recovery; the packet also supports processing and temporal-context validation."
+  },
+  {
+   "existing_id": "swingguard2026:audit-trace",
+   "decision": "change",
+   "new_ids": [
+    "swingguard2026:audit-trace"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration; retain Tools and Execution",
+    "scope_reason and evidence: rewrite with explicit R3 test and packet quotations"
+   ],
+   "reason": "The auditor and execution trace are supported, but validation of long-only direction, size, stops, horizon, and controller limits is a trading-specific verifier, and the existing control label is retired."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The card omits the packet's separately described deterministic point-in-time Data Team; added as a GTS data-management and temporal-validation module. Existing strategy, governance, and audit mechanisms remain TSK because their outputs or verifier are trading-specific."
+}
