@@ -20,11 +20,11 @@ The version-2 taxonomy fields are deliberately independent and multi-label:
 
 - `llm_side_contribution` records temporal representation/alignment,
   instruction/interaction/reasoning, and LLM adaptation.
-- `general_harness_modules` records the seven General Harness dimensions and
+- `general_harness_modules` records the five General Harness dimensions and
   fine-grained module labels used by the reviewed Time-Series Agent work.
 - `general_ts_harness_modules` records only mechanisms with a temporal
   dependency and stores `ts_specificity_reason` plus source evidence.
-- `task_specific_modules` contains the same seven-module lens under the four
+- `task_specific_modules` contains the same five-dimension lens under the four
   task families: forecasting/prediction, augmentation/synthesis,
   anomaly/diagnosis, and decision support.
 - `module_level_contributions` makes the aggregation unit explicit: each reviewed module ID is one contribution unit, so one
@@ -119,7 +119,7 @@ When adding a paper:
 
 ## Module identity and the unified taxonomy (2026-10-15)
 
-All Harness chapters and records use the same seven mechanism dimensions.
+All Harness chapters and records use the same mechanism dimensions (seven until 2026-11-06; five since the 2026-11-07 re-audit, see below).
 Contribution scope (GH, GTS, TSK) and supported tasks are coordinates on that
 same record, not alternative taxonomies. LLM-side contributions remain separate.
 The historical component catalog supplies fine-grained aliases, not another
@@ -157,3 +157,19 @@ synchronizer updates only the appendix snapshot and reviewed rows, not prose.
 ## Current maintenance workflow
 
 See [ledger maintenance](../docs/ledger-maintenance.md) for schema 2.5, preserved task aliases, attributed official links and read-only checks. The complete 2026-10-16 boundary review and independent adjudications are in `references/reviews/20261016_boundary_audit/`. Historical review files are preserved; the CSV remains the current source.
+
+## 2026-11-07 re-audit (schema 3.0)
+
+The re-audit in `reviews/20261106_terra_reaudit/` reclassified every record under `rubric_tree.yaml` (R0-R10): five
+General Harness dimensions (Interface and Interaction; Memory and Context; Tools and Execution; Planning and
+Orchestration; Optimization and Evolution), explicit layer tests, temporal functions, reuse evidence and evaluation
+evidence. The seven-dimension labels are retired and rejected by the validators. `scripts/apply_reaudit.py` imports the
+adjudicated records in `out_final/`; it replaces module lists, claim summaries and evidence, task coordinates, roles of
+work, evaluation evidence and review status, and leaves bibliographic fields and official resources untouched.
+
+New work-level columns: `role_of_work`, `claim_evidence_json`, `evaluation_evidence_json` (process validity, temporal
+validity, task performance, decision utility; each `present`, `locator`, `quote`) and `task_impact_json` (rubric R11,
+empty until `apply_reaudit.py --impact` imports `impact/<key>.json`). New module fields: `functions`, `view_status`,
+`llm_route`, `rubric_path`, `confidence` (with the existing `reuse_evidence`). Packet line citations are converted to
+`PDF p.X; source text L<n>` locators; repository sources keep `Source text L<n>`. The function-view mapping is regenerated
+from the same records (`reviews/20261106_terra_reaudit/module_function_mapping.json`).

@@ -4,7 +4,7 @@
 
 ## Version and labels
 
-`references/taxonomy_schema.json` is the version authority for record fields and controlled vocabulary. Version 2.5 adds attributed external resources, boundary-review records and original task values. Version 2.6 adds module-level `reuse_evidence`: a GH or GTS module is `demonstrated` when its source applies it to two or more task families (module tasks, else work tasks) and `inferred` otherwise; LLM-side and TSK modules are `not_applicable`. The migration fills the field only when it is absent, so a reviewed value survives later runs. Work-level and module-level public task labels use the same canonical names. Legacy CSV boolean column names remain storage keys; export maps them to the canonical task vocabulary. Original prose labels and pre-migration aliases are retained. Historical review files are immutable evidence, not the current taxonomy authority.
+`references/taxonomy_schema.json` is the version authority for record fields and controlled vocabulary. Version 2.5 adds attributed external resources, boundary-review records and original task values. Version 2.6 adds module-level `reuse_evidence`: a GH or GTS module is `demonstrated` when its source applies it to two or more task families (module tasks, else work tasks) and `inferred` otherwise; LLM-side and TSK modules are `not_applicable`. The migration fills the field only when it is absent, so a reviewed value survives later runs. Work-level and module-level public task labels use the same canonical names. Legacy CSV boolean column names remain storage keys; export maps them to the canonical task vocabulary. Original prose labels and pre-migration aliases are retained. Version 3.0 (2026-11-07 re-audit) replaces the seven mechanism dimensions with five and rejects the retired labels; it adds work-level `role_of_work`, `claim_evidence_json`, `evaluation_evidence_json` and `task_impact_json`, and module-level `functions`, `view_status`, `llm_route`, `rubric_path` and `confidence`. `reuse_evidence` now comes from the adjudicated record. Historical review files are immutable evidence, not the current taxonomy authority.
 
 ## Resources
 
@@ -18,6 +18,9 @@ Cards link to original repositories, project pages, datasets, benchmark sites, d
 4. Run read-only structural checks, tests and LaTeX compilation; inspect affected pages before publishing.
 
 ```bash
+python3 scripts/apply_reaudit.py            # import references/reviews/20261106_terra_reaudit/out_final (add --impact for R11)
+uv run scripts/classification_manager.py sync
+python3 scripts/sync_function_view.py
 uv run --with bibtexparser==1.4.3 python scripts/check_ledger_consistency.py
 PYTHONPATH=scripts uv run --with bibtexparser==1.4.3 python -m unittest discover -s scripts/tests
 python scripts/make_contribution_timeline.py

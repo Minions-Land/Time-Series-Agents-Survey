@@ -16,7 +16,7 @@ Architectures, and Evaluation*. People open this repository with a coding agent 
 
 `query_cards.py` is the fastest entry point: `--layer {LLM,GH,GTS,TSK}`, `--function {data_management,processing,
 context_memory,validation}`, `--task <family>`, `--dimension <text>`, `--reuse {demonstrated,inferred}`, `--text <kw>`,
-`--work <key>` (full card), `--stats`, `--json`.
+`--role <role_of_work>`, `--criterion <evaluation criterion>`, `--work <key>` (full card), `--stats`, `--json`.
 
 ## How to answer
 
