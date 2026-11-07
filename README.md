@@ -2,8 +2,8 @@
 <p align="center"><strong>A Survey of LLMs, Harness Architectures, and Evaluation</strong></p>
 
 <p align="center">
-  <img alt="Works reviewed" src="https://img.shields.io/badge/works-164-4B4F96">
-  <img alt="Source-located modules" src="https://img.shields.io/badge/modules-363-37807A">
+  <img alt="Works reviewed" src="https://img.shields.io/badge/works-162-4B4F96">
+  <img alt="Source-located modules" src="https://img.shields.io/badge/modules-604-37807A">
   <img alt="Official resource links" src="https://img.shields.io/badge/official%20links-117-44689F">
   <img alt="Agent ready" src="https://img.shields.io/badge/Claude%20Code%20%7C%20Codex-ready-BC6E52">
   <img alt="Updated" src="https://img.shields.io/badge/updated-Nov%202026-B0852F">
@@ -122,8 +122,9 @@ A Paper Card records what a work contributes, module by module, with the passage
 
 > [!NOTE]
 > Counts are curation counts of a reviewed corpus, not of independently reproduced systems. In November 2026 every
-> card is being re-audited against the rubric tree, one model run per paper, with verbatim-quote checks; changes are
-> adjudicated before they enter the ledger.
+> card was re-audited against the rubric tree, one model run per paper with script-checked verbatim quotes. Flagged
+> cases, layer changes and disagreements between coders were then adjudicated
+> ([records and briefs](references/reviews/20261106_terra_reaudit/)).
 
 ## 📈 What the records show
 
@@ -131,12 +132,17 @@ A Paper Card records what a work contributes, module by module, with the passage
   <img src="docs/assets/trends.png" width="88%" alt="Module contributions over time: cumulative counts and doubling times by layer, share of new modules by period, and paths showing where temporal functions are implemented.">
 </p>
 
-- **Effort is moving from the model to the runtime.** The LLM side supplied 37% of new modules in late 2024 and
-  5–16% in each later period.
-- **Temporal functionality is still rebuilt inside tasks,** about four task-specific modules for each shared temporal
-  one, but shared temporal modules grow fastest (doubling every ~5 months) and 30 of 49 are reused across task families.
-- **Temporal context and memory is the clearest gap:** implemented inside task procedures 43 times and as a shared
-  module only 5 times.
+- **Agents automate; fewer solve time series problems.** In 163 of 196 work–task pairs the Agent takes over analytical
+  steps. Only 70 of the 143 method works test a time series obstacle (leakage, regime change, data quality, context,
+  decision consequences, verifiability or deployment) in an experiment built for it. The rest report a score gain or
+  automation alone.
+- **The hard obstacles are claimed more than tested.** Verifiability is claimed in 49 work–task pairs and tested in 14.
+  Information availability is tested in 9, enforced only by design in 12 and asserted in 20. Deployment is tested in 4.
+  Anomaly diagnosis is the weakest family: 9 of its 45 works test any obstacle.
+- **Effort is moving from the model to the runtime.** The LLM side supplied about a third of new modules until the
+  end of 2024 and 7–17% in each later period. Shared temporal modules grow fastest, doubling about every 5 months.
+- **Solutions stay inside tasks.** There are 325 task-specific modules for 97 shared temporal ones. Of the module
+  links to a tested obstacle, 108 of 181 are task procedures. Only temporal data management is mostly shared (43 vs 10).
 
 ## 🤝 Contribute
 
