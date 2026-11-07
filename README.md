@@ -146,7 +146,7 @@ A Paper Card records what a work contributes, module by module, with the passage
   the 189 General Harness and General Time Series Harness modules. Of 12 rejected layer changes in the re-audit, 10
   would have moved a general mechanism into a more specific layer.
 - **Effort is moving from the model to the runtime.** The LLM side supplied about a third of new modules until the
-  end of 2024 and 7–17% in each later period. Shared temporal modules grow fastest, doubling about every 5 months.
+  end of 2024 and 7–18% in each later period. Shared temporal modules grow fastest, doubling about every 5 months.
 - **Solutions stay inside tasks.** There are 325 task-specific modules for 97 shared temporal ones. Of the module
   links to a tested requirement, 108 of 181 are task modules. Generation has no shared data-management module.
 

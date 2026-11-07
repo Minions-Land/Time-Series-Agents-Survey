@@ -95,19 +95,9 @@ def main() -> None:
         counts = contribution_counts(record)
         if not sum(counts.values()):
             continue
-        month = record.get("publication", {}).get("public_month")
-        if not month:
-            first = record.get("publication", {}).get("first_public_date") or ""
-            if len(first) == 4 and first.isdigit():
-                month = first
-        if month and len(month) == 4 and month.isdigit():
-            # Year-only records are plotted at January and remain marked as
-            # year precision in the ledger; this keeps them visible without
-            # inventing a month in the source metadata.
-            month = f"{month}-01"
-        if month and not (len(month) == 7 and month[4] == "-" and month[:4].isdigit() and month[5:].isdigit()):
-            year = record.get("publication", {}).get("first_public_date")
-            month = f"{year}-01" if year and len(year) == 4 and year.isdigit() else None
+        month = record.get("publication", {}).get("public_month") or ""
+        if not (len(month) == 7 and month[4] == "-" and month[:4].isdigit() and month[5:].isdigit()):
+            month = None                                # malformed or missing: reported, never guessed
         if not month:
             undated.append(record["citation"]["key"])
             continue
@@ -135,7 +125,6 @@ def main() -> None:
     OUT_COVERAGE.write_text(json.dumps({
         'dated_records': len(dated_records), 'undated_records': undated,
         'plotted_modules': dict(running), 'counting_unit': 'unique reviewed module ID',
-        'year_only_placement': 'January; date precision retained in ledger'
     }, indent=2)+'\n')
     with OUT_MECHANISM.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle, lineterminator="\n")
@@ -149,6 +138,9 @@ def main() -> None:
             writer.writerow([GROUPS[g], *(GROUP_LINKS.count((layer, g)) for layer in HARNESS)])
         writer.writerow(["Harness modules", *(LAYER_MODULES[layer] for layer in HARNESS)])
     plot_timeline(months, cumulative)
+    coverage = json.loads(OUT_COVERAGE.read_text())
+    coverage["calibration"] = STATS                       # every number the caption and text quote from (a) and (b)
+    OUT_COVERAGE.write_text(json.dumps(coverage, indent=2) + "\n")
 
 
 # Layer order follows the taxonomy (LLM side, then general to specific). Colours are the V7 kit's HUE dark
@@ -167,6 +159,7 @@ PERIODS = [("2023\u201324 H1", "2024-06"), ("2024 H2", "2024-12"), ("2025 H1", "
            ("2025 H2", "2025-12"), ("2026 H1", "2026-06"), ("2026 Q3", "2026-09"),
            ("2026 Q4", "2026-12")]
 ORIGIN = datetime(2023, 8, 1)
+STATS: dict = {"doubling_months": {}, "lead_over_llm_side": {}, "periods": []}
 
 
 def months_since_origin(dates):
@@ -259,9 +252,10 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
         ax.scatter(dates, y, s=40, color=color, alpha=0.5, lw=0, zorder=2)
         ax.plot(grid_dates, fit, color=color, lw=2.8, solid_capstyle="round", zorder=3)
         legend_labels.append(f"{DISPLAY[name]} (doubling {np.log(2) / b:.1f} mo)")
+        STATS["doubling_months"][name] = round(float(np.log(2) / b), 2)
     # End values, nudged apart so that close series stay legible.
     top = max(cumulative[name][-1] for name in LAYERS)
-    y_max = 50 * int(np.ceil(top * 1.08 / 50))          # headroom for the end labels; was fixed at 210
+    y_max = 50 * int(np.ceil(top * 1.04 / 50))          # headroom for the end labels; was fixed at 210
     nudge = 12 * y_max / 210                             # same on-page spacing as the 210-unit axis
     placed = []
     for name in sorted(LAYERS, key=lambda n: cumulative[n][-1]):
@@ -275,6 +269,7 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
                 ("General Harness", "General Harness\nleads LLM side", (-262, 128))]
     for leader, text, offset in callouts:
         i = first_lasting_lead(cumulative[leader], cumulative["LLM-side"])
+        STATS["lead_over_llm_side"][leader] = None if i is None else months[i]
         if i is None:
             continue
         point = (dates[i], cumulative[leader][i])
@@ -296,6 +291,7 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
         current = {name: value_at(months, cumulative[name], end) for name in LAYERS}
         new = {name: current[name] - previous[name] for name in LAYERS}
         total = sum(new.values())
+        STATS["periods"].append({"period": label, "n": total, **{k: round(100 * v / total, 1) for k, v in new.items()}})
         bottom = 0.0
         for name in LAYERS:
             share = 100 * new[name] / total

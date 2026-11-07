@@ -8,7 +8,7 @@
 - Reference manifest keys matched: 167/167 (repository-only records excluded from manifest)
 - Corpus completeness: not assessed by this structural validation
 - Errors: 0
-- Warnings: 1
+- Warnings: 0
 
 ## Errors
 
@@ -16,4 +16,4 @@ None.
 
 ## Warnings
 
-ledger/profile key mismatch: ledger_only=[], profile_only=['auditforecast2026', 'futuresim2026']
+None.
