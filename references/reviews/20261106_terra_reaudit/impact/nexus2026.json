@@ -1,0 +1,60 @@
+{
+ "citation_key": "nexus2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 11,
+    "quote": "Nexus , a multi-agent forecasting framework that decomposes prediction into specialized stages: isolating macro-level and micro-level temporal fluctuations, and integrating contextual information"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 406,
+    "quote": "These results demonstrate that Nexus consistently outperforms the LLM-based CoT-baseline, highlighting its superior efficacy in multimodal contextual time series forecasting."
+   },
+   "practical_problems": [
+    {
+     "problem": "information_availability",
+     "modules": [],
+     "tested": false,
+     "evidence": {
+      "line": 199,
+      "quote": "we designed an experimental setup that explicitly controls for data leakage."
+     },
+     "note": "evaluation data strictly after LLM knowledge cutoffs; leakage-controlled split, not varied against a leaky split calibration: post-cutoff window without leaky contrast",
+     "by_design": true
+    },
+    {
+     "problem": "context_integration",
+     "modules": [
+      "nexus2026:chronological-context",
+      "nexus2026:forecast-synthesizer"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 571,
+      "quote": "we evaluate the models' intrinsic time-series pattern-recognition capabilities by providing only the raw historical numerical sequence with associated timestamps."
+     },
+     "note": "same methods run with chronological text context (Table 2) and numerical only (Table 3)"
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "nexus2026:dual-resolution-forecast",
+      "nexus2026:micro-reasoning"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 582,
+      "quote": "we conduct a pairwise comparative evaluation between Nexus and the CoT Baseline."
+     },
+     "note": "cross-judge LLM evaluation of reasoning traces on four criteria; judged by LLMs, not human reviewers calibration: LLM-judge scores only"
+    }
+   ]
+  }
+ ],
+ "summary": "Nexus splits forecasting into macro, micro, synthesis and calibration agents and beats CoT and TimesFM-2.5 on post-cutoff Zillow and stock series, with a numeric-only setting, a reasoning-quality judge study and component ablations.",
+ "confidence": "medium"
+}

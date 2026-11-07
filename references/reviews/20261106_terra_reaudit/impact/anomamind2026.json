@@ -1,0 +1,60 @@
+{
+ "citation_key": "anomamind2026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 18,
+    "quote": "AnomaMind operates through a coarse-to-fine workflow that first localizes suspicious intervals, then constructs diagnostic evidence through tool interaction, and finally refines anomaly decisions through self-reflection."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 1464,
+    "quote": "Extensive experiments under both in-domain and cross-domain settings demonstrate consistent performance gains, validating the effectiveness of tool-augmented reasoning for TSAD."
+   },
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "anomamind2026:knowledge-memory"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1282,
+      "quote": "Detection Tool Ablation: As shown in Table V, the full AnomaMind achieves the best overall performance, demonstrating the effectiveness of the proposed detection tools."
+     },
+     "note": "tool ablation removes knowledge memory (domain knowledge and mined anomaly patterns) among other tools; effect reported as F1 drop calibration: whole-tool ablation (knowledge memory among several tools), not an exogenous context source removed."
+    },
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "anomamind2026:knowledge-memory",
+      "anomamind2026:detector-rl"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 956,
+      "quote": "cross-domain settings. The in-domain setting trains a separate model for each dataset, while the cross-domain setting trains a unified model on all training splits"
+     },
+     "note": "domain shift is motivating; the cross-domain setting trains on all datasets and tests on their splits, so no held-out shift is evaluated"
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "anomamind2026:diagnostic-toolkit"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1447,
+      "quote": "Figure 5 illustrates a representative coarse-to-fine detection case."
+     },
+     "note": "evidence construction shown in one case study; no faithfulness or reviewer evaluation"
+    }
+   ]
+  }
+ ],
+ "summary": "Turns anomaly detection into a tool-using, self-verifying workflow with an RL-trained detector; reports higher F1 than baselines on four datasets in-domain and unified-training settings, with ablations, but no held-out shift or evidence-faithfulness test.",
+ "confidence": "medium"
+}

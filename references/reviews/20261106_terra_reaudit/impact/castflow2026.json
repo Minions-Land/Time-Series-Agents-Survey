@@ -1,0 +1,48 @@
+{
+ "citation_key": "castflow2026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 20,
+    "quote": "First, CastFlow organizes the forecasting process into planning,\naction, forecasting, and reflection, establishing an agentic workflow."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 33,
+    "quote": "To evaluate the effectiveness of CastFlow, we\nconduct extensive experiments on diverse datasets and show that\nit achieves superior overall results against strong baselines."
+   },
+   "practical_problems": [
+    {
+     "problem": "information_availability",
+     "modules": [
+      "castflow2026:temporal-diagnostics"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 567,
+      "quote": "tail-risk preservation. Crucially, to prevent unintended futuredata leakage, this diagnostic tool is deployed only during the\ntraining phase and is strictly bypassed during testing."
+     },
+     "note": "leakage is prevented by design; no experiment measures leakage or its effect"
+    },
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "castflow2026:temporal-profiler",
+      "castflow2026:temporal-diagnostics"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1764,
+      "quote": "and capture complex, non-stationary dynamics. Interestingly,"
+     },
+     "note": "toolkit-category ablations are averaged over datasets, with no shift or regime-change split"
+    }
+   ]
+  }
+ ],
+ "summary": "An agentic plan-act-forecast-reflect workflow with temporal diagnostics, strategy memory and a fine-tuned forecaster automates forecast construction; component and toolkit ablations show lower MSE/MAE than baselines, but no experiment isolates leakage, shift or context.",
+ "confidence": "medium"
+}

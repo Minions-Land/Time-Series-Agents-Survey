@@ -1,0 +1,99 @@
+{
+ "citation_key": "agriworld2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 85,
+    "quote": "We propose a multi-turn agent that iterates execute–observe–refine, using intermediate artifacts to self-correct"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 460,
+    "quote": "In Forecasting tasks, however, the gap widens significantly\n(NRMSE 0.34 vs 0.18)."
+   },
+   "practical_problems": [
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "agriworld2026:typed-world",
+      "agriworld2026:reflective-execution"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 664,
+      "quote": "Temporal OOD (The El Niño Year). Testing on data\nfrom 2023, a year marked by extreme weather anomalies"
+     },
+     "note": "Table 5 compares text-only, one-shot and the reflective agent on unseen regions (Brazil) and an unseen extreme-weather year; the accuracy drop is the measure"
+    },
+    {
+     "problem": "data_quality",
+     "modules": [
+      "agriworld2026:canonical-alignment"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 200,
+      "quote": "Robust Zonal Statistics. To handle noise in satellite\ndata (e.g., clouds), we formalize the zonal statistics operation."
+     },
+     "note": "cloud noise is handled by validity-masked zonal statistics; no experiment varies noise"
+    }
+   ]
+  },
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 85,
+    "quote": "We propose a multi-turn agent that iterates execute–observe–refine, using intermediate artifacts to self-correct"
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "agriworld2026:typed-world",
+      "agriworld2026:canonical-alignment"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 479,
+      "quote": "Impact of Remote Sensing Tools. When we removed\nthe remote sensing module (w/o RS), the agent lost the\nability to \"see\" the fields."
+     },
+     "note": "ablating the remote sensing source lowers crop monitoring performance by over 40%; removing alignment is also ablated (CRS join errors)"
+    }
+   ]
+  },
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 470,
+    "quote": "the agent must\nrun a simulation, observe the outcome, and verify if the\nchange is significant."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 468,
+    "quote": "The most dramatic improvement is seen in Counterfactual Analysis (Success Rate\n43.8% vs 71.4%)."
+   },
+   "practical_problems": [
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "agriworld2026:intervention-checker"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 468,
+      "quote": "The most dramatic improvement is seen in Counterfactual Analysis (Success Rate\n43.8% vs 71.4%)."
+     },
+     "note": "counterfactual interventions are scored by a simulator-based checker as one task type in a breakdown; no cost, risk or delayed-outcome variation is isolated"
+    }
+   ]
+  }
+ ],
+ "summary": "Gives an LLM an executable agricultural time series environment and an execute-observe-refine loop, raising scores over text-only and one-shot baselines; the evaluation includes spatial and temporal out-of-domain tests and remote sensing and alignment ablations.",
+ "confidence": "medium"
+}

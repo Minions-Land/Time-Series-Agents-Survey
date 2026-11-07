@@ -1,0 +1,57 @@
+{
+ "citation_key": "epidemicagent2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 70,
+    "quote": "disease-relevant evidence into a structured transmission-impact signal, confidence value, and concise"
+   },
+   "metric_gain": false,
+   "metric_evidence": null,
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "epidemicagent2026:temporal-evidence-pack",
+      "epidemicagent2026:hfmd-context-interface"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 609,
+      "quote": "Table 4 isolates contextual components on Lishui. Removing Agent 1 degrades all metrics, confirming"
+     },
+     "note": "ablation removes the Event Interpreter, climate evidence, school calendar and retrieved guidance under a fixed forecasting core; removing the school calendar raises MAE from 4.124 to 6.695"
+    },
+    {
+     "problem": "information_availability",
+     "modules": [
+      "epidemicagent2026:temporal-evidence-pack"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 446,
+      "quote": "Weather summaries, school status, and surveillance reports are aligned to the forecast origin and"
+     },
+     "note": "context restricted by public release dates at each origin; a design constraint, not varied or compared"
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "epidemicagent2026:hfmd-context-interface"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 81,
+      "quote": "• Structured interpretability through bounded impact scores, confidence values, and concise"
+     },
+     "note": "bounded impact scores and rationales claimed as auditable; no faithfulness or reviewer study"
+    }
+   ]
+  }
+ ],
+ "summary": "An LLM interprets school, weather and surveillance context into a bounded impact signal feeding a calibrated count forecaster; baselines win on MAE in places, while ablations show the context components (notably school calendar) drive the framework's accuracy and coverage.",
+ "confidence": "medium"
+}

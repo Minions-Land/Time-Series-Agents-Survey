@@ -1,0 +1,62 @@
+{
+ "citation_key": "agentictwin2026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 276,
+    "quote": "The Retrieval Agent (RA), Diagnosis Agent (DA), Mitigation Agent (MA), and Supervisor Agent (SA) then use Et"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 1197,
+    "quote": "Table VI shows that AgenticTwin achieves the highest performance across all three tasks, obtaining diagnosis similarity,"
+   },
+   "practical_problems": [
+    {
+     "problem": "verifiability",
+     "modules": [
+      "agentictwin2026:anomaly-knowledge-base",
+      "agentictwin2026:grounded-mitigation-agent"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 963,
+      "quote": "without (WKB) and with (KB) access to the anomaly knowledge base, along with the respective gains (G%)."
+     },
+     "note": "Ablates the knowledge base used to ground root-cause diagnosis, against hallucination, across LLM sizes calibration: KB ablation scored by semantic similarity of reasoning quality, no hallucination or faithfulness measure."
+    },
+    {
+     "problem": "operational_deployment",
+     "modules": [
+      "agentictwin2026:agentic-supervision"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1209,
+      "quote": "coordinated lightweight open-source models can outperform"
+     },
+     "note": "Lightweight-model comparison on a synthetic benchmark; no real deployment or latency/resource measurement"
+    }
+   ]
+  },
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 276,
+    "quote": "The Retrieval Agent (RA), Diagnosis Agent (DA), Mitigation Agent (MA), and Supervisor Agent (SA) then use Et"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 1202,
+    "quote": "the best-performing baseline by 32.9% in diagnosis, 28.4%"
+   },
+   "practical_problems": []
+  }
+ ],
+ "summary": "A digital-twin-fed multi-agent LLM pipeline diagnoses anomalies and proposes mitigations; on a synthetic injected-anomaly benchmark it beats monolithic LLMs and a knowledge-base ablation shows grounding raises similarity scores.",
+ "confidence": "medium"
+}

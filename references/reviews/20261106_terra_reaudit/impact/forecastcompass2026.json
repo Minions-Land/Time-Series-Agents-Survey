@@ -1,0 +1,37 @@
+{
+ "citation_key": "forecastcompass2026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 21,
+    "quote": "iteratively revises memory through a verbalized memory-revision procedure"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 416,
+    "quote": "Factor-centric memory consistently improves forecasting accuracy and calibration."
+   },
+   "practical_problems": [
+    {
+     "problem": "information_availability",
+     "modules": [
+      "forecastcompass2026:memory-revision",
+      "forecastcompass2026:factor-memory"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 943,
+      "quote": "resolution facts, supporting its ability to mitigate information leakage through high-level forecasting principles."
+     },
+     "note": "Chronological protocol builds memory only from resolved questions; an LLM-judge memory-quality analysis checks that stored memory is not event-specific or post-resolution; no leaking-versus-clean comparison calibration: chronological protocol; LLM-judge memory quality scores, no measured leakage rate.",
+     "by_design": true
+    }
+   ]
+  }
+ ],
+ "summary": "Factor and reasoning memory is revised weekly from resolved questions to help an LLM forecasting agent; it lowers Brier and ECE on Prophet Arena and FutureX, with ablations and a judged check that memory avoids post-resolution details.",
+ "confidence": "medium"
+}

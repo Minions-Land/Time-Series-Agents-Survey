@@ -1,0 +1,47 @@
+{
+ "citation_key": "wang2026large",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 100,
+    "quote": "L refers to the pre-trained Large models that serve as the brain of the framework for anomaly detection."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 1061,
+    "quote": "policy H (enhance prompt by historical series) achieved the best performance in all metrics (it beats the two comparison methods as well)."
+   },
+   "practical_problems": [
+    {
+     "problem": "data_quality",
+     "modules": [
+      "wang2026large:detection_prompt"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1046,
+      "quote": "Due to the relatively small scope and short time for its data collection, ENLITEN serves as a case for the data-scarce scenario."
+     },
+     "note": "ENLITEN is used as a dedicated data-scarce case; the prompted pretrained LLM is compared with trained DSVDD, RETAD and FC-AE on it, but the amount of data is not varied. calibration: data amount not varied; single data-scarce case."
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "wang2026large:detection_prompt"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 25,
+      "quote": "enhance the interpretability of anomalies."
+     },
+     "note": "Human-readable explanations are claimed, but no faithfulness or reviewer study of the explanations is reported."
+    }
+   ]
+  }
+ ],
+ "summary": "SLEP lets a pretrained LLM detect power-system anomalies from prompted histories and reflections without training, matching or beating trained baselines on three electricity datasets including a data-scarce one; explanations are claimed but not evaluated.",
+ "confidence": "medium"
+}

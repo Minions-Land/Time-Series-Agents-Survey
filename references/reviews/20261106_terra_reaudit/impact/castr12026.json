@@ -1,0 +1,21 @@
+{
+ "citation_key": "castr12026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {"task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {"line": 145, "quote": "system autonomously constructs context through tool interactions,\nadaptively selects forecasting models for decision support"},
+   "metric_gain": true,
+   "metric_evidence": {"line": 634, "quote": "Overall, Cast-R1 achieves consistent improvements over existing\nmethods. Notably, it obtains the lowest MSE scores on all evaluated datasets"},
+   "practical_problems": [
+    {"problem": "nonstationarity", "modules": ["castr12026:diagnostic-toolkit", "castr12026:forecast-policy-training"], "tested": false,
+     "evidence": {"line": 430, "quote": "shifts, and local temporal patterns, providing structured signals that\ninform subsequent forecasting decisions under evolving conditions."},
+     "note": "change point and trend tools target evolving conditions; no shift or out-of-domain experiment, only standard benchmark splits and component ablations"},
+    {"problem": "data_quality", "modules": ["castr12026:diagnostic-toolkit"], "tested": false,
+     "evidence": {"line": 414, "quote": "data. To support this process, the toolkit provides data quality\nassessment tools that characterize missing values, saturation effects,"},
+     "note": "data quality tools exist; the feature-extraction ablation removes all diagnostics together and no missing-rate or noise sweep is run"}
+   ]}
+ ],
+ "summary": "Learns a tool-augmented, memory-backed forecasting policy with SFT and curriculum RL that lowers MSE on long-term and electricity price benchmarks; ablations isolate components, not time series obstacles.",
+ "confidence": "high"
+}

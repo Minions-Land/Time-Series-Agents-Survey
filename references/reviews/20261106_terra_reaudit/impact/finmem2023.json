@@ -1,0 +1,47 @@
+{
+ "citation_key": "finmem2023",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 26,
+    "quote": "F IN M EM presents a cutting-edge LLM agent framework for automated trading, boosting cumulative investment returns."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 1052,
+    "quote": "In response to RQ1, the trading outcomes presented in Table 2 reveal that F IN M EM outperforms all other algorithmic trading agents and the B&H baseline strategy in terms of Cumulative Return and Sharpe Ratio."
+   },
+   "practical_problems": [
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "finmem2023:profiling"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 1186,
+      "quote": "profiles: risk-seeking, risk-averse, and a self-adaptive character. We executed a comparative analysis of F IN M EM’s performance across these risk profiles"
+     },
+     "note": "Table 4 compares risk-seeking, risk-averse and self-adaptive profiles on Cumulative Return, Sharpe Ratio and Max Drawdown, including downturn behavior."
+    },
+    {
+     "problem": "context_integration",
+     "modules": [
+      "finmem2023:layered-financial-memory"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1238,
+      "quote": "K hyperparameter, F IN M EM can expand this capacity far beyond the human cognitive scope. We aimed to determine whether such flexibility in adjusting memory bandwidth translates to improvements"
+     },
+     "note": "Table 5 varies how many memory events (news, filings) are retrieved into working memory; it is a bandwidth sweep, not removal of a context source. calibration: memory bandwidth sweep, not removal of an exogenous context source."
+    }
+   ]
+  }
+ ],
+ "summary": "FinMem automates LLM stock trading with profiled risk character and layered news memory; it beats DRL and LLM agent baselines on return and Sharpe, with risk-profile and memory-bandwidth studies, but no leakage or shift test.",
+ "confidence": "medium"
+}

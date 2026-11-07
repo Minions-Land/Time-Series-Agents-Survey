@@ -1,0 +1,35 @@
+{
+ "citation_key": "lineuprl2026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 153,
+    "quote": "A VLM captioner πθ reads the chart ρ(x) and outputs a natural-language description"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 680,
+    "quote": "LineupRL has the lowest error in all eight cells, significantly so in seven, the exception being reconstruction on Saugeen where the LLM-as-judge reward ties it."
+   },
+   "practical_problems": [
+    {
+     "problem": "verifiability",
+     "modules": [
+      "lineuprl2026:identification-rlvr"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 846,
+      "quote": "Hard negatives give the better captioner on every criterion. The randomdistractor variant in fact scores higher on its own training signal, 0.982 above chance against 0.872 for LineupRL, but that only means the question got easier."
+     },
+     "note": "Table 3 and Figure 3 ablate the reward model, candidate count and distractor choice; random distractors are an easily gamed reward (verifier finds the series 72.5% without the caption), and a case study contrasts reward hacking. This is a reward-verifiability test, not an explanation-faithfulness study. calibration: reward-model ablation, not unsupported-claim or human evaluation"
+    }
+   ]
+  }
+ ],
+ "summary": "LineupRL trains a 3B VLM time series captioner with a verifiable identification reward; its captions give the lowest caption-only forecasting and reconstruction error, and the distractor ablation shows hard negatives are what make the reward resist shortcuts.",
+ "confidence": "medium"
+}

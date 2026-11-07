@@ -1,0 +1,48 @@
+{
+ "citation_key": "finagent2024",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 752,
+    "quote": "Decisions are derived from combining insights from these analyses, also considering the current financial position"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 187,
+    "quote": "With comprehensive experiments on 6 financial datasets, including\nstocks and Crypto, FinAgent significantly outperforms 12 stateof-the-art baselines in terms of 6 financial metrics with over 36%\naverage improvement on profit."
+   },
+   "practical_problems": [
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "finagent2024:trade-outcome-reflection",
+      "finagent2024:market-reflection"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 1260,
+      "quote": "When comparing the ML and MLH, the addition of\nthe high-level reflection module significantly enhances the ARR%\nand SR, while notably reducing risk."
+     },
+     "note": "component ablation of low- and high-level reflection (trade-outcome feedback) measured with return, Sharpe, drawdown and volatility; one stock shows a 7% rise in MDD"
+    },
+    {
+     "problem": "context_integration",
+     "modules": [
+      "finagent2024:market-intelligence"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 827,
+      "quote": "iv) Expert Guidance provided by financial experts as the auxiliary information, aiming to furnish a thorough and well-rounded\ncomprehension of market status."
+     },
+     "note": "news, charts and expert guidance are fused, but no ablation removes a modality; only diversified retrieval is ablated, on AAPL"
+    }
+   ]
+  }
+ ],
+ "summary": "Automates multimodal market analysis, memory retrieval, dual-level reflection and tool-assisted buy/hold/sell decisions; it beats 9 to 12 baselines on return and Sharpe across six assets in a chronological test, and the ablation shows reflection lowers risk, though stock-specific tools hurt on crypto.",
+ "confidence": "medium"
+}

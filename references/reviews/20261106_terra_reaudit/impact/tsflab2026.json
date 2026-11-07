@@ -1,0 +1,36 @@
+{
+ "citation_key": "tsflab2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 477,
+    "quote": "Paper reproduction: the agent reproduces the reported results of a recent forecasting\npaper that has no official code"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 561,
+    "quote": "TSFLab reproduces 73% of the 96 scheduled results\nwithin 10% of the paper’s MSE, against 21–46% for the other settings."
+   },
+   "practical_problems": [
+    {
+     "problem": "information_availability",
+     "modules": [
+      "tsflab2026:shared-data-protocol",
+      "tsflab2026:experiment-workflower"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 651,
+      "quote": "Without the Experiment Workflower, agents write their own training and evaluation code; they\nadd the most code, and their errors move into evaluation, such as tuning on test scores and averaging batch\nerrors."
+     },
+     "note": "module ablation (with the guide ablation, whose rejected attempts used wrong ETTh1 split boundaries) shows that without shared splitting and execution agents tune on test scores; reported qualitatively as error types, not as a leakage-rate measurement"
+    }
+   ]
+  }
+ ],
+ "summary": "Automates forecasting reproduction, benchmarking and method development for coding agents through a shared workbench with fixed chronological protocols; it raises task completion and reproduction fidelity and cuts tokens, and its module ablations qualitatively show protocol errors such as test-score tuning when the shared runner or guide is removed.",
+ "confidence": "medium"
+}

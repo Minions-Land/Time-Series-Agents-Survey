@@ -1,0 +1,54 @@
+{
+ "citation_key": "chatts2025",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "other:temporal_question_answering",
+   "automates": false,
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 1321,
+    "quote": "It can be found that ChatTS achieves consistent improvements over the baseline models across all reasoning tasks."
+   },
+   "practical_problems": [
+    {
+     "problem": "data_quality",
+     "modules": [
+      "chatts2025:synthetic-instruction",
+      "chatts2025:tsevol-instruction"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 1338,
+      "quote": "To evaluate the effectiveness of attribute-based time series generation and TSEvol, we conducted ablation studies with two variants: (1) w/o Attribute-Based, where all training datasets were replaced by"
+     },
+     "note": "scarce aligned series-text data is replaced by synthetic attribute-based data; ablation swaps in GPT-generated data or removes TSEvol, plus a training-data scaling study"
+    },
+    {
+     "problem": "operational_deployment",
+     "modules": [
+      "chatts2025:temporal-alignment"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1658,
+      "quote": "To illustrate the performance of ChatTS with its native time series multimodal capability in real-world applications, we present a"
+     },
+     "note": "one Oracle database dialogue case; not a deployment report"
+    }
+   ]
+  },
+  {
+   "task": "other:temporal_analysis",
+   "automates": false,
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 1321,
+    "quote": "It can be found that ChatTS achieves consistent improvements over the baseline models across all reasoning tasks."
+   },
+   "practical_problems": []
+  }
+ ],
+ "summary": "A trained time series multimodal LLM that answers alignment and reasoning questions natively, scoring above text-LLM and tool-agent baselines at lower token cost; ablations show attribute-based synthetic data matters, deployment is only a case study.",
+ "confidence": "medium"
+}

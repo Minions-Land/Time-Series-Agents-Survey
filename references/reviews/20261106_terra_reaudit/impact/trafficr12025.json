@@ -1,0 +1,10 @@
+{"citation_key":"trafficr12025","primary_gain":"practical_problem",
+"tasks":[{"task":"decision_support",
+"automates":true,"automation_evidence":{"line":1491,"quote":"Traffic-R1 reduced the average and maximum queue lengths by 9.3% and 4.4%, respectively. Furthermore, it achieved a substantial 75% reduction in the human labor required for daily operations."},
+"metric_gain":true,"metric_evidence":{"line":619,"quote":"As shown in Table 2, our model significantly outperforms all baselines, demonstrating strong generalization for real-world deployment."},
+"practical_problems":[
+{"problem":"nonstationarity","modules":["trafficr12025:open-world-stpo"],"tested":true,"evidence":{"line":718,"quote":"Stable OOD generalization. Traffic-R1 maintains consistent performance across diverse OOD scenarios and outperforms larger general LLMs and LLMLight by over 30% across metrics"},"note":"Table 3 evaluates local and network-wide out-of-distribution incidents; the ablation (Figure 6) also covers OOD tasks."},
+{"problem":"operational_deployment","modules":["trafficr12025:traffic-policy-training"],"tested":true,"evidence":{"line":1480,"quote":"We conducted a six-week in-situ evaluation to quantify the performance of Traffic-R1. The experiment was structured as an A/B test, comparing our proposed system against the baseline"},"note":"Six-week A/B test against manual control at 10 intersections; 3B model sized for edge inference."},
+{"problem":"verifiability","modules":["trafficr12025:traffic-policy-training"],"tested":false,"evidence":{"line":193,"quote":"We achieve human-like reasoning for explainable TSC through self-iteration of the reinforced LLM."},"note":"Explainable reasoning is claimed but no faithfulness or operator-review study is reported."}]}],
+"summary":"A 3B LLM trained by offline and online RL controls traffic signals; it beats baselines on public and out-of-distribution incident tasks and a six-week A/B test shows 9.3% shorter average queues than manual control and 75% less operator labor.",
+"confidence":"high"}

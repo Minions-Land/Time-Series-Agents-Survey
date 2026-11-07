@@ -1,0 +1,43 @@
+{
+ "citation_key": "hierarchicalmeteorologist2025",
+ "primary_gain": "automation",
+ "tasks": [
+  {
+   "task": "other:time_series_reporting",
+   "automates": true,
+   "automation_evidence": {
+    "line": 154,
+    "quote": "The Meteorologist agent uses available context and generates a structured\nanalysis with four fields: summary (multi-paragraph narrative grounded in the supplied tables), proof"
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "verifiability",
+     "modules": [
+      "hierarchicalmeteorologist2025:weather-report"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 316,
+      "quote": "(“humid and windy” → “cooler and drier”); the proof\nblock correctly relates these tags to elevated early P totals,\nrising U and a θ shift, and to decreasing daily T maxima."
+     },
+     "note": "qualitative inspection of keyword-proof-aggregate alignment and warning triggering in four locations; no baseline, no quantitative score calibration: qualitative case study only"
+    },
+    {
+     "problem": "context_integration",
+     "modules": [
+      "hierarchicalmeteorologist2025:multiscale-context"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 334,
+      "quote": "(1) Hierarchical presentation (daily + 6h) improves narrative\ncoherence: for Cork and Chennai locations, the daily trend\nin T is clearly separated from intraday variability"
+     },
+     "note": "hierarchical context is claimed to help, but all reports use the hierarchical mode; the baseline hourly-table mode is never run for comparison"
+    }
+   ]
+  }
+ ],
+ "summary": "Automates weather-forecast table interpretation and report writing with a Meteorologist-Writer pair; the evaluation is a four-location qualitative check of narrative-table consistency, keyword-proof alignment and warnings, with no baseline or hierarchical-vs-flat comparison.",
+ "confidence": "medium"
+}

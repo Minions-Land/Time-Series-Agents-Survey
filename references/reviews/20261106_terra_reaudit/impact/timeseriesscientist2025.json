@@ -1,0 +1,59 @@
+{
+ "citation_key": "timeseriesscientist2025",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 99,
+    "quote": "multimodal knowledge to automate the entire workflow a human scientist would follow for univariate time"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 342,
+    "quote": "Compared with the second-best baseline,\nTSci reduces MAE by an average of 38.2%."
+   },
+   "practical_problems": [
+    {
+     "problem": "data_quality",
+     "modules": [
+      "timeseriesscientist2025:curator"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 560,
+      "quote": "Removing the data preprocessing module in Curator leads to an\naverage of 41.80% increase in MAE, which is the largest increase among the three modules."
+     },
+     "note": "ablation of the cleaning, resampling and outlier-handling step; benchmarks are not corrupted or swept for missing rate, so the test isolates the module rather than the obstacle calibration: module ablation without a quality variable."
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "timeseriesscientist2025:reporter"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 511,
+      "quote": "Results. As shown in Table 2, TSci consistently outperforms all baselines across the five rubrics. The largest\ngains appear in AS and MJ, where win rates exceed 80%"
+     },
+     "note": "LLM-judged pairwise win rates of the generated report on analysis soundness, model justification, coherence, actionability and clarity; no human or faithfulness check against the logs calibration: LLM-judge scores only."
+    },
+    {
+     "problem": "information_availability",
+     "modules": [
+      "timeseriesscientist2025:ensemble"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 308,
+      "quote": "The ensemble strategy and (if applicable) weights are\nfixed before touching the test set to avoid data leakage."
+     },
+     "note": "ensemble choice is made on validation data before the test horizon; no leakage experiment"
+    }
+   ]
+  }
+ ],
+ "summary": "Automates univariate forecasting end to end (diagnosis, preprocessing, model search, ensembling, report), lowering MAE against statistical and LLM baselines; ablations show preprocessing matters most and an LLM-judged study rates the reports.",
+ "confidence": "medium"
+}

@@ -1,0 +1,59 @@
+{
+ "citation_key": "aiaforecaster2025",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 574,
+    "quote": "the LLM-based forecaster can independently define and execute a query strategy, asking follow-up questions as needed."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 12,
+    "quote": "On the ForecastBench benchmark (Karger et al., 2024), the AIA Forecaster achieves performance equal to human superforecasters, surpassing prior LLM"
+   },
+   "practical_problems": [
+    {
+     "problem": "information_availability",
+     "modules": [
+      "aiaforecaster2025:foreknowledge-checks"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 743,
+      "quote": "As Table 6 demonstrates, both robustness checks yield a Brier score that is within 0.001 of the baseline value"
+     },
+     "note": "LLM-judge flags search results leaking post-cutoff information (audited on 502 traces, about 1.65% of results flagged); filtered and worst-case rescoring bound the effect on Brier score."
+    },
+    {
+     "problem": "context_integration",
+     "modules": [
+      "aiaforecaster2025:adaptive-search"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 580,
+      "quote": "As shown in Table 3, our agentic search pipeline with access to the Search-A API and our internal corpus of high-quality news data significantly outperforms a no-news baseline"
+     },
+     "note": "Ablation of search source and agentic versus non-agentic search against no search, and a 2x2 crossing of search with market-price context."
+    },
+    {
+     "problem": "other",
+     "modules": [
+      "aiaforecaster2025:statistical-calibration"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1068,
+      "quote": "Mechanisms of Improvement. As Table 11 shows, both Platt scaling and extremization significantly improve forecast accuracy, while isotonic regression and OLS are less"
+     },
+     "note": "LLM hedging toward 0.5 (probability miscalibration); calibration methods are compared on Brier score. calibration: LLM hedging toward 0.5 is an LLM-internal calibration issue, not a time series obstacle."
+    }
+   ]
+  }
+ ],
+ "summary": "AIA Forecaster adds agentic news search, a supervisor that reconciles forecasts and Platt calibration to an LLM event forecaster; it matches superforecasters on ForecastBench, trails market prices on MarketLiquid, and its evaluation isolates search, foreknowledge leakage and calibration.",
+ "confidence": "high"
+}

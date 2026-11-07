@@ -1,0 +1,82 @@
+{
+ "citation_key": "genautoml2026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 20,
+    "quote": "an agentic framework that utilizes Large Language Models (LLMs) to act as neural architects in order to bridge the gap\nbetween natural language requirements and executable PyTorch code."
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "genautoml2026:revin-wrapper"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 723,
+      "quote": "disabling Dyn-RevIN caused a severe degradation in forecasting accuracy. The\nMAE error roughly increased by 94% on ETTh1 (1.251 to 2.435)"
+     },
+     "note": "Dyn-RevIN toggled on and off for the agent-built BiGRU on ETTh1, ETTm1 and Weather; helps on volatile data, hurts on stable Weather calibration: module toggle across datasets, no held-out regime reported"
+    },
+    {
+     "problem": "information_availability",
+     "modules": [
+      "genautoml2026:causal-temporal-preprocessing"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1014,
+      "quote": "Conversely, the test and validation sets only utilize\ncausal forward-filling (limit_direction=’forward’)."
+     },
+     "note": "causal split and forward-fill are applied, but no experiment varies or measures leakage"
+    },
+    {
+     "problem": "data_quality",
+     "modules": [
+      "genautoml2026:causal-temporal-preprocessing"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1007,
+      "quote": "Industrial datasets frequently suffer from missing timestamps, resulting in non-uniform time intervals"
+     },
+     "note": "resampling and interpolation are specified; no missing-rate sweep"
+    }
+   ]
+  },
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 20,
+    "quote": "an agentic framework that utilizes Large Language Models (LLMs) to act as neural architects in order to bridge the gap\nbetween natural language requirements and executable PyTorch code."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 595,
+    "quote": "The agent-designed ResNetBlock exhibited unparalleled performance, achieving a\nseparation gap 8 times better than TimesNet and 33 times better than DLinear,"
+   },
+   "practical_problems": [
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "genautoml2026:revin-wrapper"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 731,
+      "quote": "For ETTh1 and ETTm1, utilizing Dyn-RevIN on\nthe ResNetBlock was highly beneficial, driving the Discrimination Gap to"
+     },
+     "note": "Dyn-RevIN toggled for the agent-built ResNetBlock detector on three datasets; it degrades sensitivity on Weather calibration: module toggle across datasets, no held-out regime reported"
+    }
+   ]
+  }
+ ],
+ "summary": "An LLM agent writes, repairs and registers PyTorch architectures for forecasting and anomaly detection; generated models are competitive on forecasting and stronger on detection gap, and a Dyn-RevIN on/off ablation tests the non-stationarity guard, while causal preprocessing is not tested.",
+ "confidence": "medium"
+}

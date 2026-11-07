@@ -1,0 +1,15 @@
+{"citation_key":"multimodaldebate2026","primary_gain":"practical_problem",
+"tasks":[
+{"task":"forecasting_prediction",
+"automates":true,"automation_evidence":{"line":58,"quote":"Reviewer agents check decisioncritical claims with lightweight code execution and numerical lookup, resolve cross-modal disagreement, and calibrate the final answer."},
+"metric_gain":true,"metric_evidence":{"line":925,"quote":"Regression TS-Debate obtains the lowest average MAE on MTBench (Finance) and TSQA, reducing error by 36.92% on average relative to the best baseline"},
+"practical_problems":[
+{"problem":"context_integration","modules":["multimodaldebate2026:modality-debate"],"tested":true,"evidence":{"line":1155,"quote":"incorporating multiple modalities consistently improves performance over single-modality or nodebate (i.e., simple agents with tools) baselines."},"note":"Figure 3(a) ablates numerical, visual and textual analysts and removes debate on a 400-sample ablation set pooled over regression, classification and QA."},
+{"problem":"verifiability","modules":["multimodaldebate2026:temporal-verification"],"tested":true,"evidence":{"line":1222,"quote":"Across all 5,742 stored traces, reviewer agents issued 28,741 claim verdicts: 94.5% verified, 3.0% unverified, 1.6% contradicted, and 0.9% partially verified."},"note":"Conflict-resolution analysis of claim verdicts plus a tool-matched comparison (Table 3) and a no-tools ablation of programmatic verification; pooled over tasks."},
+{"problem":"information_availability","modules":["multimodaldebate2026:temporal-verification"],"tested":false,"evidence":{"line":581,"quote":"TS-Debate cannot verify future outcomes from past data; instead, it evaluates whether the causes of observed patterns plausibly persist under k."},"note":"Temporal-scope-aware calibration separates checkable past claims from future ones, but no experiment isolates it or audits leakage."}]},
+{"task":"anomaly_detection_diagnosis",
+"automates":true,"automation_evidence":{"line":58,"quote":"Reviewer agents check decisioncritical claims with lightweight code execution and numerical lookup, resolve cross-modal disagreement, and calibrate the final answer."},
+"metric_gain":true,"metric_evidence":{"line":3009,"quote":"On anomaly detection, TS-Debate achieves the best performance (0.623 ACC), surpassing the best baseline (0.583) by +4.0 points."},
+"practical_problems":[]}],
+"summary":"A training-free multimodal debate with code-backed claim verification beats zero-shot and tool-matched baselines on 20 tasks; ablations and verdict analysis support the context-integration and verifiability mechanisms, pooled across task types.",
+"confidence":"medium"}

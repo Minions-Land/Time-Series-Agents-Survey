@@ -1,0 +1,21 @@
+{
+ "citation_key": "dast2026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {"task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {"line": 20, "quote": "chains a three-stage VLM → LLM → VLM pipeline. DAST\nconverts multivariate KPI streams into visual representations,"},
+   "metric_gain": true,
+   "metric_evidence": {"line": 594, "quote": "DAST improves F1Score by about 0.41 and Accuracy by 0.51 over the strongest\nbaseline."},
+   "practical_problems": [
+    {"problem": "context_integration", "modules": ["dast2026:oran-semantic-detection"], "tested": false,
+     "evidence": {"line": 618, "quote": "Fig. 4: By leveraging O-RAN domain knowledge, DAST\nis able to realize that latency in F1-u is the actual anomaly,"},
+     "note": "domain knowledge is only shown in one qualitative case; no ablation removes it"},
+    {"problem": "nonstationarity", "modules": ["dast2026:oran-semantic-detection"], "tested": false,
+     "evidence": {"line": 735, "quote": "Our evaluation uses\na single open-source stack."},
+     "note": "zero-shot design targets drift and scarce baselines, but the authors state no multi-vendor or shift validation was run"}
+   ]}
+ ],
+ "summary": "A zero-shot VLM-LLM-VLM pipeline automates cross-interface O-RAN anomaly localization; it beats MSCRED, TAMA, VLM4TS and TSAD Agents on one testbed, without an ablation of the domain knowledge or a shift test.",
+ "confidence": "high"
+}

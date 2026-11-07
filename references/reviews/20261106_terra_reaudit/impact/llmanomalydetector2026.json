@@ -1,0 +1,21 @@
+{
+  "citation_key": "llmanomalydetector2026",
+  "primary_gain": "metric_gain",
+  "tasks": [
+    {"task": "anomaly_detection_diagnosis",
+     "automates": true,
+     "automation_evidence": {"line": 136, "quote": "model is allowed to edit only the detector program. In each iteration it (i) inspects the current detector program and its recent"},
+     "metric_gain": true,
+     "metric_evidence": {"line": 346, "quote": "The Opus loop leads the field. The detector discovered by the Opus 4.8 loop takes the most first-place finishes on every one of the four"},
+     "practical_problems": [
+       {"problem": "information_availability", "modules": ["llmanomalydetector2026:synthetic-anomaly-validation"], "tested": false,
+        "evidence": {"line": 151, "quote": "Synthetic validation and leakage control. The search uses no real anomaly labels."},
+        "note": "leakage-free search using synthetic anomalies in a held-out training slice; no leaky-versus-clean comparison"},
+       {"problem": "verifiability", "modules": ["llmanomalydetector2026:univariate-spectral-detector", "llmanomalydetector2026:multivariate-joint-spectral-detector"], "tested": false,
+        "evidence": {"line": 70, "quote": "• Interpretable, single-CPU programs. Each detector is"},
+        "note": "short NumPy programs said to be auditable from source; no reviewer or faithfulness study"}
+     ]}
+  ],
+  "summary": "An LLM autonomously edits and scores a NumPy detector program against synthetic held-out anomalies, producing compact CPU-only detectors that top TSB-AD metrics and run faster than comparable baselines; leakage control and interpretability are design claims, not isolated experiments.",
+  "confidence": "high"
+}

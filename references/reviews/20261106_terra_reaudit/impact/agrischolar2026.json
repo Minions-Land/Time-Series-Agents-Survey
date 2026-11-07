@@ -1,0 +1,61 @@
+{
+ "citation_key": "agrischolar2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 28,
+    "quote": "each advisory being produced by a\nclosed-loop system which couples multiple LLM agents with a powerful crop simulator"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 737,
+    "quote": "Agri-SCHOLAR beat the\nregional package of practices (PoP) in every season"
+   },
+   "practical_problems": [
+    {
+     "problem": "information_availability",
+     "modules": [
+      "agrischolar2026:asof-weather-trajectory"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 489,
+      "quote": "Each advisory is chosen using only the constructed weather Wt of that week (Eq. 17), never the future\nobserved weather."
+     },
+     "note": "cutoff-controlled rolling replay: advisories use only a 7-day forecast plus an analog tail from earlier years, then are scored under true weather; the cutoff is enforced in the protocol, not varied calibration: cutoff enforced by protocol in rolling replay, not varied.",
+     "by_design": true
+    },
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "agrischolar2026:llm-bounded-optimization",
+      "agrischolar2026:context-retrieval-agent"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 695,
+      "quote": "With no bounds, performance collapses. Mean yield falls by 5.1%, production cost rises about 9.5-fold and the\nsustainability penalty about 4.6-fold"
+     },
+     "note": "ablation of the LLM feasibility bounds under a profit objective with costs and environmental penalties; loose and no bounds exploit the simulator with infeasible actions"
+    },
+    {
+     "problem": "operational_deployment",
+     "modules": [
+      "agrischolar2026:llm-bounded-optimization"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 755,
+      "quote": "prospective pilots with farmers"
+     },
+     "note": "the system is described as deployable but evaluated only in simulation; farmer pilots are future work"
+    }
+   ]
+  }
+ ],
+ "summary": "Runs a weekly, cutoff-respecting advisory loop in which LLM agents bound actions and a simulator scores them, beating the regional package of practices over 11 simulated seasons; an ablation shows the bounds keep the optimizer from infeasible, costly actions.",
+ "confidence": "medium"
+}

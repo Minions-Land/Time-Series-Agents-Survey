@@ -1,0 +1,37 @@
+{
+ "citation_key": "auraforecaster2026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 160,
+    "quote": "The model retrieves observations, reasons about them, and selects\nfurther queries until it submits a forecast."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 436,
+    "quote": "Both stages increase the forecast score (table 4). SFT raises it from 20.94 to 37.94, an 81.2%\nimprovement."
+   },
+   "practical_problems": [
+    {
+     "problem": "information_availability",
+     "modules": [
+      "auraforecaster2026:market_sandbox",
+      "auraforecaster2026:beta-benchmark"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 240,
+      "quote": "by time and also separate the realization windows of their labels. The final training label is realized\non December 29, 2023, before the first test decision on February 1, 2024."
+     },
+     "note": "point-in-time tools and a chronological split with label-realization separation; the obstacle is controlled in the protocol, not varied in an ablation calibration: point-in-time chronological split without a contrast.",
+     "by_design": true
+    }
+   ]
+  }
+ ],
+ "summary": "SFT and PPO teach a 4B model to gather point-in-time market evidence and forecast returns, raising the forecast score from 20.94 to 43.31 under a leakage-controlled chronological split on an outcome-selected benchmark.",
+ "confidence": "medium"
+}

@@ -1,0 +1,47 @@
+{
+ "citation_key": "lastmile2026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 20,
+    "quote": "Our system maintains a unified forecast\nworkspace, invokes tools to retrieve contextual\nevidence, and converts reasoning trajectories into\nexplicit forecast revision actions"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 373,
+    "quote": "Within the holiday window, our\nframework reduces MAE by 80.0% relative to Prophet and"
+   },
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "lastmile2026:revision-memory"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 482,
+      "quote": "For W2 and W3 we run two configurations: with-memory, which has access to the memory bank"
+     },
+     "note": "with-memory versus no-memory control on two later windows isolates the memory context source; the calendar and evidence tools are not ablated calibration: ablates the Agent's own memory, not an exogenous source"
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "lastmile2026:forecast-workspace"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 354,
+      "quote": "we discuss the behavior of our framework qualitatively,"
+     },
+     "note": "adjustment log and revision records are inspected qualitatively; no faithfulness or operator-review study"
+    }
+   ]
+  }
+ ],
+ "summary": "Adds a constrained, auditable LLM revision layer on a TimesFM baseline using calendar and memory evidence; one air-route case study shows lower holiday-window error than Prophet and TimesFM and a memory on/off control, with no ablation of the evidence tools.",
+ "confidence": "medium"
+}

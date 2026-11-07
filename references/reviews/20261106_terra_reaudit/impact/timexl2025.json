@@ -1,0 +1,21 @@
+{
+ "citation_key": "timexl2025",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {"task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {"line": 387, "quote": "feedback, the refinement agent Mrefine refines the previous text si into si+1 by selecting and emphasizing the most relevant content"},
+   "metric_gain": true,
+   "metric_evidence": {"line": 654, "quote": "TimeXL constantly achieves the highest\nF1 and AUC scores, consistently surpassing both time series and multi-modal baselines by up to\n8.9% of AUC"},
+   "practical_problems": [
+    {"problem": "context_integration", "modules": ["timexl2025:multimodal-prototype-encoder", "timexl2025:context-refinement"], "tested": true,
+     "evidence": {"line": 784, "quote": "Firstly, the multi-modal encoder consistently\noutperforms single-modality variants across all datasets, highlighting the benefit of integrating time\nseries and textual modalities."},
+     "note": "component ablation removes the text modality, text prototypes and reflective refinement; Figure 5 also tracks text quality over refinement iterations"},
+    {"problem": "verifiability", "modules": ["timexl2025:multimodal-prototype-encoder"], "tested": false,
+     "evidence": {"line": 1492, "quote": "Importantly, this analysis also serves as a proxy for quantitatively evaluating explanation\nquality, where retrieving higher-quality case-based examples tends to yield greater performance gains."},
+     "note": "explanations are shown in a weather case study and judged only through a prediction-performance proxy; no faithfulness or human review study"}
+   ]}
+ ],
+ "summary": "Pairs a prototype encoder over series and text with prediction, reflection and refinement LLMs to improve multimodal classification of weather, finance and influenza series; it gains up to 8.9% AUC over baselines, and ablations show the text modality and refinement matter, while explanation quality is only judged by proxy.",
+ "confidence": "medium"
+}

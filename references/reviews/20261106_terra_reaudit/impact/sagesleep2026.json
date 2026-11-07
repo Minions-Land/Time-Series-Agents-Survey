@@ -1,0 +1,67 @@
+{
+ "citation_key": "sagesleep2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 211,
+    "quote": "A daily scheduler executes predefined\nquery templates to monitor data"
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "other",
+     "modules": [
+      "sagesleep2026:sleep-monitor"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 213,
+      "quote": "Notifications are triggered selectively only when significant deviations (e.g., >±30% change from\nthe 7-day moving average) or critical sleep debts are detected"
+     },
+     "note": "alert fatigue is targeted by selective thresholds; the validation excludes system-initiated notifications, so it is untested"
+    }
+   ]
+  },
+  {
+   "task": "other:temporal_question_answering",
+   "automates": true,
+   "automation_evidence": {
+    "line": 169,
+    "quote": "the query generator\nconverts natural language inquiries into Kusto Query Language\n(KQL) executable on ADX"
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "verifiability",
+     "modules": [
+      "sagesleep2026:nl-to-kql-grounded-qa",
+      "sagesleep2026:temporal-query"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 242,
+      "quote": "M4 (Response faithfulness): Also applied to queries that\npassed M1, this confirms whether the final textual response\n  describes the retrieved data without distortion."
+     },
+     "note": "M3 checks ADX results against manually computed ground truth and M4 checks response faithfulness, on 90 LLM-synthesized questions"
+    },
+    {
+     "problem": "data_quality",
+     "modules": [
+      "sagesleep2026:nl-to-kql-grounded-qa"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 265,
+      "quote": "(3) nulldata request. We conducted the test with 30 questions for each\ncategory"
+     },
+     "note": "a null-data category (no records for the queried period) is evaluated as its own query type calibration: fixed null-data query category, no sweep or injection"
+    }
+   ]
+  }
+ ],
+ "summary": "Automates sleep-data question answering through NL-to-KQL grounding and scheduled monitoring; a preliminary synthetic-query validation reports M1-M4 pipeline correctness and faithfulness without baselines.",
+ "confidence": "medium"
+}

@@ -1,0 +1,60 @@
+{
+ "citation_key": "argos2025",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 7,
+    "quote": "employs LLMs to autonomously generate such rules."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 1326,
+    "quote": "A RGOS outperforms all baselines in every dataset."
+   },
+   "practical_problems": [
+    {
+     "problem": "operational_deployment",
+     "modules": [
+      "argos2025:python-rule-synthesis",
+      "argos2025:detector-fusion"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1366,
+      "quote": "Runtime Latency for Inference. Table 6 compares the"
+     },
+     "note": "Measures per-iteration API training cost and CPU inference latency of deployed rules against baselines; no production deployment is reported calibration: latency and cost measurements only, no deployment."
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "argos2025:python-rule-synthesis"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 694,
+      "quote": "the abnormal rules in the form of comments, and then write"
+     },
+     "note": "Commented Python rules are claimed explainable and reproducible by construction; no operator or faithfulness study"
+    },
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "argos2025:data-selection"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 134,
+      "quote": "needs to be frequently updated as data distributions shift when"
+     },
+     "note": "Rules are retrained on selected data, but no distribution-shift experiment is run"
+    }
+   ]
+  }
+ ],
+ "summary": "LLM agents write, repair and review Python anomaly rules offline and fuse them with a base detector for cheap online detection; F1 rises over baselines on KPI, Yahoo and an internal set, and cost and latency are reported.",
+ "confidence": "medium"
+}

@@ -1,0 +1,35 @@
+{
+ "citation_key": "heraldlight2025",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 19,
+    "quote": "first LLM, LLM-Agent, uses these forecasts to make fine grained\ntraffic signal control, while the second LLM, LLM-Critic, refines LLM-Agent’s outputs, correcting errors and hallucinations."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 644,
+    "quote": "HeraldLight achieves a 20.03% reduction in average travel\ntime relative to SOTA method."
+   },
+   "practical_problems": [
+    {
+     "problem": "other",
+     "modules": [
+      "heraldlight2025:dual-llm-critic"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 660,
+      "quote": "Hallucination is defined as context-incoherent, repetitive, or\nconstraint-violating outputs at the decision step. The metric\nis computed as the fraction of interactions that exhibit any\nsuch symptoms."
+     },
+     "note": "LLM decision hallucination rate (Agent vs Agent+Critic) on Hangzhou 2; not a time series obstacle proper calibration: agent-internal decision hallucination, not a time series obstacle"
+    }
+   ]
+  }
+ ],
+ "summary": "Herald queue forecasts plus an LLM agent and critic automate signal-phase timing and cut average travel time versus baselines in CityFlow simulation; hallucination rate with and without the critic is also measured.",
+ "confidence": "medium"
+}

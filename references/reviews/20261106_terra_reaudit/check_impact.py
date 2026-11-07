@@ -35,6 +35,7 @@ def check(rec, lines, module_ids):
             if p.get('problem') not in PROBLEMS: errs.append(f'{name} problem {p.get("problem")}')
             if set(p.get('modules') or []) - module_ids: errs.append(f'{name} unknown module {sorted(set(p["modules"]) - module_ids)}')
             if not isinstance(p.get('tested'), bool): errs.append(f'{name} tested not boolean')
+            if p.get('tested') and p.get('by_design'): errs.append(f'{name} {p.get("problem")} tested and by_design')
             if not ev_ok(lines, p.get('evidence')): errs.append(f'{name} {p.get("problem")} quote')
             tested_any = tested_any or p.get('tested') is True
     if not rec.get('tasks'): errs.append('no tasks')
@@ -58,8 +59,10 @@ def main(folder):
         for t in rec.get('tasks') or []:
             probs = t.get('practical_problems') or []
             tested = sorted({x['problem'] for x in probs if x.get('tested')})
-            claimed = sorted({x['problem'] for x in probs if not x.get('tested')})
+            claimed = sorted({x['problem'] for x in probs if not x.get('tested') and not x.get('by_design')})
+            design = sorted({x['problem'] for x in probs if x.get('by_design')})
             fam = t.get('task')
+            for x in design: cells[(fam, 'design:' + x)] += 1
             cells[(fam, 'works')] += 1
             cells[(fam, 'automates')] += bool(t.get('automates'))
             cells[(fam, 'metric_gain')] += bool(t.get('metric_gain'))
@@ -75,10 +78,10 @@ def main(folder):
            '| Task family | Works | Automates | Metric gain | Tested practical problem | Claimed, untested only |', '|---|---|---|---|---|---|']
     for fam in sorted({k[0] for k in cells}, key=str):
         out.append(f'| {fam} | ' + ' | '.join(str(cells[(fam, c)]) for c in ('works', 'automates', 'metric_gain', 'tested_problem', 'claimed_only')) + ' |')
-    out += ['', 'Problems (tested / claimed only) by task family:', '']
+    out += ['', 'Problems (tested / controlled by design / claimed only) by task family:', '']
     for fam in sorted({k[0] for k in cells}, key=str):
         probs = sorted({k[1].split(':', 1)[1] for k in cells if k[0] == fam and ':' in k[1]})
-        out.append(f'- {fam}: ' + ', '.join(f'{x} {cells[(fam, "tested:" + x)]}/{cells[(fam, "claimed:" + x)]}' for x in probs))
+        out.append(f'- {fam}: ' + ', '.join(f'{x} {cells[(fam, "tested:" + x)]}/{cells[(fam, "design:" + x)]}/{cells[(fam, "claimed:" + x)]}' for x in probs))
     out += ['', '## Records with errors', ''] + (report or ['None.'])
     (folder / 'impact_report.md').write_text('\n'.join(out) + '\n')
     print('\n'.join(out))

@@ -1,0 +1,35 @@
+{
+ "citation_key": "artist2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "other:temporal_question_answering",
+   "automates": true,
+   "automation_evidence": {
+    "line": 16,
+    "quote": "During inference, the model actively acquires\ntask-relevant information instead of relying on\na static summary of the full sequence."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 24,
+    "quote": "ARTIST improves average accuracy by 6.46 absolute percentage points over the strongest baseline."
+   },
+   "practical_problems": [
+    {
+     "problem": "verifiability",
+     "modules": [
+      "artist2026:segment-selection"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 2992,
+      "quote": "the regions ARTIST’s controller selects can be compared to the regions XAI methods identify as important. We\nperform this comparison on two synthetic benchmarks from the TimeX suite with ground-truth masks:"
+     },
+     "note": "selected segments scored against ground-truth evidence masks (hit rate, coverage, sufficient-evidence rate) on FreqShape and SeqCombSingle"
+    }
+   ]
+  }
+ ],
+ "summary": "Trains an LLM to pick question-relevant temporal segments before answering; accuracy rises 6.46 points over the strongest baseline on six benchmarks, and selected segments are checked against ground-truth evidence masks on two synthetic sets.",
+ "confidence": "medium"
+}

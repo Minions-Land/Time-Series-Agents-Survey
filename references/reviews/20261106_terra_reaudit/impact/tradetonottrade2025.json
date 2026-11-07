@@ -1,0 +1,60 @@
+{
+ "citation_key": "tradetonottrade2025",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "data_augmentation_synthesis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 14,
+    "quote": "relying instead on sentiment- or trend-based analysis. We address this gap by developing an agentic system that uses LLMs to iteratively discover stochastic differential equations for financial time"
+   },
+   "metric_gain": false,
+   "metric_evidence": null,
+   "practical_problems": []
+  },
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 14,
+    "quote": "relying instead on sentiment- or trend-based analysis. We address this gap by developing an agentic system that uses LLMs to iteratively discover stochastic differential equations for financial time"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 1036,
+    "quote": "Table 2 shows our results for the tested LLMs. We see an average SR of 0.88 when trading with"
+   },
+   "practical_problems": [
+    {
+     "problem": "information_availability",
+     "modules": [
+      "tradetonottrade2025:risk-trading"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1014,
+      "quote": "evaluate this trading ability from 17th September 2024 to 24th April 2025. This was chosen to ensure"
+     },
+     "note": "Trading period chosen to lie outside the LLMs' training data to avoid memorized prices calibration: post-cutoff trading window without a leaky vs clean contrast.",
+     "by_design": true
+    },
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "tradetonottrade2025:risk-trading",
+      "tradetonottrade2025:stochastic-discovery"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 1036,
+      "quote": "Table 2 shows our results for the tested LLMs. We see an average SR of 0.88 when trading with"
+     },
+     "note": "Compares news-only context to news plus SDE-derived risk and trend metrics, scored on PnL, Sharpe ratio and max drawdown with transaction costs"
+    }
+   ]
+  }
+ ],
+ "summary": "An LLM builder-critic loop discovers SDEs whose risk metrics feed a daily trading agent; SDE models are recovered by most LLMs and the risk metrics lift average Sharpe from 0.88 to 1.40 in a post-training-cutoff backtest.",
+ "confidence": "medium"
+}

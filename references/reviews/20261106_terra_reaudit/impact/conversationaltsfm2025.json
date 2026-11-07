@@ -1,0 +1,18 @@
+{
+"citation_key":"conversationaltsfm2025",
+"primary_gain":"metric_gain",
+"tasks":[
+{"task":"forecasting_prediction","automates":true,
+ "automation_evidence":{"line":19,"quote":"The trained agent then engages in iterative, multi-turn conversations to perform forward-looking assessments, provide causallygrounded explanations for its weighting decisions, and adaptively refine the optimization strategy."},
+ "metric_gain":true,
+ "metric_evidence":{"line":524,"quote":"Our TSOrchestra achieves rank 7.3 on Mean Absolute Scaled Error (MASE) and 8.2 Continuous Ranked Probability Score (CRPS), outperforming all individual foundation models"},
+ "practical_problems":[
+  {"problem":"verifiability","modules":["conversationaltsfm2025:shap-faithfulness-validator","conversationaltsfm2025:ensemble-audit-reflection"],"tested":false,
+   "evidence":{"line":1734,"quote":"Example Faithfulness Analysis. For dataset ett1_short with three models:"},
+   "note":"SHAP-based faithfulness score trains and filters explanations; only one worked example is shown, with no aggregate faithfulness or reviewer evaluation"},
+  {"problem":"nonstationarity","modules":["conversationaltsfm2025:forecast-ensemble-control"],"tested":false,
+   "evidence":{"line":70,"quote":"first performs a forward-looking assessment, analyzing historical performance patterns to determine if current weight combinations will remain valid and to identify potential regime shifts."},
+   "note":"regime-shift assessment is part of the agent loop but no shift experiment is reported"}]}
+],
+"summary":"An R1-tuned LLM judge selects metrics, weights and stops an ensemble of forecasting foundation models and explains the weights; on GIFT-Eval it ranks above every single model, with ablations on agentic versus non-agentic selection, but explanation faithfulness is not evaluated.",
+"confidence":"medium"}

@@ -1,0 +1,48 @@
+{
+ "citation_key": "finanalyst2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 116,
+    "quote": "Each of our eight specialized agents consumes one data source: news (today’s bundle), 8-K filings"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 335,
+    "quote": "On TSLA, the multi-specialist LLM pipeline returns +13.51% against a −14.7% Buy-and-Hold"
+   },
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "finanalyst2026:specialist-trading"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 503,
+      "quote": "The ablation (Table 6) yields several findings. The Event (8-K) specialist is the most influential signal"
+     },
+     "note": "Ablation disables each source-specific specialist and reports the change in cumulative return and Sharpe"
+    },
+    {
+     "problem": "operational_deployment",
+     "modules": [
+      "finanalyst2026:specialist-trading",
+      "finanalyst2026:inference-cache"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 14,
+      "quote": "On the final official leaderboard (accessed 2026-07-05), Fin-Analyst ranks"
+     },
+     "note": "Live FinMMEval leaderboard run as a deployed service; interim versus final window rankings reversed"
+    }
+   ]
+  }
+ ],
+ "summary": "An eight-specialist LLM pipeline with a Meta-Agent (and a rule vote for BTC) makes daily trades; it ranks first on TSLA in the live window, an ablation shows 8-K events matter most, and BTC rules end flat.",
+ "confidence": "medium"
+}

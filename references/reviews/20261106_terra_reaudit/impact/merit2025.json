@@ -1,0 +1,30 @@
+{
+ "citation_key": "merit2025",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {"task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {"line": 17, "quote": "The core of our MERIT is to utilize three\nLLM agents to collaboratively generate positive views for time series data."},
+   "metric_gain": true,
+   "metric_evidence": {"line": 840, "quote": "We can observe that MERIT consistently outperforms all baseline methods across different prediction lengths"},
+   "practical_problems": []},
+  {"task": "data_augmentation_synthesis",
+   "automates": true,
+   "automation_evidence": {"line": 20, "quote": "an augmentation agent which automatically selects\nreliable augmentation strategies from an augmentation strategy library."},
+   "metric_gain": true,
+   "metric_evidence": {"line": 904, "quote": "MERIT w/o AUG performs\nmuch worse than the full model, indicating the\nimportance of dynamic augmentation strategy selection."},
+   "practical_problems": [
+    {"problem": "data_quality", "modules": ["merit2025:positive-views", "merit2025:augmentation-review-feedback"], "tested": true,
+     "evidence": {"line": 996, "quote": "Robustness Analysis to Noise. To evaluate the\nrobustness of the MERIT framework, we add different levels of noise to the input data in a time\nseries classification task"},
+     "note": "input-noise sweep (0 to 0.5) and label-flip sweep compare MERIT against baselines; the noise targeted is input corruption, not augmentation noise specifically"}
+   ]},
+  {"task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {"line": 17, "quote": "The core of our MERIT is to utilize three\nLLM agents to collaboratively generate positive views for time series data."},
+   "metric_gain": true,
+   "metric_evidence": {"line": 859, "quote": "MERIT achieves\nsuperior performance across both datasets from\nTable 5, particularly showing significant improvements in F1-score."},
+   "practical_problems": []}
+ ],
+ "summary": "Uses three LLM agents to pick and review augmentations for contrastive representation learning; gains on classification, imputation, forecasting and anomaly benchmarks, component ablations, and one input-noise robustness sweep.",
+ "confidence": "medium"
+}

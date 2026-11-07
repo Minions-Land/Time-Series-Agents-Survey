@@ -1,0 +1,18 @@
+{
+ "citation_key": "physiologicalagent2025",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {"task": "other:physiological_signal_estimation",
+   "automates": true,
+   "automation_evidence": {"line": 437, "quote": "it can automatically retrieve the relevant PPG signal and process it for HR estimation."},
+   "metric_gain": true,
+   "metric_evidence": {"line": 456, "quote": "our agent achieves the lowest error rates, with an MAE of 2.83, RMSE of 5.47, MAPE of 0.04, and MAD of 1.90."},
+   "practical_problems": [
+    {"problem": "data_quality", "modules": ["physiologicalagent2025:ppg-pipeline"], "tested": false,
+     "evidence": {"line": 331, "quote": "Signal quality assessment: This stage incorporates a well-established model [24] to distinguish clean PPG signals from noisy or artifact-affected segments."},
+     "note": "Quality assessment and GAN reconstruction target motion artifacts, but no ablation or noise sweep isolates them; only end-to-end agent vs GPT comparison."}
+   ]}
+ ],
+ "summary": "An orchestrator agent retrieves wearable PPG and runs a fixed processing pipeline for HR estimation, giving lower error than GPT-4o-mini and GPT-4o with code interpreter on 12 held-out participants.",
+ "confidence": "high"
+}

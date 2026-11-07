@@ -1,0 +1,57 @@
+{
+ "citation_key": "stride2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": false,
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 15,
+    "quote": "using cross-entropy and quantile losses. Evaluations demonstrate STRIDE establishes state-of-the-art"
+   },
+   "practical_problems": [
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "stride2026:latent-fusion",
+      "stride2026:reasoning-distillation"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 358,
+      "quote": "of our framework we perform in-domain and out-of-domain forecasting as well as reasoning quality"
+     },
+     "note": "in-domain vs out-of-domain TFRBench datasets, with in-domain training samples excluded"
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "stride2026:reasoning-distillation"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 759,
+      "quote": "We employ an LLM-as-a-Judge protocol to score the generated narratives across four critical"
+     },
+     "note": "LLM-as-a-Judge scores of generated reasoning on domain relevance, forecasting correctness, event relevance and logic-to-number consistency, in and out of domain; judge-based, no human reviewer calibration: LLM-judge scores of reasoning only"
+    },
+    {
+     "problem": "information_availability",
+     "modules": [
+      "stride2026:oracle-reasoning-corpus",
+      "stride2026:reasoning-distillation"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 74,
+      "quote": "a lightweight student LLM to generate high-quality analytical strategies using strictly historical"
+     },
+     "note": "future-aware oracle reasoning distilled into a history-only student; only a training-sample exclusion for leakage, no experiment on it"
+    }
+   ]
+  }
+ ],
+ "summary": "Distills LLM reasoning into a lightweight student whose latent state is injected into time series foundation models; it improves MASE/CRPS on GIFT-Eval and is evaluated out-of-domain and with an LLM-judged reasoning-quality protocol on TFRBench.",
+ "confidence": "medium"
+}

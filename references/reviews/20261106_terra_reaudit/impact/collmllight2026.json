@@ -1,0 +1,56 @@
+{
+ "citation_key": "collmllight2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "decision_support",
+   "automates": false,
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 799,
+    "quote": "However, in the New York dataset, which presents higher coordination complexity, CoLLMLight8B outperforms all baselines, achieving a 25.17% reduction in AWT"
+   },
+   "practical_problems": [
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "collmllight2026:simulation-sft",
+      "collmllight2026:policy-refinement"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 788,
+      "quote": "In the first experiment, all learning-based methods were trained on the synthetic traffic flow dataset, Syn-Train, and evaluated on seven real-world traffic flow datasets to assess their zero-shot performance."
+     },
+     "note": "Train on synthetic flow, evaluate zero-shot on seven real-world flow datasets; compares transfer against RL and LLM baselines."
+    },
+    {
+     "problem": "other",
+     "modules": [
+      "collmllight2026:complexity-routing"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1018,
+      "quote": "By utilizing reasoning strategies tailored to different traffic scenarios, our method outperforms the complex reasoning in most datasets while achieving significant efficiency improvements."
+     },
+     "note": "Real-time inference-latency obstacle: ablation of reasoning strategies reports travel time against total inference time. calibration: inference latency/efficiency is agent-internal, not a time series obstacle."
+    },
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "collmllight2026:policy-refinement"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 29,
+      "quote": "propose a fine-tuning strategy that leverages iterative simulationdriven data collection and environmental feedback to build a lightweight LLM tailored for cooperative TSC."
+     },
+     "note": "Environmental feedback on queue length after a delay is used for refinement; the stage ablation measures score, not the delayed-consequence obstacle."
+    }
+   ]
+  }
+ ],
+ "summary": "CoLLMLight replaces RL signal controllers with cooperative LLM agents using neighbor spatiotemporal context, complexity-aware reasoning depth and simulation-feedback tuning; it lowers travel and waiting time, including zero-shot transfer from synthetic to real flows and a cost-versus-latency ablation.",
+ "confidence": "medium"
+}

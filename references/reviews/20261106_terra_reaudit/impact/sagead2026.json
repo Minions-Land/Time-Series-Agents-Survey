@@ -1,0 +1,47 @@
+{
+ "citation_key": "sagead2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 29,
+    "quote": "A Supervisor then converts these structured records into analyst-facing"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 32,
+    "quote": "anomaly-type labels as in-context examples. Across three benchmarks, SAGE"
+   },
+   "practical_problems": [
+    {
+     "problem": "verifiability",
+     "modules": [
+      "sagead2026:anomaly-evidence"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 809,
+      "quote": "we conduct a methodblind human evaluation with 10 technically experienced evaluators on 25 samples and four methods."
+     },
+     "note": "Blind expert ratings of accuracy, validity, clarity and usefulness of the evidence-grounded diagnoses against three other methods"
+    },
+    {
+     "problem": "data_quality",
+     "modules": [
+      "sagead2026:synthetic-icl"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 804,
+      "quote": "Synthetic ICL also improves performance across all datasets, with the largest gain on"
+     },
+     "note": "Ablation removes label-free synthetic in-context examples built from normal segments, targeting scarce anomaly labels calibration: ablation of a whole module without a quality variable"
+    }
+   ]
+  }
+ ],
+ "summary": "Four family-specific analyzer agents with numerical tools and plots feed an evidence-grounded detector and report writer; it tops average Point-F1 on three benchmarks, and ablations plus a blind human study support the evidence and label-free ICL components.",
+ "confidence": "medium"
+}

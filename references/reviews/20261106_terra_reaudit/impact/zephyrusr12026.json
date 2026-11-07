@@ -1,0 +1,41 @@
+{
+ "citation_key": "zephyrusr12026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "other:time_series_reporting",
+   "automates": true,
+   "automation_evidence": {
+    "line": 21,
+    "quote": "Our framework optimizes this reward in a simulated tool-calling\nenvironment, enabling vision-language agents to gather and analyze forecast evidence across regions\nand lead times before producing a report."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 552,
+    "quote": "Zephyrus-R1 improves report quality under all three judges."
+   },
+   "practical_problems": [
+    {
+     "problem": "verifiability",
+     "modules": [
+      "zephyrusr12026:grounded-report-reward"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 310,
+      "quote": "Our key finding is that this report claim annotation is a difficult task even for domain experts, with significant inter-expert"
+     },
+     "note": "grounding gate and claim-entailment reward target factual, evidence-backed reports; the expert audit checks the LLM judges' claim labels (reward reliability), not whether agent reports are faithful, and no ablation of the gate is run"
+    }
+   ]
+  },
+  {
+   "task": "other:temporal_question_answering",
+   "automates": false,
+   "metric_gain": false,
+   "practical_problems": []
+  }
+ ],
+ "summary": "Two-stage RL (verifiable weather questions, then reports with a grounding-gated rubric and claim-entailment reward) improves report scores of 4B and 27B vision-language agents under three LLM judges; the expert audit validates the judges, so no practical problem is tested.",
+ "confidence": "medium"
+}

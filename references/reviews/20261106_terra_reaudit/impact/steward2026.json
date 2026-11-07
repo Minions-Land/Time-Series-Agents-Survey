@@ -1,0 +1,80 @@
+{
+ "citation_key": "steward2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 36,
+    "quote": "four analysts read news feeds, SEC filings, macroeconomic series\nand market data and emit typed reports"
+   },
+   "metric_gain": false,
+   "practical_problems": []
+  },
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 36,
+    "quote": "four analysts read news feeds, SEC filings, macroeconomic series\nand market data and emit typed reports, from which a Portfolio\nManager sets target positions"
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "steward2026:invariant-core"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 826,
+      "quote": "core alone over 2015–2026 (Table 11, Figure 6): its stops, caps, cashonly rule and breaker applied to LLM-free weekly entries on the"
+     },
+     "note": "LLM-free backtest of the risk core against 50 random entry policies and momentum entries; measures maximum drawdown at unchanged Sharpe"
+    },
+    {
+     "problem": "context_integration",
+     "modules": [
+      "steward2026:multiagent-pipeline",
+      "steward2026:graded-memory"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 705,
+      "quote": "per morning), the same input without any memory layer, and a\nsingle model that receives the raw data the analysts read and must\nanalyse and decide in one call."
+     },
+     "note": "replay of 20 mornings compares typed analyst reports plus memory, no memory, and a single model on raw data calibration: removes the Agent's own memory layer, not an exogenous source"
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "steward2026:multiagent-pipeline",
+      "steward2026:graded-memory"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 950,
+      "quote": "A deterministic audit of 750 recorded CoTs (Table 12) extracted 254,094 cited\nnumbers"
+     },
+     "note": "audit of whether numbers cited in stored reasoning exist in the agent input, with a placebo against another day's input"
+    },
+    {
+     "problem": "operational_deployment",
+     "modules": [
+      "steward2026:nightly-outcome-grading",
+      "steward2026:governed-evolution"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 453,
+      "quote": "Steward traded live from April 8 to September 10, 2026 (102 trading\ndays) on real-time Web data, in a brokerage paper account funded"
+     },
+     "note": "five-month live paper-trading deployment with logged cost and nightly grading; paper fills, one drawdown window"
+    }
+   ]
+  }
+ ],
+ "summary": "A multi-agent investing system with an invariant risk core, code-graded memory and gated prompt evolution is evaluated in a five-month live run, replay ablations, an LLM-free backtest, a prompt-injection red team and a grounding audit, which show contained drawdown and no followed injection but no outperformance claim.",
+ "confidence": "medium"
+}

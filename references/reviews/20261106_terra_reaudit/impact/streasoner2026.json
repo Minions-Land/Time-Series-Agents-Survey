@@ -1,0 +1,28 @@
+{
+ "citation_key": "streasoner2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {"task": "forecasting_prediction",
+   "automates": false,
+   "metric_gain": false,
+   "practical_problems": [
+    {"problem": "context_integration", "modules": ["streasoner2026:spatial-tslm", "streasoner2026:s-grpo"], "tested": true,
+     "evidence": {"line": 998, "quote": "Effect of Spatial Information Usage During RL.\nTo further examine whether S-GRPO improves the\nmodel’s ability to leverage spatial knowledge, we\nevaluate model checkpoints"},
+     "note": "graph structure on/off during RL, measured on the etiological reasoning task (gap grows from 0.5 to 6.2); the evaluated task is reasoning QA, not forecasting, where STReasoner is only comparable (2.6% difference)"},
+    {"problem": "nonstationarity", "modules": ["streasoner2026:spatial-tslm", "streasoner2026:sde-synthesis"], "tested": true,
+     "evidence": {"line": 768, "quote": "We evaluate STReasoner in a strict zero-shot setting, where no finetuning is performed on this dataset."},
+     "note": "synthetic-to-real transfer: trained only on synthetic data, evaluated zero-shot on a CausalRivers causal QA set; this is a causal QA test, not forecasting"}
+   ]},
+  {"task": "data_augmentation_synthesis",
+   "automates": true,
+   "automation_evidence": {"line": 223, "quote": "Network SDEs-based multi-agent spatiotemporal data synthesis pipeline."},
+   "metric_gain": false,
+   "practical_problems": [
+    {"problem": "verifiability", "modules": ["streasoner2026:sde-synthesis"], "tested": true,
+     "evidence": {"line": 1685, "quote": "To validate the usefulness of the generated data\npairs and assess whether the textual descriptions are\naccurately aligned with the corresponding spatiotemporal data"},
+     "note": "human labeling of 1,200 synthetic data-text pairs for alignment (1,064 high quality, 136 low quality retained out)"}
+   ]}
+ ],
+ "summary": "Synthesizes graph-coupled time series with an SDE multi-agent pipeline and trains a TS-LM for spatio-temporal reasoning; gains are on a self-built reasoning benchmark with comparable forecasting, and a spatial-input study and a zero-shot real-data QA test probe context and transfer.",
+ "confidence": "medium"
+}

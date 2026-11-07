@@ -1,0 +1,9 @@
+{"citation_key":"feta2025","primary_gain":"metric_gain",
+"tasks":[{"task":"other:time_series_classification",
+"automates":true,"automation_evidence":{"line":12,"quote":"FETA decomposes a multivariate series into channel-wise subproblems, retrieves a few structurally similar labeled examples for each channel, and leverages a reasoning LLM to"},
+"metric_gain":true,"metric_evidence":{"line":531,"quote":"FETA (Qwen3) achieves the best average accuracy at 47.3%, surpassing strong classical (WEASEL+MUSE 43.7%),"},
+"practical_problems":[
+{"problem":"data_quality","modules":["feta2025:example-retriever"],"tested":false,"evidence":{"line":9,"quote":"labeled data are often scarce, making task-specific training costly"},"note":"scarce labels motivate training-free exemplar reasoning; no experiment varies label count, only standard UEA splits and component ablations"},
+{"problem":"verifiability","modules":["feta2025:channel-reasoner","feta2025:channel-classification"],"tested":false,"evidence":{"line":553,"quote":"Requiring the LLM to output a calibrated confidence per channel and aggregating via confidence-weighted fusion"},"note":"interpretability claimed via exemplar grounding and confidence; no faithfulness or review study, ablation measures accuracy only"}]}],
+"summary":"FETA replaces trained classifiers with a training-free multi-agent pipeline and reaches higher average accuracy on nine UEA datasets; ablations show accuracy contributions of each component, with no test of scarcity or interpretability.",
+"confidence":"high"}

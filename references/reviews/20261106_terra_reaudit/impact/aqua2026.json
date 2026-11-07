@@ -1,0 +1,90 @@
+{
+ "citation_key": "aqua2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 9,
+    "quote": "whether an autonomous system can use evidence from earlier experiments to improve the hypotheses and candidates proposed in later iterations."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 67,
+    "quote": "On US equities, Part II reaches a per-stock information coefficient of +0.0843, versus +0.0613 for the strongest baseline, a GRU, under the same evaluator"
+   },
+   "practical_problems": [
+    {
+     "problem": "information_availability",
+     "modules": [
+      "aqua2026:sealed-search",
+      "aqua2026:causal-factor-grammar"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 557,
+      "quote": "of +2.15 before the volatility overlay and +2.50 after it, and a fully causal walk-forward that chooses every parameter from past data alone still reaches +2.0."
+     },
+     "note": "Leakage is prevented by construction (sealed data path, causal operators); the only experiment is a fully causal walk-forward that selects all strategy parameters from past data, a leakage-controlled check. No leaky-versus-sealed comparison or injected-leak test is reported. calibration: leakage prevented by construction; causal walk-forward without leaky contrast.",
+     "by_design": true
+    },
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "aqua2026:hybrid-ts-predictor",
+      "aqua2026:threshold-strategy"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 558,
+      "quote": "Table 4 breaks the Sharpe down by year. It is positive in every year from 2021 to 2025, including the held-out years and the 2022 drawdown,"
+     },
+     "note": "Held-out Sharpe reported per calendar year, including the 2022 drawdown, to show performance is not concentrated in one regime; Part I regime-aware selection has no regime experiment."
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "aqua2026:falsifiable-proposal",
+      "aqua2026:factor-falsification-evaluator"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 209,
+      "quote": "Before assembling the expression, the agent states each factor as a falsifiable proposal, with"
+     },
+     "note": "Falsifiable proposals and controlled event-window tests gate factors, but only illustrative iteration records are shown; no experiment isolates their effect."
+    }
+   ]
+  },
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 62,
+    "quote": "multi-agent pipeline that proposes falsifiable economic hypotheses, evaluates factors, combines"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 519,
+    "quote": "ending well above a Nasdaq-100 buy-and-hold benchmark over the same period without"
+   },
+   "practical_problems": [
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "aqua2026:threshold-strategy"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 525,
+      "quote": "Two construction steps lift the held-out"
+     },
+     "note": "Strategy returns are scored as Sharpe under a 2 bp two-leg turnover cost, and the construction steps (sector neutralization, causal volatility overlay) are compared step by step; simulated only, not live."
+    }
+   ]
+  }
+ ],
+ "summary": "AQuA runs sealed-sandbox LLM research loops that discover factors and train a hybrid return model, reaching a higher held-out IC than a GRU and a cost-aware long/short Sharpe positive in every year; leakage is controlled by design and probed only by a causal walk-forward, and results are simulated, not live.",
+ "confidence": "medium"
+}

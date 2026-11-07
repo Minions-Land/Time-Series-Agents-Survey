@@ -1,0 +1,63 @@
+{
+ "citation_key": "aion2026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 11,
+    "quote": "series harness built from six component groups: agents, skills, rules, memory, evaluation, and protocols. In"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 784,
+    "quote": "The best result is the recent-week median baseline with RMSLE = 0.4352, while Direct Build commits early to a LightGBM path and scores 1.6811"
+   },
+   "practical_problems": [
+    {
+     "problem": "information_availability",
+     "modules": [
+      "aion2026:validation",
+      "aion2026:grounding"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 764,
+      "quote": "The clearest example appears in the execution trace around a baseline that uses the corresponding weekday from the previous week. The trace records that a one-week lag is directly"
+     },
+     "note": "single Kaggle case: harnessed run checks the forecast horizon against history and invalidates a lag strategy that would read the hidden window, while Direct Build run has no explicit boundary check; n=1 trace comparison calibration: single n=1 trace comparison, no measured leakage rate.",
+     "by_design": true
+    },
+    {
+     "problem": "context_integration",
+     "modules": [
+      "aion2026:memory",
+      "aion2026:grounding"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 773,
+      "quote": "Knowledge-Grounded Reasoning Before Strategy Commitment"
+     },
+     "note": "external evidence expansion before strategy commitment; observed in one trace, not ablated"
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "aion2026:evaluation",
+      "aion2026:lifecycle"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 735,
+      "quote": "The harnessed execution runs for 47.9 minutes, modifies 9 files, and goes through 3 critique rounds with 3 review interruptions."
+     },
+     "note": "critique rounds and review blocks counted for one run; output correctness or reviewer value not tested"
+    }
+   ]
+  }
+ ],
+ "summary": "A governed harness adds temporal-boundary checks, evidence expansion and review to a coding agent; one Kaggle case shows it catching a future-lag strategy and reaching RMSLE 0.4352 versus 1.6811 for a direct build, but the evidence is a single paired run.",
+ "confidence": "low"
+}

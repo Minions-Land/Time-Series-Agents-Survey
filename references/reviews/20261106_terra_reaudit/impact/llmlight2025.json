@@ -1,0 +1,24 @@
+{
+  "citation_key": "llmlight2025",
+  "primary_gain": "practical_problem",
+  "tasks": [
+    {"task": "decision_support",
+     "automates": false,
+     "automation_evidence": null,
+     "metric_gain": true,
+     "metric_evidence": {"line": 1013, "quote": "Extensive experiments on ten traffic datasets show that LLMLight with LightGPT significantly outperforms nine baseline methods"},
+     "practical_problems": [
+       {"problem": "nonstationarity", "modules": ["llmlight2025:traffic-controller", "llmlight2025:lightgpt-training"], "tested": true,
+        "evidence": {"line": 899, "quote": "4.7.1 Transferability. We first study the transferability ability of different methods by implementing the pre-trained model in another distinct road network."},
+        "note": "transfer to an unseen road network, scaling to larger networks, and a fourfold extreme high-traffic scenario absent from training, against RL baselines whose performance declines"},
+       {"problem": "verifiability", "modules": ["llmlight2025:traffic-controller"], "tested": true,
+        "evidence": {"line": 961, "quote": "We conduct a human expert evaluation of LLMLight across five randomly selected traffic scenarios to assess its reasoning and"},
+        "note": "per-decision rationales checked by traffic police, drivers and AI specialists plus one worked case; small qualitative study, not a faithfulness metric"},
+       {"problem": "operational_deployment", "modules": ["llmlight2025:lightgpt-training"], "tested": false,
+        "evidence": {"line": 961, "quote": "We are partnering with the Institute of Deep Perception Technology2 in China to deploy LLMLight in real-world transportation systems3 ."},
+        "note": "prototype and deployment-cost analysis; no report of operation under production traffic"}
+     ]}
+  ],
+  "summary": "LLMLight prompts an LLM (and the distilled LightGPT) to choose signal phases from traffic observations with rationales, beating RL and LLM baselines on ten datasets, and its evaluation includes transfer, scaling and extreme-traffic tests plus a small expert review of its reasoning.",
+  "confidence": "medium"
+}

@@ -1,0 +1,59 @@
+{
+ "citation_key": "epiworld2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": false,
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 589,
+    "quote": "Table 1 shows world-model performance. EpiWorld outperforms all baselines on OOD PeakMAE across the three datasets"
+   },
+   "practical_problems": [
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "epiworld2026:action-conditioned-world-model"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 1034,
+      "quote": "world model is trained on Dec 2020 – Sep 2021\n(Alpha and Delta waves) and evaluated on the heldout Jan 2022 Omicron wave plus eight subsequent\nweeks, giving a temporal-OOD setting."
+     },
+     "note": "temporal, state-wise and intervention-OOD splits plus a world-model component ablation"
+    }
+   ]
+  },
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 83,
+    "quote": "Conditioned on this context, the actor generates interventions and explicit reasoning traces over the current"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 557,
+    "quote": "Table 2: Policy optimisation performance over 8-week rollouts, reported as cumulative hospitalisation reduction\nagainst the reference historical policy (lower is better)."
+   },
+   "practical_problems": [
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "epiworld2026:action-conditioned-world-model",
+      "epiworld2026:tiered-skill-library"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 1970,
+      "quote": "Removing the LLM roughly halves the reduction\nwhile the mean intervention intensity is essentially\nunchanged (0.485 against ≈ 0.50)"
+     },
+     "note": "policy outcomes from counterfactual rollouts under interventions, with a no-LLM ablation and intervention-OOD split; simulator-based, not real deployment"
+    }
+   ]
+  }
+ ],
+ "summary": "An action-conditioned world model grounds an LLM policy actor with protocol constraints and lessons; it improves OOD peak forecasting and simulated hospitalisation reduction over RL and control baselines, with OOD splits and an LLM ablation.",
+ "confidence": "high"
+}

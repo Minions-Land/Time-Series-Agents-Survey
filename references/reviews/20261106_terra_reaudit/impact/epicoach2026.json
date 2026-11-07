@@ -1,0 +1,80 @@
+{
+ "citation_key": "epicoach2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 962,
+    "quote": "H1–H5 were pre-specified; H6–H11 were registered by the agent during the live cycles."
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "information_availability",
+     "modules": [
+      "epicoach2026:sealed-prediction-registry",
+      "epicoach2026:rolling-origin-replay"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 646,
+      "quote": "The twin is refit once per week, after all of that week’s predictions have been scored and before the next are sealed, so no prediction is ever made by a model that has seen the ride it predicts."
+     },
+     "note": "prospective phase seals predictions before each ride and scores them (20 sealed, 14 scored); a protocol, no variant without sealing calibration: sealing protocol without a contrast variant.",
+     "by_design": true
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "epicoach2026:sealed-prediction-registry"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 825,
+      "quote": "The no-registry ablation is indistinguishable. I7 reduced"
+     },
+     "note": "ablation of identifiability gate and registry at 60 origins; the gate cut duplicate hypotheses (62 to 40) and demoted premature verdicts, but forecast accuracy did not improve"
+    },
+    {
+     "problem": "operational_deployment",
+     "modules": [
+      "epicoach2026:wrist-digital-twin"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 834,
+      "quote": "e) Prospective phase: three weeks.: Figure 8 shows"
+     },
+     "note": "live three-week cycle with one real athlete; the twin did not meet its pre-specified standard on climb time"
+    }
+   ]
+  },
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 75,
+    "quote": "The agent prescribes the next training week as a constrained"
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "epicoach2026:information-directed-design"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 84,
+      "quote": "pessimistic as the athlete improved, and the safety officer vetoed the agent twice."
+     },
+     "note": "safety-constrained workout design run live; the safety officer vetoed the agent twice; no ablation of the constraints or utility measure calibration: live decision metrics but no ablation or variation of constraints or utility."
+    }
+   ]
+  }
+ ],
+ "summary": "EpiCoach lets an agent register falsifiable hypotheses and prescribe safety-gated training experiments; replay shows the agentic loop matches a static twin, and a three-week live phase reports sealed-prediction calibration and vetoes rather than an accuracy gain.",
+ "confidence": "medium"
+}

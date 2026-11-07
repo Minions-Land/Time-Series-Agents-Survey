@@ -1,0 +1,48 @@
+{
+ "citation_key": "timecap2025",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 256,
+    "quote": "The first agent, AC , generates a textual summary sx that contains the underlying context of the"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 746,
+    "quote": "Table 2 presents the performance of T IME CAP, T IME CP, and their competitors across all datasets."
+   },
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "timecap2025:dual-agent-prompts",
+      "timecap2025:multimodal-encoder"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 769,
+      "quote": "Input Augmentation. Our multi-modal encoder, which"
+     },
+     "note": "Ablation (2) in Table 3 compares the text-plus-series encoder with a series-only variant, and (1) compares contextualization with PromptCast"
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "timecap2025:dual-agent-prompts"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 461,
+      "quote": "Interpreting the Predictions"
+     },
+     "note": "Implicit and explicit interpretations are shown only in a qualitative case study; no faithfulness or reviewer measurement"
+    }
+   ]
+  }
+ ],
+ "summary": "Two LLM agents summarize series context and predict events, fused with a multimodal encoder; it improves F1 and AUROC on seven datasets, and ablations show the generated text context and retrieved examples contribute.",
+ "confidence": "medium"
+}

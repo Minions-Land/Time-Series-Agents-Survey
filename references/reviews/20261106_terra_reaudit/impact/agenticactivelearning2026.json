@@ -1,0 +1,47 @@
+{
+ "citation_key": "agenticactivelearning2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 16,
+    "quote": "present an active learning framework for detecting anomalies in samples of periodic variable stars,\nwith the vetting delegated to multimodal large language model agents."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 27,
+    "quote": "At the same labeling budget, the initial ranking would have recovered only 30% of our catalog,"
+   },
+   "practical_problems": [
+    {
+     "problem": "verifiability",
+     "modules": [
+      "agenticactivelearning2026:consensus-review"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 1141,
+      "quote": "therefore increased the purity of the anomaly sample\n(fraction passing our inspection) by a factor of ∼2."
+     },
+     "note": "five-agent majority review demoted 23 of 43 single-agent anomalies; authors manually inspected demoted and surviving sources and measured purity"
+    },
+    {
+     "problem": "data_quality",
+     "modules": [
+      "agenticactivelearning2026:light-curve-interface"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 211,
+      "quote": "We applied quality cuts to remove sparsely observed\nand noise-dominated sources with fewer than 50 observations or magnitude ranges ∆m > 15 mag,"
+     },
+     "note": "artifact false positives and quality cuts are handled by prompts and filters; no experiment varies noise or sampling"
+    }
+   ]
+  }
+ ],
+ "summary": "Delegates anomaly vetting of 373,646 ASAS-SN light curves to Gemini agents inside an active learning loop; it recovers more of the catalog than the initial ranking at equal budget, and the consensus review roughly doubles sample purity by the authors' own inspection.",
+ "confidence": "medium"
+}

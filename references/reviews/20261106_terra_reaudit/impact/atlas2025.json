@@ -1,0 +1,62 @@
+{
+ "citation_key": "atlas2025",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 17,
+    "quote": "LLM AgentS), a unified agentic framework for"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 544,
+    "quote": "The results show that AdaptiveOPRO consistently improves upon fixed prompts"
+   },
+   "practical_problems": [
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "atlas2025:adaptive-opro"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 557,
+      "quote": "magnitude scales with the slack left by the tuned baseline, which is largest under volatile conditions and narrowest in already-favorable regimes."
+     },
+     "note": "separate bullish, bearish-volatile and sideways regime scenarios; Adaptive-OPRO gain over baseline and reflection reported per regime"
+    },
+    {
+     "problem": "context_integration",
+     "modules": [
+      "atlas2025:market-analyst",
+      "atlas2025:news-analyst",
+      "atlas2025:fundamental-analyst"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 1126,
+      "quote": "Table 4 shows distinct agent contributions through"
+     },
+     "note": "ablation removing each analyst across regimes; removing the Market Analyst hurts most, while ROI slightly improves without market data in the bullish regime"
+    },
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "atlas2025:adaptive-opro",
+      "atlas2025:trading-execution"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 462,
+      "quote": "latency, slippage, market impact, and intraday partial fills, and assume deterministic execution."
+     },
+     "note": "targets delayed noisy trading feedback, but the delay is not varied and execution costs are abstracted away; only return, Sharpe and drawdown are reported"
+    }
+   ]
+  }
+ ],
+ "summary": "A multi-analyst LLM trading agent with windowed prompt optimization on delayed feedback; across regime-specific equity scenarios Adaptive-OPRO beats static and reflection prompts, with the gain largest in volatile regimes, and an analyst ablation shows which context matters.",
+ "confidence": "medium"
+}

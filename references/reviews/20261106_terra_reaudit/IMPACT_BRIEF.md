@@ -50,3 +50,28 @@ tests that it does. Your job is to code this from the source, conservatively.
 6. Run `python3 check_impact.py impact/<key>.json` and fix the record until it prints `OK`.
 7. Write only `impact/<key>.json` for your keys. No network.
 8. Final message: one line per key, in the form `key: primary_gain; tested problems; untested problems`.
+
+## Calibration pass (uniform test rule)
+
+The first pass was coded in 19 batches, and the batches read "tested" differently. A second pass applies one rule to
+every item marked `tested: true`. An item stays tested only if the paper reports a result in which the obstacle itself
+is the quantity that is varied or measured.
+
+| Problem | Tested | Not tested (set `tested: false`) |
+|---|---|---|
+| information_availability | leaky vs clean, an ablation of the cutoff guard, or a measured leakage or foreknowledge rate | a post-cutoff test window, point-in-time replay or chronological split used without a contrast: set `by_design: true` |
+| nonstationarity | a held-out domain, regime or period reported separately (OOD set, zero-shot cross-dataset, per-regime results) | a plain chronological split |
+| data_quality | a sweep or controlled injection of missing values, noise or scarcity, or few-shot vs full data | a fixed preprocessing step, or an ablation of a whole module without a quality variable |
+| context_integration | an ablation that removes an exogenous context source (text, news, events, documents, other modalities) | removing the Agent's own outputs, memory of its own runs, or same-modality retrieved series |
+| decision_consequence | decision-level outcomes (return, cost, risk, utility) together with an ablation of the mechanism that handles them, or a variation of costs or constraints | decision metrics against baselines only: that is `metric_gain` |
+| verifiability | human or expert evaluation, faithfulness against ground-truth evidence, or a verifier ablation measured on unsupported claims or hallucination | LLM-judge scores of reasoning quality alone, or a case study |
+| operational_deployment | a real deployment, live run, A/B test or study with field users | latency or cost measurements alone |
+| other | a time series obstacle that meets the same standard | agent-internal issues (exploration, tool priors, prompt injection) |
+
+After the items are re-coded, recompute `primary_gain`:
+1. `measurement` stays for benchmarks and resources.
+2. Otherwise use `practical_problem` if any tested item remains.
+3. Otherwise use `metric_gain` if any task entry has it.
+4. Otherwise use `automation`.
+
+Each record must still pass `check_impact.py`.

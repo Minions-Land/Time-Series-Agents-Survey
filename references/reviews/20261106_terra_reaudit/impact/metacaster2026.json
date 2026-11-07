@@ -1,0 +1,24 @@
+{"citation_key":"metacaster2026","primary_gain":"practical_problem",
+"tasks":[
+{"task":"forecasting_prediction",
+"automates":true,"automation_evidence":{"line":22,"quote":"MetaCaster, a metaharness-optimized multi-agent framework that\nuses agentic data generation to automatically\ntrain specialized lightweight forecasters"},
+"metric_gain":true,"metric_evidence":{"line":1055,"quote":"(1) M ETAC ASTER outperforms the generation/augmentation baselines in most cases, demonstrating the benefit of optimizing data generation"},
+"practical_problems":[
+{"problem":"data_quality","modules":["metacaster2026:generation","metacaster2026:forecaster-training","metacaster2026:harness-optimization"],"tested":true,
+"evidence":{"line":1056,"quote":"(2) M ETAC ASTER’s performance\nimproves with larger K, showing effective fewshot utilization; (3) When K ≥ 30, M ETAC ASTER\napproaches or even surpasses Dtrm"},
+"note":"Few-shot support-set size K swept from 10 to 100 against the full-data upper reference on 18 datasets."},
+{"problem":"nonstationarity","modules":["metacaster2026:generation","metacaster2026:harness-optimization"],"tested":true,
+"evidence":{"line":987,"quote":"test corpus (7 datasets), and an out-of-domain\n(OOD) test corpus (3 datasets). The IND corpus\nshares domains with Char , while the OOD corpus\ncovers unseen domains"},
+"note":"Separates in-domain and out-of-domain test corpora, disjoint from the harness-optimization corpus."},
+{"problem":"context_integration","modules":["metacaster2026:generation"],"tested":true,
+"evidence":{"line":1093,"quote":"Table 2(b) shows that contextual cues Cm\nare crucial, as they guide MG AGENT in selecting\ndomain-relevant knowledge for generating time se-"},
+"note":"Ablation removing the textual context C_m from the data-generation agent."}]},
+{"task":"data_augmentation_synthesis",
+"automates":true,"automation_evidence":{"line":22,"quote":"MetaCaster, a metaharness-optimized multi-agent framework that\nuses agentic data generation to automatically\ntrain specialized lightweight forecasters"},
+"metric_gain":true,"metric_evidence":{"line":1055,"quote":"(1) M ETAC ASTER outperforms the generation/augmentation baselines in most cases, demonstrating the benefit of optimizing data generation"},
+"practical_problems":[
+{"problem":"data_quality","modules":["metacaster2026:generation"],"tested":true,
+"evidence":{"line":1056,"quote":"(2) M ETAC ASTER’s performance\nimproves with larger K, showing effective fewshot utilization; (3) When K ≥ 30, M ETAC ASTER\napproaches or even surpasses Dtrm"},
+"note":"Generated series from K few-shot examples are judged by the downstream forecaster, with K swept and compared to real full data."}]}],
+"summary":"Agents generate few-shot synthetic training series and train lightweight forecasters, improving on generation and augmentation baselines; K sweeps, out-of-domain corpora and a context ablation test scarcity, domain shift and context use.",
+"confidence":"high"}

@@ -1,0 +1,48 @@
+{
+ "citation_key": "tessa2024",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 16,
+    "quote": "we propose TESSA, a multi-agent system designed to automatically generate both general and domain-specific annotations for time series"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 644,
+    "quote": "TESSA achieves the best performance among all compared methods, demonstrating its effectiveness in generating high-quality general annotations."
+   },
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "tessa2024:general-annotation",
+      "tessa2024:source-text-features"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 641,
+      "quote": "(1) No-Text shows the worst performance across all datasets, validating the need for annotations to improve performance in downstream tasks."
+     },
+     "note": "Forecasting with an Informer model is run with no text, baseline text and TESSA annotations; the No-Text arm removes the text context."
+    },
+    {
+     "problem": "data_quality",
+     "modules": [
+      "tessa2024:annotation-review"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 24,
+      "quote": "utilizes limited annotations from the target domain to learn domain-specific terminology and"
+     },
+     "note": "Scarce target-domain annotations motivate the term extractor; no experiment varies the number of target annotations."
+    }
+   ]
+  }
+ ],
+ "summary": "TESSA automates general and domain-specific time series annotation with feature selection, source-domain text transfer and a reviewer; adding its annotations lowers downstream forecasting error over no-text and LLM baselines, while annotation quality is mostly LLM-judged.",
+ "confidence": "medium"
+}

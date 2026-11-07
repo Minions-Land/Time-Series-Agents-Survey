@@ -1,0 +1,45 @@
+{
+ "citation_key": "tsagent2025",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 17,
+    "quote": "evidence-driven agentic process: (1) it alternates\nbetween thinking, tool execution, and observation\nin a ReAct-style loop"
+   },
+   "metric_gain": false,
+   "practical_problems": []
+  },
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 17,
+    "quote": "evidence-driven agentic process: (1) it alternates\nbetween thinking, tool execution, and observation\nin a ReAct-style loop"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 434,
+    "quote": "it significantly outperforms the baseline\non seasonality, anomalies, and structural break classification tasks which requires more detailed analysis of local"
+   },
+   "practical_problems": [
+    {
+     "problem": "verifiability",
+     "modules": [
+      "tsagent2025:intent-evidence-gate"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 715,
+      "quote": "Removing the final answer verification also reduces accuracy, with a larger impact on the reasoning benchmarks."
+     },
+     "note": "the gate is ablated for accuracy and iteration count; unsupported answers and leakage are inferred, not measured, and no faithfulness or no-series test is run"
+    }
+   ]
+  }
+ ],
+ "summary": "A ReAct-style agent computes evidence with raw-series tools and gates answers on it; it matches or beats text, vision and TS-language-model baselines on time series QA benchmarks, with ablations lowering accuracy, but no forecasting score or leakage test is reported.",
+ "confidence": "medium"
+}

@@ -1,0 +1,47 @@
+{
+ "citation_key": "neuroagentic2026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 52,
+    "quote": "The Neuro-Agentic Loop is designed to autonomously identify new risks, develop counterfactual control strategies, and reject risky or hallucinatory"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 806,
+    "quote": "The Neuro-Agentic model succeeded in preventing breach in five of 15 trials (33.3%), which is between 26.7% (4/15) of LSTM and 13.3% (2/15) of TCN."
+   },
+   "practical_problems": [
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "neuroagentic2026:counterfactual-control"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 788,
+      "quote": "Sudden spike attacks accounted for five trials and consistently triggered active mitigation strategies. In this category, the risk reduction values were"
+     },
+     "note": "measures risk reduction and breach prevention of counterfactually simulated control actions per attack type on SWaT, against passive forecast and LSTM/TCN under the same scaffolding calibration: decision metrics against baselines only (metric_gain)"
+    },
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "neuroagentic2026:risk-based-rejection"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 803,
+      "quote": "No hallucinated action was ever executed (column “Hallucinated Action Executed” in Table III is False for all trials)."
+     },
+     "note": "counts rejected unsafe LLM actions and executed hallucinated actions over 15 trials; no ablation without the filter calibration: decision metrics against baselines only (metric_gain)"
+    }
+   ]
+  }
+ ],
+ "summary": "An LLM planner proposes control actions that a TimesFM counterfactual and risk filter vet; on 15 SWaT attack trials it prevents 5 breaches versus 4 (LSTM) and 2 (TCN) and executes no unsafe action, though without a filter-off ablation.",
+ "confidence": "medium"
+}

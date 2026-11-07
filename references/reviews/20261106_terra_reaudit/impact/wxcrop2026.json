@@ -1,0 +1,54 @@
+{
+ "citation_key": "wxcrop2026",
+ "primary_gain": "automation",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 102,
+    "quote": "It must be usable by agencies, growers and specialists alike without technical preparation, so that plain-language requests replace manual data assembly."
+   },
+   "metric_gain": false,
+   "practical_problems": []
+  },
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 102,
+    "quote": "It must be usable by agencies, growers and specialists alike without technical preparation, so that plain-language requests replace manual data assembly."
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "wxcrop2026:payout-calibrated-loss",
+      "wxcrop2026:crop-vulnerability"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 437,
+      "quote": "The probability of a payout is calibrated. In 1,660 storm county-months the Brier score was 0.177 against 0.224 for the historical frequency"
+     },
+     "note": "Loss and payout probability are checked against insured-loss records in held-out years and against independent production records, i.e. consequences in crop value rather than weather accuracy. calibration: decision metrics against baselines only, no mechanism ablation or cost variation."
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "wxcrop2026:receipt-grounded-tools"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1519,
+      "quote": "The platform runs the tools and records each result as a receipt that holds the value, its unit, the data version and the filters applied."
+     },
+     "note": "Source receipts make each number traceable, but no experiment measures faithfulness or user review of receipts."
+    }
+   ]
+  }
+ ],
+ "summary": "A tool-grounded agent turns dated weather evidence into hazard tiers and calibrated crop-loss estimates with source receipts; evaluation checks hazard indices and loss against insurance and independent records rather than against agent baselines.",
+ "confidence": "medium"
+}

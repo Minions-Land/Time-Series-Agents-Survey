@@ -1,0 +1,55 @@
+{
+ "citation_key": "timer12025",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": false,
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 835,
+    "quote": "Experimental results show this approach not only improves forecasting\nperformance but also enhances generalization under zero-shot and"
+   },
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "timer12025:forecast-template"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 1009,
+      "quote": "Models without timestamp information struggle to capture\nlong-range dependencies, while those lacking contextual guidance\noften produce logically inconsistent outputs."
+     },
+     "note": "Table 4 removes timestamps and domain context from the training template on ETTh1, ETTm2 and Wind"
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "timer12025:grip-forecast-reasoner"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1100,
+      "quote": "To test whether reasoning content affects prediction, we construct two reasoning-perturbation settings at inference time."
+     },
+     "note": "No Think, Shuffled Think and Corrupted Think interventions test whether the generated reasoning is tied to the forecast calibration: reasoning perturbation is not human, ground-truth faithfulness or verifier ablation."
+    },
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "timer12025:grip-forecast-reasoner"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 52,
+      "quote": "undermining adaptability to evolving temporal dynamics."
+     },
+     "note": "out-of-distribution generalization is claimed, but no dedicated shift or held-out-domain experiment appears in the source"
+    }
+   ]
+  }
+ ],
+ "summary": "Trains an LLM with SFT warmup and GRIP reinforcement fine-tuning to reason before forecasting; it improves MSE on nine datasets, and ablations test template context and whether the reasoning actually drives the forecast.",
+ "confidence": "medium"
+}

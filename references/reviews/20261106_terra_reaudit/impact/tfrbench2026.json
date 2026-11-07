@@ -1,0 +1,56 @@
+{
+ "citation_key": "tfrbench2026",
+ "primary_gain": "measurement",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 11,
+    "quote": "we propose a systematic multi-agent framework that utilizes an iterative verification loop to synthesize numerically grounded reasoning traces."
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "tfrbench2026:windowed-event-retrieval"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 803,
+      "quote": "Impact of event forecasting on performance. Our experiments show that augmenting reasoning\nwith external search for 𝑋ℎ𝑖𝑠𝑡 and event forecasting for future horizon improves forecasting performance"
+     },
+     "note": "same models run with and without retrieved events; Electricity MASE falls 2.853 to 1.327 but event-aware reasoning hurts Web/CloudOps (Bitbrains 1.123 to 5.460)"
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "tfrbench2026:reasoning-reference",
+      "tfrbench2026:trace-refinement"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 910,
+      "quote": "Robustness. Additionally, we conduct a robustness analysis of the LLM-as-a-Judge (App. E), which\ndemonstrates a high correlation between independent judge scores"
+     },
+     "note": "judge agreement and a comparison against a human expert panel (70.4% Pearson), plus reasoning-quality versus MASE analysis calibration: LLM-judge reasoning scores; judge agreement is not faithfulness of the agent."
+    },
+    {
+     "problem": "information_availability",
+     "modules": [
+      "tfrbench2026:windowed-event-retrieval"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 415,
+      "quote": "Data Integrity and Leakage Prevention. We explicitly distinguish the role of ground truth (𝑌 )\nand future events/context across Data Creation Phase and Evaluation Phase."
+     },
+     "note": "oracle future events are used only to build references and evaluated models see only history; this is a protocol design with no leakage-varying experiment"
+    }
+   ]
+  }
+ ],
+ "summary": "Provides a reasoning-aware forecasting benchmark whose reference traces come from a search-and-verify multi-agent loop; paired runs show event context helps in energy and traffic but hurts in cloud workloads, and the judge is checked against human experts.",
+ "confidence": "medium"
+}

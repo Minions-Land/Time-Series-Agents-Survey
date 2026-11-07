@@ -1,0 +1,49 @@
+{
+ "citation_key": "fincon2024",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 759,
+    "quote": "This communication method channels financial data from multiple sources to specialized analyst agents, who distill it into key investment insights."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 594,
+    "quote": "our results show that F IN C ON outperforms both the Markowitz MV portfolio and F IN RL as well as the market baseline"
+   },
+   "practical_problems": [
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "fincon2024:risk-aware-portfolio",
+      "fincon2024:verbal-reinforcement"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 651,
+      "quote": "In response to RQ2 and RQ3, we conduct a comprehensive evaluation of our unique risk control component through two ablation studies."
+     },
+     "note": "with versus without daily CVaR risk control (Table 4) and with versus without PnL-driven belief updates (Table 5), on cumulative return, Sharpe ratio and max drawdown in bullish, bearish and mixed markets"
+    },
+    {
+     "problem": "context_integration",
+     "modules": [
+      "fincon2024:manager-analyst",
+      "fincon2024:time-aware-memory"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 326,
+      "quote": "We construct a market environment representation using real-world financial data, including stock prices, daily news, company filings (Form 10-Q, Form 10-K, etc.), and"
+     },
+     "note": "multi-source text, filings and audio routed by timeliness; only compared with other agents end to end, no modality or memory ablation"
+    }
+   ]
+  }
+ ],
+ "summary": "FinCon uses a manager-analyst agent hierarchy with CVaR risk control and episodic belief updates for trading and portfolio decisions; it beats DRL, LLM and portfolio baselines on cumulative return and Sharpe, and ablations show the risk mechanisms improve outcomes.",
+ "confidence": "medium"
+}

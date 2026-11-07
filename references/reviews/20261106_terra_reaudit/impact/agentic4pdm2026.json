@@ -1,0 +1,71 @@
+{
+ "citation_key": "agentic4pdm2026",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 987,
+    "quote": "The agent identifies ambiguity among candidate classes and selects measurements that could\nresolve it, while CCGA controls each result’s permitted influence through reference checks rather than"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 489,
+    "quote": "Overall, Agentic4PDM consistently achieves the highest average performance across all three tests."
+   },
+   "practical_problems": [
+    {
+     "problem": "verifiability",
+     "modules": [
+      "agentic4pdm2026:ccga"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 946,
+      "quote": "Finalization controls unreliable Judge proposals. In A7 (No Finalization), we examine if the Judge can\nreliably determine the final diagnosis without the admission conditions defined in Section 3.5.3."
+     },
+     "note": "ablation removes the request gate, packet and influence gate, and finalization admission checks; accuracy and macro-F1 drops measured on PU GRS (accuracy is the outcome, not a separate faithfulness study) calibration: finalization ablation measured on accuracy/F1, not on unsupported claims or faithfulness."
+    },
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "agentic4pdm2026:evidence-construction"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 984,
+      "quote": "potentially shifting operating conditions. Although raw signal statistics may change, diagnostically meaningful"
+     },
+     "note": "named motivation; no split varies operating conditions"
+    },
+    {
+     "problem": "data_quality",
+     "modules": [
+      "agentic4pdm2026:evidence-construction"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 983,
+      "quote": "We introduce Agentic4PDM, an agentic framework for industrial fault diagnosis under label scarcity and"
+     },
+     "note": "label scarcity targeted with a fixed reference budget; no budget sweep"
+    },
+    {
+     "problem": "operational_deployment",
+     "modules": [
+      "agentic4pdm2026:ccga"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 690,
+      "quote": "narrowing the gap between benchmark evaluation and practical industrial\ndeployment."
+     },
+     "note": "offline evaluation on a customer test set plus an API cost analysis; no production deployment reported"
+    }
+   ]
+  }
+ ],
+ "summary": "Contract-checked gated adjudication lets an LLM judge select and weigh analytical measurements for fault diagnosis; it beats deep, foundation-model and agentic baselines on benchmarks and a customer test set, and gate ablations isolate the governance mechanism.",
+ "confidence": "medium"
+}

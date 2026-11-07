@@ -1,0 +1,62 @@
+{
+ "citation_key": "finarena2025",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 24,
+    "quote": "The machine module utilizes a Large Language Model-based (LLM-based) multi-agent system to integrate diverse data sources, such as stock prices, news articles, and financial statements."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 701,
+    "quote": "In eight of the ten cases, FinArena’s performance can beat the multiple baselines we set, not only achieving a higher average, but also having a smaller variance."
+   },
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "finarena2025:adaptive-retrieval"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 558,
+      "quote": "Then we used the news data set to conduct an ablation experiment of our adaptive-RAG method against the non-RAG method, and the results are shown in Figure 3."
+     },
+     "note": "adaptive RAG versus no RAG on news analysis for next-day movement; also multimodal versus price-only baselines"
+    }
+   ]
+  },
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 26,
+    "quote": "Finally, a universal expert agent makes investment decisions based on the features extracted from multimodal data and investors’ individual risk preferences."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 864,
+    "quote": "In this experiment, though the benefits brought by various strategies based on FinArena prediction results vary, they generally exceed the baseline."
+   },
+   "practical_problems": [
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "finarena2025:risk-aware-report"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 865,
+      "quote": "Among the four investor’s risk preference, M.Agg achieves the best AR and SR performance, but the worst MD performance."
+     },
+     "note": "trading simulation under four risk profiles with different allocation and withdrawal rules, reporting return, Sharpe and drawdown; A-share returns were negative"
+    }
+   ]
+  }
+ ],
+ "summary": "Automates multimodal stock analysis and risk-profile-conditioned recommendations; it beats baselines in most US stocks, adaptive RAG improves accuracy over no RAG, and a four-profile trading simulation shows return-drawdown trade-offs but negative A-share returns.",
+ "confidence": "medium"
+}

@@ -1,0 +1,42 @@
+{
+ "citation_key": "gruver2023llmtime",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": false,
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 377,
+    "quote": "Evaluated on log likelihood and CRPS, LLMT IME considerably"
+   },
+   "practical_problems": [
+    {
+     "problem": "data_quality",
+     "modules": [
+      "gruver2023llmtime:decimal-representation"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 545,
+      "quote": "In Figure 8 we compare likelihoods and CRPS value for forecasts from traditional time series methods and LLaMA-2 70B on data that has been corrupted with missing values"
+     },
+     "note": "missing-rate sweep (0 to 50%) comparing NaN-string encoding with interpolation baselines; the NaN formatting is a text-encoding choice that the card folds into the decimal representation"
+    },
+    {
+     "problem": "information_availability",
+     "modules": [],
+     "tested": false,
+     "evidence": {
+      "line": 940,
+      "quote": "To further address the memorization concern, we also perform a direct experiment to show GPT-3 also demonstrates strong performance when evaluated on time series recorded after its training data"
+     },
+     "note": "evaluation check on three series recorded after the GPT-3 cutoff; it tests benchmark contamination of the base model, not a module calibration: post-cutoff series evaluated without a leaky contrast",
+     "by_design": true
+    }
+   ]
+  }
+ ],
+ "summary": "LLMTime encodes numbers and converts token probabilities into densities so an untuned LLM forecasts zero-shot, beating baselines on CRPS and likelihood; a missing-data sweep and a post-cutoff test probe two obstacles.",
+ "confidence": "medium"
+}

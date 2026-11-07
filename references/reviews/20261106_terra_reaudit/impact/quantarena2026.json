@@ -1,0 +1,45 @@
+{
+ "citation_key": "quantarena2026",
+ "primary_gain": "measurement",
+ "tasks": [
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 14,
+    "quote": "A model constructs features and stock-scoring code, receives feedback"
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "information_availability",
+     "modules": [
+      "quantarena2026:date-scoped-data-interface",
+      "quantarena2026:sealed-research-protocol"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 699,
+      "quote": "Feedback improves the research window more than"
+     },
+     "note": "sealed 2024 split vs 2022-2023 research window; iterative runs lose 12.4 points between windows vs 7.7 for one-shot calibration: sealed chronological split without leaky contrast",
+     "by_design": true
+    },
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "quantarena2026:sealed-research-protocol"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 16,
+      "quote": "order book. Scores are dominated by realized excess return and complemented by signal quality"
+     },
+     "note": "trading constraints, costs and market impact are built into the evaluator; no experiment varies them"
+    }
+   ]
+  }
+ ],
+ "summary": "A benchmark of end-to-end LLM quantitative research on A-share data with date-scoped data and a sealed out-of-sample year; it measures that no model beats the equal-weight market and that iteration gains are partly specific to the research window.",
+ "confidence": "medium"
+}

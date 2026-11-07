@@ -1,0 +1,17 @@
+{"citation_key":"timerlm2026","primary_gain":"practical_problem",
+"tasks":[{"task":"anomaly_detection_diagnosis","automates":true,
+"automation_evidence":{"line":144,"quote":"TimeRLM, an RLM formulation that enables manipulating time-series signals as external context, querying them over multiple turns in a sandboxed Python environment, and reasoning through code and vision"},
+"metric_gain":true,
+"metric_evidence":{"line":159,"quote":"On average, TimeRLM improves upon all evaluated TSLM baselines on all evaluated benchmarks, and"},
+"practical_problems":[
+{"problem":"nonstationarity","modules":["timerlm2026:anomaly-rl"],"tested":true,
+"evidence":{"line":1027,"quote":"Fine-tuned on AnomalyXL, TSLMs collapse on the unseen LTAF and Sleep-PSG generalization sets, with no model exceeding an IoU of 0.004."},
+"note":"Zero-shot transfer from synthetic AnomalyXL training to held-out real ECG (LTAF) and sleep (PSG) windows; F1 on the held-out sets is compared before and after RL post-training and against fine-tuned TSLMs."},
+{"problem":"verifiability","modules":["timerlm2026:anomaly-benchmark"],"tested":true,
+"evidence":{"line":1011,"quote":"The largest gains occur on tasks requiring citing specific segments, including classify-with-evidence (0.043 to"},
+"note":"AnomalyXL scores answers that must cite a span, channel or magnitude with a deterministic function of the final message, so evidence-grounded outputs are measured directly rather than only a label."},
+{"problem":"other","modules":["timerlm2026:recursive-sandbox"],"tested":true,
+"evidence":{"line":1214,"quote":"at or near zero for both single-pass variants at every length (text: ≤ 0.003; image: 0.11 → 0.00 as L grows), while the RLM holds 0.62–0.76 at every length"},
+"note":"Long-context series (up to 131k points): accuracy is broken down by context length for single-pass versus code-querying configurations."}]}],
+"summary":"TimeRLM lets an LLM query a long series through sandboxed code and submit evidence-grounded anomaly answers, and RL post-training lifts a 4B model; it beats single-pass TSLMs on the AnomalyXL benchmark across context lengths and transfers zero-shot to held-out clinical signals, with localization there staying near zero.",
+"confidence":"medium"}

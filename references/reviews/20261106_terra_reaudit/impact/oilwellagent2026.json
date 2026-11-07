@@ -1,0 +1,31 @@
+{
+ "citation_key": "oilwellagent2026",
+ "primary_gain": "automation",
+ "tasks": [
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 29,
+    "quote": "The agent is not a standalone classifier. Its role is to: (1) confirm upstream decisions when sensor evidence supports them, (2) justify decisions"
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "verifiability",
+     "modules": [
+      "oilwellagent2026:llm-diagnosis-procedure"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 653,
+      "quote": "plausible-sounding but incorrect domain claims. An expert audit of a"
+     },
+     "note": "sensor-grounded justifications and validity flags target the explainability gap; the validity flag is scored against injected wrong labels, but justification faithfulness and operator review are untested (expert audit left as future work)"
+    }
+   ]
+  }
+ ],
+ "summary": "A prompted LLM layer downstream of an Open-World pipeline justifies, validates and names oil-well anomalies; evaluation reports accuracy, validation precision and novelty detection rates on 3W without baselines or ablations, so only automation is supported.",
+ "confidence": "medium"
+}

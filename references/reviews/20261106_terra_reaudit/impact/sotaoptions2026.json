@@ -1,0 +1,24 @@
+{
+ "citation_key": "sotaoptions2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {"task": "decision_support",
+   "automates": true,
+   "automation_evidence": {"line": 60, "quote": "The agent selects among nine strategy families and their parameters, while deterministic\nresolvers map these decisions into contracts, position sizes, and hedges."},
+   "metric_gain": true,
+   "metric_evidence": {"line": 373, "quote": "SOTA earns a total return of 18.32%, an annualized Sharpe ratio of 1.60, and a maximum drawdown\nof 8.96%."},
+   "practical_problems": [
+    {"problem": "context_integration", "modules": ["sotaoptions2026:teacher-trajectories", "sotaoptions2026:policy-training"], "tested": true,
+     "evidence": {"line": 400, "quote": "We then ask whether news remains useful during reinforcement learning. Holding the supervised\ncheckpoint fixed, we compare reinforcement learning with and without contemporaneous news"},
+     "note": "ablation of the news context source: news helps the teacher but retaining it in RL drops return from 18.32% to -2.72%"},
+    {"problem": "information_availability", "modules": ["sotaoptions2026:teacher-trajectories", "sotaoptions2026:point-in-time-state"], "tested": false,
+     "evidence": {"line": 394, "quote": "To reduce temporal and identity leakage, we anonymize the information presented to the frontier"},
+     "note": "anonymization and a point-in-time state target leakage; only a chronological train/test split is used, no leakage-controlled comparison"},
+    {"problem": "decision_consequence", "modules": ["sotaoptions2026:strategy-resolvers", "sotaoptions2026:size-resolver", "sotaoptions2026:hedge-resolver"], "tested": false,
+     "evidence": {"line": 367, "quote": "All feasible policies use the same test dates, execution model, transaction-cost assumptions,"},
+     "note": "costs, position limits and portfolio state are part of the environment, but no experiment varies them; results are standard return and risk metrics"}
+   ]}
+ ],
+ "summary": "Trains an LLM to select option strategies with deterministic resolvers, earning positive out-of-sample return where rule-based and machine-learning baselines lose; the only isolated obstacle test is the news ablation.",
+ "confidence": "medium"
+}

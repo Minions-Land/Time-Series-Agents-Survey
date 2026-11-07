@@ -1,0 +1,48 @@
+{
+ "citation_key": "finrldeepseek2025",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 29,
+    "quote": "Using LLMs (DeepSeek V3 (DeepSeek-AI et al., 2024), Qwen 2.5 72B (Qwen et al., 2025) Llama 3.3 70B (Grattafiori et al., 2024)), we extract stock recommendations and risk assessment"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 167,
+    "quote": "These preliminary results in figure 1 with Qwen 2.5 show that integrating LLM stock recommendations consistently improves PPO in terms of cumulative returns."
+   },
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "finrldeepseek2025:llm-news-signal-extraction",
+      "finrldeepseek2025:news-action-modulation"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 275,
+      "quote": "For PPO-DeepSeek, stronger LLM infusion mostly degrades performance, even for tiny (0.1%) perturbations."
+     },
+     "note": "Varies the strength of the news-derived LLM signal from 10% to 0.1% against price-only PPO; the effect is mostly negative for PPO."
+    },
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "finrldeepseek2025:risk-return-modulation"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 281,
+      "quote": "For CPPO-DeepSeek, stronger LLM infusion improves performance"
+     },
+     "note": "Risk-score modulation of CVaR-PPO returns evaluated with CVaR, Information Ratio and Rachev Ratio across infusion strengths."
+    }
+   ]
+  }
+ ],
+ "summary": "News-derived LLM recommendation and risk scores scale RL trading actions and CVaR returns; backtests show mixed gains, helping CPPO with stronger infusion but mostly hurting PPO.",
+ "confidence": "medium"
+}

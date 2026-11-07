@@ -1,0 +1,49 @@
+{
+ "citation_key": "agenticrag2024",
+ "primary_gain": "metric_gain",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 49,
+    "quote": "orchestrator analyzes the incoming user request, determines its\nnature and complexity, and then routes (or delegates) it to the corresponding task-specific sub-agent"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 1102,
+    "quote": "Our proposed framework outperforms baseline methods across the benchmark datasets, showing significant\nimprovements on the forecasting and anomaly detection tasks."
+   },
+   "practical_problems": [
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "agenticrag2024:pattern-prompt-pool"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 313,
+      "quote": "given the current state of research in this field. To address the challenges of non-stationarity and distributional shifts in real-world\ndata, we utilize a differentiable dynamic prompting mechanism[3]."
+     },
+     "note": "prompt pool is motivated by shift and window-length problems, but results are average scores on chronological splits with no shift, drift or out-of-domain test"
+    }
+   ]
+  },
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 49,
+    "quote": "orchestrator analyzes the incoming user request, determines its\nnature and complexity, and then routes (or delegates) it to the corresponding task-specific sub-agent"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 1102,
+    "quote": "Our proposed framework outperforms baseline methods across the benchmark datasets, showing significant\nimprovements on the forecasting and anomaly detection tasks."
+   },
+   "practical_problems": []
+  }
+ ],
+ "summary": "A ReAct master agent routes requests to task-specific DPO-tuned SLM sub-agents with retrieval-conditioned prompt pools and reports better forecasting and anomaly detection scores than earlier baselines; the shift motivation is not tested, and the missingness sweep belongs to imputation.",
+ "confidence": "medium"
+}

@@ -1,0 +1,63 @@
+{
+ "citation_key": "plotstowords2026",
+ "primary_gain": "automation",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 300,
+    "quote": "The Planner Agent is responsible for transforming the user query\ninto a structured execution plan."
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "verifiability",
+     "modules": [
+      "plotstowords2026:model-aware-explanation"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 639,
+      "quote": "EF improves uncertainty awareness\nand reduces hallucinations, suggesting that model-aware reasoning\nleads to more faithful and robust responses."
+     },
+     "note": "ablates explanation grounding over three pipelines (numbers only, plus plots, plus SHAP and uncertainty) on 30 queries, scored by an LLM judge on model awareness, trustworthiness and hallucination; no human study calibration: LLM-judge scores only"
+    },
+    {
+     "problem": "context_integration",
+     "modules": [
+      "plotstowords2026:domain-context"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 326,
+      "quote": "Its primary\nrole is to supply contextual information that is not directly observable in the raw time-series data but is essential for accurate and\nmeaningful reasoning."
+     },
+     "note": "the Knowledge Agent is not ablated; the BF/IF/EF comparison varies plots and model signals only"
+    }
+   ]
+  },
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 300,
+    "quote": "The Planner Agent is responsible for transforming the user query\ninto a structured execution plan."
+   },
+   "metric_gain": false,
+   "practical_problems": []
+  },
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 300,
+    "quote": "The Planner Agent is responsible for transforming the user query\ninto a structured execution plan."
+   },
+   "metric_gain": false,
+   "practical_problems": []
+  }
+ ],
+ "summary": "A query-planned multi-agent harness automates forecasting, interpretation and textual explanation for GPU-cluster analysis; an LLM-judge ablation over 30 queries shows model-aware signals raise explanation quality and cut hallucination, with no human study or forecast-accuracy gain.",
+ "confidence": "medium"
+}

@@ -1,0 +1,60 @@
+{
+ "citation_key": "smartenergyagent2026",
+ "primary_gain": "automation",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": false,
+   "metric_gain": false,
+   "practical_problems": []
+  },
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 44,
+    "quote": "an end-to-end agentic pipeline that combines deep time-series forecasting, variational anomaly detection, and LLM-based reasoning to generate prioritized, actionable maintenance recommendations."
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "verifiability",
+     "modules": [
+      "smartenergyagent2026:feedback-memory"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 496,
+      "quote": "quantifying its impact on accuracy requires sustained expert-validated corrections and is left for future work."
+     },
+     "note": "operator-feedback memory is implemented but its effect is not measured"
+    }
+   ]
+  },
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 44,
+    "quote": "an end-to-end agentic pipeline that combines deep time-series forecasting, variational anomaly detection, and LLM-based reasoning to generate prioritized, actionable maintenance recommendations."
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "smartenergyagent2026:context-retrieval"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 440,
+      "quote": "Each was evaluated under both static retrieval (all six RAG sources retrieved unconditionally) and dynamic retrieval (three core sources always retrieved"
+     },
+     "note": "static (six sources) versus dynamic (three to six sources) retrieval over 16 scenarios and five LLM backends; scores matched, so selection saved context without changing diagnosis quality calibration: static vs dynamic selection of retrieval sources, no exogenous source removed"
+    }
+   ]
+  }
+ ],
+ "summary": "Automates appliance forecasting, anomaly detection, context retrieval and diagnosis into one pipeline for facility managers; evaluation reports forecast metrics without baselines and a 16-scenario LLM rubric where dynamic retrieval matched static retrieval.",
+ "confidence": "medium"
+}

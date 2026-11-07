@@ -1,0 +1,35 @@
+{
+ "citation_key": "castfsr2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 18,
+    "quote": "observation and autonomously selects suitable lightweight forecasters to construct a data-driven forecast prior."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 893,
+    "quote": "Table 1 compares CastFSR with forecasting baselines across long- and short-term benchmarks. CastFSR achieves the best or second-best performance on most metrics"
+   },
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "castfsr2026:forecast-revision"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 1004,
+      "quote": "Removing slow deliberative reasoning also reduces performance on most metrics, highlighting the importance of contextual evidence retrieval and reasoning."
+     },
+     "note": "Ablation removes the slow stage that retrieves contextual evidence and revises the forecast prior; reflective evaluation (temporal, contextual, domain consistency) is ablated in the same table."
+    }
+   ]
+  }
+ ],
+ "summary": "A Fast-Slow-Reflect agent selects forecasters, revises their prior with retrieved context and checks consistency; it is best or second-best on most benchmarks, and removing the context-reasoning stage degrades results.",
+ "confidence": "medium"
+}

@@ -1,0 +1,27 @@
+{
+ "citation_key": "tsreasoner2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {"task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {"line": 43, "quote": "highlighting the promise of domain-specialized agents for\nautomating real-world time series reasoning and analysis."},
+   "metric_gain": true,
+   "metric_evidence": {"line": 1061, "quote": "TS-Reasoner outperforms baseline models in success rates while simultaneously achieving superior\ninference quality as evidenced by lower MAPE values."},
+   "practical_problems": [
+    {"problem": "nonstationarity", "modules": ["tsreasoner2026:task-decomposer", "tsreasoner2026:custom-operator"], "tested": true,
+     "evidence": {"line": 1232, "quote": "Secondly, we test adaptation to stock future volatility prediction task\nfeaturing unseen domain and instruction from the in-context samples."},
+     "note": "unseen-domain and unseen-instruction test (Table 4) against baselines; a single out-of-domain task, not a shift sweep"},
+    {"problem": "information_availability", "modules": ["tsreasoner2026:forecast-holdout"], "tested": false,
+     "evidence": {"line": 316, "quote": "temporally valid self-evaluation, where the last 10% of each time series is used as a\npseudo-holdout for intermediate feedback"},
+     "note": "temporally valid within-instance holdout is a design choice; the ablation removes intermediate feedback but does not test leakage"}
+   ]},
+  {"task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {"line": 43, "quote": "highlighting the promise of domain-specialized agents for\nautomating real-world time series reasoning and analysis."},
+   "metric_gain": true,
+   "metric_evidence": {"line": 1070, "quote": "In contrast, TS-Reasoner achieves the strongest\noverall tradeoff, consistently attaining high success rates together with competitive inference quality."},
+   "practical_problems": []}
+ ],
+ "summary": "Automates multi-step time series inference with a tool-using agent, error feedback and generated operators; it beats LLM, ReAct and AutoML baselines on a new benchmark with component ablations, and one unseen-domain test supports generalization.",
+ "confidence": "medium"
+}

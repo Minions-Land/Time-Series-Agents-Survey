@@ -1,0 +1,57 @@
+{
+ "citation_key": "acetrader2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "decision_support",
+   "automates": false,
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 787,
+    "quote": "ACE-Trader outperforms direct prompting with the same DeepSeek V4 Flash backbone, increasing cumulative return from -19.72% to 12.44%."
+   },
+   "practical_problems": [
+    {
+     "problem": "information_availability",
+     "modules": [
+      "acetrader2026:co-evolution"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 470,
+      "quote": "Testing covers 2026-01-01 to 202606-30, using prices, news, and associated asset information collected from Financial Modeling Prep"
+     },
+     "note": "Test window set after the training-data cutoffs of all evaluated LLMs and feedback used only once observable; a leakage-controlled split rather than a leakage-versus-no-leakage comparison. calibration: post-cutoff test window used without a leaky-vs-clean contrast.",
+     "by_design": true
+    },
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "acetrader2026:adversarial-trading",
+      "acetrader2026:memory-selector"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 804,
+      "quote": "Second, the Red-Team selector improves risk-adjusted performance. Variant 3 outperforms Variant 1 across all reported metrics."
+     },
+     "note": "Returns after 5 bp transaction costs under a gross-exposure limit; Sharpe, drawdown and volatility are reported and the Red-Team risk-review selector is ablated."
+    },
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "acetrader2026:memory-selector"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 113,
+      "quote": "First, how can Trader and Red-Team adapt memory selection to changing market conditions?"
+     },
+     "note": "Return-trained selector is motivated by changing regimes; no regime-split or shift experiment is reported."
+    }
+   ]
+  }
+ ],
+ "summary": "ACE-Trader adds return-trained memory selection and a Trader-Red-Team review loop to an LLM portfolio trader; it beats the same backbone prompted directly and learned baselines after costs with lower drawdown, evaluated on a post-cutoff test period.",
+ "confidence": "medium"
+}

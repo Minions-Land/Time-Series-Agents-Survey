@@ -1,0 +1,45 @@
+{
+ "citation_key": "chen2025trace",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": false,
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 23,
+    "quote": "demonstrate that TRACE achieves prediction accuracy on par\nwith state-of-the-art deep learning models while significantly\noutperforming other baseline models in data-scarce scenarios."
+   },
+   "practical_problems": [
+    {
+     "problem": "data_quality",
+     "modules": [
+      "chen2025trace:cot-instruction-tuning",
+      "chen2025trace:der-cot",
+      "chen2025trace:forecast-consensus"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 1546,
+      "quote": "The prediction errors of each model under the data missingness scenario, simulated through random deletion, are shown in\nFig. 6 (right)."
+     },
+     "note": "Few-shot sweeps over sample size and a random-deletion missing-ratio sweep against baselines, plus imputation quality measured by downstream MAE."
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "chen2025trace:factuality-verification"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 2098,
+      "quote": "Across 1000 test cases, this ablated version exhibited a consistent increase in MAE per round."
+     },
+     "note": "Removes lexical, semantic and factual consistency checks on inter-agent summaries and measures MAE and propagation of erroneous summaries."
+    }
+   ]
+  }
+ ],
+ "summary": "A fine-tuned LLM with multi-agent consensus forecasts distributed energy resource power at parity with deep models on standard splits, with tested gains under data scarcity and missingness and an ablation of factuality verification.",
+ "confidence": "medium"
+}

@@ -1,0 +1,59 @@
+{
+ "citation_key": "timera2025",
+ "primary_gain": "measurement",
+ "tasks": [
+  {
+   "task": "anomaly_detection_diagnosis",
+   "automates": true,
+   "automation_evidence": {
+    "line": 15,
+    "quote": "we propose Time-series Reasoning for Anomaly (T IME -RA), a novel task that reformulates TSAD from a discriminative into a generative, reasoning-intensive paradigm."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 1303,
+    "quote": "Analysis of Table 2 indicates that SFT generally improves performance, with most models achieving higher F1scores and better semantic alignment in Thought Matching after tuning."
+   },
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "timera2025:rats40k-dataset"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 1313,
+      "quote": "RQ 3: Can visual representation enhance the T IME -RA task? Table 3 demonstrates that visual representation is a powerful catalyst for the T IME RA task"
+     },
+     "note": "Compares raw time series, text observation and plot inputs for MLLMs; effect is clear on reasoning (Thought Matching) but varies on classification. calibration: plot vs raw/text input is a representation change of the same series, not an exogenous context source."
+    },
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "timera2025:rats-sft"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 1328,
+      "quote": "We evaluate the fine-tuned Qwen2.5-7B models on realworld datasets from other domains and compare the results with those of common TSAD models."
+     },
+     "note": "Tests the RATs40K fine-tuned model on in-domain and out-of-domain real-world anomaly datasets without further tuning."
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "timera2025:anomaly-evaluation"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 12,
+      "quote": "often lacks the fine-grained categorization and explanatory reasoning required for transparent decision-making."
+     },
+     "note": "Explanatory thoughts are scored for semantic match with references, but no faithfulness or operator study is run."
+    }
+   ]
+  }
+ ],
+ "summary": "Time-RA turns anomaly detection into a generative diagnosis task with a 40K multimodal dataset and feedback-refined reasoning labels; benchmarks show SFT and plots help reasoning and the tuned model transfers to unseen datasets.",
+ "confidence": "medium"
+}

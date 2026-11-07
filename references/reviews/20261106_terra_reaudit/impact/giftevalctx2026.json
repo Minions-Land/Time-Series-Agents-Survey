@@ -1,0 +1,19 @@
+{
+ "citation_key": "giftevalctx2026",
+ "primary_gain": "measurement",
+ "tasks": [
+  {"task": "forecasting_prediction",
+   "automates": false,
+   "metric_gain": false,
+   "practical_problems": [
+    {"problem": "context_integration", "modules": ["giftevalctx2026:paired-context-evaluation"], "tested": true,
+     "evidence": {"line": 173, "quote": "GIFT-Eval-CTX supports a paired evaluation of the\nsame forecasting model under two information conditions."},
+     "note": "the same model is run history-only and with Macro, Micro or both structured effects; aggregate relative MASE drops 40.7% for GPT-5.6 Sol and 29.6% for Claude Opus 4.8"},
+    {"problem": "verifiability", "modules": ["giftevalctx2026:validated-effect-annotation", "giftevalctx2026:blind-first-critic"], "tested": false,
+     "evidence": {"line": 237, "quote": "Deterministic\nvalidation then checks the proposed type and type-specific criteria."},
+     "note": "annotations are validator-gated and a random subset is reviewed manually, but no review result is reported"}
+   ]}
+ ],
+ "summary": "Provides a 10,000-instance contextual forecasting benchmark with agent-generated, validator-checked structured effects; paired history-only versus context runs measure how much context lowers MASE for TSFMs, LLMs and an agentic system.",
+ "confidence": "high"
+}

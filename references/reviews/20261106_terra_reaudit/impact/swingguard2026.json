@@ -1,0 +1,73 @@
+{
+ "citation_key": "swingguard2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "decision_support",
+   "automates": true,
+   "automation_evidence": {
+    "line": 19,
+    "quote": "specialized analysts synthesize point-in-time technical, sentiment, on-chain, and macroeconomic evidence through bullish–bearish deliberation."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 640,
+    "quote": "The synchronized, cost-adjusted portfolio returns 37.16% with 2.98 Sharpe and 6.44% drawdown, versus 30.11%, 1.19, and 28.47% for equal-weight buy-and-hold."
+   },
+   "practical_problems": [
+    {
+     "problem": "decision_consequence",
+     "modules": [
+      "swingguard2026:risk-conditioned-generation",
+      "swingguard2026:risk-governance"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 675,
+      "quote": "Full versus Post-hoc Risk tests when risk enters strategy generation; Post-hoc Risk versus No Risk Controller tests downstream governance;"
+     },
+     "note": "cost-adjusted returns, drawdown, repricing at 5/30/50 bp, and ablations that move risk before generation or remove the five-minute controller"
+    },
+    {
+     "problem": "information_availability",
+     "modules": [
+      "swingguard2026:point-in-time-data-preparation"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 505,
+      "quote": "Look-ahead bias control. All decision inputs obey a pointin-time availability boundary."
+     },
+     "note": "experiments run under a point-in-time boundary (release-date macro series, frozen Random Forest, execution at next open) for all methods; the boundary is enforced, not varied calibration: point-in-time boundary enforced, not varied",
+     "by_design": true
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "swingguard2026:audit-trace"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 659,
+      "quote": "Figure 3 traces a representative intervention while the system held an active BTC position."
+     },
+     "note": "one illustrative trace linking risk state to executed position; no faithfulness or reviewer study"
+    },
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "swingguard2026:risk-governance"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 739,
+      "quote": "Future work will test broader regimes and recovery efficiency."
+     },
+     "note": "regime sensitivity motivates the design but no shift or cross-regime test is run"
+    }
+   ]
+  }
+ ],
+ "summary": "Conditions daily trading proposals on current risk and governs exposure with a five-minute controller; cost-adjusted backtests on BTC and ETH beat baselines and ablations show the controller and pre-generation risk conditioning each matter.",
+ "confidence": "medium"
+}

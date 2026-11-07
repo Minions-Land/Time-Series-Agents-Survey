@@ -1,0 +1,13 @@
+{"citation_key":"scenariodiff2026","primary_gain":"practical_problem",
+"tasks":[{"task":"forecasting_prediction",
+"automates":true,"automation_evidence":{"line":18,"quote":"a Historical Context\nAgent extracts stepwise evidence from raw documents, a Scenario\nAgent produces a qualitative scenario description for the forecast\nhorizon,"},
+"metric_gain":true,"metric_evidence":{"line":732,"quote":"Overall, S CE NARIO D IFF achieves the strongest horizon-level performance,\nwith the largest number of MSE/MAE wins across horizons\nand domains."},
+"practical_problems":[
+{"problem":"context_integration","modules":["scenariodiff2026:historical-context-agent","scenariodiff2026:scenario-guidance","scenariodiff2026:anchor-guidance-agent"],"tested":true,
+"evidence":{"line":1087,"quote":"The results show that all three modules contribute to the\nfinal performance. Removing the Historical Context Agent\ncauses the largest degradation in most domains,"},
+"note":"Ablates each text-derived context level and compares event-driven against non-event-driven domains on Time-MMD."},
+{"problem":"data_quality","modules":["scenariodiff2026:historical-context-agent","scenariodiff2026:anchor-blended-sampling"],"tested":true,
+"evidence":{"line":1448,"quote":"f) Source-text perturbation: To evaluate the sensitivity of\nS CENARIO D IFF to corrupted textual signals, we perturb the\nsource text at different ratios"},
+"note":"Perturbs source text (10-50 percent) and contaminates anchors with noisy high-confidence values, measuring error."}]}],
+"summary":"Turns noisy documents into three levels of agent-produced guidance for a diffusion forecaster; ablations, event-driven subset analysis and text and anchor perturbation tests show where context helps and how noise degrades it, alongside better Time-MMD scores.",
+"confidence":"high"}

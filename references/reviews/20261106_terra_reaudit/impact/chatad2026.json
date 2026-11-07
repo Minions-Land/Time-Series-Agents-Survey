@@ -1,0 +1,18 @@
+{"citation_key":"chatad2026","primary_gain":"metric_gain",
+"tasks":[
+{"task":"data_augmentation_synthesis",
+"automates":true,"automation_evidence":{"line":116,"quote":"We propose TSEvol, an LLM-driven agentbased time series evolution algorithm for SFT instruction synthesis."},
+"metric_gain":true,"metric_evidence":{"line":831,"quote":"in ablation studies with 2K random samples, the combination of CRL + IFL in ChatAD-Llama-8B model improves the accuracy and F1-score by 3.53% and 3.95%, while reducing the FPR by 1.29% compared to using CRL alone."},
+"practical_problems":[]},
+{"task":"anomaly_detection_diagnosis",
+"automates":false,
+"metric_gain":true,"metric_evidence":{"line":634,"quote":"Table 3 (left) demonstrates that ChatAD-Qwen2.57B outperforms all modles. Specifically, it achieves substantial improvements in Accuracy (21.81% ∼ 40.81%) and F1 score (24.93% ∼ 52.85%)"},
+"practical_problems":[
+{"problem":"verifiability","modules":["chatad2026:tsevol"],"tested":false,"evidence":{"line":111,"quote":"Strengthening AD comprehension and multiturn dialogue within MTSLLMs paves the way toward fully explainable anomalies."},"note":"Reasoning and dialogue data target explainable anomalies, but only accuracy, F1 and FPR are measured, not explanation faithfulness or operator review."},
+{"problem":"nonstationarity","modules":["chatad2026:tkto"],"tested":false,"evidence":{"line":657,"quote":"SGAD, FORCE, IMPUT, and CLASS are used for cross-data/task tests (AD, forecasting, imputation, classification)."},"note":"Generalization to unseen data distributions is a stated aim; the single smart-grid cross-data test is reported jointly with cross-task tests, not as a shift study."}]},
+{"task":"forecasting_prediction",
+"automates":false,
+"metric_gain":true,"metric_evidence":{"line":781,"quote":"For the forecasting and imputation tasks, the numerical prediction performance consistently outperforms the benchmarks."},
+"practical_problems":[]}],
+"summary":"ChatAD uses agent-synthesized reasoning dialogues and TKTO to fine-tune LLMs for anomaly detection, beating nine baselines on accuracy, F1 and FPR and transferring to forecasting zero-shot; no explanation or shift study is reported.",
+"confidence":"medium"}

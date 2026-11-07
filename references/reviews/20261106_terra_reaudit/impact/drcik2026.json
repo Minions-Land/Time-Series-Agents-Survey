@@ -1,0 +1,56 @@
+{
+ "citation_key": "drcik2026",
+ "primary_gain": "measurement",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 12,
+    "quote": "we introduce Dr-CiK, a benchmark for evaluating whether agents can retrieve forecasting-relevant supporting context from a document corpus, filter out distractors"
+   },
+   "metric_gain": false,
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "drcik2026:forecast-research-testbed",
+      "drcik2026:forecast-dependent-distractors"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 518,
+      "quote": "With supporting evidence, DP-Gemini and MoiraiAgent substantially outperform their no-context counterparts, showing that they are capable of leveraging contextual information."
+     },
+     "note": "Compares no context, ground-truth supporting evidence and DR-retrieved evidence, plus a hops ablation; DR evidence from some agents is worse than no context."
+    },
+    {
+     "problem": "verifiability",
+     "modules": [
+      "drcik2026:three-level-evaluation"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 447,
+      "quote": "Level 2: Deep Research. Isolates the DR agent's retrieval and synthesis quality (Evidence Recall, Document Recall, Distractor Avoidance), independent of the forecaster."
+     },
+     "note": "Measures whether agents recover ground-truth supporting evidence and avoid distractors; most recover under 5% of evidence."
+    },
+    {
+     "problem": "information_availability",
+     "modules": [
+      "drcik2026:environment-generation"
+     ],
+     "tested": false,
+     "evidence": {
+      "line": 998,
+      "quote": "Two sources receive date adjustment as a contamination mitigation: Melbourne pedestrian counts are shifted forward by seven years and Eurostat rail by nine years"
+     },
+     "note": "Date shifts and leakage audits protect benchmark validity, but no experiment varies or measures leakage."
+    }
+   ]
+  }
+ ],
+ "summary": "Dr-CiK is a testbed of 240 tasks where agents must retrieve forecast-relevant context from a corpus with distractors; it shows ground-truth context helps, while current deep research agents recover little evidence and can hurt forecasts.",
+ "confidence": "high"
+}

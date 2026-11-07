@@ -1,0 +1,38 @@
+{
+ "citation_key": "fromnewstoforecast2024",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 17,
+    "quote": "LLM-based agents to iteratively filter out irrelevant news and employ human-like"
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 958,
+    "quote": "Our approach significantly outperforms traditional methods that rely solely on historical time series"
+   },
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "fromnewstoforecast2024:news-temporal-pairing",
+      "fromnewstoforecast2024:news-selection",
+      "fromnewstoforecast2024:news-reflection",
+      "fromnewstoforecast2024:news-conditioned-lora"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 653,
+      "quote": "introduction of proper news and other supplementary information leads to significant performance"
+     },
+     "note": "four prompt scenarios (numbers only, text, news, news plus supplements) isolate the news context; Table 2 varies reflection iterations of the selection logic; unselected news is shown to hurt"
+    }
+   ]
+  }
+ ],
+ "summary": "Agents select and refine news relevant to a series and a fine-tuned LLM forecasts with it; ablating news and the reflection iterations shows the context changes accuracy, with only modest gain for traffic where news is too coarse.",
+ "confidence": "high"
+}

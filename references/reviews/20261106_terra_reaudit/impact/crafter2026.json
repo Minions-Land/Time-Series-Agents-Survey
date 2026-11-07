@@ -1,0 +1,49 @@
+{
+ "citation_key": "crafter2026",
+ "primary_gain": "practical_problem",
+ "tasks": [
+  {
+   "task": "forecasting_prediction",
+   "automates": true,
+   "automation_evidence": {
+    "line": 24,
+    "quote": "We therefore study corrective feature discovery: automatically finding interpretable features of the residual, the signal of where and how a particular frozen forecaster fails."
+   },
+   "metric_gain": true,
+   "metric_evidence": {
+    "line": 537,
+    "quote": "Under the shared harness of §4, both C RAFTER variants outperform each of the three dedicated feature-engineering systems, with per-baseline paired Wilcoxon tests significant at p<0.01."
+   },
+   "practical_problems": [
+    {
+     "problem": "context_integration",
+     "modules": [
+      "crafter2026:llm-feature-proposer",
+      "crafter2026:residual-feature-search"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 707,
+      "quote": "The clearest case is EPF. External banks and syntactic search add little beyond the covariate-only corrector, while C RAFTER removes much more of the frozen error"
+     },
+     "note": "Source-blind gate isolates the feature source: covariate-only corrector, syntactic search and external feature banks versus LLM-named semantic features."
+    },
+    {
+     "problem": "nonstationarity",
+     "modules": [
+      "crafter2026:source-blind-gate",
+      "crafter2026:corrector-selection"
+     ],
+     "tested": true,
+     "evidence": {
+      "line": 888,
+      "quote": "We test this by replaying the features accepted on one split onto a later split, with the LLM and search turned off, so only the feature set's origin changes"
+     },
+     "note": "Replay of accepted features across ordered split pairs against self and covariate-only bounds; performance decays mildly with split distance."
+    }
+   ]
+  }
+ ],
+ "summary": "An agent mines a frozen forecaster's residuals for LLM-named and searched corrective features behind a source-blind gate; it beats feature-engineering baselines, and controls isolate feature source and cross-split transfer.",
+ "confidence": "medium"
+}
