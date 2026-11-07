@@ -48,9 +48,30 @@ def count_module_labels(value: dict) -> int:
     return len({label for labels in dimensions.values() if isinstance(labels, list) for label in labels})
 
 
+def in_scope(record: dict) -> bool:
+    """Schema 3.0: only reviewed contributions count; background references are excluded."""
+    module = record.get("module_level_contributions", {})
+    return (record.get("inclusion") == "reviewed_contribution" and "modules" in module
+            and module.get("review_status") in {"paper_verified", "repository_verified"})
+
+
+def module_functions(module: dict) -> list[str]:
+    """Temporal functions of one module (schema 3.0 top-level field; older ledgers keep them in function_view)."""
+    functions = module.get("functions")
+    if functions is None:
+        functions = (module.get("function_view") or {}).get("functions") or []
+    return [f for f in functions if f in FUNCTIONS]
+
+
+def reuse_level(module: dict) -> str:
+    """demonstrated (source applies it to >= 2 of the four task families), inferred, or not_applicable."""
+    level = (module.get("reuse_evidence") or {}).get("level")
+    return level if level in {"demonstrated", "inferred"} else "not_applicable"
+
+
 def contribution_counts(record: dict) -> dict[str, int]:
     module = record.get("module_level_contributions", {})
-    if "modules" in module and module.get("review_status") in {"paper_verified", "repository_verified"}:
+    if in_scope(record):
         counts = Counter(m["layer"] for m in module["modules"])
         return {"LLM-side": counts["LLM"], "General Harness": counts["GH"],
                 "General Time Series Harness": counts["GTS"], "Task-Specific Harness": counts["TSK"]}
@@ -85,8 +106,8 @@ def main() -> None:
         monthly.setdefault(month, Counter()).update(counts)
         for module in record["module_level_contributions"]["modules"]:
             if module["layer"] in ("GTS", "TSK"):
-                for function in (module.get("function_view") or {}).get("functions") or []:
-                    TEMPORAL.append((month, function, module["layer"], module["reuse_evidence"]["level"]))
+                for function in module_functions(module):
+                    TEMPORAL.append((month, function, module["layer"], reuse_level(module)))
 
     months = sorted(monthly)
     running = Counter()
@@ -232,15 +253,19 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
         ax.plot(grid_dates, fit, color=color, lw=2.8, solid_capstyle="round", zorder=3)
         legend_labels.append(f"{DISPLAY[name]} (doubling {np.log(2) / b:.1f} mo)")
     # End values, nudged apart so that close series stay legible.
+    top = max(cumulative[name][-1] for name in LAYERS)
+    y_max = 50 * int(np.ceil(top * 1.08 / 50))          # headroom for the end labels; was fixed at 210
+    nudge = 12 * y_max / 210                             # same on-page spacing as the 210-unit axis
     placed = []
     for name in sorted(LAYERS, key=lambda n: cumulative[n][-1]):
         value = cumulative[name][-1]
-        y_text = max(value, placed[-1] + 12) if placed else value
+        y_text = max(value, placed[-1] + nudge) if placed else value
         placed.append(y_text)
-        ax.annotate(f"{value}", (dates[-1], value), xytext=(dates[-1] + timedelta(days=16), y_text),
+        ax.annotate(f"{value}", (dates[-1], value), xytext=(dates[-1] + timedelta(days=26), y_text),
                     va="center", fontsize=14, fontweight="bold", color=COLORS[name], annotation_clip=False)
-    callouts = [("Task-Specific Harness", "Task-Specific Harness\nleads LLM side", (-150, 62)),
-                ("General Harness", "General Harness\nleads LLM side", (-205, 92))]
+    # Offsets (points) place both boxes in the empty upper-left area of the 0-350 axis.
+    callouts = [("Task-Specific Harness", "Task-Specific Harness\nleads LLM side", (14, 78)),
+                ("General Harness", "General Harness\nleads LLM side", (-262, 128))]
     for leader, text, offset in callouts:
         i = first_lasting_lead(cumulative[leader], cumulative["LLM-side"])
         if i is None:
@@ -252,8 +277,8 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
                     bbox=dict(boxstyle="round,pad=0.38,rounding_size=0.5", fc="white", ec=MID[leader], lw=1.2),
                     arrowprops=dict(arrowstyle="-", color=COLORS[leader], lw=1.3, shrinkA=0, shrinkB=7))
     ax.set_ylabel("Cumulative Modules", labelpad=8)
-    ax.set_ylim(0, 210)
-    ax.set_yticks([0, 50, 100, 150, 200])
+    ax.set_ylim(0, y_max)
+    ax.set_yticks(range(0, y_max + 1, 50 if y_max <= 250 else 100))
     ax.set_xlim(dates[0] - timedelta(days=20), datetime(2026, 12, 15))
     ax.xaxis.set_major_locator(mdates.YearLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
