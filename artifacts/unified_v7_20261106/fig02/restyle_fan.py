@@ -418,8 +418,9 @@ def slide_box(shape, x0=None, x1=None):
 def ink_boxes(t):
     """Slide-space boxes of what a tag actually draws: its logo, and its name and year text at their measured widths."""
     out = [slide_box(k) for k in walk(t.shapes) if k.shape_type == 13]
-    for k in walk(t.shapes):
-        if k.shape_type != 17 or not k.text_frame.text.strip(): continue
+    texts_ = [k for k in walk(t.shapes) if k.shape_type == 17 and k.text_frame.text.strip()]
+    texts_.sort(key=lambda k: k.text_frame.text.strip().isdigit())          # name first, year last
+    for k in texts_:
         rpr = k.text_frame.paragraphs[0].runs[0]._r.find(qn('a:rPr'))
         q = k.text_frame.paragraphs[0].runs[0].font.size
         pt = q.pt if q is not None else (int(rpr.get('sz')) / 100 if rpr is not None and rpr.get('sz') else 15.23)
@@ -427,7 +428,7 @@ def ink_boxes(t):
         ins = k.text_frame.margin_left if k.text_frame.margin_left is not None else 91440
         w = name_width(k.text_frame.text.strip(), pt) / ax
         x0, y0, x1, y1 = slide_box(k, k.left + ins, k.left + ins + w)
-        h = (y1 - y0); yc = (y0 + y1) / 2; th = pt * 12700 * 1.1                    # text height, centred (anchor ctr)
+        h = (y1 - y0); yc = (y0 + y1) / 2; th = pt * 12700 * 0.75                   # glyph height, centred (anchor ctr)
         out.append((x0, yc - th / 2, x1, yc + th / 2))
     return out
 
@@ -455,27 +456,43 @@ def slot_room(t, text, gap_in=0.06):
     return (ay * year.left + by) - (an * name.left + bn) - an * ins - gap_in * E - name_width(text, pt)
 
 
-def fit_year(t, others, gap_in=0.06, min_pt=12.0):
-    """Fit a rewritten name into its slot. If the name overruns the year column, the year moves right to follow it,
-    provided the moved year does not overlap another tag; otherwise the name shrinks (down to min_pt) until the move
-    is clear or the name fits."""
+SHORT = {'timeclaw2026harness': 'TC-Harness', 'timeclaw2026explore': 'TimeClaw', 'timeseriesscientist2025': 'TS-Scientist',
+         'timeseriesexamagent2026': 'TS-Exam Agent'}               # last resort when the full name cannot be placed
+
+
+def fit_tag(t, others, edges, gap_in=0.06, min_pt=12.5, margin_in=0.05):
+    """Place a rewritten tag whose name overruns its year column. The overrun is absorbed by moving the whole tag
+    left (inside its wedge) and the year right, as far as each stays clear of the other tags and the wedge spokes;
+    the name shrinks (down to min_pt) only if that is not enough. Returns False if no placement is clear.
+    `edges(y)` gives the slide x of the wedge's left and right spokes at slide height y."""
     name, year, pt = tag_parts(t)
-    if year is None: return
+    if year is None: return True
     text = name.text_frame.text.strip()
-    ay, _ = x_map(year)
-    ypt = int(year.text_frame.paragraphs[0].runs[0]._r.find(qn('a:rPr')).get('sz') or 1120) / 100
-    def clear(room):
-        nx0 = year.left - room / ay
-        bx = slide_box(year, nx0, nx0 + (name_width(year.text_frame.text.strip(), ypt) + 0.04 * E) / ay)
-        return not any(bx[0] < o[2] and o[0] < bx[2] and bx[1] < o[3] and o[1] < bx[3] for o in others)
-    room = slot_room(t, text, gap_in)
-    while room < 0 and not clear(room) and pt > min_pt:
+    at, _ = x_map(t); ay, _ = x_map(year)
+    m = margin_in * E
+    hit = lambda bx: any(bx[0] < o[2] and o[0] < bx[2] and bx[1] < o[3] and o[1] < bx[3] for o in others)
+    def ok_left(s_):                                       # whole tag moved left by s_ (slide EMU)
+        for b in ink_boxes(t):
+            bx = (b[0] - s_, b[1], b[2] - s_, b[3])
+            if hit(bx) or bx[0] < max(edges(b[1])[0], edges(b[3])[0]) + m: return False
+        return True
+    def ok_right(s_left, s_right):                         # year moved right by s_right after the tag moved left
+        yb = next(b for b in ink_boxes(t) if True and b is not None)
+        ys = [b for b in ink_boxes(t)][-1]                 # the year's text box is the last text box drawn
+        bx = (ys[0] - s_left + s_right, ys[1], ys[2] - s_left + s_right, ys[3])
+        return not hit(bx) and bx[2] < min(edges(ys[1])[1], edges(ys[3])[1]) - m
+    while True:
+        deficit = -slot_room(t, text, gap_in)
+        if deficit <= 0: return True
+        step = 0.02 * E
+        left = 0.0
+        while left + step <= deficit and ok_left(left + step): left += step
+        if ok_right(left, deficit - left):
+            t.left = int(t.left - left / at); year.left = int(year.left + deficit / ay)   # year: full overrun relative to the name
+            return True
+        if pt <= min_pt: return False
         pt -= 0.25
         for r_ in name.text_frame.paragraphs[0].runs: r_.font.size = Pt(pt)
-        room = slot_room(t, text, gap_in)
-    ok = room >= 0 or clear(room)
-    if room < 0: year.left = int(year.left - room / ay)
-    return ok
 
 
 def ledger_tags(g, outer, kx):
@@ -518,6 +535,18 @@ def ledger_tags(g, outer, kx):
     assert len(spokes) == len(WEDGES) - 1, spokes
     centre = lambda x: ((x.left + x.width / 2) / E, (x.top + x.height / 2) / E)
     texts = lambda t: [k for k in walk(t.shapes) if k.shape_type == 17 and k.text_frame.text.strip()]
+    def edges_at(w, t, y_slide):
+        """Slide x of wedge w's left and right spokes at slide height y (t: any shape whose parent is the fan group)."""
+        (ax_, bx_), (ay_, by_) = axis_map(t, 'x'), axis_map(t, 'y')
+        yc = (y_slide - by_) / ay_ / E                                  # fan-group child inches
+        i = WEDGES.index(w)
+        out = []
+        for a_ in ((spokes[i] if i < len(spokes) else 180.0), (spokes[i - 1] if i > 0 else 0.0)):
+            s_ = math.sin(math.radians(a_))
+            if abs(s_) < 1e-6: out.append(-1e12 if a_ > 90 else 1e12); continue
+            r_ = (CY - yc) / (RINGS[3][1] * s_)
+            out.append(ax_ * (CX + r_ * RINGS[3][0] * math.cos(math.radians(a_))) * E + bx_)
+        return out
     tags = []
     for t in g.shapes:
         if t.shape_type != 6: continue
@@ -577,8 +606,14 @@ def ledger_tags(g, outer, kx):
                 nx.getparent().replace(nx, deepcopy(ox))
                 old._element.addnext(pic); old._element.getparent().remove(old._element); cur_logo[0] = c
             if name_of[c] == old_text: return True
-            return fit_year(t, [b_ for o, _, _ in tags if o is not t and o._element.getparent() is not None
-                                for b_ in ink_boxes(o)])
+            others = [b_ for o, _, _ in tags if o is not t and o._element.getparent() is not None for b_ in ink_boxes(o)]
+            if fit_tag(t, others, lambda y: edges_at(w, t, y)): return True
+            if c in SHORT and SHORT[c] != name_of[c]:          # abbreviated name, same work
+                nm_box.text_frame.paragraphs[0].runs[0].text = SHORT[c]
+                for r_, sz_ in zip(nm_box.text_frame.paragraphs[0].runs, saved[1]): r_.font.size = sz_
+                if yr_box is not None: yr_box.left = saved[0]
+                return fit_tag(t, others, lambda y: edges_at(w, t, y))
+            return False
         tries = ([new] if new == k else []) + [c for c in (cands if new != k else []) ]
         if new == k and not apply(k):                            # valid work, but its full name does not fit here
             in_wedge[w].discard(k); uses[k] -= 1
@@ -603,6 +638,37 @@ def ledger_tags(g, outer, kx):
                 report.append(f'{w}: {k} -> {placed_}')
             new = placed_
         t._tag_key = new
+        t._rewritten = new != k or name_of[new] != old_text
+    # final pass: a rewritten tag that overlaps another tag moves sideways inside its wedge (left first, then right)
+    live = [(t, w) for t, w, _ in tags if t._element.getparent() is not None]
+    for t, w in live:
+        if not getattr(t, '_rewritten', False): continue           # designer-placed tags stay as they are
+        others = [b for o, _ in live if o is not t for b in ink_boxes(o)]
+        hit = lambda: any(b[0] < o[2] and o[0] < b[2] and b[1] < o[3] and o[1] < b[3] for b in ink_boxes(t) for o in others)
+        def inside(sign):                                          # only the spoke in the direction of the move
+            if sign < 0: return all(max(edges_at(w, t, b[1])[0], edges_at(w, t, b[3])[0]) < b[0] for b in ink_boxes(t))
+            return all(b[2] < min(edges_at(w, t, b[1])[1], edges_at(w, t, b[3])[1]) for b in ink_boxes(t))
+        if not hit(): continue
+        at, _ = x_map(t); start = t.left; done = False
+        for sign in (-1, 1):
+            t.left = start
+            for k_ in range(1, 16):                                # up to 0.3 in
+                t.left = int(start + sign * k_ * 0.02 * E / at)
+                if not inside(sign): break
+                if not hit(): done = True; break
+            if done: break
+        if not done:                                               # blocked both ways: tighten the tag itself
+            t.left = start
+            name, year, pt = tag_parts(t)
+            q = name.text_frame.paragraphs[0].runs[0].font.size; pt = q.pt if q is not None else pt
+            ay, _ = x_map(year)
+            while hit() and pt > 12.5 and year is not None:
+                pt -= 0.25
+                for r_ in name.text_frame.paragraphs[0].runs: r_.font.size = Pt(pt)
+                room = slot_room(t, name.text_frame.text.strip())
+                if room > 0: year.left = int(year.left - room / ay)   # the year follows the shorter name
+            done = not hit()
+        report.append(f'{w}: moved {t._tag_key}' + ('' if done else ' (could not clear an overlap)'))
     print('ledger check of tags:', len(tags), 'tags,', len(report), 'changed'); [print('  ', r_) for r_ in report]
 
 
