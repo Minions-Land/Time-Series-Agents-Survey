@@ -125,7 +125,7 @@ def main():
         'Optimization\n& Evolution': (['Optimization', 'and Evolution'], 'gh'),
         'Temporal Data\nManagement': (['Temporal Data', 'Management'], 'gts'),
         'Temporal \nProcessing': (['Temporal', 'Processing'], 'gts'),
-        'Temporal \nContext & Memory': (['Temporal', 'Context and Memory'], 'gts'),
+        'Temporal \nContext & Memory': (['Temporal', 'Context', 'and Memory'], 'gts'),
         'Temporal\nValidation': (['Temporal', 'Validation'], 'gts'),
         'Forecasting \nPrediction': (['Forecasting', 'and Prediction'], 'tsk'),
         'Data Augmentation\n& Synthesis': (['Data Augmentation', 'and Synthesis'], 'tsk'),
@@ -139,7 +139,7 @@ def main():
         t = s.text_frame.text
         if t in wedge:
             lines, key = wedge[t]; set_lines(s, lines, HUE[key][0]); wedge_labels.append(s.shape_id)
-            size = {'Temporal \nContext & Memory': 14.5, 'Interface\n& Interaction': 15}.get(t, 16)
+            size = {'Interface\n& Interaction': 15}.get(t, 16)
             for p in s.text_frame.paragraphs:
                 for r in p.runs: r.font.size = Pt(size)          # "and" makes the labels longer than the old "&"
             if t.startswith('Interface'): s.left += Inches(0.18)   # keep clear of the icon on its left
@@ -762,7 +762,7 @@ def arched_layer_names(slide, rpr, to_slide, kx, ky, labels, size_max=21.5, line
 
 
 # Task-Specific Harness wedges (scripts/task_groups.py, ORDER): new boundaries in degrees, from 50 (GTS | TSK) to 0.
-TSK_GROUPS = [('Analysis of', 'Observed Series'), ('Forecasting',), ('Generation',), ('Decision', 'Making')]
+TSK_GROUPS = [('Analysis', 'of Observed', 'Series'), ('Forecasting',), ('Generation',), ('Decision', 'Making')]
 TSK_BOUNDS = [50.0, 29.5, 18.5, 9.5, 0.0]
 # Representative works per group. A work goes to the group of its Task-Specific Harness modules (ledger task labels
 # mapped by task_groups.LEAF); a work whose modules span two groups stays in the group that matches its former family
@@ -786,7 +786,7 @@ def retask_tsk(g, slide, sid, keep, wedge_labels, centre, to_child, to_slide, tn
     lim = TSK_BOUNDS[0] - 1
     mids = [(a0 + a1) / 2 for a0, a1 in zip(TSK_BOUNDS, TSK_BOUNDS[1:])]
     label_at, icon_at = list(mids), list(mids)
-    label_at[0], icon_at[0] = 35.5, 43.0          # the wide Analysis wedge: label and icon side by side, not overlapping
+    # every wedge: label (inner) and icon (outer) on the wedge's centre line, as in the other sectors
     # spokes: the three thin spokes inside the sector move to the new boundaries (same radii)
     outer = lambda s: max(ends(s), key=norm)
     thin = sorted((s for s in g.shapes if s.shape_type == 1 and s.line.fill.type == 1 and s.line.width.pt < 1.9
