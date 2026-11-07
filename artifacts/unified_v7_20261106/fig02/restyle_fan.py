@@ -340,6 +340,9 @@ def main():
     g._element.grpSpPr.remove(g._element.grpSpPr.find(qn('a:xfrm')))
     g._element.grpSpPr.insert(0, xfrm)
 
+    # 5b) representative works: every tag must have a module in its wedge's cell of the re-audited ledger
+    ledger_tags(g, outer, kx)
+
     # 6) clay icons for the 14 wedges (top-level pictures), ordered left to right around the fan
     names = ['llm', 'chat', 'memory', 'tools', 'planning', 'runtime', 'calendar', 'window', 'timeline', 'cutoff',
              'anomaly', 'forecast', 'synthesis', 'decision']   # task groups: analysis, forecasting, generation, decision
@@ -351,8 +354,337 @@ def main():
         path = os.path.join(ICON_DIR + '_print', nm + '.png')
         slide.shapes.add_picture(path, int(c[0] - size / 2), int(c[1] - size / 2), size, size)
         p._element.getparent().remove(p._element)
+
+    # 7) layer names in the inner ring as arched text: one rotated text box per character along the ring
+    rpr = deepcopy(by_id[47].text_frame.paragraphs[0].runs[0]._r.find(qn('a:rPr')))
+    for old in (by_id[47], by_id[79], by_id[289], by_id[80], by_id[1090], by_id[83], name):
+        old._element.getparent().remove(old._element)
+    arched_layer_names(slide, rpr, to_slide, kx, ky, [('llm', a_gh, 180.0, ('LLM', 'Side')),
+                       ('gh', a_gts, a_gh, ('General', 'Harness')),
+                       ('gts', a_tsk, a_gts, ('General Time Series', 'Harness')),
+                       ('tsk', 0.0, a_tsk, ('Task-Specific', 'Harness'))])
     prs.save(OUT)
     print('saved', OUT, 'sectors at', [round(b, 1) for b in bounds], 'rotation factor', round(f, 4), 'icons', len(pics))
+
+
+FONT_FILE = '/System/Library/Fonts/Supplemental/Comic Sans MS Bold.ttf'
+LEDGER = os.path.join(HERE, '..', '..', '..', 'paper_classification_ledger.json')
+WEDGES = ['tsk4', 'tsk3', 'tsk2', 'tsk1', 'gts4', 'gts3', 'gts2', 'gts1', 'optimization', 'planning', 'tools', 'memory',
+          'interface', 'llm']                                 # by angle, from 0 deg (right) to 180 deg (left)
+CELL = {'interface': ('GH', 'Interface and Interaction'), 'memory': ('GH', 'Memory and Context'),
+        'tools': ('GH', 'Tools and Execution'), 'planning': ('GH', 'Planning and Orchestration'),
+        'optimization': ('GH', 'Optimization and Evolution'), 'gts1': ('GTS', 'data_management'),
+        'gts2': ('GTS', 'processing'), 'gts3': ('GTS', 'context_memory'), 'gts4': ('GTS', 'validation'),
+        'tsk1': ('TSK', 'analysis'), 'tsk2': ('TSK', 'forecasting'), 'tsk3': ('TSK', 'generation'),
+        'tsk4': ('TSK', 'decision'), 'llm': ('LLM', None)}
+# figure tag name -> ledger key where the name is not the ledger's work name (None: not a reviewed contribution)
+TAG_KEY = {'TS-Scientist': 'timeseriesscientist2025', 'AURA': 'auraforecaster2026', 'TS-Gym': 'timeseriesgym2025',
+           'SIRN': 'siren2026', 'SIREN': 'siren2026', 'TS-Exam Agent': 'timeseriesexamagent2026',
+           'TSOrchestr': 'conversationaltsfm2025', 'TSOrchestra': 'conversationaltsfm2025',
+           'TimeClaw-EEL': 'timeclaw2026explore', 'TimeClaw-Harness': 'timeclaw2026harness',
+           'AuditForecast': None, 'FutureSim': None}
+SHOWN = {'siren2026': 'SIREN', 'timeclaw2026explore': 'TimeClaw-EEL', 'timeclaw2026harness': 'TimeClaw-Harness',
+         'conversationaltsfm2025': 'TSOrchestra'}
+MAX_USES = 3                                                  # a work appears in at most three wedges
+TAG_FONT = '/System/Library/Fonts/Supplemental/Times New Roman Bold.ttf'
+
+
+def axis_map(shape, axis='x'):
+    """(a, b) with slide = a * local + b along one axis, for a shape inside any number of nested groups."""
+    pos, ext = ('x', 'cx') if axis == 'x' else ('y', 'cy')
+    a, b = 1.0, 0.0
+    el = shape._element.getparent()
+    while el is not None:
+        if el.tag == qn('p:grpSp'):
+            xf = el.find(qn('p:grpSpPr')).find(qn('a:xfrm'))
+            k = int(xf.find(qn('a:ext')).get(ext)) / int(xf.find(qn('a:chExt')).get(ext))
+            off, ch = int(xf.find(qn('a:off')).get(pos)), int(xf.find(qn('a:chOff')).get(pos))
+            a, b = a * k, off + (b - ch) * k
+        el = el.getparent()
+    return a, b
+
+
+x_map = lambda shape: axis_map(shape, 'x')
+
+
+def slide_box(shape, x0=None, x1=None):
+    """Slide-space box (x0, y0, x1, y1) of a shape, optionally with other local x bounds."""
+    (ax, bx), (ay, by) = axis_map(shape, 'x'), axis_map(shape, 'y')
+    lx0 = shape.left if x0 is None else x0
+    lx1 = shape.left + shape.width if x1 is None else x1
+    return ax * lx0 + bx, ay * shape.top + by, ax * lx1 + bx, ay * (shape.top + shape.height) + by
+
+
+def ink_boxes(t):
+    """Slide-space boxes of what a tag actually draws: its logo, and its name and year text at their measured widths."""
+    out = [slide_box(k) for k in walk(t.shapes) if k.shape_type == 13]
+    for k in walk(t.shapes):
+        if k.shape_type != 17 or not k.text_frame.text.strip(): continue
+        rpr = k.text_frame.paragraphs[0].runs[0]._r.find(qn('a:rPr'))
+        q = k.text_frame.paragraphs[0].runs[0].font.size
+        pt = q.pt if q is not None else (int(rpr.get('sz')) / 100 if rpr is not None and rpr.get('sz') else 15.23)
+        ax, _ = x_map(k)
+        ins = k.text_frame.margin_left if k.text_frame.margin_left is not None else 91440
+        w = name_width(k.text_frame.text.strip(), pt) / ax
+        x0, y0, x1, y1 = slide_box(k, k.left + ins, k.left + ins + w)
+        h = (y1 - y0); yc = (y0 + y1) / 2; th = pt * 12700 * 1.1                    # text height, centred (anchor ctr)
+        out.append((x0, yc - th / 2, x1, yc + th / 2))
+    return out
+
+
+def tag_parts(t):
+    tx = [k for k in walk(t.shapes) if k.shape_type == 17 and k.text_frame.text.strip()]
+    name = next(k for k in tx if not k.text_frame.text.strip().isdigit())
+    year = next((k for k in tx if k.text_frame.text.strip().isdigit()), None)
+    rpr = name.text_frame.paragraphs[0].runs[0]._r.find(qn('a:rPr'))
+    pt = int(rpr.get('sz')) / 100 if rpr is not None and rpr.get('sz') else 15.23
+    return name, year, pt
+
+
+def name_width(text, pt):
+    from PIL import ImageFont
+    return ImageFont.truetype(TAG_FONT, 1000).getlength(text) / 1000 * pt * 12700      # slide EMU
+
+
+def slot_room(t, text, gap_in=0.06):
+    """Slide EMU left between the end of `text` (at the tag's name size) and the tag's year column."""
+    name, year, pt = tag_parts(t)
+    if year is None: return 1e9
+    (an, bn), (ay, by) = x_map(name), x_map(year)
+    ins = name.text_frame.margin_left if name.text_frame.margin_left is not None else 91440
+    return (ay * year.left + by) - (an * name.left + bn) - an * ins - gap_in * E - name_width(text, pt)
+
+
+def fit_year(t, others, gap_in=0.06, min_pt=12.0):
+    """Fit a rewritten name into its slot. If the name overruns the year column, the year moves right to follow it,
+    provided the moved year does not overlap another tag; otherwise the name shrinks (down to min_pt) until the move
+    is clear or the name fits."""
+    name, year, pt = tag_parts(t)
+    if year is None: return
+    text = name.text_frame.text.strip()
+    ay, _ = x_map(year)
+    ypt = int(year.text_frame.paragraphs[0].runs[0]._r.find(qn('a:rPr')).get('sz') or 1120) / 100
+    def clear(room):
+        nx0 = year.left - room / ay
+        bx = slide_box(year, nx0, nx0 + (name_width(year.text_frame.text.strip(), ypt) + 0.04 * E) / ay)
+        return not any(bx[0] < o[2] and o[0] < bx[2] and bx[1] < o[3] and o[1] < bx[3] for o in others)
+    room = slot_room(t, text, gap_in)
+    while room < 0 and not clear(room) and pt > min_pt:
+        pt -= 0.25
+        for r_ in name.text_frame.paragraphs[0].runs: r_.font.size = Pt(pt)
+        room = slot_room(t, text, gap_in)
+    ok = room >= 0 or clear(room)
+    if room < 0: year.left = int(year.left - room / ay)
+    return ok
+
+
+def ledger_tags(g, outer, kx):
+    """Check every representative-work tag against the ledger and repair the ones that fail.
+
+    A tag in wedge w is valid when its work has a module in w's cell: an LLM-side module (LLM wedge), a General Harness
+    module with that mechanism dimension, a General Time Series Harness module with that temporal function, or a
+    Task-Specific Harness module applied to that task group (scripts/task_groups.py). Valid tags stay. An invalid tag
+    keeps its slot and is rewritten (name, year, logo) to the valid work, among the works already shown in the figure
+    (their logos are known), with the most modules in that cell and the fewest appearances so far; a slot with no
+    valid candidate is removed. Years follow the ledger's first public version."""
+    import csv, json, re
+    sys.path.insert(0, os.path.join(HERE, '..', '..', '..', 'scripts'))
+    from task_groups import module_groups
+    recs = {r['citation']['key']: r for r in json.load(open(LEDGER)) if r.get('inclusion') == 'reviewed_contribution'}
+    norm = lambda t: re.sub(r'[^a-z0-9]', '', t.lower())
+    by_work = {}
+    with open(os.path.join(HERE, '..', '..', '..', 'paper_classification_ledger.csv'), encoding='utf-8') as fh:
+        for row in csv.DictReader(fh):
+            if row['citation_key'] in recs: by_work.setdefault(norm(row['work']), row['citation_key'])
+    def key_of(name, seen_timeclaw=[]):
+        if name == 'TimeClaw':                                # two works share the short name: EEL first, then Harness
+            seen_timeclaw.append(1); return 'timeclaw2026explore' if len(seen_timeclaw) == 1 else 'timeclaw2026harness'
+        if name in TAG_KEY: return TAG_KEY[name]
+        n = norm(name)
+        if n in by_work: return by_work[n]
+        hits = {v for kk, v in by_work.items() if kk.startswith(n) or n.startswith(kk)}
+        return hits.pop() if len(hits) == 1 else None
+    def count(key, wedge):
+        layer, label = CELL[wedge]; n = 0
+        for m in recs[key]['module_level_contributions']['modules']:
+            if m['layer'] != layer: continue
+            if layer == 'LLM': n += 1
+            elif layer == 'GH': n += label in (m.get('dimensions') or [])
+            elif layer == 'GTS': n += label in (m.get('functions') or (m.get('function_view') or {}).get('functions') or [])
+            else: n += label in module_groups(m)
+        return n
+    lines = [x for x in g.shapes if x.shape_type == 1 and x.line.fill.type == 1]
+    spokes = sorted({round(angle(*outer(x)), 1) for x in lines})
+    assert len(spokes) == len(WEDGES) - 1, spokes
+    centre = lambda x: ((x.left + x.width / 2) / E, (x.top + x.height / 2) / E)
+    texts = lambda t: [k for k in walk(t.shapes) if k.shape_type == 17 and k.text_frame.text.strip()]
+    tags = []
+    for t in g.shapes:
+        if t.shape_type != 6: continue
+        tx = texts(t); nm = [k for k in tx if not k.text_frame.text.strip().isdigit()]
+        if not nm: continue
+        w = WEDGES[sum(1 for b in spokes if b < angle(*centre(t)))]
+        tags.append([t, w, key_of(nm[0].text_frame.text.strip())])
+    logo = {}
+    for t, w, k in tags:
+        if k and k not in logo: logo[k] = deepcopy(next(x for x in walk(t.shapes) if x.shape_type == 13)._element)
+    name_of = {}
+    for t, w, k in tags:
+        if k: name_of.setdefault(k, SHOWN.get(k, next(x for x in texts(t) if not x.text_frame.text.strip().isdigit()).text_frame.text.strip()))
+    valid = lambda k, w: k in recs and count(k, w) > 0
+    uses = {}
+    for t, w, k in tags:
+        if valid(k, w): uses[k] = uses.get(k, 0) + 1
+    report = []
+    in_wedge = {}
+    for t, w, k in tags:
+        if valid(k, w): in_wedge.setdefault(w, set()).add(k)
+    for t, w, k in sorted(tags, key=lambda x: (WEDGES.index(x[1]), x[0].top)):
+        in_wedge.setdefault(w, set())
+        if valid(k, w):
+            new = k
+        else:
+            cands = [c for c in logo if valid(c, w) and c not in in_wedge[w] and uses.get(c, 0) < MAX_USES] or \
+                    [c for c in logo if valid(c, w) and c not in in_wedge[w] and uses.get(c, 0) < MAX_USES + 1]   # rather than an empty slot
+            # names that fit the slot's year column first, so a longer name does not run into the next column
+            cands.sort(key=lambda c: (slot_room(t, name_of[c]) < -0.04 * E, -count(c, w), uses.get(c, 0),
+                                      -int(recs[c]['publication']['public_month'][:4]), c))
+            if not cands:
+                report.append(f'{w}: removed {k}'); t._element.getparent().remove(t._element); continue
+            new = cands[0]; uses[new] = uses.get(new, 0) + 1; in_wedge[w].add(new)
+            report.append(f'{w}: {k} -> {new}')
+        # rewrite name, year and logo; a candidate whose name cannot be placed without overlapping another tag is
+        # skipped, and a slot with no placeable candidate is removed
+        old_text = next(x for x in texts(t) if not x.text_frame.text.strip().isdigit()).text_frame.text.strip()
+        nm_box, yr_box, _ = tag_parts(t)
+        saved = (yr_box.left if yr_box is not None else None, [r_.font.size for r_ in nm_box.text_frame.paragraphs[0].runs])
+        cur_logo = [k]
+        def apply(c):
+            if yr_box is not None: yr_box.left = saved[0]
+            for r_, sz_ in zip(nm_box.text_frame.paragraphs[0].runs, saved[1]): r_.font.size = sz_
+            for x in texts(t):
+                is_year = x.text_frame.text.strip().isdigit()
+                runs = x.text_frame.paragraphs[0].runs
+                for r_ in runs[1:]: r_.text = ''
+                for p_ in x.text_frame.paragraphs[1:]:
+                    for r_ in p_.runs: r_.text = ''
+                runs[0].text = recs[c]['publication']['public_month'][:4] if is_year else name_of[c]
+            if c != cur_logo[0]:
+                old = next(x for x in walk(t.shapes) if x.shape_type == 13)
+                pic = deepcopy(logo[c])
+                for nv in pic.iter(qn('p:cNvPr')): nv.set('id', str(9000 + len(report) + len(in_wedge[w])))
+                nx = pic.find(qn('p:spPr')).find(qn('a:xfrm')); ox = old._element.find(qn('p:spPr')).find(qn('a:xfrm'))
+                nx.getparent().replace(nx, deepcopy(ox))
+                old._element.addnext(pic); old._element.getparent().remove(old._element); cur_logo[0] = c
+            if name_of[c] == old_text: return True
+            return fit_year(t, [b_ for o, _, _ in tags if o is not t and o._element.getparent() is not None
+                                for b_ in ink_boxes(o)])
+        tries = ([new] if new == k else []) + [c for c in (cands if new != k else []) ]
+        if new == k and not apply(k):                            # valid work, but its full name does not fit here
+            in_wedge[w].discard(k); uses[k] -= 1
+            tries = [c for c in logo if valid(c, w) and c not in in_wedge[w] and uses.get(c, 0) < MAX_USES]
+            tries.sort(key=lambda c: (slot_room(t, name_of[c]) < -0.04 * E, -count(c, w), uses.get(c, 0), c))
+            new = None
+        elif new == k:
+            tries = []
+        if new != k:
+            placed_ = None
+            for c in tries:
+                if apply(c): placed_ = c; break
+            if placed_ is None:
+                if new is not None: uses[new] -= 1; in_wedge[w].discard(new)
+                report[-1:] = [] if report and report[-1].startswith(f'{w}: {k} ->') else report[-1:]
+                report.append(f'{w}: removed {k} (no candidate fits the slot)')
+                t._element.getparent().remove(t._element); continue
+            if placed_ != new:
+                if new is not None: uses[new] -= 1; in_wedge[w].discard(new)
+                uses[placed_] = uses.get(placed_, 0) + 1; in_wedge[w].add(placed_)
+                if report and report[-1].startswith(f'{w}: {k} ->'): report.pop()
+                report.append(f'{w}: {k} -> {placed_}')
+            new = placed_
+        t._tag_key = new
+    print('ledger check of tags:', len(tags), 'tags,', len(report), 'changed'); [print('  ', r_) for r_ in report]
+
+
+def arched_layer_names(slide, rpr, to_slide, kx, ky, labels, size_max=21.5, lines_at=(0.68, 0.32), margin=0.12, llm_margin=0.04):
+    """Write each layer name as two arched lines centred in its sector of the inner ring (between RINGS[0] and
+    RINGS[1]). Characters follow the ring ellipse in slide space and are rotated to its tangent, so the text reads
+    around the centre. One font size is used for the three Harness layers; it shrinks from size_max until every line
+    fits inside its sector with `margin` inches to spare at both ends. The narrow LLM wedge gets its own fitted size."""
+    from PIL import ImageFont
+    from pptx.enum.text import MSO_AUTO_SIZE, MSO_ANCHOR
+    font = ImageFont.truetype(FONT_FILE, 1000)
+    cxs, cys = to_slide(CX, CY)
+    def ring(t):                                          # semi-axes (EMU, slide space) at fraction t of the band
+        rx = RINGS[0][0] + t * (RINGS[1][0] - RINGS[0][0]); ry = RINGS[0][1] + t * (RINGS[1][1] - RINGS[0][1])
+        return rx * E * kx, ry * E * ky
+    def arclen(Rx, Ry, a0, a1, n=400):                   # length of the ellipse arc a0..a1 (degrees), EMU
+        da = math.radians(a1 - a0) / n
+        return sum(math.hypot(Rx * math.sin(math.radians(a0) + (k + .5) * da), Ry * math.cos(math.radians(a0) + (k + .5) * da)) * da
+                   for k in range(n))
+    width = lambda text, pt: sum(font.getlength(c) for c in text) / 1000 * pt * 12700 * 1.04   # EMU, slight tracking
+    def fits(a0, a1, lines, pt, m):
+        return all(width(ln, pt) + 2 * m * E <= arclen(*ring(t), a0, a1) for ln, t in zip(lines, lines_at))
+    def size_for(a0, a1, lines, cap, m=margin):
+        pt = cap
+        while pt > 8 and not fits(a0, a1, lines, pt, m): pt -= 0.25
+        return pt
+    shared = min(size_for(a0, a1, lines, size_max) for key, a0, a1, lines in labels if key != 'llm')
+    placed = {}
+    def add_char_box(text, x, y, w, pt, rot, key):
+        bw, bh = int(w * 1.9 + 20000), int(pt * 12700 * 1.5)
+        tb = slide.shapes.add_textbox(int(x - bw / 2), int(y - bh / 2), bw, bh)
+        tf = tb.text_frame; tf.word_wrap = False; tf.auto_size = MSO_AUTO_SIZE.NONE
+        tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
+        tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+        para = tf.paragraphs[0]; para.alignment = PP_ALIGN.CENTER
+        r = para._p.makeelement(qn('a:r'), {}); r.append(deepcopy(rpr))
+        tt = r.makeelement(qn('a:t'), {}); tt.text = text; r.append(tt); para._p.append(r)
+        run = para.runs[0]; run.font.size = Pt(pt); run.font.bold = True; run.font.color.rgb = rgb(HUE[key][0])
+        tb.rotation = rot % 360
+    for key, a0, a1, lines in labels:
+        if key == 'llm':
+            # The LLM wedge is only a few degrees wide and nearly horizontal: arched letters would stand on end.
+            # Its name runs along the wedge's radius instead (reading towards the centre), at the largest size that
+            # fits the band length and the wedge width at the text's inner end.
+            text, am = ' '.join(lines), math.radians((a0 + a1) / 2)
+            (rx0, ry0), (rx1, ry1) = ring(0.0), ring(1.0)
+            band = math.hypot((rx1 - rx0) * math.cos(am), (ry1 - ry0) * math.sin(am))
+            Rx, Ry = ring(0.5)
+            rmid = math.hypot(Rx * math.cos(am), Ry * math.sin(am))
+            pt = shared
+            while pt > 8:
+                w = width(text, pt)
+                inner = rmid - w / 2
+                if w + 2 * llm_margin * E <= band and pt * 12700 * 1.1 <= inner * math.radians(a1 - a0) - 2 * llm_margin * E: break
+                pt -= 0.25
+            placed[key] = pt
+            x, y = cxs + Rx * math.cos(am), cys - Ry * math.sin(am)
+            add_char_box(text, x, y, width(text, pt) / 1.9, pt, math.degrees(math.atan2(Ry * math.sin(am), -Rx * math.cos(am))), key)
+            continue
+        pt = shared
+        placed[key] = pt
+        for ln, t in zip(lines, lines_at):
+            Rx, Ry = ring(t)
+            am = (a0 + a1) / 2
+            half = width(ln, pt) / 2
+            # walk the ellipse from the sector middle to find the start angle (text reads with decreasing angle)
+            grid = [am + k * 0.02 for k in range(int((a1 - am) / 0.02) + 1)]
+            start = next(a for a in grid if arclen(Rx, Ry, am, a, 60) >= half)
+            s_done, a_cur = 0.0, start
+            for c in ln:
+                w = font.getlength(c) / 1000 * pt * 12700 * 1.04
+                target = s_done + w / 2                    # arc position of this character's centre
+                a_c = a_cur
+                while arclen(Rx, Ry, a_c, start, 40) < target: a_c -= 0.01
+                s_done += w
+                if c == ' ': continue
+                ar = math.radians(a_c)
+                x, y = cxs + Rx * math.cos(ar), cys - Ry * math.sin(ar)
+                rot = math.degrees(math.atan2(Ry * math.cos(ar), Rx * math.sin(ar)))   # tangent, reading direction
+                add_char_box(c, x, y, w, pt, rot, key)
+                a_cur = a_c
+    print('arched layer names, font sizes:', {k: round(v, 2) for k, v in placed.items()})
 
 
 # Task-Specific Harness wedges (scripts/task_groups.py, ORDER): new boundaries in degrees, from 50 (GTS | TSK) to 0.
