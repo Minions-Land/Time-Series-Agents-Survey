@@ -133,7 +133,7 @@ A Paper Card records what a work contributes, module by module, with the passage
 ## 📈 What the records show
 
 <p align="center">
-  <img src="docs/assets/trends.png" width="88%" alt="Module contributions over time: cumulative counts and doubling times by layer, share of new modules by period, and a classification of every Harness module by mechanism dimension and task group, coloured by layer.">
+  <img src="docs/assets/trends.png" width="88%" alt="Module contributions over time: cumulative counts and doubling times by layer, share of new modules by period, and a classification of every Harness module from its layer through its mechanism dimensions to its task groups.">
 </p>
 
 - **How to assess a new work.** Place its modules in the formula; check the claimed scope (a general mechanism
@@ -147,6 +147,9 @@ A Paper Card records what a work contributes, module by module, with the passage
   would have moved a general mechanism into a more specific layer.
 - **Effort is moving from the model to the runtime.** The LLM side supplied about a third of new modules until the
   end of 2024 and 7–18% in each later period. Shared temporal modules grow fastest, doubling about every 5 months.
+- **Time series adaptation is mostly tools.** 67 of the 97 General Time Series Harness modules provide tools and
+  execution; only 18 plan or orchestrate and 2 optimize the Harness, so temporal workflow control is still written as a
+  general mechanism or inside a task. Decision making relies on task modules in every mechanism dimension.
 - **Solutions stay inside tasks.** There are 325 task-specific modules for 97 shared temporal ones. Of the module
   links to a tested requirement, 108 of 181 are task modules. Generation has no shared data-management module.
 
