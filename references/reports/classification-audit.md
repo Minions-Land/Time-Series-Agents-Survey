@@ -1,14 +1,14 @@
 # Classification ledger audit
 
-- Records: 166
-- Unique citation keys: 166
-- Primary loci: {'GH': 10, 'GTS': 11, 'LLM': 37, 'NONE': 3, 'TSK': 105}
-- Multi-label task-axis counts: {'anomaly_detection_diagnosis': 39, 'augmentation_synthesis': 11, 'decision_support': 46, 'forecasting_reasoning': 84}
-- BibTeX keys matched: 166/166 (repository-only records excluded from production BibTeX)
-- Reference manifest keys matched: 166/166 (repository-only records excluded from manifest)
+- Records: 167
+- Unique citation keys: 167
+- Primary loci: {'GH': 12, 'GTS': 12, 'LLM': 28, 'NONE': 5, 'TSK': 110}
+- Multi-label task-axis counts: {'anomaly_detection_diagnosis': 45, 'augmentation_synthesis': 10, 'decision_support': 49, 'forecasting_reasoning': 95}
+- BibTeX keys matched: 167/167 (repository-only records excluded from production BibTeX)
+- Reference manifest keys matched: 167/167 (repository-only records excluded from manifest)
 - Corpus completeness: not assessed by this structural validation
 - Errors: 0
-- Warnings: 0
+- Warnings: 1
 
 ## Errors
 
@@ -16,4 +16,4 @@ None.
 
 ## Warnings
 
-None.
+ledger/profile key mismatch: ledger_only=[], profile_only=['auditforecast2026', 'futuresim2026']
