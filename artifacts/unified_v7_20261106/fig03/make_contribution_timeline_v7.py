@@ -37,6 +37,7 @@ OUT_GROUPS = HERE / "task_group_placement.csv"               # panel (c) counts,
 DIM_LINKS: list[tuple[str, str]] = []                         # (mechanism dimension, layer), one per module label
 GROUP_LINKS: list[tuple[str, str]] = []                       # (layer, task group), one per module task group
 LAYER_MODULES: Counter = Counter()                            # Harness modules per layer
+PAIRS: list[tuple[str, str, str]] = []                        # (mechanism dimension, task group, layer) of one module
 sys.path.insert(0, str(ROOT / "scripts"))
 from task_groups import GROUPS, ORDER as GROUP_ORDER, module_groups   # noqa: E402  task groups of the survey
 # The five mechanism dimensions of the General Harness (Table tab:component-vocab), in the order of Section 4.
@@ -86,6 +87,8 @@ def main() -> None:
             LAYER_MODULES[layer] += 1
             DIM_LINKS.extend((d, layer) for d in module.get("dimensions") or [] if d in DIMENSIONS)
             GROUP_LINKS.extend((layer, g) for g in GROUP_ORDER if g in module_groups(module))
+            PAIRS.extend((d, g, layer) for d in module.get("dimensions") or [] if d in DIMENSIONS
+                         for g in GROUP_ORDER if g in module_groups(module))
     monthly: dict[str, Counter] = {}
     dated_records, undated = [], []
     for record in records:
@@ -197,7 +200,7 @@ OY = CH + 0.35                       # the top row sits above panel (c)
 ZONES = {"a": (0.12, OY + 0.10, 6.88, 5.10), "b": (7.16, OY + 0.10, 6.05, 5.10), "c": (0.12, 0.10, 13.09, CH - 0.1)}
 AXES = {"a": (1.02, OY + 0.80, 5.36, 3.98), "b": (8.16, OY + 1.12, 4.92, 3.48)}
 TITLES = {"a": "(a)  Cumulative Module Contributions", "b": "(b)  Share of New Modules by Period",
-          "c": "(c)  Harness Modules by Mechanism Dimension, Layer and Task Group"}
+          "c": "(c)  Harness Modules by Mechanism Dimension and Task Group"}
 
 
 def zone_panel(fig, key):
@@ -318,7 +321,7 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
     plt.close(fig)
 
 
-# ---- (c) classification of Harness modules: mechanism dimension -> layer -> task group ------------------------
+# ---- (c) classification of Harness modules: mechanism dimension -> task group, coloured by layer --------------
 DIM_LABEL = {"Interface and Interaction": "Interface and\nInteraction", "Memory and Context": "Memory and\nContext",
              "Tools and Execution": "Tools and\nExecution", "Planning and Orchestration": "Planning and\nOrchestration",
              "Optimization and Evolution": "Optimization\nand Evolution"}
@@ -329,22 +332,20 @@ NODE_FILL, NODE_EDGE = "#FFFFFF", "#D9DBE8"
 
 
 def parallel_paths(fig, months):
-    """Mechanism dimension -> Harness layer -> task group. Left paths are the mechanism labels of the modules of each
-    layer, right paths their task groups; both are coloured by the layer, so the panel reads as the classification of
-    every Harness module in the vocabularies of Table tab:term-basis."""
+    """Mechanism dimension -> task group. Each path joins one mechanism label and one task group of the same Harness
+    module and is coloured by the module's layer; inside each box the paths are grouped by layer, so a box shows how
+    its modules split over General Harness, General Time Series Harness and Task-Specific Harness."""
     from matplotlib.patches import FancyBboxPatch as Box
     from matplotlib.path import Path as MPath
     from matplotlib.patches import PathPatch
     x0, y0, w, h = ZONES["c"]
     cx = fig.add_axes((x0 / FIG_W, y0 / FIG_H, w / FIG_W, h / FIG_H)); cx.set_xlim(0, w); cx.set_ylim(0, h); cx.axis("off")
     axes = [("Mechanism Dimension", DIMENSIONS, lambda k: DIM_LABEL[k]),
-            ("Layer", HARNESS, lambda k: LAYER_NAME[k].replace("General Time Series ", "General Time Series\n")
-                                                      .replace("Task-Specific ", "Task-Specific\n")),
             ("Task Group", GROUP_ORDER, lambda k: GROUP_LABEL[k])]
-    links = [DIM_LINKS, GROUP_LINKS]                       # link a joins axis a and axis a + 1
-    size = [Counter(d for d, _ in DIM_LINKS), LAYER_MODULES, Counter(g for _, g in GROUP_LINKS)]
-    XS, BWS = [0.55, 5.25, 9.95], [2.6, 2.6, 2.6]          # left edge and width of each axis' boxes
-    MINH, GAPS = [0.62, 0.8, 0.66], [0.13, 0.16, 0.14]
+    split = [Counter(DIM_LINKS), Counter((g, l) for l, g in GROUP_LINKS)]      # (key, layer) -> modules
+    size = [Counter(d for d, _ in DIM_LINKS), Counter(g for _, g in GROUP_LINKS)]
+    XS, BWS = [1.0, 9.15], [2.95, 2.95]                    # left edge and width of each axis' boxes
+    MINH, GAPS = [0.62, 0.66], [0.13, 0.15]
     top, bottom = h - 1.05, 0.62
     boxes = {}
     for a, (title, keys, label) in enumerate(axes):
@@ -357,36 +358,28 @@ def parallel_paths(fig, months):
             boxes[(a, k)] = (y - hh, hh)
             y -= hh + GAPS[a]
     order = [{k: i for i, k in enumerate(keys)} for _, keys, _ in axes]
-    style = {"GH": (COLORS["General Harness"], 1.3, 0.7), "GTS": (COLORS["General Time Series Harness"], 1.5, 0.8),
-             "TSK": (COLORS["Task-Specific Harness"], 0.9, 0.4)}
-    layer_of = lambda link, a: link[1] if a == 0 else link[0]
-    for a, items in enumerate(links):
-        # slots on the right side of axis a and the left side of axis a + 1, ordered by the opposite end
-        ends = {}
-        for side_axis, other in ((a, 1), (a + 1, 0)):
-            for k in axes[side_axis][1]:
-                idx = [i for i, it in enumerate(items) if it[1 - other] == k]
-                idx.sort(key=lambda i: (order[a + other][items[i][other]], order[a + 1 - other][items[i][1 - other]]))
-                yb, hh = boxes[(side_axis, k)]
-                for j, i in enumerate(idx):
-                    ends[(i, side_axis)] = yb + hh - hh * (j + 1) / (len(idx) + 1)
-        draw = sorted(range(len(items)), key=lambda i: ("TSK", "GH", "GTS").index(layer_of(items[i], a)))
-        for i in draw:
-            col, lw, al = style[layer_of(items[i], a)]
-            xa, xb = XS[a] + BWS[a], XS[a + 1]
-            ya, yb = ends[(i, a)], ends[(i, a + 1)]
-            xm = (xa + xb) / 2
-            p = MPath([(xa, ya), (xm, ya), (xm, yb), (xb, yb)], [MPath.MOVETO, MPath.CURVE4, MPath.CURVE4, MPath.CURVE4])
-            cx.add_patch(PathPatch(p, fc="none", ec=col, lw=lw, alpha=al, zorder=2, capstyle="round"))
-    # boxes: dimension and task-group boxes give their split over the three layers, layer boxes their module count
-    split = [Counter((d, l) for d, l in DIM_LINKS), None, Counter((g, l) for l, g in GROUP_LINKS)]
+    layer_rank = {l: i for i, l in enumerate(HARNESS)}
+    ends = {}
+    for a in (0, 1):                                       # slots inside each box: by the other end (fewer crossings), then by layer
+        for k in axes[a][1]:
+            idx = [i for i, it in enumerate(PAIRS) if it[a] == k]
+            idx.sort(key=lambda i: (order[1 - a][PAIRS[i][1 - a]], layer_rank[PAIRS[i][2]]))
+            yb, hh = boxes[(a, k)]
+            for j, i in enumerate(idx):
+                ends[(i, a)] = yb + hh - hh * (j + 1) / (len(idx) + 1)
+    style = {"GH": (COLORS["General Harness"], 1.2, 0.6), "GTS": (COLORS["General Time Series Harness"], 1.3, 0.7),
+             "TSK": (COLORS["Task-Specific Harness"], 0.9, 0.35)}
+    xa, xb = XS[0] + BWS[0], XS[1]
+    xm = (xa + xb) / 2
+    for i in sorted(range(len(PAIRS)), key=lambda i: ("TSK", "GH", "GTS").index(PAIRS[i][2])):
+        col, lw, al = style[PAIRS[i][2]]
+        ya, yb = ends[(i, 0)], ends[(i, 1)]
+        p = MPath([(xa, ya), (xm, ya), (xm, yb), (xb, yb)], [MPath.MOVETO, MPath.CURVE4, MPath.CURVE4, MPath.CURVE4])
+        cx.add_patch(PathPatch(p, fc="none", ec=col, lw=lw, alpha=al, zorder=2, capstyle="round"))
+    # boxes: name and the number of modules of each layer
     for (a, k), (yb, hh) in boxes.items():
         BW, label = BWS[a], axes[a][2]
-        if a == 1:
-            sub, edge, lwb = f"{LAYER_MODULES[k]} modules", COLORS[LAYER_NAME[k]], 2.0
-        else:
-            sub, edge, lwb = " · ".join(f"{split[a][(k, l)]} {l}" for l in HARNESS), NODE_EDGE, 1.1
-        cx.add_patch(Box((XS[a], yb), BW, hh, boxstyle="round,pad=0,rounding_size=0.07", fc=NODE_FILL, ec=edge, lw=lwb, zorder=3))
+        cx.add_patch(Box((XS[a], yb), BW, hh, boxstyle="round,pad=0,rounding_size=0.07", fc=NODE_FILL, ec=NODE_EDGE, lw=1.1, zorder=3))
         lines = label(k).split("\n")
         mid = yb + hh / 2
         line_h = 0.22                                     # inches per 12.5 pt line
@@ -394,8 +387,19 @@ def parallel_paths(fig, months):
         t_y = mid + block / 2 - line_h * len(lines) / 2   # centre of the title block
         cx.text(XS[a] + BW / 2, t_y, "\n".join(lines), ha="center", va="center", fontsize=12.5,
                 fontweight="bold", color=INK, zorder=4, linespacing=1.0)
-        cx.text(XS[a] + BW / 2, mid - block / 2 + 0.1, sub, ha="center", va="center", fontsize=11.5,
-                color=MUTED, zorder=4)
+        parts = [(f"{split[a][(k, l)]} {l}", COLORS[LAYER_NAME[l]]) for l in HARNESS]
+        renderer = fig.canvas.get_renderer()
+        widths = []
+        for txt, _ in parts:
+            probe = cx.text(0, -10, txt, fontsize=11.5, fontweight="bold")
+            widths.append(probe.get_window_extent(renderer).width / fig.dpi)
+            probe.remove()
+        sep = 0.16
+        xt = XS[a] + BW / 2 - (sum(widths) + sep * (len(parts) - 1)) / 2
+        for (txt, col), wt in zip(parts, widths):           # counts in the colour of their layer
+            cx.text(xt, mid - block / 2 + 0.1, txt, ha="left", va="center", fontsize=11.5, fontweight="bold",
+                    color=col, zorder=4)
+            xt += wt + sep
     # legend: one entry per Harness layer, centred as a row
     ly = 0.24
     entries = [(LAYER_NAME[l], style[l]) for l in HARNESS]
@@ -409,7 +413,7 @@ def parallel_paths(fig, months):
     total = sum(sw + pad + wt for wt in widths) + sep * (len(entries) - 1)
     xl = (w - total) / 2
     for (lab, (col, lw, al)), wt in zip(entries, widths):
-        cx.plot([xl, xl + sw], [ly, ly], color=col, lw=lw + 1.4, alpha=min(1, al + 0.2), solid_capstyle="round")
+        cx.plot([xl, xl + sw], [ly, ly], color=col, lw=lw + 1.6, alpha=min(1, al + 0.3), solid_capstyle="round")
         cx.text(xl + sw + pad, ly, lab, va="center", fontsize=12.5, color=INK)
         xl += sw + pad + wt + sep
 
