@@ -327,6 +327,16 @@ GROUP_LABEL = {"analysis": "Analysis of\nObserved Series", "forecasting": "Forec
 NODE_FILL, NODE_EDGE = "#FFFFFF", "#D9DBE8"
 
 
+def shares(counts: list[int]) -> list[int]:
+    """Whole percentages that sum to 100 (largest remainder)."""
+    total = sum(counts)
+    raw = [100 * c / total for c in counts]
+    out = [int(r) for r in raw]
+    for i in sorted(range(len(raw)), key=lambda i: raw[i] - out[i], reverse=True)[:100 - sum(out)]:
+        out[i] += 1
+    return out
+
+
 def parallel_paths(fig, months):
     """Layer -> mechanism dimension -> task group. Each path is one (mechanism dimension, task group) pair of one
     Harness module, starts at the module's layer and keeps the layer colour, so the panel reads as the classification
@@ -370,8 +380,8 @@ def parallel_paths(fig, months):
                 yb, hh = boxes[(a, k)]
                 for j, i in enumerate(idx):
                     ends[(i, a, side)] = yb + hh - hh * (j + 1) / (len(idx) + 1)
-    style = {"GH": (COLORS["General Harness"], 1.2, 0.6), "GTS": (COLORS["General Time Series Harness"], 1.3, 0.7),
-             "TSK": (COLORS["Task-Specific Harness"], 0.9, 0.35)}
+    style = {"GH": (COLORS["General Harness"], 1.2, 0.32), "GTS": (COLORS["General Time Series Harness"], 1.3, 0.38),
+             "TSK": (COLORS["Task-Specific Harness"], 0.9, 0.2)}
     for i in sorted(range(len(items)), key=lambda i: ("TSK", "GH", "GTS").index(items[i][0])):
         col, lw, al = style[items[i][0]]
         for a in (0, 1):
@@ -393,13 +403,15 @@ def parallel_paths(fig, months):
             cx.add_patch(Box((XS[a], yb), BW, hh, boxstyle="round,pad=0,rounding_size=0.07", fc=col, ec=col, lw=1.1, zorder=3))
             cx.text(XS[a] + BW / 2, t_y, "\n".join(lines), ha="center", va="center", fontsize=12.5,
                     fontweight="bold", color="white", zorder=4, linespacing=1.0)
-            cx.text(XS[a] + BW / 2, mid - block / 2 + 0.1, f"{LAYER_MODULES[k]} modules", ha="center", va="center",
+            pct = dict(zip(HARNESS, shares([LAYER_MODULES[l] for l in HARNESS])))
+            cx.text(XS[a] + BW / 2, mid - block / 2 + 0.1, f"{pct[k]}% of modules", ha="center", va="center",
                     fontsize=11.5, color="white", zorder=4)
             continue
         cx.add_patch(Box((XS[a], yb), BW, hh, boxstyle="round,pad=0,rounding_size=0.07", fc=NODE_FILL, ec=NODE_EDGE, lw=1.1, zorder=3))
         cx.text(XS[a] + BW / 2, t_y, "\n".join(lines), ha="center", va="center", fontsize=12.5,
                 fontweight="bold", color=INK, zorder=4, linespacing=1.0)
-        parts = [(f"{split[a][(k, l)]} {l}", COLORS[LAYER_NAME[l]]) for l in HARNESS]
+        pct = shares([split[a][(k, l)] for l in HARNESS])   # share of the box's modules in each layer
+        parts = [(f"{q}% {l}", COLORS[LAYER_NAME[l]]) for q, l in zip(pct, HARNESS)]
         widths = []
         for txt, _ in parts:
             probe = cx.text(0, -10, txt, fontsize=11.5, fontweight="bold")
