@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="#-talk-to-the-survey">Talk to the survey</a> ·
-  <a href="#-how-a-time-series-agent-is-built">Taxonomy</a> ·
+  <a href="#-how-a-time-series-agent-is-built">The formula</a> ·
   <a href="#-paper-cards">Paper Cards</a> ·
   <a href="#-what-the-records-show">Findings</a> ·
   <a href="main.tex">Manuscript</a> ·
@@ -57,7 +57,9 @@ Then ask, for example:
 
 $$\textbf{Time Series Agent} \approx \text{LLM} + \text{General Harness} + \text{Time Series Harness}$$
 
-Each concrete module a paper contributes is assigned to the **most specific** layer whose condition it meets:
+$$\textbf{Time Series Harness} = \text{General Time Series Harness} + \text{Task-Specific Harness}$$
+
+This formula is the one concept the survey introduces. Each concrete module a paper contributes is assigned to the **most specific** layer whose condition it meets:
 
 ```mermaid
 flowchart LR
@@ -70,13 +72,15 @@ flowchart LR
     Q2 -- no --> GH["General Harness<br/>REUSE"]
 ```
 
-| Part | Vocabulary used across the survey |
-|---|---|
-| **LLM side** | Temporal representation and alignment · temporal instruction and reasoning · learning to operate temporal workflows |
-| **General Harness** | Interface and Interaction · Memory and Context · Tools and Execution · Planning and Orchestration · Optimization and Evolution |
-| **General Time Series Harness** | Temporal Data Management · Temporal Processing · Temporal Context and Memory · Temporal Validation |
-| **Task-Specific Harness** | Forecasting and Prediction · Data Augmentation and Synthesis · Anomaly Detection and Diagnosis · Decision Support |
-| **Evaluation** | Process Validity · Temporal Validity · Task Performance · Decision Utility |
+Every other label describes one term, and none is a new classification:
+
+| Term | Vocabulary | Basis |
+|---|---|---|
+| **LLM side** | Temporal representation and alignment · temporal instruction and reasoning · learning to operate temporal workflows | Where the model enters the Agent loop $a_k=\pi_\theta(s_k)$: the state it reads, its parameters, its action policy |
+| **General Harness** | Interface and Interaction · Memory and Context · Tools and Execution · Planning and Orchestration · Optimization and Evolution | Synthesized from Agent and Harness research (CoALA, Wang et al., code-harness and agentic-harness surveys) |
+| **General Time Series Harness** | Temporal Data Management · Temporal Processing · Temporal Context and Memory · Temporal Validation | The availability record $(x_i,t_i,v_i)$: store it, operate on it over windows, admit outside context, check $v_i\le\tau$ |
+| **Task-Specific Harness** | Forecasting and Prediction · Data Augmentation and Synthesis · Anomaly Detection and Diagnosis · Decision Support | Task grouping of Chen et al. (2026) |
+| **Evaluation** | Process Validity · Temporal Validity · Task Performance · Decision Utility | One check per term |
 
 <p align="center">
   <img src="docs/assets/landscape.png" width="96%" alt="Landscape fan chart: the LLM side and the three Harness sectors, their wedges, and representative works as outer tags.">
