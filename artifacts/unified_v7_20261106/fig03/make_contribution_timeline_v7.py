@@ -33,7 +33,12 @@ OUT_PDF = HERE / "Figure03_V7.pdf"
 OUT_CSV = HERE / "module_contribution_timeline.csv"
 OUT_COVERAGE = HERE / "module_contribution_timeline_coverage.json"
 OUT_MECHANISM = HERE / "mechanism_placement.csv"            # panel (c) counts, quoted in the text
-MECHANISM: list[tuple[str, str, str]] = []                    # (month, mechanism dimension, layer)
+OUT_GROUPS = HERE / "task_group_placement.csv"               # panel (c) counts, quoted in the text
+DIM_LINKS: list[tuple[str, str]] = []                         # (mechanism dimension, layer), one per module label
+GROUP_LINKS: list[tuple[str, str]] = []                       # (layer, task group), one per module task group
+LAYER_MODULES: Counter = Counter()                            # Harness modules per layer
+sys.path.insert(0, str(ROOT / "scripts"))
+from task_groups import GROUPS, ORDER as GROUP_ORDER, module_groups   # noqa: E402  task groups of the survey
 # The five mechanism dimensions of the General Harness (Table tab:component-vocab), in the order of Section 4.
 DIMENSIONS = ["Interface and Interaction", "Memory and Context", "Tools and Execution",
               "Planning and Orchestration", "Optimization and Evolution"]
@@ -70,6 +75,17 @@ def contribution_counts(record: dict) -> dict[str, int]:
 
 def main() -> None:
     records = json.loads(LEDGER.read_text(encoding="utf-8"))
+    # panel (c) needs no date, so it covers every reviewed work
+    for record in records:
+        if not in_scope(record):
+            continue
+        for module in record["module_level_contributions"]["modules"]:
+            layer = module["layer"]
+            if layer not in HARNESS:
+                continue
+            LAYER_MODULES[layer] += 1
+            DIM_LINKS.extend((d, layer) for d in module.get("dimensions") or [] if d in DIMENSIONS)
+            GROUP_LINKS.extend((layer, g) for g in GROUP_ORDER if g in module_groups(module))
     monthly: dict[str, Counter] = {}
     dated_records, undated = [], []
     for record in records:
@@ -94,11 +110,6 @@ def main() -> None:
             continue
         dated_records.append(record["citation"]["key"])
         monthly.setdefault(month, Counter()).update(counts)
-        for module in record["module_level_contributions"]["modules"]:
-            if module["layer"] in HARNESS:
-                for dimension in module.get("dimensions") or []:
-                    if dimension in DIMENSIONS:
-                        MECHANISM.append((month, dimension, module["layer"]))
 
     months = sorted(monthly)
     running = Counter()
@@ -127,7 +138,13 @@ def main() -> None:
         writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(["mechanism dimension", *HARNESS])
         for dimension in DIMENSIONS:
-            writer.writerow([dimension, *(sum(t[1] == dimension and t[2] == layer for t in MECHANISM) for layer in HARNESS)])
+            writer.writerow([dimension, *(DIM_LINKS.count((dimension, layer)) for layer in HARNESS)])
+    with OUT_GROUPS.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle, lineterminator="\n")
+        writer.writerow(["task group", *HARNESS])
+        for g in GROUP_ORDER:
+            writer.writerow([GROUPS[g], *(GROUP_LINKS.count((layer, g)) for layer in HARNESS)])
+        writer.writerow(["Harness modules", *(LAYER_MODULES[layer] for layer in HARNESS)])
     plot_timeline(months, cumulative)
 
 
@@ -180,7 +197,7 @@ OY = CH + 0.35                       # the top row sits above panel (c)
 ZONES = {"a": (0.12, OY + 0.10, 6.88, 5.10), "b": (7.16, OY + 0.10, 6.05, 5.10), "c": (0.12, 0.10, 13.09, CH - 0.1)}
 AXES = {"a": (1.02, OY + 0.80, 5.36, 3.98), "b": (8.16, OY + 1.12, 4.92, 3.48)}
 TITLES = {"a": "(a)  Cumulative Module Contributions", "b": "(b)  Share of New Modules by Period",
-          "c": "(c)  Mechanism Dimensions by Layer"}
+          "c": "(c)  Harness Modules by Mechanism Dimension, Layer and Task Group"}
 
 
 def zone_panel(fig, key):
@@ -301,81 +318,74 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
     plt.close(fig)
 
 
-# ---- (c) parallel paths: one path per (Harness module, mechanism dimension) assignment ----------------------------
+# ---- (c) classification of Harness modules: mechanism dimension -> layer -> task group ------------------------
 DIM_LABEL = {"Interface and Interaction": "Interface and\nInteraction", "Memory and Context": "Memory and\nContext",
              "Tools and Execution": "Tools and\nExecution", "Planning and Orchestration": "Planning and\nOrchestration",
              "Optimization and Evolution": "Optimization\nand Evolution"}
 LAYER_NAME = {"GH": "General Harness", "GTS": "General Time Series Harness", "TSK": "Task-Specific Harness"}
+GROUP_LABEL = {"analysis": "Analysis of\nObserved Series", "forecasting": "Forecasting", "generation": "Generation",
+               "decision": "Decision\nMaking"}
 NODE_FILL, NODE_EDGE = "#FFFFFF", "#D9DBE8"
 
 
 def parallel_paths(fig, months):
-    """Period -> mechanism dimension -> Harness layer. Each path is one mechanism label of one Harness module and is
-    coloured by the layer the module is assigned to, so the panel shows where each mechanism is implemented."""
+    """Mechanism dimension -> Harness layer -> task group. Left paths are the mechanism labels of the modules of each
+    layer, right paths their task groups; both are coloured by the layer, so the panel reads as the classification of
+    every Harness module in the vocabularies of Table tab:term-basis."""
     from matplotlib.patches import FancyBboxPatch as Box
     from matplotlib.path import Path as MPath
     from matplotlib.patches import PathPatch
     x0, y0, w, h = ZONES["c"]
     cx = fig.add_axes((x0 / FIG_W, y0 / FIG_H, w / FIG_W, h / FIG_H)); cx.set_xlim(0, w); cx.set_ylim(0, h); cx.axis("off")
-    period_of = lambda m: next(label for label, end in PERIODS if m <= end)
-    items = [(period_of(m), d, layer) for m, d, layer in MECHANISM]
-    axes = [
-        ("Period", [p for p, _ in PERIODS], lambda k: k),
-        ("Mechanism Dimension", DIMENSIONS, lambda k: DIM_LABEL[k]),
-        ("Layer", HARNESS, lambda k: LAYER_NAME[k].replace("General Time Series ", "General Time Series\n")
-                                                   .replace("Task-Specific ", "Task-Specific\n")),
-    ]
-    NA = len(axes)
-    XS, BWS = [0.7, 5.25, 10.0], [1.7, 2.6, 2.6]          # left edge and width of each axis' boxes
-    MINH, GAPS = [0.46, 0.62, 0.8], [0.1, 0.13, 0.16]
+    axes = [("Mechanism Dimension", DIMENSIONS, lambda k: DIM_LABEL[k]),
+            ("Layer", HARNESS, lambda k: LAYER_NAME[k].replace("General Time Series ", "General Time Series\n")
+                                                      .replace("Task-Specific ", "Task-Specific\n")),
+            ("Task Group", GROUP_ORDER, lambda k: GROUP_LABEL[k])]
+    links = [DIM_LINKS, GROUP_LINKS]                       # link a joins axis a and axis a + 1
+    size = [Counter(d for d, _ in DIM_LINKS), LAYER_MODULES, Counter(g for _, g in GROUP_LINKS)]
+    XS, BWS = [0.55, 5.25, 9.95], [2.6, 2.6, 2.6]          # left edge and width of each axis' boxes
+    MINH, GAPS = [0.62, 0.8, 0.66], [0.13, 0.16, 0.14]
     top, bottom = h - 1.05, 0.62
     boxes = {}
     for a, (title, keys, label) in enumerate(axes):
-        BW, gap, minh = BWS[a], GAPS[a], MINH[a]
-        cx.text(XS[a] + BW / 2, h - 0.62, title, ha="center", va="center", fontsize=14.5, fontweight="bold", color=INK)
-        counts = Counter(it[a] for it in items)
-        span = top - bottom - gap * (len(keys) - 1)
-        free = span - minh * len(keys)
+        cx.text(XS[a] + BWS[a] / 2, h - 0.62, title, ha="center", va="center", fontsize=14.5, fontweight="bold", color=INK)
+        total = sum(size[a][k] for k in keys)
+        free = top - bottom - GAPS[a] * (len(keys) - 1) - MINH[a] * len(keys)
         y = top
         for k in keys:
-            hh = minh + free * counts[k] / len(items)
+            hh = MINH[a] + free * size[a][k] / total
             boxes[(a, k)] = (y - hh, hh)
-            y -= hh + gap
-    # slot positions: on each side of a box, order paths by the node they come from / go to (fewer crossings)
-    order = {a: {k: i for i, k in enumerate(axes[a][1])} for a in range(NA)}
-    slots = {}
-    for a in range(NA):
-        for side, nb in (("L", a - 1), ("R", a + 1)):
-            if nb < 0 or nb >= NA: continue
-            for k in axes[a][1]:
-                idx = [i for i, it in enumerate(items) if it[a] == k]
-                idx.sort(key=lambda i: tuple(order[b][items[i][b]] for b in (nb, *range(NA)) if b != a))
-                yb, hh = boxes[(a, k)]
+            y -= hh + GAPS[a]
+    order = [{k: i for i, k in enumerate(keys)} for _, keys, _ in axes]
+    style = {"GH": (COLORS["General Harness"], 1.3, 0.7), "GTS": (COLORS["General Time Series Harness"], 1.5, 0.8),
+             "TSK": (COLORS["Task-Specific Harness"], 0.9, 0.4)}
+    layer_of = lambda link, a: link[1] if a == 0 else link[0]
+    for a, items in enumerate(links):
+        # slots on the right side of axis a and the left side of axis a + 1, ordered by the opposite end
+        ends = {}
+        for side_axis, other in ((a, 1), (a + 1, 0)):
+            for k in axes[side_axis][1]:
+                idx = [i for i, it in enumerate(items) if it[1 - other] == k]
+                idx.sort(key=lambda i: (order[a + other][items[i][other]], order[a + 1 - other][items[i][1 - other]]))
+                yb, hh = boxes[(side_axis, k)]
                 for j, i in enumerate(idx):
-                    slots[(i, a, side)] = yb + hh - hh * (j + 1) / (len(idx) + 1)
-    style = {"GH": (COLORS["General Harness"], 1.3, 0.75), "GTS": (COLORS["General Time Series Harness"], 1.5, 0.85),
-             "TSK": (COLORS["Task-Specific Harness"], 0.9, 0.38)}
-    draw = sorted(range(len(items)), key=lambda i: ("TSK", "GH", "GTS").index(items[i][2]))   # shared layers on top
-    for i in draw:
-        col, lw, al = style[items[i][2]]
-        for a in range(NA - 1):
+                    ends[(i, side_axis)] = yb + hh - hh * (j + 1) / (len(idx) + 1)
+        draw = sorted(range(len(items)), key=lambda i: ("TSK", "GH", "GTS").index(layer_of(items[i], a)))
+        for i in draw:
+            col, lw, al = style[layer_of(items[i], a)]
             xa, xb = XS[a] + BWS[a], XS[a + 1]
-            ya, yb = slots[(i, a, "R")], slots[(i, a + 1, "L")]
+            ya, yb = ends[(i, a)], ends[(i, a + 1)]
             xm = (xa + xb) / 2
             p = MPath([(xa, ya), (xm, ya), (xm, yb), (xb, yb)], [MPath.MOVETO, MPath.CURVE4, MPath.CURVE4, MPath.CURVE4])
             cx.add_patch(PathPatch(p, fc="none", ec=col, lw=lw, alpha=al, zorder=2, capstyle="round"))
-    # boxes with counts; each dimension box gives its split over the three Harness layers
+    # boxes: dimension and task-group boxes give their split over the three layers, layer boxes their module count
+    split = [Counter((d, l) for d, l in DIM_LINKS), None, Counter((g, l) for l, g in GROUP_LINKS)]
     for (a, k), (yb, hh) in boxes.items():
-        title, keys, label = axes[a]
-        BW = BWS[a]
-        n = sum(1 for it in items if it[a] == k)
-        edge, lwb = NODE_EDGE, 1.1
-        sub = f"n = {n}"
+        BW, label = BWS[a], axes[a][2]
         if a == 1:
-            c = Counter(it[2] for it in items if it[1] == k)
-            sub = " · ".join(f"{c[l]} {l}" for l in HARNESS)
-        if a == 2:
-            edge, lwb = COLORS[LAYER_NAME[k]], 2.0
+            sub, edge, lwb = f"{LAYER_MODULES[k]} modules", COLORS[LAYER_NAME[k]], 2.0
+        else:
+            sub, edge, lwb = " · ".join(f"{split[a][(k, l)]} {l}" for l in HARNESS), NODE_EDGE, 1.1
         cx.add_patch(Box((XS[a], yb), BW, hh, boxstyle="round,pad=0,rounding_size=0.07", fc=NODE_FILL, ec=edge, lw=lwb, zorder=3))
         lines = label(k).split("\n")
         mid = yb + hh / 2
