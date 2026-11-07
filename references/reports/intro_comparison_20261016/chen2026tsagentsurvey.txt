@@ -1,0 +1,1662 @@
+                                                                        LLM Agents for Time-Series: A Survey
+
+                                                                         Yilong Chen1 Xiao Qin1 Chenghao Liu2 *
+                                                                         Liang Wu3 Noelle I. Samia1 Kaize Ding1†
+                                                                  1
+                                                                    Northwestern University 2 Datadog AI Research 3 Nokia
+                                                                                              †
+                                                                                                  Corresponding author
+
+
+
+
+                                                                                                                                                                 Papers
+                                                                   Abstract                                                                                                                        47
+                                                                                                                                                            45
+                                                                                                                                         Forecasting &
+                                                                                                                             14          Reasoning
+                                                 LLM-based agents are increasingly being devel-
+
+
+
+
+arXiv:2608.26226v1 [cs.AI] 26 Aug 2026
+                                                                                                               19                                           30
+                                                 oped for time-series problems, but their design                    47                   Augmentation &
+                                                                                                                                         Synthesis
+                                                                                                                    papers
+                                                                                                                                                            15
+                                                 choices vary substantially across task settings.                            6           Detection &
+                                                                                                                                         Diagnosis
+                                                                                                                     8
+                                                 This survey adopts a problem-driven taxonomy                                            Decision Support    0
+                                                                                                                                                            ’23Q4           ’24Q4          ’25Q4 ’26Q2
+                                                 that organizes these systems by the time-series                                                                                             Quarter
+                                                                                                                    (a) Task cover age                                (b) Cumulative r eleases
+                                                 problems they address rather than by isolated
+                                                 technical components. We group existing sys-
+                                                                                                             Figure 1: Task coverage and release timeline of 47 sur-
+                                                 tems into four categories: forecasting and rea-
+                                                                                                             veyed LLM-agent papers for time-series tasks.
+                                                 soning, augmentation and synthesis, anomaly
+                                                 detection and diagnosis, and decision support.
+                                                 Within each category, we examine how task re-
+                                                 quirements shape agent architecture, tool use,              offer an alternative by leveraging general-purpose
+                                                 and memory design. We further summarize                     language reasoning to assist time-series analysis,
+                                                 representative datasets and environments, and               for example as modules for encoding and explain-
+                                                 compare reported model performance under                    ing temporal patterns. Moving beyond prompt-only
+                                                 shared or closely related settings. Overall, this           use, LLMs can be deployed as agents (Wang et al.,
+                                                 survey offers a task-oriented guide to design-              2024a) that plan actions, call tools, and maintain
+                                                 ing LLM-based agents for time-series problems               memory across multiple steps. Such agentic sys-
+                                                 and identifies open gaps for future work.
+                                                                                                             tems are particularly suitable for time-series ap-
+                                         1       Introduction                                                plications because many time-series tasks require
+                                                                                                             updates from new observations, decisions under
+                                         Time-series analysis (Hamilton, 2020) plays an                      evolving conditions, and tool-augmented integra-
+                                         important role in many real-world domains, in-                      tion of heterogeneous evidence rather than a fixed
+                                         cluding finance (Tsay, 2005), transportation (Xu                    pipeline (Cheng et al., 2026; Tao et al., 2026; Zhang
+                                         et al., 2016), and climate science (Kim et al., 2025).              et al., 2025c). Motivated by this shift, this survey
+                                         Representative tasks include forecasting (Chat-                     reviews recent progress on LLM-based agentic sys-
+                                         field, 2000; De Gooijer and Hyndman, 2006), data                    tems for time-series tasks.
+                                         augmentation (Wen et al., 2020), anomaly detec-                        Recent time-series leaderboards further suggest
+                                         tion (Blázquez-García et al., 2021; Schmidl et al.,                 that agentic systems are becoming competitive with
+                                         2022), and decision support. These tasks have long                  state-of-the-art methods by harnessing strong time-
+                                         been addressed with statistical and classical ma-                   series models rather than replacing them (Aksu
+                                         chine learning models such as ARIMA (Shumway                        et al., 2024). By coordinating foundation models,
+                                         and Stoffer, 2017), bootstrapping (Efron, 1992),                    retrieval, validation, and domain tools within task-
+                                         and LOF (Breunig et al., 2000), and more recently                   specific workflows, these systems shift the practi-
+                                         with deep models such as RNNs (Medsker and Jain,                    cal question from which model to use toward how
+                                         2000) and Transformers (Vaswani et al., 2017).                      agent architectures, tools, and memory should be
+                                            However, applying these methods often relies                     designed for each task. This motivates our problem-
+                                         heavily on expert knowledge to design analysis                      driven taxonomy of time-series agentic systems.
+                                         pipelines and interpret results. Recent advances in                 Positioning. Existing LLM-for-time-series sur-
+                                         large language models (LLMs) (Zhao et al., 2026)                    veys (Chang et al., 2026; Zhang et al., 2025c) typi-
+                                             *
+                                                 This work was completed prior to joining Datadog.           cally organize methods by individual LLM capabil-
+ities (e.g., planning, reasoning, memory, and tool        time-series tasks that require evidence gathering,
+use), rather than by how these capabilities are inte-     feedback integration, or adaptive action selection.
+grated for concrete time-series tasks. Conversely,        We view LLM agents as observe–act–update sys-
+domain-general LLM-agent surveys (Wang et al.,            tems that combine reasoning, planning, tool use,
+2024a; Guo et al., 2024; Li et al., 2024; Ferrag          and memory (Wang et al., 2024a; Zhang et al.,
+et al., 2025) seldom address time-series-specific         2025c), and use this distinction to separate agentic
+challenges such as streaming inputs, temporal de-         systems from prompt-only LLM applications.
+pendence, distribution shift, and action–data cou-
+pling. We therefore adopt a problem-driven taxon-         3     Fundamental Design Dimensions
+omy that groups methods by target task and ana-           Before the task taxonomy, we summarize three
+lyzes recurring design patterns in architecture, tool     design dimensions of time-series agentic systems:
+use, and memory. A detailed comparison with re-           architecture, tools, and memory.
+lated surveys is provided in Appendix A.
+   The remainder of this survey introduces the nec-       3.1     Architecture
+essary background and core design dimensions in           We distinguish single-agent and multi-agent archi-
+Sections 2–3, presents the problem-driven taxon-          tectures; for multi-agent systems, we further de-
+omy in Section 4, and reviews practical resources         scribe their architectural patterns as cooperative,
+and future research directions in Sections 5–6.           competitive, or mixed (Zhu et al., 2024).
+2   Background and Foundations
+                                                                     Architectural Patterns in Time-Series Agents
+Time-Series Data and Representations. A time                                                       Single-Agent Systems
+series may arise from a continuous-time process,
+but practical systems usually operate on observed                                                                         Plan
+
+
+or tokenized indices. Let {τt }Tt=1 satisfy τ1 <                                                                          Tools
+                                                                Time-Series Data           Single Agent                                          Output
+· · · < τT , and denote                                                                                                   Memory
+
+
+      Xτ1 :τT = (xτ1 , . . . , xτT ),   xτt ∈ Rd ,
+                                                                                                   Multi-Agent Systems
+
+where d covers observed channels, covariates, or                           Cooperative
+                                                                  Complementary roles + shared output
+                                                                                                                                Competitive
+                                                                                                                   Parallel hypotheses + scoring/debate
+
+spatially distributed sensors. For irregular, noisy, or                    Feedback                                          Hypo 1
+
+                                                                                                                   Agent 1
+
+partially observed data, systems typically construct            Agent 1    Agent 2    Agent 3     Output
+                                                                                                                             Hypo 2
+
+                                                                                                                   Agent 2
+zτt = ϕ(Xτ1 :τt ) to summarize historical context.                                                                           Hypo 3
+                                                                                                                                      Debate/Voting       Output
+
+
+Time-Series Modeling. Time-series modeling                       Plan       Tools     Memory
+                                                                                                                   Agent 3
+
+
+
+
+transforms temporal observations into forecasts,
+anomaly scores, learned representations, or ex-           Figure 2: An illustration of the main architectural pat-
+planatory summaries. Statistical models (e.g.,            terns for time-series agent systems.
+ARIMA, ARCH/GARCH, HMMs) encode assump-
+tions about dependence, stationarity, latent regimes,     Single-Agent Systems. A single-agent system uses
+and uncertainty (Shumway and Stoffer, 2017; En-           one agent to plan reasoning steps, call tools, main-
+gle, 1982; Bollerslev, 1986; Rabiner, 1989). Deep         tain memory, and produce outputs or actions from
+models (e.g., LSTM, TCN, DeepAR) learn tempo-             current observations (Yao et al., 2023).
+ral patterns (Hochreiter and Schmidhuber, 1997;           Cooperative Multi-Agent Systems. Cooperative
+Bai et al., 2018; Salinas et al., 2020), and LLM-         systems assign agents complementary roles or sub-
+based models (e.g., Time-LLM, LSTPrompt) rep-             tasks that are not directly interchangeable, such as
+resent sequences through tokenized or multimodal          sequential stages or planner–executor structures, so
+inputs for language-based reasoning or explana-           agents coordinate toward a shared output (Li et al.,
+tion (Jin et al., 2024; Liu et al., 2024a). As stan-      2024; Wooldridge, 2009).
+dalone components, however, these models typ-             Competitive Multi-Agent Systems. Competitive
+ically do not choose workflows, call tools, or re-        systems instantiate agents or agent-generated can-
+vise memory and hypotheses based on intermediate          didates as alternatives: they produce competing hy-
+feedback.                                                 potheses, forecasts, explanations, rules, or actions,
+From Inference to Agentic Systems. Static anal-           which are then resolved by scoring, ranking, voting,
+ysis pipelines are often inadequate for interactive       debate, or an explicit judge (Zhu et al., 2024).
+Mixed Multi-Agent Systems. Mixed systems com-             which the LLM serves only as a static encoder or
+bine cooperative role decomposition with compet-          post-hoc explainer, and (iii) domain-general agents
+itive comparison, debate, or selection within the         that are not designed for time-series constraints or
+same workflow (Zhu et al., 2024).                         temporally grounded evaluation.
+                                                             We adopt a problem-driven taxonomy that
+3.2   Tools                                               groups systems by the time-series problems they
+Tools are callable interfaces to external programs        address, and discuss design dimensions within each
+invoked by the LLM agent (Wang et al., 2024c). In         setting. This choice is user-oriented: readers are of-
+time-series agents, they enable access to temporal        ten more concerned with what kinds of designs are
+data, specialized computation, and verifiable feed-       suitable for a given time-series problem than with
+back that cannot be obtained reliably from para-          design dimensions in isolation. A problem-driven
+metric knowledge alone. Common tool families              view therefore provides clearer guidance for select-
+include (i) Database APIs, which provide struc-           ing and understanding agent designs in practice.
+tured access to stored data; (ii) Search & Retrieval      Under this taxonomy, we identify four problem cat-
+APIs, which return relevant external information          egories: Forecasting & Reasoning, Augmentation
+or historical records; (iii) Data Processing Tools,       & Synthesis, Anomaly Detection & Diagnosis, and
+which transform raw inputs into more useful repre-        Decision Support. Within each category, we further
+sentations, such as through alignment or dynamic          distinguish several sub-problems. Table 3 summa-
+time warping (DTW); (iv) Statistical & ML Mod-            rizes representative methods; Figure 3 shows the
+els, which produce predictions, scores, or learned        full taxonomy.
+representations; and (v) Simulators, Solvers & Opti-
+mizers, which evaluate actions, enforce constraints,      4.1   Time-Series Forecasting & Reasoning
+or compute solutions in structured environments.          Time-series forecasting and reasoning share a com-
+                                                          mon requirement: the agent must produce outputs
+3.3   Memory
+                                                          that are not only plausible in language, but also
+Memory in time-series agents helps maintain co-           grounded in explicit numerical or contextual evi-
+herence across reasoning steps, especially in tem-        dence. In both settings, a fixed context window
+porally evolving settings (Zhang et al., 2024d). We       or a coarse global summary is often insufficient,
+summarize memory by functional role: (i) Evi-             because the correct conclusion may depend on lo-
+dence logs, which record intermediate traces of a         cal temporal patterns, historical analogs, reusable
+decision process, such as intermediate predictions,       prototypes, or aligned external context such as
+retrieved evidence, tool outputs, candidate actions,      news (Zhang et al., 2025e). As a result, effective
+and validation results; (ii) Pattern library, which       systems usually do not treat context as a static in-
+stores retrievable historical cases or typical data       put. Instead, they actively construct evidence be-
+fragments, such as recurring market patterns, fault       yond the context window, for example by retrieving
+signatures, or similar past situations; and (iii) Anal-   relevant slices on demand (Jalori et al., 2025) or
+ysis strategies, which capture reusable experience        querying prototype memories (Jiang et al., 2025).
+about how to analyze a situation, such as which           Time-Series Forecasting. Time-series forecast-
+tools to use, which features to focus on, or how to       ing agents aim to predict future values from his-
+interpret signals before acting.                          torical observations under non-stationarity, noise,
+                                                          and horizon-dependent uncertainty. In forecasting,
+4     Taxonomy
+                                                          agent systems are mainly shaped by: (i) multi-stage
+We define an LLM agent for time series as a sys-          workflows, and (ii) competing hypotheses.
+tem in which an LLM must make at least one deci-             Multi-stage workflows are central in forecast-
+sion that changes a multi-step time-series workflow,      ing because prediction is rarely a single-step task.
+such as selecting an action or tool, updating mem-        Such workflows may involve data diagnosis, pre-
+ory, revising a hypothesis, or coordinating stages.       processing, model selection, contextual analysis,
+We classify the system as single-agent when one           prediction, and validation, so errors in early stages
+LLM fills this role and as multi-agent when two or        can invalidate later conclusions. A common design
+more LLMs take distinct decision-making roles and         is therefore to ground each stage in explicit inter-
+interact through cooperation, competition, or both.       mediate evidence rather than free-form reasoning
+We exclude (i) one-shot prompting, (ii) pipelines in      alone. TimeSeriesScientist (Zhao et al., 2025) is
+                                          Forecasting    TimeSeriesScientist (Zhao et al., 2025), TimeXL (Jiang et al., 2025),
+                                                         TimeCAP (Lee et al., 2025), NewsTSForecasting (Zhang et al., 2025e),
+                                                         TRACE (Chen and Xie, 2025), FLAIRR-TS (Jalori et al., 2025),
+                   Forecasting                           Nexus (Das et al., 2026), CastFlow (Pan et al., 2026)
+                   & Reasoning
+                                          Reasoning      TS-Agent (Liu et al., 2025), TS-Reasoner (Ye et al., 2024b),
+                                                         ZARA (Li et al., 2026), Agentic-RAG (Ravuru et al., 2024),
+                                                         CLIMATEAGENT (Kim et al., 2025), FETA (Sui et al., 2025)
+
+                                          Data           TESSA (Lin et al., 2026), DCATS (Yeh et al., 2025), MERIT (Zhou et al., 2025)
+                                          Augmentation
+                   Augmentation
+                   & Synthesis
+                                          Synthesis      ChatTS (Xie et al., 2025), BRIDGE (Li et al., 2025),
+                                                         GenAI4RiskModeling (Joshi, 2025)
+
+   LLM Agents                             Detection      AD-AGENT (Yang et al., 2025), ARGOS (Gu et al., 2025),
+ for Time Series                                         CALM (Devireddy and Huang, 2025), SLEP (Wang et al., 2026),
+                   Anomaly Detection                     SAGE (Kang et al., 2026)
+                   & Diagnosis
+                                          Diagnosis      LEMAD (Ji et al., 2025), AgentFM (Zhang et al., 2025a),
+                                                         LLM-TSFD (Zhang et al., 2025b)
+
+                                          Trading        ElliottAgents (Chudziak and Wawer, 2024; Wawer and Chudziak, 2025),
+                                                         FactorMAD (Duan et al., 2025), FinAgent (Zhang et al., 2024a),
+                                                         FinArena (Xu et al., 2025), FinCon (Yu et al., 2024),
+                                                         FinMem (Yu et al., 2025), FinRL-DeepSeek (Benhenda, 2025),
+                                                         ATLAS (Papadakis et al., 2025), TradingAgents (Xiao et al., 2024)
+
+                   Decision Support
+                                          Traffic        Open-TI (Da et al., 2024), LLMTraveler (Wang et al., 2025),
+                                          Control        LLMLight (Lai et al., 2025), CoLLMLight (Yuan et al., 2026),
+                                                         HeraldLight (Guo et al., 2025), Traffic-R1 (Zou et al., 2025),
+                                                         Virtual Traffic Police (Wei et al., 2026), CuraLight (Guo et al., 2026)
+
+                                          Grid           Grid-Agent (Zhang et al., 2025d), GridMind (Jin et al., 2025)
+                                          Control
+
+
+                                  Figure 3: A taxonomy of LLM agents for time-series tasks.
+
+
+a representative example: it uses statistical mod-                    Time-Series Reasoning. Time-series reasoning
+els and other tools to generate diagnostics, valida-                  agents derive explanations, answers, or classifica-
+tion results, and configuration records, and stores                   tions from temporal evidence rather than directly
+them as evidence logs for review, provenance, and                     predicting future values. In reasoning, two task-
+correction. Nexus (Das et al., 2026) uses contex-                     specific considerations are especially important: (i)
+tualization, dual-resolution macro/micro outlook                      domain knowledge and numerical support, and (ii)
+generation, and synthesis/calibration stages, while                   multi-step reasoning reliability.
+CastFlow (Pan et al., 2026) organizes forecasting
+                                                                         Domain knowledge and numerical support are
+as planning, action, prediction, and reflection with
+                                                                      essential in reasoning because text-trained LLMs
+memory and multi-view diagnostic tools.
+                                                                      do not reliably encode temporal structure, domain
+   Competing hypotheses are another distinctive                       mechanisms, or quantitative operations. A com-
+feature of forecasting. Different strategies may                      mon design is therefore to separate planning from
+focus on different signals, temporal scales, or ex-                   computation: the main agent handles coordination,
+ogenous factors, so relying on a single reasoning                     while numerical analysis is delegated to special-
+path can be brittle. One design is to use competitive                 ized sub-agents or auditable tools and operators.
+architectural patterns, where agents or candidate                     Agentic-RAG (Ravuru et al., 2024) illustrates the
+strategies represent forecasting views and are com-                   sub-agent route, while TS-Agent (Liu et al., 2025)
+pared through explicit error feedback. NewsTS-                        illustrates the tool-grounded route. Reasoning sys-
+Forecasting (Zhang et al., 2025e) follows this idea                   tems may also require domain knowledge beyond
+by using error-based scoring and reflection to con-                   raw observations. ZARA (Li et al., 2026) mines
+trol strategy updates. TRACE (Chen and Xie, 2025)                     discriminative features offline and stores domain
+similarly uses communication and multi-agent con-                     feature-importance profiles as reusable guidance,
+sistency refinement under sparse or missing obser-                    while CLIMATEAGENT (Kim et al., 2025) uses
+vations, while also showing that consistency alone                    specialized data agents to handle API conventions,
+is not enough unless communication is checked                         metadata retrieval, and parameter validation. For
+against evidence.                                                     classification-style reasoning, FETA (Sui et al.,
+2025) decomposes multivariate series into channel-      sentation of the same series. These two forms are
+wise comparisons against retrieved exemplars and        shaped by different challenges: (i) semantic preser-
+then aggregates confidence-weighted decisions.          vation is central for numeric augmentation, while
+   Multi-step reasoning reliability is similar to       (ii) domain annotation understanding is the main
+multi-stage forecasting workflows: reasoning tasks      bottleneck for textual augmentation.
+also involve a sequence of dependent steps, and             Semantic preservation is the core challenge in
+early errors can propagate across the chain. A          numeric augmentation. Augmented data should
+common design is therefore to make the process          remain aligned with the target series rather than
+explicit, so intermediate results can be checked        merely look realistic in isolation. A common de-
+and revised rather than passed forward implicitly.      sign follows one of two routes: either construct
+CLIMATEAGENT (Kim et al., 2025) follows the             target-specific training sets from neighboring se-
+sub-agent route and records code, retrieved data,       ries, as in DCATS (Yeh et al., 2025), or retrieve
+and results as evidence logs, so later stages can       similar sequences and then apply classic augmenta-
+build on verified outputs. TS-Reasoner (Ye et al.,      tions such as jittering, scaling, and time warping,
+2024b) follows the operator route by compiling rea-     as in MERIT (Zhou et al., 2025). Verification is es-
+soning into an executable operator pipeline, where      pecially important here. LLM-as-Judge based only
+execution feedback can trigger plan revision and        on pretrained knowledge can be brittle, so stronger
+operator reselection. In both cases, evidence logs      designs usually rely on downstream validation sig-
+support downstream reasoning, reflection, and re-       nals (Yeh et al., 2025).
+covery. Verification may be handled by dedicated            Domain annotation understanding is the main
+checking agents or by the same LLM in a critic          challenge in textual augmentation. In series-to-text
+role, as in TS-Agent (Liu et al., 2025).                semantic augmentation, the added data is not a
+                                                        new numeric sequence but a textual annotation,
+ Discussion: Forecasting and reasoning both             which can be viewed as another representation
+ need evidence beyond a fixed context window            or semantic view of the same series. The diffi-
+ and are vulnerable to error accumulation in long       culty is that pretrained LLMs do not reliably un-
+ workflows. These shared challenges motivate            derstand domain-specific time-series annotations.
+ pattern libraries for retrieving precedents, ev-       TESSA (Lin et al., 2026) derives domain-agnostic
+ idence logs for preserving intermediate steps,         concepts (e.g., trend, periodicity, volatility) from
+ and tool calls for quantitative support. The main      cross-domain annotations and converts them into
+ difference is that forecasting more often com-         domain-specific annotations via a domain agent.
+ pares competing hypotheses, whereas reason-            Time-Series Synthesis. Time-series synthesis
+ ing more often uses refinement loops to reduce         aims to generate new sequences under specified
+ long-chain errors.                                     controls or constraints rather than to expand a sin-
+                                                        gle target series. Under this view, it mainly includes
+4.2   Time-Series Augmentation & Synthesis              two settings: text-guided synthesis, where the sys-
+Time-series data augmentation and synthesis con-        tem generates sequences that satisfy both scenario
+struct additional data while preserving time-series     descriptions and domain knowledge, and domain-
+semantics. Their main failure mode is semantic          attribute construction without external scenario text.
+drift: the constructed data may look plausible but      These two settings face different bottlenecks: (i)
+violate the structures that matter for downstream       text–series alignment is central in the former, while
+tasks, such as trend, periodicity, local shapes, or     (ii) domain constraint compliance is the main chal-
+correlations. The key difference is semantic source:    lenge in the latter.
+augmentation mainly relies on the target series,            Text–series alignment is the core challenge in
+whereas synthesis must align control text (e.g., sce-   text-guided synthesis. In real-world settings, paired
+nario descriptions) with domain rules.                  scenario-query and time-series data are usually
+Time-Series Data Augmentation. Time-series              scarce, so LLMs cannot reliably map free-form
+data augmentation aims to construct additional data     text directly to numerical sequences. A common
+around a target sequence while preserving task-         design is therefore to rewrite descriptions of real
+relevant semantics. It typically appears in two         time series into structured text queries and then
+forms: generating numeric perturbations and gen-        map these queries into executable generation set-
+erating textual annotations as an alternative repre-    tings. BRIDGE (Li et al., 2025) extracts templates
+(e.g., length, trend, periodicity, extrema, variance),    raw sequence. SAGE (Kang et al., 2026) makes
+refines them, and trains a controlled diffusion gen-      this evidence construction more explicit by assign-
+erator. GenAI4RiskModeling (Joshi, 2025) instead          ing specialized analyzers to point, structural, sea-
+uses LLM-generated queries to tune GAN/VAE-               sonal, and pattern anomalies, then consolidating
+based interest-rate scenario generation.                  their tool-grounded outputs into confidence-scored
+   Domain constraint compliance is the main chal-         anomaly records.
+lenge in domain-attribute construction without ex-           Non-degradation is critical because the agent is
+ternal scenario text. In this setting, the diffi-         often layered on top of an existing deployed detec-
+culty is not text alignment but ensuring that gen-        tor, so it should improve alarm quality without un-
+erated data still conforms to implicit domain rules       derperforming the base system. A common design
+and constraints. ChatTS (Xie et al., 2025) con-           is to treat the deployed detector as a base model
+structs synthetic time-series/text supervision by         and let the agent learn complementary corrections
+sampling domain-relevant attributes, generating           for its typical errors. ARGOS (Gu et al., 2025)
+rule-consistent series, and filtering Q&A pairs for       exemplifies this idea by constructing deterministic
+attribute consistency.                                    rules to correct base-detector failures and fusing
+                                                          rule outputs with detector outputs at inference time.
+ Discussion: For augmentation and synthesis,                 Streaming monitoring is a special but practically
+ the central issue is semantic drift: generated           important setting because concept drift may require
+ outputs may look plausible while violating task-         continual adaptation. The main risk is contami-
+ relevant structures. Current systems therefore           nation control: short-lived anomalies may be ab-
+ favor construction and verification pipelines, us-       sorbed as the new normal during online updates.
+ ing data processing, generation modules, and             CALM (Devireddy and Huang, 2025) addresses
+ downstream validation signals. Memory is                 this with a continual design in which an LLM
+ less central here; when used, it mainly stores           judge filters training data by distinguishing tran-
+ reusable templates or semantic patterns with             sient noise from sustained distribution shift, and
+ domain rules.                                            only the latter is used to fine-tune the forecasting-
+                                                          based detector.
+4.3   Time-Series Anomaly Detection &                     Time-Series Diagnosis. In our scope, time-series
+      Diagnosis                                           diagnosis focuses on explaining, localizing, and
+Time-series anomaly detection and diagnosis are           responding to abnormal events. In practice, two
+closely related: detection asks whether and when          challenges are especially important: (i) evidence
+abnormal patterns occur, while diagnosis asks why         integration, and (ii) limited diagnostic supervision.
+and where they occur and how to respond. Their               Evidence integration is important for diagnosis
+main difference lies in task emphasis.                    for reasons similar to anomaly detection, but di-
+Time-Series Anomaly Detection. In our scope,              agnosis places more emphasis on explanation and
+time-series anomaly detection focuses on produc-          localization. In the papers we survey, this is of-
+ing reliable alarms, such as point-wise labels,           ten handled by explicitly incorporating textual ev-
+anomalous windows, or alert events. In practice,          idence, such as logs, alerts, traces, and topology
+three challenges are especially important: (i) evi-       context, as part of the model input or generated
+dence quality, (ii) non-degradation relative to the       report. AgentFM (Zhang et al., 2025a) follows
+base detector, and (iii) streaming monitoring under       this pattern and further improves stability through
+continual updates.                                        a RAG+CoT design that retrieves labeled histori-
+   Evidence quality matters because reliable alarms       cal examples as task-specific references, reducing
+often require more than raw series values alone.          free-form drift.
+Here, decision evidence refers to the information            Limited diagnostic supervision is another recur-
+directly supporting the alarm decision, such as sum-      ring bottleneck because labeled fault cases and
+mary statistics, learned features, or retrieved histor-   high-quality incident narratives are often scarce.
+ical snippets. A common design is to strengthen           LLM-TSFD (Zhang et al., 2025b) addresses this
+this evidence by injecting it into prompts or down-       with a human-in-the-loop data preparation stage,
+stream modules. SLEP (Wang et al., 2026) follows          where users specify labeling or cleaning intent
+this direction by enriching detector inputs with ad-      and the system generates executable code refined
+ditional evidence rather than relying only on the         through feedback.
+ Discussion: Anomaly detection and diagnosis             oriented query, allowing market situations, price-
+ both build actionable monitoring pipelines from         driving explanations, and trading lessons to be
+ heterogeneous temporal evidence. This makes             stored separately. FinCon (Yu et al., 2024) further
+ tool support central, especially data processing,       updates manager-level investment beliefs, which
+ detectors, analytical modules, and external evi-        serve as evolving analytical strategies.
+ dence sources. Sequential cooperative pipelines            Risk preference is another special concern in trad-
+ remain common, while streaming scenarios em-            ing. In some settings, the system needs to account
+ phasize memory updates and deployment-time              for human preference alignment; FinArena (Xu
+ adaptation. Memory mainly supports auditabil-           et al., 2025) injects user risk preferences and feed-
+ ity and retrieval through evidence logs and his-        back into prompts so that they directly influence
+ torical pattern libraries.                              the final recommendation. In other settings, the
+                                                         system does not explicitly incorporate user feed-
+4.4   Time-Series Decision Support                       back, but instead constructs internal role-based vari-
+                                                         ation to induce different risk styles, as in Tradin-
+Time-series decision support differs from forecast-      gAgents (Xiao et al., 2024) and FinMem (Yu et al.,
+ing or diagnosis because the output is an executable     2025). Recent evaluation work further emphasizes
+action, plan, or allocation rather than a descriptive    that static financial QA is insufficient for evaluat-
+judgment. Decisions must be grounded in a prede-         ing trading agents: StockBench (Chen et al., 2025)
+fined action space and satisfy domain constraints.       evaluates agents in multi-month markets where
+Existing agentic work that satisfies our time-series     daily prices, fundamentals, and news lead to se-
+scope is concentrated in trading, traffic control, and   quential buy–sell–hold decisions.
+grid control; because the latter two share closed-       Traffic & Grid Control. Traffic and grid control
+loop control constraints, we discuss them together.      agents both choose executable control actions from
+We exclude decision-support agents in domains            evolving infrastructure states. Traffic systems focus
+such as healthcare treatment and supply-chain op-        on signal actions under real-time flow constraints
+erations when they do not directly use time-series       and network-level coordination, while grid systems
+evidence to produce executable decisions.                target mitigation plans under changing loads, viola-
+Trading. Trading agents focus on sequential finan-       tions, contingencies, and uncertainty.
+cial decisions (e.g., buy, sell, hold) under evolv-         Hard constraints are central because infrastruc-
+ing market conditions. Three considerations are          ture actions must be evaluated in closed-loop en-
+central: (i) heterogeneous external evidence, (ii)       vironments. In traffic control, queue length, wait-
+historical experience, and (iii) risk preference.        ing time, throughput, and travel time evolve after
+   Heterogeneous external evidence, such as news,        each signal action. LLMLight (Lai et al., 2025)
+financial statements, social media, earnings calls,      operates in a fixed control space and is evaluated
+visual charts, and technical indicators, often affects   in a traffic simulator. More recent systems add
+trading decisions, but it comes in different forms       stronger coordination and validation mechanisms:
+and operates at different temporal scales. Process-      CoLLMLight (Yuan et al., 2026) constructs a spa-
+ing all of it with a single agent can easily lead to     tiotemporal graph for network-wide coordination,
+context overload and mixed signals. A common             HeraldLight (Guo et al., 2025) uses a dual-LLM
+cooperative pattern is a planner–executor structure,     design with herald-guided prompts for fine-grained
+where specialized subagents or modules handle dif-       signal control, and Traffic-R1 (Zou et al., 2025)
+ferent evidence sources and their outputs are then       trains a lightweight reasoning model for real-time
+aggregated. TradingAgents (Xiao et al., 2024), Fin-      signal control. In grid control, candidate actions
+Con (Yu et al., 2024), and FinArena (Xu et al.,          such as switching, curtailment, or dispatch must
+2025) all follow this pattern.                           be checked by power-flow solvers or safety valida-
+   Trading decisions often rely heavily on histor-       tors. Grid-Agent (Zhang et al., 2025d) is a repre-
+ical experience. In agent systems, this is usually       sentative example: the LLM proposes structured
+supported by memory in the form of pattern library       mitigation plans, while power-flow solvers and vali-
+and analytical strategies, which abstract past situa-    dation modules determine their performance. Grid-
+tions into retrievable patterns or reusable decision     Mind (Jin et al., 2025) similarly uses LLM agents
+experience. FinAgent (Zhang et al., 2024a) exem-         for power-system analysis, with solvers providing
+plifies this design: each stage produces a retrieval-    domain-grounded feedback.
+   Human-specified policies are another distinctive       uation toward reasoning.
+feature. In some systems, humans specify policies         Interactive Environments. These platforms en-
+or optimization settings, and the LLM agent mainly        able closed-loop experiments with explicit state, ac-
+orchestrates downstream execution. Open-TI (Da            tion, and reward signals. Typical examples include
+et al., 2024) illustrates this pattern well: some tasks   Grid2Op (Marot et al., 2021) for power systems,
+translate human-described policies into signal ac-        SUMO (Behrisch et al., 2011) for traffic control,
+tions, while others let the user specify simulation       and SocioDojo (Cheng and Chin, 2024) for trading.
+settings or optimization techniques and have the          Toolkits. Toolkits provide reusable pipelines,
+LLM route the request to the appropriate tool chain.      APIs, and baselines for reproducible development.
+Virtual Traffic Police (Wei et al., 2026) follows a re-   Common options include StatsForecast (Garza
+lated augmentation strategy by using an LLM agent         et al., 2022), NeuralForecast (Challu et al.,
+to adjust parameters of existing traffic controllers      2023), Sktime (Löning et al., 2019), and Stable-
+under unforeseen incidents, while CuraLight (Guo          Baselines3 (Raffin et al., 2021).
+et al., 2026) uses debate-guided data curation to
+improve an LLM-centered signal controller.
+                                                          6   Future Work
+    Discussion: Different decision targets lead
+                                                          This survey reviews LLM-based agentic systems
+    to different design principles across trading,
+                                                          for time-series problems through a problem-driven
+    traffic control, and grid control. Trading
+                                                          taxonomy of forecasting and reasoning, augmenta-
+    systems more often use cooperative planner–
+                                                          tion and synthesis, anomaly detection and diagno-
+    executor designs to decompose multimodal evi-
+                                                          sis, and decision support. Building on this taxon-
+    dence, whereas traffic and grid control systems
+                                                          omy, we highlight four open directions.
+    rely more on simulator-grounded execution–
+    validation pipelines. The same contrast appears       Numerical Understanding and Domain Knowl-
+    in memory and tool use: trading emphasizes            edge. LLMs remain limited in understanding nu-
+    historical experience and heterogeneous data,         merical signals and specialized domain knowl-
+    while traffic and grid control depend more on         edge (Hung et al., 2023; Ye et al., 2024b). Even
+    simulation and feasibility checks.                    with external tools, agents must still interpret tool
+                                                          outputs and connect them to domain-specific rea-
+                                                          soning.
+5     Resources
+                                                          Causal and Counterfactual Temporal Reason-
+This section summarizes key resources for imple-          ing. Many time-series agents still rely mainly on
+menting and evaluating LLM agents for time-series         correlations, while causal discovery from time se-
+tasks. We organize them into four categories and          ries remains assumption-sensitive (Assaad et al.,
+provide representative examples (Table 5).                2022). Diagnosis and decision support require
+Datasets and Repositories. These resources                evidence-grounded reasoning about interventions,
+provide the raw observations used for training            delayed effects, and counterfactual outcomes; oth-
+and offline evaluation. Representative forecast-          erwise agents may hallucinate causal or temporal
+ing datasets include Electricity (Lai et al., 2018),      claims (Wang et al., 2023).
+METR-LA (Li et al., 2017), and ETT (Zhou                  Online Adaptation and Continual Improvement.
+et al., 2021), while common anomaly datasets in-          In anomaly detection and decision support, agents
+clude SWaT (Mathur and Tippenhauer, 2016) and             often need to improve after deployment. Yet most
+SMAP/MSL (Hundman et al., 2018). Monash                   systems remain static or rely on memory updates,
+TSF (Godahewa et al., 2021) serves as a multi-            while parameter adaptation remains rare (Jaglan
+domain repository.                                        and Barnes, 2025; Zheng et al., 2026).
+Benchmarks. Benchmarks define comparable                  Benchmarking Agent Workflows. Current stud-
+tasks and metrics across methods. Forecasting             ies evaluate time-series agents mainly with task
+benchmarks include M4/M5 (Makridakis et al.,              metrics, leaving workflow quality undermeasured.
+2018, 2022) and MIRAI (Ye et al., 2024a), while           Future benchmarks should evaluate intermediate
+anomaly suites include NAB (Lavin and Ahmad,              decisions, tool use, validation, and reflection along-
+2015) and TSB-UAD (Paparrizos et al., 2022).              side downstream performance (Weng et al., 2026;
+TimeSeriesExam (Cai et al., 2024) extends eval-           Cheng et al., 2026).
+Limitations                                                  Mostapha Benhenda. 2025. FinRL-DeepSeek: LLM-
+                                                              infused risk-sensitive reinforcement learning for trad-
+While this survey provides a comprehensive                    ing agents. arXiv preprint arXiv:2502.07393.
+overview of LLM-based agentic systems for time-
+                                                             Aadyot Bhatnagar, Paul Kassianik, Chenghao Liu, Tian
+series tasks, it has several limitations:                      Lan, Wenzhuo Yang, Rowan Cassius, Doyen Sa-
+Scope and coverage. Due to the rapid pace of                   hoo, Devansh Arpit, Sri Subramanian, Gerald Woo,
+advancements in LLM-based agents, some recent                  Amrita Saha, Arun Kumar Jagota, Gokulakrishnan
+developments and emerging directions may not be                Gopalakrishnan, Manpreet Singh, K C Krithika,
+                                                               Sukumar Maddineni, Daeki Cho, Bo Zong, Yingbo
+fully captured in this survey.                                 Zhou, and 4 others. 2021. Merlion: A machine
+Lack of quantitative comparison. The broad                     learning library for time series. arXiv preprint
+range of time-series tasks and heterogeneous evalu-            arXiv:2109.09265.
+ation settings make it difficult to establish a unified      Ane Blázquez-García, Angel Conde, Usue Mori, and
+and fair empirical comparison across all systems.              Jose A Lozano. 2021. A review on outlier/anomaly
+Design guidance. The design insights are derived               detection in time series data. ACM computing surveys
+from recurring patterns observed in the literature             (CSUR), 54(3):1–33.
+rather than controlled experimental validation, and          Tim Bollerslev. 1986. Generalized autoregressive con-
+thus may not generalize to all practical settings.             ditional heteroskedasticity. Journal of Econometrics,
+Despite these limitations, we hope this survey pro-            31(3):307–327.
+vides a useful and structured reference for under-           Markus M Breunig, Hans-Peter Kriegel, Raymond T
+standing and designing LLM-based time-series                  Ng, and Jörg Sander. 2000. Lof: identifying density-
+agents.                                                       based local outliers. In Proceedings of the 2000 ACM
+                                                              SIGMOD international conference on Management
+                                                              of data, pages 93–104.
+References                                                   Yifu Cai, Arjun Choudhry, Mononito Goswami, and
+Sridhar Adepu, Venkata Reddy Palleti, Gyanendra                Artur Dubrawski. 2024.      Timeseriesexam: A
+   Mishra, and Aditya Mathur. 2020. Investigation of           time series understanding exam. arXiv preprint
+   cyber attacks on a water distribution system. In Inter-     arXiv:2410.14752.
+   national Conference on Applied Cryptography and           Yifu Cai, Xinyu Li, Mononito Goswami, Michał Wil-
+   Network Security, pages 274–291. Springer.                  iński, Gus Welter, and Artur Dubrawski. 2025. Time-
+                                                               seriesgym: A scalable benchmark for (time series)
+Taha Aksu, Gerald Woo, Juncheng Liu, Xu Liu, Cheng-
+                                                               machine learning engineering agents. arXiv preprint
+  hao Liu, Silvio Savarese, Caiming Xiong, and Doyen
+                                                               arXiv:2505.13291.
+  Sahoo. 2024. Gift-eval: A benchmark for general
+  time series forecasting model evaluation. arXiv            Cristian Challu, Kin G Olivares, Boris N Oreshkin, Fed-
+  preprint arXiv:2410.10393.                                   erico Garza Ramirez, Max Mergenthaler Canseco,
+                                                               and Artur Dubrawski. 2023. Nhits: Neural hierar-
+Alexander Alexandrov, Konstantinos Benidis, Michael
+                                                               chical interpolation for time series forecasting. In
+  Bohlke-Schneider, Valentin Flunkert, Jan Gasthaus,
+                                                               Proceedings of the AAAI conference on artificial in-
+  Tim Januschowski, Danielle C Maddix, Syama Ran-
+                                                               telligence, volume 37, pages 6989–6997.
+  gapuram, David Salinas, Jasper Schulz, Lorenzo
+  Stella, Ali Caner Türkmen, and Yuyang Wang. 2020.          Ching Chang, Yidan Shi, Defu Cao, Wei Yang, Jeehyun
+  Gluonts: Probabilistic and neural time series mod-           Hwang, Haixin Wang, Jiacheng Pang, Wei Wang,
+  eling in python. Journal of Machine Learning Re-             Yan Liu, Wen-Chih Peng, and Tien-Fu Chen. 2026.
+  search, 21(116):1–6.                                         A survey of reasoning and agentic systems in time
+                                                               series with large language models. Transactions on
+Charles K. Assaad, Emilie Devijver, and Eric Gaussier.         Machine Learning Research.
+  2022. Survey and evaluation of causal discovery
+  methods for time series. Journal of Artificial Intelli-    Chris Chatfield. 2000. Time-series forecasting. Chap-
+  gence Research, 73:767–819.                                  man and Hall/CRC.
+Shaojie Bai, J Zico Kolter, and Vladlen Koltun. 2018.        Si-An Chen, Chun-Liang Li, Sercan O. Arik,
+  An empirical evaluation of generic convolutional and          Nathanael Christian Yoder, and Tomas Pfister. 2023.
+  recurrent networks for sequence modeling. CoRR,               Tsmixer: An all-mlp architecture for time series
+  abs/1803.01271.                                               forecasting. Transactions on Machine Learning Re-
+                                                                search.
+Michael Behrisch, Laura Bieker, Jakob Erdmann, and
+  Daniel Krajzewicz. 2011. Sumo–simulation of urban          Yanxu Chen, Zijun Yao, Yantao Liu, Amy Xin, Jin Ye,
+  mobility: an overview. In Proceedings of SIMUL               Jianing Yu, Lei Hou, and Juanzi Li. 2025. Stock-
+  2011, the third international conference on advances         bench: Can llm agents trade stocks profitably in real-
+  in system simulation. ThinkMind.                             world markets? arXiv preprint arXiv:2510.02209.
+Yuxuan Chen and Haipeng Xie. 2025. Trace: Unlocking         Justin Fu, Aviral Kumar, Ofir Nachum, George Tucker,
+  the potential of llms in time series forecasting for         and Sergey Levine. 2020. D4rl: Datasets for deep
+  distributed energy resources. IEEE Transactions on           data-driven reinforcement learning. arXiv preprint
+  Artificial Intelligence.                                     arXiv:2004.07219.
+
+Junyan Cheng and Peter Chin. 2024. Sociodojo: Build-        Federico Garza, Max Mergenthaler Canseco, Cristian
+  ing lifelong analytical agents with real-world text and     Challú, and Kin G Olivares. 2022. Statsforecast:
+  time series. In The Twelfth International Conference        Lightning fast forecasting with statistical and econo-
+  on Learning Representations.                                metric models. PyCon Salt Lake City, Utah, US,
+                                                              2022:6.
+Mingyue Cheng, Xiaoyu Tao, Qi Liu, Ze Guo, and
+  Enhong Chen. 2026. Position: Beyond model-centric         Rohit Girdhar, Alaaeldin El-Nouby, Zhuang Liu, Man-
+  prediction – agentic time series forecasting. arXiv         nat Singh, Kalyan Vasudev Alwala, Armand Joulin,
+  preprint arXiv:2602.01776.                                  and Ishan Misra. 2023. Imagebind: One embed-
+                                                              ding space to bind them all. In Proceedings of the
+Jaroslaw A Chudziak and Michal Wawer. 2024. Elliotta-         IEEE/CVF Conference on Computer Vision and Pat-
+   gents: A natural language-driven multi-agent system        tern Recognition.
+   for stock market analysis and prediction. In Proceed-
+   ings of the 38th Pacific Asia Conference on Language,    Rakshitha Godahewa, Christoph Bergmeir, Geoffrey I
+   Information and Computation, pages 961–970.                Webb, Rob J Hyndman, and Pablo Montero-Manso.
+                                                              2021. Monash time series forecasting archive. arXiv
+Longchao Da, Kuanru Liou, Tiejin Chen, Xuesong                preprint arXiv:2105.06643.
+  Zhou, Xiangyong Luo, Yezhou Yang, and Hua Wei.
+  2024. Open-TI: Open traffic intelligence with aug-        Nate Gruver, Marc Finzi, Shikai Qiu, and Andrew Gor-
+  mented language model. International Journal of             don Wilson. 2023. Large language models are zero-
+  Machine Learning and Cybernetics, 15(10):4761–              shot time series forecasters. In Advances in Neural
+  4786.                                                       Information Processing Systems, volume 36, pages
+                                                              24013–24034.
+Sarkar Snigdha Sarathi Das, Palash Goyal, Mihir Par-
+                                                            Yile Gu, Yifan Xiong, Jonathan Mace, Yuting Jiang,
+  mar, Nanyun Peng, Vishy Tirumalashetty, Chun-
+                                                              Yigong Hu, Baris Kasikci, and Peng Cheng. 2025.
+  Liang Li, Rui Zhang, Jinsung Yoon, and Tomas Pfis-
+                                                              ARGOS: Agentic time-series anomaly detection with
+  ter. 2026. Nexus: An agentic framework for time
+                                                              autonomous rule generation via large language mod-
+  series forecasting. arXiv preprint arXiv:2605.14389.
+                                                              els. arXiv preprint arXiv:2501.14170.
+Jan G De Gooijer and Rob J Hyndman. 2006. 25 years          Caglar Gulcehre, Ziyu Wang, Alexander Novikov,
+   of time series forecasting. International journal of       Thomas Paine, Sergio Gómez, Konrad Zolna,
+   forecasting, 22(3):443–473.                                Rishabh Agarwal, Josh S Merel, Daniel J Mankowitz,
+                                                              Cosmin Paduraru, Gabriel Dulac-Arnold, Jerry Li,
+Ashok Devireddy and Shunping Huang. 2025. Calm:               Mohammad Norouzi, Matthew Hoffman, Nicolas
+  A framework for continuous, adaptive, and llm-              Heess, and Nando de Freitas. 2020. Rl unplugged: A
+  mediated anomaly detection in time-series streams.          suite of benchmarks for offline reinforcement learn-
+  arXiv preprint arXiv:2508.21273.                            ing. Advances in neural information processing sys-
+                                                              tems, 33:7248–7259.
+Yitong Duan, Chuheng Zhang, and Jian Li. 2025. Fac-
+  torMAD: A multi-agent debate framework based on           Qing Guo, Xinhang Li, Junyu Chen, Zheng Guo, Xiao-
+  large language models for interpretable stock alpha         cong Li, Lin Zhang, and Lei Li. 2025. A dual large
+  factor mining. In Proceedings of the 6th ACM In-            language models architecture with herald guided
+  ternational Conference on AI in Finance, pages 605–         prompts for parallel fine grained traffic signal control.
+  613.                                                        arXiv preprint arXiv:2511.00136.
+Bradley Efron. 1992. Bootstrap methods: another             Qing Guo, Xinhang Li, Junyu Chen, Zheng Guo,
+  look at the jackknife. In Breakthroughs in statis-          Shengzhe Xu, Lin Zhang, and Lei Li. 2026. Cu-
+  tics: Methodology and distribution, pages 569–593.          raLight: Debate-guided data curation for LLM-
+  Springer.                                                   centered traffic signal control. arXiv preprint
+                                                              arXiv:2604.05663.
+Robert F Engle. 1982. Autoregressive conditional het-
+  eroscedasticity with estimates of the variance of         Taicheng Guo, Xiuying Chen, Yaqi Wang, Ruidi Chang,
+  united kingdom inflation. Econometrica, 50(4):987–           Shichao Pei, Nitesh V Chawla, Olaf Wiest, and Xi-
+  1008.                                                        angliang Zhang. 2024. Large language model based
+                                                               multi-agents: A survey of progress and challenges.
+Mohamed Amine Ferrag, Norbert Tihanyi, and Mer-                arXiv preprint arXiv:2402.01680.
+ ouane Debbah. 2025. From llm reasoning to au-
+ tonomous ai agents: A comprehensive review. arXiv          James D Hamilton. 2020. Time series analysis. Prince-
+ preprint arXiv:2504.19678.                                   ton university press.
+Songqiao Han, Xiyang Hu, Hailiang Huang, Minqi            Ming Jin, Shiyu Wang, Lintao Ma, Zhixuan Chu,
+  Jiang, and Yue Zhao. 2022. Adbench: Anomaly de-           James Y. Zhang, Xiaoming Shi, Pin-Yu Chen, Yux-
+  tection benchmark. Advances in neural information         uan Liang, Yuan-Fang Li, Shirui Pan, and Qingsong
+  processing systems, 35:32142–32159.                      Wen. 2024. Time-llm: Time series forecasting by re-
+                                                            programming large language models. In The Twelfth
+Sepp Hochreiter and Jürgen Schmidhuber. 1997. Long          International Conference on Learning Representa-
+  short-term memory. Neural Computation, 9(8):1735–         tions.
+  1780.
+                                                          Satyadhar Joshi. 2025. Using gen ai agents with gae and
+Kyle Hundman, Valentino Constantinou, Christopher           vae to enhance resilience of us markets. Available at
+  Laporte, Ian Colwell, and Tom Soderstrom. 2018.           SSRN 5123068.
+  Detecting spacecraft anomalies using lstms and non-
+  parametric dynamic thresholding. In Proceedings of      Hyeongwon Kang, Jeongseob Kim, Jinwoo Park, and
+  the 24th ACM SIGKDD international conference on           Pilsung Kang. 2026. Detecting time series anomalies
+  knowledge discovery & data mining, pages 387–395.         like an expert: A multi-agent llm framework with spe-
+                                                            cialized analyzers. arXiv preprint arXiv:2605.05725.
+Chia-Chien Hung, Wiem Ben Rim, Lindsay Frost, Lars        Hyeonjae Kim, Chenyue Li, Wen Deng, Mengxi Jin,
+  Bruckner, and Carolin Lawrence. 2023. Walking a           Wen Huang, Mengqian Lu, and Binhang Yuan. 2025.
+  tightrope–evaluating large language models in high-       Climateagent: Multi-agent orchestration for com-
+  risk domains. In Proceedings of the 1st GenBench          plex climate data science workflows. arXiv preprint
+  Workshop on (Benchmarking) Generalisation in NLP,         arXiv:2511.20109.
+  pages 99–111.
+                                                          Kenneth R Knapp, Michael C Kruk, David H Levin-
+Aman Jaglan and Jarrod Barnes. 2025. Continual learn-       son, Howard J Diamond, and Charles J Neumann.
+ ing, not training: Online adaptation for agents. arXiv     2010. The international best track archive for cli-
+ preprint arXiv:2511.01093.                                 mate stewardship (ibtracs) unifying tropical cyclone
+                                                            data. Bulletin of the American Meteorological Soci-
+Gunjan Jalori, Preetika Verma, and Sercan Ö Arık. 2025.     ety, 91(3):363–376.
+  FLAIRR-TS–forecasting LLM-agents with iterative
+  refinement and retrieval for time series. In Find-      Guokun Lai, Wei-Cheng Chang, Yiming Yang, and
+  ings of the Association for Computational Linguis-        Hanxiao Liu. 2018. Modeling long-and short-term
+  tics: EMNLP 2025, pages 15427–15437. Association          temporal patterns with deep neural networks. In
+  for Computational Linguistics.                            The 41st international ACM SIGIR conference on re-
+                                                            search & development in information retrieval, pages
+Sijie Ji, Xinzhe Zheng, and Chenshu Wu. 2024. Hargpt:       95–104.
+   Are llms zero-shot human activity recognizers?
+   arXiv preprint arXiv:2403.02727.                       Siqi Lai, Zhao Xu, Weijia Zhang, Hao Liu, and Hui
+                                                            Xiong. 2025. LLMLight: Large language models
+Xin Ji, Le Zhang, Wenya Zhang, Fang Peng, Yi-               as traffic signal control agents. In Proceedings of
+  fan Mao, Xingchuang Liao, and Kui Zhang. 2025.            the 31st ACM SIGKDD Conference on Knowledge
+  LEMAD: LLM-empowered multi-agent system for               Discovery and Data Mining V. 1, pages 2335–2346.
+  anomaly detection in power grid services. Electron-
+  ics, 14(15):3008.                                       Nikolay Laptev. 2015. Yahoo s5 dataset. Yahoo Web-
+                                                            scope Dataset S5. Time-series anomaly detection
+                                                            benchmark.
+Yushan Jiang, Zijie Pan, Xikun Zhang, Sahil Garg, An-
+  derson Schneider, Yuriy Nevmyvaka, and Dongjin          Alexander Lavin and Subutai Ahmad. 2015. Evaluating
+  Song. 2024. Empowering time series analysis with          real-time anomaly detection algorithms–the numenta
+  large language models: A survey. arXiv preprint           anomaly benchmark. In 2015 IEEE 14th interna-
+  arXiv:2402.03182.                                         tional conference on machine learning and applica-
+                                                            tions (ICMLA), pages 38–44. IEEE.
+Yushan Jiang, Wenchao Yu, Geon Lee, Dongjin Song,
+  Kijung Shin, Wei Cheng, Yanchi Liu, and Haifeng         Geon Lee, Wenchao Yu, Kijung Shin, Wei Cheng, and
+  Chen. 2025. TimeXL: Explainable multi-modal time          Haifeng Chen. 2025. TimeCAP: Learning to con-
+  series prediction with LLM-in-the-loop. In The            textualize, augment, and predict time series events
+  Thirty-ninth Annual Conference on Neural Informa-         with large language model agents. In Proceedings
+  tion Processing Systems.                                  of the AAAI Conference on Artificial Intelligence,
+                                                            volume 39, pages 18082–18090.
+Hongwei Jin, Kibaek Kim, and Jonghwan Kwon. 2025.
+  GridMind: LLMs-powered agents for power system          Zikang Leng, Hyeokhyen Kwon, and Thomas Ploetz.
+  analysis and operations. In Proceedings of the SC’25      2023. Generating virtual on-body accelerometer data
+  Workshops of the International Conference for High        from virtual textual descriptions for human activity
+  Performance Computing, Networking, Storage and            recognition. In Proceedings of the 2023 ACM Inter-
+  Analysis, pages 560–568.                                  national Symposium on Wearable Computers.
+Hao Li, Yu-Hao Huang, Chang Xu, Viktor Schlegel,           Xu Liu, Yutong Xia, Yuxuan Liang, Junfeng Hu, Yiwei
+  Renhe Jiang, Riza Batista-Navarro, Goran Nenadic,          Wang, Lei Bai, Chao Huang, Zhenguang Liu, Bryan
+  and Jiang Bian. 2025. BRIDGE: Bootstrapping text           Hooi, and Roger Zimmermann. 2023. Largest: A
+  to control time-series generation via multi-agent it-      benchmark dataset for large-scale traffic forecasting.
+  erative optimization and diffusion modeling. In Pro-       Advances in Neural Information Processing Systems,
+  ceedings of the 42nd International Conference on           36:75354–75371.
+  Machine Learning, volume 267 of Proceedings of
+  Machine Learning Research, pages 34742–34773.            Yong Liu, Tengge Hu, Haoran Zhang, Haixu Wu, Shiyu
+  PMLR.                                                      Wang, Lintao Ma, and Mingsheng Long. 2024c.
+                                                             itransformer: Inverted transformers are effective for
+Xinyi Li, Sai Wang, Siqi Zeng, Yu Wu, and Yi Yang.           time series forecasting. In International Conference
+  2024. A survey on llm-based multi-agent sys-               on Learning Representations.
+  tems: workflow, infrastructure, and challenges. Vici-
+  nagearth, 1(1):9.                                        Markus Löning, Anthony Bagnall, Sajaysurya Ganesh,
+                                                            Viktor Kazakov, Jason Lines, and Franz J Király.
+Yaguang Li, Rose Yu, Cyrus Shahabi, and Yan Liu.            2019.     sktime: A unified interface for ma-
+  2017. Diffusion convolutional recurrent neural net-       chine learning with time series. arXiv preprint
+  work: Data-driven traffic forecasting. arXiv preprint     arXiv:1909.07872.
+  arXiv:1707.01926.
+                                                           Yunfei Luo, Yuliang Chen, Asif Salekin, and Tauhidur
+                                                             Rahman. 2024. Toward foundation model for mul-
+Zechen Li, Baiyu Chen, Hao Xue, and Flora D Salim.           tivariate wearable sensing of physiological signals.
+  2026. ZARA: Training-free motion time-series rea-          arXiv preprint arXiv:2412.09758.
+  soning via evidence-grounded LLM agents. In Pro-
+  ceedings of the 64th Annual Meeting of the Associa-      Spyros Makridakis, Evangelos Spiliotis, and Vassilios
+  tion for Computational Linguistics (Volume 1: Long         Assimakopoulos. 2018. The m4 competition: Re-
+  Papers), pages 14986–15008. Association for Com-           sults, findings, conclusion and way forward. Interna-
+  putational Linguistics.                                    tional Journal of forecasting, 34(4):802–808.
+Minhua Lin, Zhengzhang Chen, Yanchi Liu, Xujiang           Spyros Makridakis, Evangelos Spiliotis, and Vassilios
+  Zhao, Zongyu Wu, Junxiang Wang, Xiang Zhang,               Assimakopoulos. 2022. M5 accuracy competition:
+  Suhang Wang, and Haifeng Chen. 2026. Decoding              Results, findings, and conclusions. International
+  time series with llms: A multi-agent framework for         journal of forecasting, 38(4):1346–1364.
+  cross-domain annotation. In Findings of the Asso-
+  ciation for Computational Linguistics: EACL 2026,        Pankaj Malhotra, Lovekesh Vig, Gautam Shroff, and
+  pages 6244–6281.                                           Puneet Agarwal. 2015. Long short term memory net-
+                                                             works for anomaly detection in time series. ESANN.
+Haoxin Liu, Zhiyuan Zhao, Jindong Wang, Harshavard-
+  han Kamarthi, and B. Aditya Prakash. 2024a. Lst-         Antoine Marot, Benjamin Donnot, Gabriel Dulac-
+  prompt: Large language models as zero-shot time            Arnold, Adrian Kelly, Aidan O’Sullivan, Jan Viebahn,
+  series forecasters by long-short-term prompting. In        Mariette Awad, Isabelle Guyon, Patrick Panciatici,
+  Findings of the Association for Computational Lin-         and Camilo Romero. 2021. Learning to run a power
+  guistics: ACL 2024, pages 7832–7840, Bangkok,              network challenge: a retrospective analysis. In
+  Thailand. Association for Computational Linguistics.       NeurIPS 2020 competition and demonstration track,
+                                                             pages 112–132. PMLR.
+Jiexi Liu and Songcan Chen. 2024. Timesurl: Self-
+                                                           Aditya P Mathur and Nils Ole Tippenhauer. 2016. Swat:
+   supervised contrastive learning for universal time
+                                                             A water treatment testbed for research and training
+   series representation learning. In Proceedings of
+                                                             on ics security. In 2016 international workshop
+   the AAAI Conference on Artificial Intelligence, vol-
+                                                             on cyber-physical systems for smart water networks
+   ume 38, pages 13918–13926.
+                                                             (CySWater), pages 31–36. IEEE.
+Jun Liu, Chaoyun Zhang, Jiaxu Qian, Minghua Ma,            Larry R Medsker and Lakhmi C Jain. 2000. Recurrent
+  Si Qin, Chetan Bansal, Qingwei Lin, Saravan Ra-            Neural Networks: Design and Applications. CRC
+  jmohan, and Dongmei Zhang. 2024b. Large lan-               Press.
+  guage models can deliver accurate and interpretable
+  time series anomaly detection. arXiv preprint            Seungwhan Moon, Andrea Madotto, Zhaojiang Lin,
+  arXiv:2405.15370.                                          Ayush Saraf, Amy Bearman, and Babak Damavandi.
+                                                             2023. Imu2clip: Language-grounded motion sensor
+Penghang Liu, Elizabeth Fons, Annita Vapsi, Mohsen           translation with multimodal contrastive learning. In
+  Ghassemi, Svitlana Vyetrenko, Daniel Borrajo,              Findings of the Association for Computational Lin-
+  Vamsi K. Potluru, and Manuela Veloso. 2025. TS-            guistics: EMNLP 2023, pages 13246–13253.
+  Agent: Understanding and reasoning over raw time
+  series via iterative insight gathering. arXiv preprint   Yuqi Nie, Nam H. Nguyen, Phanwadee Sinthong, and
+  arXiv:2510.07432. NeurIPS 2025 Workshop on                 Jayant Kalagnanam. 2023. A time series is worth 64
+  Foundations of Reasoning in Language Models.               words: Long-term forecasting with transformers. In
+  International Conference on Learning Representa-        Alban Siffer, Pierre-Alain Fouque, Alexandre Termier,
+  tions.                                                    and Christine Largouet. 2017. Anomaly detection in
+                                                            streams with extreme value theory. In Proceedings
+Bokai Pan, Mingyue Cheng, Zhiding Liu, Shuo Yu,             of the 23rd ACM SIGKDD International Conference
+  Xiaoyu Tao, Yuchong Wu, Qi Liu, Defu Lian, and            on Knowledge Discovery and Data Mining, pages
+  Enhong Chen. 2026. Castflow: Learning role-               1067–1075.
+  specialized agentic workflows for time series fore-
+  casting. arXiv preprint arXiv:2604.27840.               Songyuan Sui, Zihang Xu, and Xia Hu. 2025. Training-
+                                                            free time series classification via in-context reasoning
+Charidimos Papadakis, Angeliki Dimitriou, Gior-             with llm agents. arXiv preprint arXiv:2510.05950.
+  gos Filandrianos, Maria Lymperaiou, Konstantinos
+  Thomas, and Giorgos Stamou. 2025. ATLAS: Adap-          Xiaoyu Tao, Mingyue Cheng, Chuang Jiang, Tian Gao,
+  tive trading with LLM agents through dynamic              Huanjian Zhang, and Yaguo Liu. 2026. Cast-r1:
+  prompt optimization and multi-agent coordination.         Learning tool-augmented sequential decision poli-
+  arXiv preprint arXiv:2510.15949.                          cies for time series forecasting. arXiv preprint
+                                                            arXiv:2602.13802.
+John Paparrizos, Yuhao Kang, Paul Boniol, Ruey S Tsay,    Ruey S Tsay. 2005. Analysis of financial time series.
+  Themis Palpanas, and Michael J Franklin. 2022. Tsb-       John wiley & sons.
+  uad: An end-to-end benchmark suite for univariate
+  time-series anomaly detection. Proc. VLDB Endow.,       Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob
+  15(8):1697–1711.                                          Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz
+                                                            Kaiser, and Illia Polosukhin. 2017. Attention is all
+Joon Sung Park, Joseph C. O’Brien, Carrie J. Cai,           you need. Advances in neural information processing
+  Meredith Ringel Morris, Percy Liang, and Michael S.       systems, 30.
+  Bernstein. 2023. Generative agents: Interactive
+  simulacra of human behavior. arXiv preprint             Bingrui Wang, Yuan Zhou, Leijiao Ge, and Sun-Yuan
+  arXiv:2304.03442.                                         Kung. 2026. Large-model-based smart agent for time
+                                                            series anomaly detection in power systems. Expert
+Lawrence R Rabiner. 1989. A tutorial on hidden markov       Systems with Applications, 296:128917.
+  models and selected applications in speech recogni-
+  tion. Proceedings of the IEEE, 77(2):257–286.           Lei Wang, Chen Ma, Xueyang Feng, Zeyu Zhang, Hao
+                                                            Yang, Jingsen Zhang, Zhiyuan Chen, Jiakai Tang,
+Antonin Raffin, Ashley Hill, Adam Gleave, Anssi Kan-        Xu Chen, Yankai Lin, Wayne Xin Zhao, Zhewei Wei,
+  ervisto, Maximilian Ernestus, and Noah Dormann.           and Ji-Rong Wen. 2024a. A survey on large lan-
+  2021. Stable-baselines3: Reliable reinforcement           guage model based autonomous agents. Frontiers of
+  learning implementations. Journal of machine learn-       Computer Science, 18(6):186345.
+  ing research, 22(268):1–8.
+                                                          Leizhen Wang, Peibo Duan, Zhengbing He, Cheng Lyu,
+Chidaksh Ravuru, Sagar Srinivas Sakhinana, and              Xin Chen, Nan Zheng, Li Yao, and Zhenliang Ma.
+  Venkataramana Runkana. 2024. Agentic retrieval-           2025. Agentic large language models for day-to-
+  augmented generation for time series analysis. arXiv      day route choices. Transportation Research Part C:
+  preprint arXiv:2408.14484.                                Emerging Technologies, 180:105307.
+
+Hansheng Ren, Bixiong Xu, Yujing Wang, Chao Yi,           Zexin Wang, Changhua Pei, Minghua Ma, Xin Wang,
+  Congrui Huang, Xiaoyu Kou, Tony Xing, Mao Yang,           Zhihan Li, Dan Pei, Saravan Rajmohan, Dongmei
+  Jie Tong, and Qi Zhang. 2019. Time-series anomaly         Zhang, Qingwei Lin, and Haiming Zhang. 2024b.
+  detection service at microsoft. In Proceedings of         Revisiting vae for unsupervised time series anomaly
+                                                            detection: A frequency perspective. In Proceedings
+  the 25th ACM SIGKDD international conference on
+                                                            of the ACM Web Conference, pages 3096–3105.
+  knowledge discovery & data mining, pages 3009–
+  3017.                                                   Zhendong Wang, Ioanna Miliou, Isak Samsten, and
+                                                            Panagiotis Papapetrou. 2023. Counterfactual expla-
+David Salinas, Valentin Flunkert, Jan Gasthaus, and Tim     nations for time series forecasting. In 2023 IEEE
+  Januschowski. 2020. Deepar: Probabilistic forecast-       International Conference on Data Mining (ICDM),
+  ing with autoregressive recurrent networks. Interna-      pages 1391–1396.
+  tional Journal of Forecasting, 36(3):1181–1191.
+                                                          Zhiruo Wang, Zhoujun Cheng, Hao Zhu, Daniel Fried,
+Sebastian Schmidl, Phillip Wenig, and Thorsten Papen-       and Graham Neubig. 2024c. What are tools anyway?
+  brock. 2022. Anomaly detection in time series: a          a survey from the language model perspective. arXiv
+  comprehensive evaluation. Proceedings of the VLDB         preprint arXiv:2403.15452.
+  Endowment, 15(9):1779–1797.
+                                                          Michał Wawer and Jarosław A Chudziak. 2025. Inte-
+Robert H Shumway and David S Stoffer. 2017. Arima           grating traditional technical analysis with ai: A multi-
+  models. In Time series analysis and its applications:     agent llm-based approach to stock market forecasting.
+  with R examples, pages 75–163. Springer.                  arXiv preprint arXiv:2506.16813.
+Hua Wei, Chacha Chen, Guanjie Zheng, Kan Wu,                 Congluo Xu, Zhaobin Liu, and Ziyang Li. 2025.
+  Vikash V. Gayah, Kai Xu, and Zhenhui Li. 2019a.              FinArena: A human-agent collaboration framework
+  Presslight: Learning max pressure control to coordi-         for financial market analysis and forecasting. arXiv
+  nate traffic signals in arterial network. In Proceed-        preprint arXiv:2503.02692.
+  ings of the 25th ACM SIGKDD International Con-
+  ference on Knowledge Discovery and Data Mining,            Fengli Xu, Yuyun Lin, Jiaxin Huang, Di Wu, Hongzhi
+  pages 1290–1298.                                             Shi, Jeungeun Song, and Yong Li. 2016. Big data
+                                                               driven mobile traffic understanding and forecasting:
+Hua Wei, Nan Xu, Huichu Zhang, Guanjie Zheng, Xin-             A time series approach. IEEE transactions on ser-
+  shi Zang, Chacha Chen, Weinan Zhang, Yanmin Zhu,             vices computing, 9(5):796–805.
+  Kai Xu, and Zhenhui Li. 2019b. Colight: Learning
+                                                             Haowen Xu, Wenxiao Chen, Nengwen Zhao, Zeyan Li,
+  network-level cooperation for traffic signal control.
+                                                               Jiahao Bu, Zhihan Li, Ying Liu, Youjian Zhao, Dan
+  In Proceedings of the 28th ACM International Con-
+                                                               Pei, and Yang Feng. 2018. Unsupervised anomaly
+  ference on Information and Knowledge Management,
+                                                               detection via variational auto-encoder for seasonal
+  pages 1913–1922.
+                                                               kpis in web applications. In Proceedings of the 2018
+                                                               World Wide Web Conference, pages 187–196.
+Shiqi Wei, Qiqing Wang, and Kaidi Yang. 2026. Vir-
+  tual traffic police: Large language model-augmented        Jiehui Xu, Haixu Wu, Jianmin Wang, and Ming-
+  traffic signal control for unforeseen incidents. arXiv        sheng Long. 2021. Anomaly transformer: Time se-
+  preprint arXiv:2601.15816.                                    ries anomaly detection with association discrepancy.
+                                                                arXiv preprint arXiv:2110.02642.
+Qingsong Wen, Liang Sun, Fan Yang, Xiaomin Song,
+  Jingkun Gao, Xue Wang, and Huan Xu. 2020. Time             Hao Xue and Flora D. Salim. 2023. Promptcast: A
+  series data augmentation for deep learning: A survey.        new prompt-based learning paradigm for time series
+  arXiv preprint arXiv:2002.12478.                             forecasting. IEEE Transactions on Knowledge and
+                                                               Data Engineering.
+Muyan Weng, Defu Cao, Wei Yang, Yashaswi Sharma,
+ and Yan Liu. 2026. Temporalbench: A benchmark               Hongyang Yang, Xiao-Yang Liu, and Christina Dan
+ for evaluating llm-based agents on contextual and             Wang. 2023. Fingpt: Open-source financial large
+ event-informed time series tasks. arXiv preprint              language models. arXiv preprint arXiv:2306.06031.
+ arXiv:2602.13272.
+                                                             Tiankai Yang, Junjun Liu, Michael Siu, Jiahang Wang,
+                                                                Zhuangzhuang Qian, Chanjuan Song, Cheng Cheng,
+Michael Wooldridge. 2009. An Introduction to MultiA-           Xiyang Hu, and Yue Zhao. 2025. Ad-agent: A multi-
+  gent Systems. Wiley, Chichester, UK.                          agent framework for end-to-end anomaly detection.
+                                                                In Proceedings of the 14th International Joint Con-
+Haixu Wu, Tengge Hu, Yong Liu, Hang Zhou, Jianmin               ference on Natural Language Processing and the 4th
+  Wang, and Mingsheng Long. 2023. Timesnet: Tem-               Conference of the Asia-Pacific Chapter of the Associ-
+  poral 2d-variation modeling for general time series           ation for Computational Linguistics, pages 191–205.
+  analysis. In International Conference on Learning
+  Representations.                                           Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak
+                                                               Shafran, Karthik Narasimhan, and Yuan Cao. 2023.
+Haixu Wu, Jiehui Xu, Jianmin Wang, and Mingsheng               React: Synergizing reasoning and acting in language
+  Long. 2021. Autoformer: Decomposition transform-             models. Preprint, arXiv:2210.03629.
+  ers with auto-correlation for long-term series forecast-
+  ing. In Advances in Neural Information Processing          Chenchen Ye, Ziniu Hu, Yihe Deng, Zijie Huang,
+  Systems, volume 34, pages 22419–22430.                       Mingyu Derek Ma, Yanqiao Zhu, and Wei Wang.
+                                                               2024a. Mirai: Evaluating llm agents for event fore-
+Renjie Wu and Eamonn J Keogh. 2021. Current time               casting. arXiv preprint arXiv:2407.01231.
+  series anomaly detection benchmarks are flawed
+  and are creating the illusion of progress. IEEE            Wen Ye, Wei Yang, Defu Cao, Yizhou Zhang, Lum-
+  transactions on knowledge and data engineering,             ingyuan Tang, Jie Cai, and Yan Liu. 2024b. TS-
+  35(3):2421–2429.                                            Reasoner: Domain-oriented time series inference
+                                                              agents for reasoning and automated analysis. arXiv
+                                                              preprint arXiv:2410.04047.
+Yijia Xiao, Edward Sun, Di Luo, and Wei Wang. 2024.
+  TradingAgents: Multi-agents LLM financial trading          Chin-Chia Michael Yeh, Vivian Lai, Uday Singh
+   framework. arXiv preprint arXiv:2412.20138.                 Saini, Xiran Fan, Yujie Fan, Junpeng Wang, Xin
+                                                               Dai, and Yan Zheng. 2025. Empowering time se-
+Zhe Xie, Zeyan Li, Xiao He, Longlong Xu, Xidao                 ries forecasting with llm-agents. arXiv preprint
+  Wen, Tieying Zhang, Jianjun Chen, Rui Shi, and Dan           arXiv:2508.04231.
+  Pei. 2025. ChatTS: Aligning time series with LLMs
+  via synthetic data for enhanced understanding and          Kun Yi, Qi Zhang, Wei Fan, Shoujin Wang, Pengyang
+  reasoning. Proceedings of the VLDB Endowment,                Wang, Hui He, Ning An, Defu Lian, Longbing Cao,
+  18(8):2385–2398.                                             and Zhendong Niu. 2023. Frequency-domain mlps
+  are more effective learners in time series forecast-       Proceedings of the 33rd ACM International Confer-
+  ing. In Advances in Neural Information Processing          ence on the Foundations of Software Engineering,
+  Systems, volume 36, pages 76656–76679.                     pages 525–529.
+Yangyang Yu, Haohang Li, Zhi Chen, Yuechen                 Qi Zhang, Chao Xu, Jie Li, Yicheng Sun, Jinsong Bao,
+  Jiang, Yang Li, Jordan W Suchow, Denghui Zhang,            and Dan Zhang. 2025b. Llm-tsfd: An industrial
+  and Khaldoun Khashanah. 2025. FinMem: A                    time series human-in-the-loop fault diagnosis method
+  performance-enhanced LLM trading agent with lay-           based on a large language model. Expert Systems
+  ered memory and character design. IEEE Transac-            with Applications, 264:125861.
+  tions on Big Data.
+                                                           Regina Zhang, Si Qi Goh, Xingsheng Chen, Zongru Li,
+Yangyang Yu, Zhiyuan Yao, Haohang Li, Zhiyang Deng,          Honggang Wen, Jiale Guo, Menglin Yang, Hongzhi
+  Yupeng Cao, Zhi Chen, Jordan W Suchow, Rong Liu,           Yin, Qiang Yang, Siu-Ming Yiu, and Kwok-Yan Lam.
+  Zhenyu Cui, Zhaozhuo Xu, Denghui Zhang, Kodu-              2025c. From prompts to agents: A comprehensive
+  vayur Subbalakshmi, Guojun Xiong, Yueru He, Jimin          survey of llm-driven time series analysis. Available
+  Huang, Dong Li, and Qianqian Xie. 2024. FinCon:            at SSRN 6614598.
+  A synthesized LLM multi-agent system with con-
+  ceptual verbal reinforcement for enhanced financial      Wentao Zhang, Lingxuan Zhao, Haochong Xia, Shuo
+  decision making. Advances in Neural Information           Sun, Jiaze Sun, Molei Qin, Xinyi Li, Yuqing Zhao,
+  Processing Systems, 37:137010–137045.                     Yilei Zhao, Xinyu Cai, Longtao Zheng, Xinrun Wang,
+                                                            and Bo An. 2024a. A multimodal foundation agent
+Zirui Yuan, Siqi Lai, and Hao Liu. 2026. CoLLM-             for financial trading: Tool-augmented, diversified,
+   Light: Cooperative large language model agents for       and generalist. In Proceedings of the 30th acm sigkdd
+   network-wide traffic signal control. In International    conference on knowledge discovery and data mining,
+  Conference on Learning Representations.                   pages 4314–4325.
+Zhihan Yue, Yujing Wang, Juanyong Duan, Tianmeng
+                                                           Xiyuan Zhang, Ranak Roy Chowdhury, Rajesh K
+  Yang, Congrui Huang, Yunhai Tong, and Bixiong Xu.
+                                                             Gupta, and Jingbo Shang. 2024b. Large language
+  2022. Ts2vec: Towards universal representation of
+                                                             models for time series: A survey. arXiv preprint
+  time series. In Proceedings of the AAAI Conference
+                                                             arXiv:2402.01801.
+  on Artificial Intelligence, volume 36, pages 8980–
+  8987.                                                    Xiyuan Zhang, Dongjin Teng, Ranak Roy Chowdhury,
+Ailing Zeng, Muxi Chen, Lei Zhang, and Qiang Xu.             Siyang Li, Dong Hong, Rajesh K. Gupta, and Jingbo
+  2023. Are transformers effective for time series fore-     Shang. 2024c. Unimts: Unified pre-training for mo-
+  casting? In Proceedings of the AAAI Conference             tion time series. In Advances in Neural Informa-
+  on Artificial Intelligence, volume 37, pages 11121–        tion Processing Systems, volume 37, pages 107469–
+  11128.                                                     107493.
+
+Zhiyuan Zeng, Jiashuo Liu, Siyuan Chen, Tianci He,         Yan Zhang, Ahmad Mohammad Saber, Amr Youssef,
+  Yali Liao, Yixiao Tian, Jinpeng Wang, Zaiyuan Wang,        and Deepa Kundur. 2025d. Grid-Agent: An LLM-
+  Yang Yang, Lingyue Yin, Mingren Yin, Zhenwei               powered multi-agent system for power grid control.
+  Zhu, Tianle Cai, Zehui Chen, Jiecao Chen, Yantao           arXiv preprint arXiv:2508.05702.
+  Du, Xiang Gao, Jiacheng Guo, Liang Hu, and 12
+  others. 2025. Futurex: An advanced live benchmark        Yunhao Zhang and Junchi Yan. 2023. Crossformer:
+  for llm agents in future prediction. arXiv preprint        Transformer utilizing cross-dimension dependency
+  arXiv:2508.11987.                                          for multivariate time series forecasting. In Interna-
+                                                             tional Conference on Learning Representations.
+Chaoli Zhang, Tian Zhou, Qingsong Wen, and Liang
+  Sun. 2022a. Tfad: A decomposition time series            Yuxuan Zhang, Yangyang Feng, Daifeng Li, Kexin
+  anomaly detection architecture with time-frequency         Zhang, Junlan Chen, and Bowen Deng. 2025e. Can
+  analysis. In Proceedings of the 31st ACM Interna-          competition enhance the proficiency of agents pow-
+  tional Conference on Information and Knowledge             ered by large language models in the realm of news-
+  Management, pages 2497–2507.                               driven time series forecasting?     arXiv preprint
+                                                             arXiv:2504.10210.
+Liang Zhang, Qiang Wu, Jun Shen, Linyuan Lu, Bo Du,
+   and Jianqing Wu. 2022b. Expression might be             Zeyu Zhang, Xiaohe Bo, Chen Ma, Rui Li, Xu Chen,
+   enough: Representing pressure and demand for re-          Quanyu Dai, Jieming Zhu, Zhenhua Dong, and Ji-
+   inforcement learning based traffic signal control. In     Rong Wen. 2024d. A survey on the memory mecha-
+  Proceedings of the 39th International Conference on        nism of large language model based agents. Preprint,
+  Machine Learning, pages 26645–26654.                       arXiv:2404.13501.
+
+Lingzhe Zhang, Yunpeng Zhai, Tong Jia, Xiaosong            Haokun Zhao, Xiang Zhang, Jiaqi Wei, Yiwei Xu, Yut-
+  Huang, Chiming Duan, and Ying Li. 2025a.                   ing He, Siqi Sun, and Chenyu You. 2025. Time-
+  AgentFM: Role-aware failure management for dis-            SeriesScientist: A general-purpose AI agent for time
+  tributed databases with LLM-driven multi-agents. In        series analysis. arXiv preprint arXiv:2510.01538.
+Wayne Xin Zhao, Kun Zhou, Junyi Li, Tianyi Tang,
+ Xiaolei Wang, Yupeng Hou, Yingqian Min, Beichen
+ Zhang, Junjie Zhang, Zican Dong, Yifan Du, Chen
+ Yang, Yushuo Chen, Zhipeng Chen, Jinhao Jiang,
+ Ruiyang Ren, Yifan Li, Xinyu Tang, Zikang Liu, and
+ 3 others. 2026. A survey of large language models.
+ Frontiers of Computer Science, 20(12):2012627.
+Junhao Zheng, Chengming Shi, Xidi Cai, Qiuke Li,
+  Duzhen Zhang, Chenxing Li, Dong Yu, and Qianli
+  Ma. 2026. Lifelong learning of large language model
+  based agents: A roadmap. IEEE Transactions on
+  Pattern Analysis and Machine Intelligence.
+Haoyi Zhou, Shanghang Zhang, Jieqi Peng, Shuai
+  Zhang, Jianxin Li, Hui Xiong, and Wancai Zhang.
+  2021. Informer: Beyond efficient transformer for
+  long sequence time-series forecasting. In Proceed-
+  ings of the AAAI conference on artificial intelligence,
+  volume 35, pages 11106–11115.
+
+Shu Zhou, Yunyang Xuan, Yuxuan Ao, Xin Wang, Tao
+  Fan, and Hao Wang. 2025. Merit: Multi-agent collab-
+  oration for unsupervised time series representation
+  learning. In Findings of the Association for Compu-
+  tational Linguistics: ACL 2025, pages 24011–24028.
+
+Tian Zhou, Ziqing Ma, Qingsong Wen, Xue Wang,
+  Liang Sun, and Rong Jin. 2022. Fedformer: Fre-
+  quency enhanced decomposed transformer for long-
+  term series forecasting. In Proceedings of the 39th In-
+  ternational Conference on Machine Learning, pages
+  27268–27286.
+Tian Zhou, Peisong Niu, Xue Wang, Liang Sun, and
+  Rong Jin. 2023. One fits all: Power general time
+  series analysis by pretrained lm. In Advances in
+  Neural Information Processing Systems, volume 36.
+Changxi Zhu, Mehdi Dastani, and Shihan Wang. 2024.
+  A survey of multi-agent deep reinforcement learning
+  with communication. Autonomous Agents and Multi-
+  Agent Systems, 38(1):4.
+Xingchen Zou, Yuhao Yang, Zheng Chen, Xixuan
+  Hao, Yiqi Chen, Chao Huang, and Yuxuan Liang.
+  2025. Traffic-R1: Reinforced LLMs bring human-
+  like reasoning to traffic signal control systems. arXiv
+  preprint arXiv:2508.02344.
+A   Survey Scope and Related Surveys                  are not intended to define a separate taxonomy of
+                                                      prompt types.
+This appendix describes how we selected papers
+and how our survey differs from related surveys on    B.1   Forecasting and Reasoning
+LLMs for time-series analysis.
+                                                       System:
+Paper selection. We searched arXiv, ACL An-            You are a time-series analysis agent.
+                                                       Use temporal evidence, retrieved context,
+thology, ACM Digital Library, IEEE Xplore, DBLP,       and tool outputs to produce a grounded
+                                                       forecast, answer, or classification. Do
+Semantic Scholar, Google Scholar, and references       not rely on unsupported patterns.
+from related surveys, with the last update in May      User:
+2026. Search terms paired agent concepts, includ-      Task:
+                                                       - Forecast the target horizon, or answer
+ing LLM agent, multi-agent, tool use, memory, and        the temporal reasoning or classification
+reflection, with time-series tasks and domains such      question.
+
+as forecasting, anomaly detection, diagnosis, trad-    Inputs:
+                                                       - Historical observations:
+ing, traffic control, and power grids. We included       <series or summarized windows>
+                                                       - Target horizon or question:
+papers in which an LLM controls at least one deci-       <forecast horizon / question>
+sion that shapes a multi-step time-series workflow,    - Retrieved analogs or external context:
+                                                         <optional>
+including action or tool selection, memory updat-      - Candidate hypotheses or exemplars:
+                                                         <optional>
+ing, hypothesis revision, or stage coordination. We    - Tool outputs:
+excluded one-shot prompting, static LLM encoders,        <trend, seasonality, anomaly,
+                                                          correlation, model scores>
+post-hoc explainers, and domain-general agents
+                                                       Instructions:
+without time-series evaluation. The final corpus       1. Identify trend, seasonality, local
+contains 47 representative systems; Table 3 codes         changes, and unusual events.
+                                                       2. Select evidence relevant to the
+their agent design, and Table 6 reports comparable        horizon or question.
+                                                       3. Compare candidate hypotheses or
+metrics where available.                                  retrieved exemplars when provided.
+                                                       4. Use tool outputs for quantitative
+                                                          claims.
+Comparison with related surveys. Table 1 com-          5. Produce the forecast, answer, or label
+                                                          with a concise rationale.
+pares survey scope, task coverage, taxonomy, and       6. State uncertainty and failure modes.
+design guidance. For categorical labels, Yes de-
+                                                       Output JSON:
+notes that the named dimension is a primary            {
+                                                                 "evidence_summary": "...",
+and sustained focus, Partial denotes agent cover-                "reasoning": "...",
+age without a clear separation from prompt-only                  "prediction_answer_or_label": "...",
+                                                                 "confidence": "...",
+methods, and Limited denotes localized rather                    "limitations": "..."
+                                                       }
+than category-wide design discussion. Method-
+, topology-, capability-, and problem-driven tax-
+onomies organize methods by LLM adaptation, rea-        This example reflects common input–output
+soning structure, agent capability, and time-series   needs in forecasting and reasoning agents such
+problem family, respectively.                         as TimeSeriesScientist (Zhao et al., 2025),
+   Topology-driven surveys characterize reasoning     TimeXL (Jiang et al., 2025), TS-Agent (Liu et al.,
+structures (Chang et al., 2026); our problem-driven   2025), and TS-Reasoner (Ye et al., 2024b).
+taxonomy complements them by linking task set-
+tings to architecture, tools, and memory. We cover    B.2   Augmentation and Synthesis
+47 representative systems under the inclusion rule
+                                                       System:
+above and report per-system annotations in Table 3.    You are assisting time-series data
+                                                       construction. Augment a target series or
+                                                       synthesize a controlled series only when
+B   Representative Prompt Examples by                  the requested temporal semantics and
+                                                       domain constraints can be preserved.
+    Task Family
+                                                       User:
+                                                       Task:
+This appendix provides representative prompt ex-       - Create an augmented example, synthetic
+amples for the major task families in our taxonomy.      series, or textual annotation.
+
+The examples are abstracted from recurring input–      Inputs:
+                                                       - Construction mode:
+output needs in the surveyed systems. They are not       <target augmentation | text-guided
+verbatim prompts from any single paper, and they
+Table 1: Comparison with related time-series LLM surveys. ✓: clearly covered; ∼: partially covered; ×: not
+covered.
+
+                                          LLM       Forecasting Augmentation Anomaly Detection Decision                      Design
+       Survey            Year TS-specific Agents    & Reasoning & Synthesis    & Diagnosis     Support Taxonomy             Guidance
+  (Jiang et al., 2024)   2024     Yes     No            ✓           ∼               ✓             ∼     Method-driven       Limited
+(Zhang et al., 2024b)    2024     Yes     No            ✓           ✓               ✓             ×     Method-driven       Limited
+ (Chang et al., 2026)    2026     Yes     Partial       ✓           ✓               ✓             ✓     Topology-driven     Limited
+(Zhang et al., 2025c)    2025     Yes     Partial       ✓           ✓               ✓             ∼     Capability-driven   Limited
+         Ours            2026     Yes     Yes           ✓           ✓               ✓             ✓     Problem-driven      Yes
+
+
+
+
+    synthesis | domain-attribute synthesis>                               - Temporal context:
+ - Seed series or source examples:                                          <recent history, seasonality,
+   <values / windows / examples>                                             expected behavior>
+ - Desired label, scenario, or query:                                     - Auxiliary context:
+   <class, event, scenario, or description>                                 <logs, alerts, topology,
+ - Required temporal properties:                                             related variables>
+   <trend, periodicity, volatility, extrema>                              - Historical cases:
+ - Domain constraints:                                                      <optional retrieved examples>
+   <valid ranges, correlations,
+    physical rules>                                                       Instructions:
+ - Validation criteria:                                                   1. Compare the candidate window with
+   <downstream check or consistency rule>                                    expected temporal behavior.
+                                                                          2. Separate detector evidence from
+ Instructions:                                                               contextual or textual evidence.
+ 1. Preserve task-relevant temporal                                       3. Check whether context supports or
+    semantics when augmenting a target                                       contradicts the detector evidence.
+    series.                                                               4. Identify the most likely abnormal
+ 2. Align control text or domain attributes                                  interval or root cause.
+    with the generated series when                                        5. Avoid overriding the detector or
+    synthesizing new data.                                                   overclaiming when evidence is
+ 3. Apply only transformations consistent                                    weak or conflicting.
+    with the label or scenario.                                           6. Return a decision, supporting evidence,
+ 4. Avoid changing causal, seasonal, or                                      and confidence.
+    domain-critical structure.
+ 5. Explain which properties are preserved                                Output JSON:
+    or intentionally changed.                                             {
+ 6. Return a compact structured result for                                  "decision": "normal | anomalous | uncertain",
+    downstream validation.                                                  "abnormal_interval": "...",
+                                                                            "supporting_evidence": "...",
+ Output JSON:                                                               "root_cause_hypothesis": "...",
+ {                                                                          "confidence": "..."
+   "construction_mode": "...",                                            }
+           "constructed_item": "...",
+           "control_attributes": "...",
+           "preserved_properties": "...",
+   "changed_properties": "...",                                            This example reflects common input–output
+   "validation_notes": "..."
+ }                                                                      needs in anomaly detection and diagnosis systems
+                                                                        such as SAGE (Kang et al., 2026), ARGOS (Gu
+                                                                        et al., 2025), AgentFM (Zhang et al., 2025a), and
+   This example reflects common input–output
+                                                                        LLM-TSFD (Zhang et al., 2025b).
+needs in augmentation and synthesis systems such
+as TESSA (Lin et al., 2026), MERIT (Zhou et al.,                        B.4    Decision Support
+2025), BRIDGE (Li et al., 2025), and ChatTS (Xie
+et al., 2025).                                                            System:
+                                                                          You are a sequential decision-support
+                                                                          agent. Recommend only actions allowed by
+B.3     Anomaly Detection and Diagnosis                                   the action space and supported by the
+                                                                          current temporal state, constraints, and
+                                                                          validation feedback.
+ System:
+ You are a time-series monitoring agent.                                  User:
+ Convert detector evidence, temporal                                      Task:
+ context, and auxiliary logs into a                                       - Select the next trading, traffic-control,
+ supported alarm, point/window label, or                                    or grid-control action.
+ diagnostic explanation.
+                                                                          Inputs:
+ User:                                                                    - Current state:
+ Task:                                                                      <market / intersection / grid state>
+ - Decide whether the candidate window is                                 - Recent history:
+   anomalous, or explain a fault.                                           <prices, flows, loads, events,
+                                                                             or violations>
+ Inputs:                                                                  - Historical experience:
+ - Candidate window:                                                        <retrieved cases, lessons, or patterns>
+   <time range and observed values>                                       - External evidence:
+ - Detector evidence:                                                       <news, indicators, forecasts,
+   <scores, thresholds, labels, residuals>                                   alerts, optional>
+ - Action space:                                        its category, associated problem type, interactivity,
+   <allowed actions and parameter ranges>               temporal scale, number of series, and latest release
+ - Constraints:
+   <risk preference, safety limits,                     when available.
+    policies, timing, feasibility>
+ - Validation feedback:
+   <simulator, solver, or previous outcome>             F   Evaluation Evidence and Metrics
+ Instructions:
+ 1. Summarize the state variables that
+                                                        Table 6 reports representative comparable quan-
+    matter for the next action.                         titative evidence across forecasting, reasoning,
+ 2. Compare feasible actions under the
+    provided constraints.                               anomaly detection, trading, and traffic-control
+ 3. Use historical experience for
+    market-like settings when available.                tasks. We only group results that share the same
+ 4. Use validation feedback to reject                   task, dataset, and metric, and we mark the surveyed
+    unsafe or dominated actions.
+ 5. Recommend one action and explain the                agent methods in bold. The table is intended as
+    expected effect.
+ 6. State the main risk and what should be              comparable evidence rather than a universal leader-
+    monitored next.                                     board: scores may still depend on horizon, split,
+ Output JSON:                                           point-adjustment rule, transaction-cost assumption,
+ {
+   "state_summary": "...",                              or simulator configuration.
+   "recommended_action": "...",
+   "justification": "...",                              Error metrics. Regression-style tasks usually re-
+   "constraint_check": "...",
+   "next_monitoring_target": "..."                      port point-wise errors such as mean absolute error
+ }
+                                                        (MAE), mean squared error (MSE), and root mean
+                                                        squared error (RMSE):
+  This example reflects common input–output                                       n
+needs in decision-support systems such as Tradin-                              1X
+                                                                     MAE =        |yi − ŷi |,
+gAgents (Xiao et al., 2024), FinCon (Yu et al.,                                n
+                                                                                 i=1
+2024), LLMLight (Lai et al., 2025), and Grid-                             1X
+                                                                             n
+Agent (Zhang et al., 2025d).                                        MSE =       (yi − ŷi )2 ,
+                                                                          n
+                                                                            i=1
+                                                                          √
+C    Typical Design Patterns                                       RMSE = MSE.
+Figure 4 provides a supplementary visual summary        Here yi and ŷi denote the target and prediction for
+of the typical design patterns discussed across dif-    the i-th evaluated point, and n is the number of
+ferent time-series tasks in Section 4. Each panel       evaluated points. Lower values indicate better fore-
+shows a common design pattern rather than the           casts. Scale-free variants such as MAPE, sMAPE,
+exact design of a specific system. Dashed boxes de-     or MASE are used when series with different mag-
+note agent modules together with their tools, solid     nitudes must be compared.
+boxes group entities with similar roles, solid arrows
+show the main flow, dashed arrows indicate con-         Classification and detection metrics. Reason-
+ditional or fallback paths, and background colors       ing, event prediction, anomaly detection, and some
+group panels from the same higher-level problem         augmentation studies are commonly evaluated with
+type.                                                   accuracy, precision, recall, and F1. Let TP, FP, and
+                                                        FN denote true positives, false positives, and false
+D    Failure Modes and Design Patterns                  negatives:
+The task sections discuss these failure modes in                        TP                    TP
+                                                        Precision =            , Recall =           ,
+context. Table 2 brings them into one view and                       TP + FP                TP + FN
+links each one to design choices reported in related                   Precision · Recall
+                                                                F1 = 2                    .
+work. The table is not a causal comparison; it is                      Precision + Recall
+meant as a practical checklist for where a design       Macro-F1 averages class-wise F1 and is useful un-
+choice helps and what should be inspected.              der class imbalance; micro-F1 aggregates counts
+                                                        before computing F1. In anomaly detection, F1
+E    Resources Summary
+                                                        can be point-wise, point-adjusted, or event-based,
+Table 5 summarizes the resources discussed in Sec-      so comparisons require the same adjustment rule.
+tion 5, including benchmarks, datasets, environ-        Score-based detectors may additionally use AU-
+ments, and toolkits. For each resource, we report       ROC or AUPR.
+Table 2: Summary of documented failure modes for time-series agent systems. Each failure mode is linked to
+related work, design choices, and implementation checks.
+
+Failure mode              Where it appears                Related work                       Design choice                                   Implementation check
+
+Error propagation across Forecasting and reasoning TimeSeriesScientist (Zhao et al., Keep stage outputs explicit. Log retrieved ev- Can a reader inspect the artifact
+workflow stages          pipelines that pass outputs 2025); CLIMATEAGENT (Kim idence, tool calls, predictions, and validation used by the next stage?
+                         through diagnosis, model et al., 2025); CastFlow (Pan et al., results so later stages do not inherit hidden er-
+                         selection, context analysis, 2026)                            rors
+                         prediction, and validation
+
+Numerical or domain rea- Tasks that require temporal TS-Agent (Liu et al., 2025); TS- Let the LLM plan and explain, but move cal- Can the numerical claim be re-
+soning errors            structure, metadata, domain Reasoner (Ye et al., 2024b); CLI- culation and domain-specific parsing into tools, run outside the LLM?
+                         conventions, or quantitative op- MATEAGENT (Kim et al., 2025) operators, or specialist agents
+                         erations
+
+Semantic drift in gener- Augmentation and synthesis, DCATS (Yeh et al., 2025); Generate from target context and verify tempo- Do checks cover trend, season-
+ated data                where plausible-looking out- MERIT (Zhou et al., 2025); ral properties before the synthetic data enters ality, local shape, and correla-
+                         puts can break trend, periodic- BRIDGE (Li et al., 2025) training or evaluation                         tion rather than textual plausi-
+                         ity, local shape, correlation, or                                                                       bility alone?
+                         domain constraints
+
+Brittle LLM-as-judge val- Validation settings where a pre- DCATS (Yeh et al., 2025); TS- Treat LLM critique as one signal. Require task Would the output be rejected if
+idation                   trained judge can approve an Reasoner (Ye et al., 2024b)       metrics, execution feedback, or downstream val- another LLM approved it but
+                          output without task evidence or                                idation before accepting an output              the executable check failed?
+                          executable checks
+
+Contamination during on- Streaming anomaly detection, CALM (Devireddy and Huang, Separate alarm decisions from update decisions; Can short-lived anomalies be
+line updates             where transient anomalies can 2025)                     gate which observations can enter memory or kept out of the update set?
+                         be absorbed as the new normal                           fine-tuning data
+
+Unsafe or infeasible ac- Traffic and grid-control agents LLMLight (Lai et al., 2025); Grid- Check proposed actions with a simulator, solver, Does every action pass an en-
+tions in closed-loop con- that issue executable actions Agent (Zhang et al., 2025d); Grid- feasibility test, or safety validator before execu- vironment or constraint check
+trol                      under operational constraints Mind (Jin et al., 2025)             tion                                               first?
+
+
+
+
+Generation and annotation metrics. For aug-                                              length, throughput, cumulative reward, and con-
+mentation and synthesis, evaluation is often in-                                         straint violations.
+direct: generated samples are used to train or
+adapt a downstream model, and the downstream
+MAE, MSE, accuracy, or F1 is reported. Pa-
+pers may also measure distributional fidelity with
+DTW, MMD, autocorrelation, spectral statistics, or
+nearest-neighbor analyses, and annotation quality
+with expert agreement or label accuracy.
+Decision and control metrics. Trading agents
+are evaluated by both return and risk. Cumulative
+return (CR) measures portfolio growth, while the
+Sharpe ratio (SR) measures risk-adjusted return:
+                                   E[Rt − Rf ]
+                        SR =                   .
+                                   σ(Rt − Rf )
+Maximum drawdown, volatility, and turnover fur-
+ther capture downside risk and trading cost sensi-
+tivity. Recent trading-agent benchmarks such as
+StockBench (Chen et al., 2025) further stress multi-
+month sequential evaluation under daily market
+signals.
+   Traffic-control agents are usually evaluated in
+closed-loop simulators. Average travel time (ATT)
+is the mean travel duration across vehicles:
+                                    N
+                     1 X exit
+               ATT =    (ti − tentry
+                               i     ),
+                     N
+                                   i=1
+
+where lower ATT indicates more efficient traffic
+flow. Related metrics include waiting time, queue
+Table 3: Summary of representative LLM-based agentic methods for time-series tasks. Each method is grouped by
+Problem Type and further characterized by its publication year, venue or source, architecture, tools, and memory.
+
+ Method                     Year    Source      Problem Type      Architecture          Tools                                      Memory
+TimeSeriesScientist (Zhao 2025      arXiv       Forecasting       Multi (Cooperative)   Stat./ML Models                            Evidence Logs
+et al., 2025)
+TimeXL (Jiang et al.,     2025      NeurIPS     Forecasting       Multi (Cooperative)   None                                       Evidence Logs,
+2025)                                                                                                                              Pattern Library
+TimeCAP (Lee et al.,      2025      AAAI        Forecasting       Multi (Cooperative)   Data Processing Tools                      Pattern Library
+2025)
+NewsTSForecasting         2025      arXiv       Forecasting       Multi (Competitive)   Search & Retrieval APIs                    Evidence Logs,
+(Zhang et al., 2025e)                                                                                                              Analysis Strategies
+TRACE (Chen and Xie,      2025      IEEE TAI Forecasting          Multi (Competitive)   None                                       Evidence Logs
+2025)
+FLAIRR-TS (Jalori et al., 2025      EMNLP       Forecasting       Multi (Cooperative)   None                                       Evidence Logs,
+2025)                               Findings                                                                                       Analysis Strategies
+Nexus (Das et al., 2026) 2026       arXiv       Forecasting       Multi (Cooperative)   Data Processing Tools                      Evidence Logs
+CastFlow (Pan et al.,     2026      arXiv       Forecasting       Multi (Mixed)         Data Processing Tools, Stat./ML Models     Evidence Logs,
+2026)                                                                                                                              Pattern Library
+TS-Agent (Liu et al.,     2025      NeurIPS     Reasoning         Single                Data Processing Tools, Stat./ML Models     Evidence Logs
+2025)                               Wkshp.
+Agentic-RAG (Ravuru       2024      KDD UC      Reasoning         Multi (Cooperative)   None                                       Pattern Library
+et al., 2024)
+TS-Reasoner (Ye et al.,   2024      arXiv       Reasoning         Single                Database APIs, Data Processing Tools,     Evidence Logs
+2024b)                                                                                  Stat./ML Models
+ZARA (Li et al., 2026)    2026      ACL         Reasoning         Multi (Cooperative)   Database APIs, Data Processing Tools,     Pattern Library,
+                                                                                        Stat./ML Models                           Analysis Strategies
+ CLIMATEAGENT (Kim          2025    arXiv       Reasoning         Multi (Cooperative)   Database APIs, Data Processing Tools,     Evidence Logs
+ et al., 2025)                                                                          Simulators, Solvers & Optimizers
+ FETA (Sui et al., 2025)    2025    arXiv       Reasoning         Multi (Competitive)   Data Processing Tools, Search & Retrieval Pattern Library
+                                                                                        APIs
+TESSA (Lin et al., 2026)    2026    EACL        Augmentation      Multi (Cooperative)   Data Processing Tools                      None
+DCATS (Yeh et al., 2025)    2025    arXiv       Augmentation      Single                Stat./ML Models                            Evidence Logs
+MERIT (Zhou et al.,         2025    ACL         Augmentation      Multi (Cooperative)   Data Processing Tools, Stat./ML Models     None
+2025)
+ChatTS (Xie et al., 2025)   2025    PVLDB       Synthesis         Multi (Cooperative)   None                                     None
+GenAI4RiskModeling          2025    SSRN        Synthesis         Multi (Cooperative)   Database APIs, Data Processing Tools,    None
+(Joshi, 2025)                                                                           Stat./ML Models
+BRIDGE (Li et al., 2025)    2025    ICML        Synthesis         Multi (Mixed)         Search & Retrieval APIs, Stat./ML Models Pattern Library
+ AD-AGENT (Yang et al., 2025        AACL        Detection         Multi (Cooperative)   Data Processing Tools, Stat./ML Models     Evidence Logs,
+ 2025)                                                                                                                             Analysis Strategies
+ ARGOS (Gu et al., 2025) 2025       arXiv       Detection         Multi (Mixed)         Data Processing Tools, Stat./ML Models     Evidence Logs
+ SLEP (Wang et al., 2026) 2026      ESWA        Detection         Single                Data Processing Tools                      Evidence Logs,
+                                                                                                                                   Analysis Strategies
+ CALM (Devireddy and      2025      arXiv       Detection         Single                Data Processing Tools, Stat./ML Models     None
+ Huang, 2025)
+ SAGE (Kang et al., 2026) 2026      arXiv       Detection         Multi (Cooperative)   Data Processing Tools, Stat./ML Models Evidence Logs
+ LEMAD (Ji et al., 2025) 2025       Electron.   Diagnosis         Multi (Cooperative)   Data Processing Tools, Stat./ML Models Evidence Logs
+ AgentFM (Zhang et al.,   2025      FSE         Diagnosis         Multi (Cooperative)   Database APIs, Data Processing Tools,    None
+ 2025a)                                                                                 Stat./ML Models
+ LLM-TSFD (Zhang et al., 2025       ESWA        Diagnosis         Single                Database APIs, Data Processing Tools,    Pattern Library
+ 2025b)                                                                                 Search & Retrieval APIs, Stat./ML Models
+ ElliottAgents (Chudziak 2024       PACLIC      Trading           Multi (Cooperative)   Data Processing Tools, Stat./ML Models     Pattern Library
+ and Wawer, 2024; Wawer
+ and Chudziak, 2025)
+ TradingAgents (Xiao      2024      arXiv       Trading           Multi (Mixed)         Data Processing Tools, Search & Retrieval Evidence Logs
+ et al., 2024)                                                                          APIs
+ FinCon (Yu et al., 2024) 2024      NeurIPS     Trading           Multi (Cooperative)   Database APIs, Data Processing Tools,     Evidence Logs,
+                                                                                        Search & Retrieval APIs                   Pattern Library,
+                                                                                                                                  Analysis Strategies
+ FinAgent (Zhang et al.,  2024      KDD         Trading           Multi (Cooperative)   Data Processing Tools                     Pattern Library,
+ 2024a)                                                                                                                           Analysis Strategies
+ FactorMAD (Duan et al., 2025       ICAIF       Trading           Multi (Competitive)   Data Processing Tools, Stat./ML Models Pattern Library
+ 2025)
+ FinMem (Yu et al., 2025) 2025      IEEE        Trading           Single                Database APIs, Data Processing Tools      Evidence Logs,
+                                    TBD                                                                                           Pattern Library
+ FinArena (Xu et al., 2025) 2025    arXiv       Trading           Multi (Cooperative)   Data Processing Tools, Search & Retrieval None
+                                                                                        APIs
+ATLAS (Papadakis et al., 2025       arXiv       Trading           Multi (Cooperative)   Search & Retrieval APIs, Simulators,      Analysis Strategies
+2025)                                                                                   Solvers & Optimizers
+FinRL-DeepSeek            2025      arXiv       Trading           Single                Stat./ML Models                           None
+(Benhenda, 2025)
+Open-TI (Da et al., 2024) 2024      IJMLC       Traffic Control   Multi (Cooperative)   Database APIs, Data Processing Tools,      None
+                                                                                        Stat./ML Models
+ LLMTraveler (Wang et al., 2025     TR-C        Traffic Control   Single                None                                       Evidence Logs
+ 2025)
+ LLMLight (Lai et al.,       2025   KDD         Traffic Control   Single                Simulators, Solvers & Optimizers           None
+ 2025)
+ CoLLMLight (Yuan et al., 2026      ICLR        Traffic Control   Multi (Mixed)         Data Processing Tools, Simulators, Solvers Evidence Logs
+ 2026)                                                                                  & Optimizers
+ HeraldLight (Guo et al., 2025      arXiv       Traffic Control   Multi (Mixed)         Stat./ML Models, Simulators, Solvers &     Evidence Logs
+ 2025)                                                                                  Optimizers
+ Traffic-R1 (Zou et al.,     2025   arXiv       Traffic Control   Single                Simulators, Solvers & Optimizers           Analysis Strategies
+ 2025)
+ Virtual Traffic Police (Wei 2026   arXiv       Traffic Control   Single                Search & Retrieval APIs, Simulators,       Evidence Logs
+ et al., 2026)                                                                          Solvers & Optimizers
+ CuraLight (Guo et al.,      2026   arXiv       Traffic Control   Multi (Competitive)   Simulators, Solvers & Optimizers           Evidence Logs
+ 2026)
+ Grid-Agent (Zhang et al., 2025     arXiv       Grid Control      Multi (Cooperative)   Simulators, Solvers & Optimizers           Evidence Logs
+ 2025d)
+ GridMind (Jin et al.,       2025   SC Work- Grid Control         Multi (Cooperative)   Simulators, Solvers & Optimizers           Evidence Logs
+ 2025)                              shops
+Table 4: Within-family counts and percentages of architecture, tool, and memory choices among the 47 systems
+summarized in Table 3. Tool and memory categories are non-exclusive.
+
+ Task Family                                 Architecture                                                    Tools                                                                           Memory
+
+ Forecasting & Reasoning                     Single: 2 (14.3%); Multi (Cooperative): 8                       Database APIs: 3 (21.4%); Search & Retrieval APIs: 2                            Evidence Logs: 10 (71.4%); Pattern Library:
+ (n = 14)                                    (57.1%); Multi (Competitive): 3 (21.4%);                        (14.3%); Data Processing Tools: 8 (57.1%); Stat./ML                             6 (42.9%); Analysis Strategies: 3 (21.4%);
+                                             Multi (Mixed): 1 (7.1%)                                         Models: 5 (35.7%); Simulators, Solvers & Optimizers: 1                          None: 0 (0%)
+                                                                                                             (7.1%); None: 4 (28.6%)
+
+ Augmentation & Synthesis                    Single: 1 (16.7%); Multi (Cooperative): 4   Database APIs: 1 (16.7%); Search & Retrieval APIs: 1                                                Evidence Logs: 1 (16.7%); Pattern Library: 1
+ (n = 6)                                     (66.7%); Multi (Competitive): 0 (0%); Multi (16.7%); Data Processing Tools: 3 (50.0%); Stat./ML                                                 (16.7%); Analysis Strategies: 0 (0%); None:
+                                             (Mixed): 1 (16.7%)                          Models: 4 (66.7%); Simulators, Solvers & Optimizers: 0                                              4 (66.7%)
+                                                                                         (0%); None: 1 (16.7%)
+
+ Anomaly Detection &                         Single: 3 (37.5%); Multi (Cooperative): 4   Database APIs: 2 (25.0%); Search & Retrieval APIs: 1                                                Evidence Logs: 5 (62.5%); Pattern Library: 1
+ Diagnosis (n = 8)                           (50.0%); Multi (Competitive): 0 (0%); Multi (12.5%); Data Processing Tools: 8 (100%); Stat./ML                                                  (12.5%); Analysis Strategies: 2 (25.0%);
+                                             (Mixed): 1 (12.5%)                          Models: 7 (87.5%); Simulators, Solvers & Optimizers: 0                                              None: 2 (25.0%)
+                                                                                         (0%); None: 0 (0%)
+
+ Decision Support (n = 19) Single: 6 (31.6%); Multi (Cooperative): 8                                         Database APIs: 3 (15.8%); Search & Retrieval APIs: 5                            Evidence Logs: 10 (52.6%); Pattern Library:
+                           (42.1%); Multi (Competitive): 2 (10.5%);                                          (26.3%); Data Processing Tools: 9 (47.4%); Stat./ML                             5 (26.3%); Analysis Strategies: 4 (21.1%);
+                           Multi (Mixed): 3 (15.8%)                                                          Models: 5 (26.3%); Simulators, Solvers & Optimizers: 9                          None: 4 (21.1%)
+                                                                                                             (47.4%); None: 1 (5.3%)
+
+
+
+
+ 1. Forecasting:                                               2. Reasoning:                                               3. Augmentation:                                                   4. Synthesis:
+ multi-stage workflows + competing hypotheses                  numerical/contextual evidence + verification                semantic preservation + downstream validation                      text alignment + domain constraint compliance
+
+                                Toolbox          Pattern Lib
+
+                                                                                                                                                         Time-Series Data
+
+
+                                                                  Time-Series Data        Question                                                                                                 Time-Series Data        Query
+  Time-Series Data
+                                                  Processor
+                                                   Agent
+                                                                                                                                         Retrieval Agent          Pattern Lib
+                                                                                          Feedback                                                                                               Structured query                      Parsing Agent
+     Forecaster Agents
+                                                                     Reasoner                                 Critic
+                Hypo 1            Hypo 2            Hypo 3            Agent                                   Agent
+                                                                                                                                       Augmentation Agent       Augmentation Methods
+                                                                                      Proposed Answer
+
+
+                                                                                                                            Feedback        Justification           Augmented Data               Synthesis Agent      Generative models       Quality Gate
+                                                                                                                                                                                                                       (e.g. GAN, VAE)
+
+
+
+
+                                                                                                                                                      Review Agent          Augmented Data
+                                                                                                                                                                                                                  Synthetic Data
+                     Refiner Agent          Forecast Report                             Quality Gate        Final Answer
+                                                                                                                           Downstream Validation
+
+
+
+ 5. Anomaly Detection:                                         6. Diagnosis:                                               7. Trading:                                                        8. Traffic & Grid Control:
+ reliable alarms + base detector                               human-in-the-loop + evidence integration                    heterogeneous external evidence                                    closed-loop environments + simulators/solvers
+
+
+
+
+                                                                                                                                                                                                                                      User
+                                                                 Time-Series Data      Logs              Planner Agent          Stock Price        Financial News Investment Reports
+ Time-Series Data        Processor Agent                                                                                                                                                       Time-Series Data
+                                                                                                                                                                                                                          Commands
+
+
+
+
+                                                                                                                              Analyst Agent 1     Analyst Agent 2      Analyst Agent 3
+                                                                 Detector Agent      Diagnosis Agent    Mitigation Agent
+                                                                                                                                                                                                  Processor                Decision              Quality
+  Detection Rules        Detector Agent    Detection Models
+                                                                                                                                                                                                   Agent                    Agent                 Gate
+
+
+                                      Feedback
+                                                                                                                                                   Manager Agent            Backtest Agent
+                                                                     Alert               Cause              Actions
+                                                                                                                                              Strategy
+                                                                                                                                                                        Risk
+                                                                                                                                                                     Preference
+
+                         Anomaly Result     Reviewer Agent                                                                                                                                                                 Decision             Simulator
+                                                                                                             Feedback
+                                                                                                 User                                                           User
+
+
+
+
+Figure 4: Typical design patterns of time-series agent systems across representative tasks. From top left to bottom
+right, the panels correspond to forecasting, reasoning, augmentation, synthesis, anomaly detection, diagnosis,
+trading, and traffic and grid control.
+Table 5: Summary of representative resources for time-series tasks. Each resource is grouped by Problem Type and
+further characterized by its type, interactivity, temporal scale, number of series, and latest release.
+
+ Resource                                  Category          Problem Type              Interactive   Timesteps    Series        Latest   Re-
+                                                                                                                                lease
+ Forecasting
+ M4 (Makridakis et al., 2018)              Benchmark         Forecasting               No            Up to 10k    ∼100k         2018
+ M5 (Makridakis et al., 2022)              Benchmark         Forecasting               No            1.9k         42k           2020
+ MIRAI (Ye et al., 2024a)                  Benchmark         Forecasting               No            ∼ 1M         59k           2025
+ FutureX (Zeng et al., 2025)               Benchmark         Forecasting               No            Live/Daily   195 sources   2025
+ Monash TSF (Godahewa et al., 2021)        Dataset Repo      Multi-Domain Forecast-    No            Up to 527k   Up to 145k    2021
+                                                             ing
+ IHEPC                                     Dataset           Energy Forecasting        No            2M           9             2011
+ Electricity (Lai et al., 2018)            Dataset           Energy Forecasting        No            26k          321           2015
+ METR-LA (Li et al., 2017)                 Dataset           Traffic Forecasting       No            34k          207           2018
+ PEMS-BAY (Li et al., 2017)                Dataset           Traffic Forecasting       No            52k          325           2018
+ ETT (Zhou et al., 2021)                   Dataset           Energy Forecasting        No            Up to 69k    7             2021
+ Exchange (Lai et al., 2018)               Dataset           Finance Forecasting       No            7.6k         8             2021
+ Traffic (Lai et al., 2018)                Dataset           Traffic Forecasting       No            17k          862           2023
+ Weather                                   Dataset           Weather Forecasting       No            53k          21            2023
+ LargeST (Liu et al., 2023)                Dataset           Traffic Forecasting       No            526k         Up to 8.6k    2023
+ ILI                                       Dataset           Health Forecasting        No            Unclear      7             2026
+ StatsForecast (Garza et al., 2022)        Toolkit           Forecasting               No            N/A          N/A           2025
+ NeuralForecast (Challu et al., 2023)      Toolkit           Forecasting               No            N/A          N/A           2026
+ Reasoning
+ TimeSeriesExam (Cai et al., 2024)         Benchmark         Reasoning                 No            N/A          >700 Tasks    2024
+ IBTrACS (Knapp et al., 2010)              Dataset           Reasoning                 No            N/A          Unclear       2025
+ Anomaly Detection
+ TSB-UAD (Paparrizos et al., 2022)         Benchmark Suite   Anomaly Detection         No            Varies       12.7k TS      2022
+ ADBench (Han et al., 2022)                Benchmark Suite   Anomaly Detection         No            Varies       57 Datasets   2022
+ NAB (Lavin and Ahmad, 2015)               Benchmark         Anomaly Detection         No            Up to 22k    58            2015
+ UCR-AD (Wu and Keogh, 2021)               Benchmark         Anomaly Detection         No            Unclear      250           2021
+ SWaT (Mathur and Tippenhauer,             Dataset           Anomaly Detection         No            11 days      51            2016
+ 2016)
+ SMAP (Hundman et al., 2018)               Dataset           Anomaly Detection         No            430k         55            2018
+ MSL (Hundman et al., 2018)                Dataset           Anomaly Detection         No            67k          27            2018
+ WADI (Adepu et al., 2020)                 Dataset           Anomaly Detection         No            Unclear      103           2019
+ KPI (Ren et al., 2019)                    Dataset           Anomaly Detection         No            Unclear      ∼29 KPIs      2019
+ ADTK                                      Toolkit           Anomaly Detection         No            N/A          N/A           2020
+ Luminol                                   Toolkit           Anomaly Detection         No            N/A          N/A           2017
+ Decision Support
+ RL Unplugged (Gulcehre et al., 2020)      Dataset           Offline RL                No            N/A          N/A           2020
+ D4RL (Fu et al., 2020)                    Dataset           Offline RL                No            N/A          N/A           2021
+ Grid2Op (Marot et al., 2021)              Environment       Power System Control      Yes           N/A          N/A           2026
+ SocioDojo (Cheng and Chin, 2024)          Environment       Trading                   Yes           N/A          N/A           2024
+ CityLearn                                 Environment       Building Energy Control   Yes           N/A          N/A           2025
+ SUMO (Behrisch et al., 2011)              Environment       Traffic Control           Yes           N/A          N/A           2026
+ Stable-Baselines3 (Raffin et al., 2021)   Toolkit           Reliable RL               No            N/A          N/A           2026
+ Others
+ TimeSeriesGym (Cai et al., 2025)          Benchmark         Multi-Task                No            N/A          N/A           2025
+ Sktime (Löning et al., 2019)              Toolkit           Multi-Task                No            N/A          N/A           2025
+ GluonTS (Alexandrov et al., 2020)         Toolkit           Multi-Task                No            N/A          N/A           2025
+ Merlion (Bhatnagar et al., 2021)          Toolkit           Multi-Task                No            N/A          N/A           2024
+Table 6: Comparable quantitative evidence across time-series tasks (Part 1). Agent methods are highlighted in bold.
+
+Task                        Dataset           Metric       Method                                          Score
+ETTh1 forecasting (Zhou et al., 2021)
+Forecasting                ETTh1              MAE          FLAIRR-TS (Jalori et al., 2025)                 0.101
+Forecasting                ETTh1              MAE          LSTP (Liu et al., 2024a)                        0.150
+Forecasting                ETTh1              MAE          DLinear (Zeng et al., 2023)                     0.390
+Forecasting                ETTh1              MAE          Agentic-RAG (Llama3-8B) (Ravuru et al., 2024)   0.396
+Forecasting                ETTh1              MAE          GPT4TS (Zhou et al., 2023)                      0.397
+Forecasting                ETTh1              MAE          PatchTST (Nie et al., 2023)                     0.399
+Forecasting                ETTh1              MAE          TimesNet (Wu et al., 2023)                      0.402
+Forecasting                ETTh1              MAE          FEDFormer (Zhou et al., 2022)                   0.419
+Forecasting                ETTh1              MAE          Time-LLM (Jin et al., 2024)                     0.460
+Weather forecasting (Lee et al., 2025)
+Forecasting                 Weather           F1           TimeXL (GPT-4o) (Jiang et al., 2025)            0.696
+Forecasting                 Weather           F1           TimeCAP (GPT-4) (Lee et al., 2025)              0.668
+Forecasting                 Weather           F1           FreTS (Yi et al., 2023)                         0.623
+Forecasting                 Weather           F1           Time-LLM (Jin et al., 2024)                     0.613
+Forecasting                 Weather           F1           PatchTST (Nie et al., 2023)                     0.592
+Forecasting                 Weather           F1           LLMTime (Gruver et al., 2023)                   0.587
+Forecasting                 Weather           F1           Autoformer (Wu et al., 2021)                    0.546
+Forecasting                 Weather           F1           iTransformer (Liu et al., 2024c)                0.541
+Forecasting                 Weather           F1           DLinear (Zeng et al., 2023)                     0.540
+Forecasting                 Weather           F1           Crossformer (Zhang and Yan, 2023)               0.500
+Forecasting                 Weather           F1           PromptCast (Xue and Salim, 2023)                0.499
+Forecasting                 Weather           F1           TimesNet (Wu et al., 2023)                      0.494
+Forecasting                 Weather           F1           TSMixer (Chen et al., 2023)                     0.488
+TimeSeriesExam reasoning (Cai et al., 2024)
+Reasoning                TimeSeriesExam       Accuracy     TS-Agent (GPT-4o-mini) (Liu et al., 2025)       0.55
+Reasoning                TimeSeriesExam       Accuracy     GPT-o1                                          0.37
+Reasoning                TimeSeriesExam       Accuracy     GPT-4o                                          0.29
+Reasoning                TimeSeriesExam       Accuracy     DeepSeek                                        0.28
+Reasoning                TimeSeriesExam       Accuracy     Phi-3.5                                         0.25
+HAR average reasoning (Li et al., 2026)
+Reasoning                 HAR average         Macro-F1     ZARA (Gemini-2.0-Flash) (Li et al., 2026)       0.814
+Reasoning                 HAR average         Macro-F1     UniMTS (Zhang et al., 2024c)                    0.321
+Reasoning                 HAR average         Macro-F1     IMU2CLIP (Moon et al., 2023)                    0.179
+Reasoning                 HAR average         Macro-F1     ImageBind (Girdhar et al., 2023)                0.142
+Reasoning                 HAR average         Macro-F1     Gemini Plot                                     0.135
+Reasoning                 HAR average         Macro-F1     Gemini Table                                    0.130
+Reasoning                 HAR average         Macro-F1     Gemini Text                                     0.129
+Reasoning                 HAR average         Macro-F1     HARGPT Text (Ji et al., 2024)                   0.104
+Reasoning                 HAR average         Macro-F1     IMUGPT (Leng et al., 2023)                      0.100
+Reasoning                 HAR average         Macro-F1     HARGPT Plot (Ji et al., 2024)                   0.099
+Reasoning                 HAR average         Macro-F1     NormWear (Luo et al., 2024)                     0.077
+KPI anomaly detection (Ren et al., 2019)
+Anomaly detection         KPI                 F1           ARGOS (GPT-4o) (Gu et al., 2025)                0.897
+Anomaly detection         KPI                 F1           LSTMAD (Malhotra et al., 2015)                  0.819
+Anomaly detection         KPI                 F1           FCVAE (Wang et al., 2024b)                      0.818
+Anomaly detection         KPI                 F1           MERIT (Llama3.1-8B) (Zhou et al., 2025)         0.815
+Anomaly detection         KPI                 F1           TimesURL (Liu and Chen, 2024)                   0.803
+Anomaly detection         KPI                 F1           TS2Vec (Yue et al., 2022)                       0.791
+Anomaly detection         KPI                 F1           SR (Ren et al., 2019)                           0.785
+Anomaly detection         KPI                 F1           DONUT (Xu et al., 2018)                         0.779
+Anomaly detection         KPI                 F1           DSPOT (Siffer et al., 2017)                     0.768
+Anomaly detection         KPI                 F1           SPOT (Siffer et al., 2017)                      0.751
+Anomaly detection         KPI                 F1           AutoRegression                                  0.668
+Anomaly detection         KPI                 F1           TFAD (Zhang et al., 2022a)                      0.564
+Anomaly detection         KPI                 F1           AnomalyTransformer (Xu et al., 2021)            0.282
+Table 7: Comparable quantitative evidence across time-series tasks (Part 2). Agent methods are highlighted in bold.
+
+Task                          Dataset                  Metric   Method                                         Score
+Yahoo anomaly detection (Laptev, 2015)
+Anomaly detection         Yahoo                        F1       MERIT (Llama3.1-8B) (Zhou et al., 2025)        0.905
+Anomaly detection         Yahoo                        F1       TimesURL (Liu and Chen, 2024)                  0.892
+Anomaly detection         Yahoo                        F1       TS2Vec (Yue et al., 2022)                      0.885
+Anomaly detection         Yahoo                        F1       SR (Ren et al., 2019)                          0.879
+Anomaly detection         Yahoo                        F1       DONUT (Xu et al., 2018)                        0.873
+Anomaly detection         Yahoo                        F1       DSPOT (Siffer et al., 2017)                    0.861
+Anomaly detection         Yahoo                        F1       SPOT (Siffer et al., 2017)                     0.847
+Anomaly detection         Yahoo                        F1       ARGOS (GPT-4o) (Gu et al., 2025)               0.810
+Anomaly detection         Yahoo                        F1       TFAD (Zhang et al., 2022a)                     0.773
+Anomaly detection         Yahoo                        F1       AutoRegression                                 0.526
+Anomaly detection         Yahoo                        F1       FCVAE (Wang et al., 2024b)                     0.464
+Anomaly detection         Yahoo                        F1       LSTMAD (Malhotra et al., 2015)                 0.350
+Anomaly detection         Yahoo                        F1       LLMAD (GPT-4-32k) (Liu et al., 2024b)          0.142
+AAPL single-asset trading (Yu et al., 2024)
+Trading                    AAPL                        SR       FinCon (GPT-4-Turbo) (Yu et al., 2024)         1.597
+Trading                    AAPL                        SR       FinGPT (GPT-4-Turbo) (Yang et al., 2023)       1.161
+Trading                    AAPL                        SR       B&H                                            1.107
+Trading                    AAPL                        SR       DQN                                            1.048
+Trading                    AAPL                        SR       FinAgent (GPT-4-Turbo) (Zhang et al., 2024a)   1.041
+Trading                    AAPL                        SR       FinMem (GPT-4-Turbo) (Yu et al., 2025)         0.994
+Trading                    AAPL                        SR       PPO                                            0.704
+Trading                    AAPL                        SR       A2C                                            0.683
+Trading                    AAPL                        SR       GA (GPT-4-Turbo) (Park et al., 2023)           0.372
+AMZN single-asset trading (Yu et al., 2024)
+Trading                    AMZN                        SR       FinCon (GPT-4-Turbo) (Yu et al., 2024)         0.904
+Trading                    AMZN                        SR       DQN                                            0.398
+Trading                    AMZN                        SR       PPO                                            0.138
+Trading                    AMZN                        SR       B&H                                            0.072
+Trading                    AMZN                        SR       GA (GPT-4-Turbo) (Park et al., 2023)           -0.199
+Trading                    AMZN                        SR       A2C                                            -0.444
+Trading                    AMZN                        SR       FinMem (GPT-4-Turbo) (Yu et al., 2025)         -0.773
+Trading                    AMZN                        SR       FinAgent (GPT-4-Turbo) (Zhang et al., 2024a)   -1.493
+Trading                    AMZN                        SR       FinGPT (GPT-4-Turbo) (Yang et al., 2023)       -1.810
+Jinan 1 traffic signal control (Lai et al., 2025)
+Traffic control               Jinan 1                  ATT      LightGPT (Llama2-13B) (Lai et al., 2025)       274.03
+Traffic control               Jinan 1                  ATT      Advanced-CoLight (Zhang et al., 2022b)         274.67
+Traffic control               Jinan 1                  ATT      LightGPT (Llama3-8B) (Lai et al., 2025)        275.10
+Traffic control               Jinan 1                  ATT      GPT-4                                          275.26
+Traffic control               Jinan 1                  ATT      Efficient-CoLight (Zhang et al., 2022b)        277.11
+Traffic control               Jinan 1                  ATT      CoLight (Wei et al., 2019b)                    279.60
+Traffic control               Jinan 1                  ATT      Maxpressure                                    281.58
+Traffic control               Jinan 1                  ATT      FixedTime                                      481.79
+Traffic control               Jinan 1                  ATT      Random                                         597.62
+Open-TI Config1 traffic signal control (Da et al., 2024)
+Traffic control             Open-TI Config1              ATT    Open-TI (GPT-4.0) (Da et al., 2024)            103.46
+Traffic control             Open-TI Config1              ATT    PressLight (Wei et al., 2019a)                 107.39
+Traffic control             Open-TI Config1              ATT    DQN                                            162.19
+Traffic control             Open-TI Config1              ATT    SOTL                                           218.06
+Traffic control             Open-TI Config1              ATT    FixedTime                                      552.72
+

@@ -1,0 +1,2633 @@
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and
+Scheduling for Tailored LLM Reasoning
+
+Jiahui Zhou 1 Dan Li 1 Boxin Li 2 Xiao Zhang 2 Erli Meng 2 Lin Li 1 Zhuomin Chen 1
+Jian Lou 1 See-Kiong Ng 3
+
+1. Introduction
+
+Abstract
+
+arXiv:2602.07830v2 [cs.AI] 7 May 2026
+
+Time series is a pervasive data type across various application domains, rendering the reasonable solving of diverse time series tasks a longstanding goal. Recent advances in large language
+models (LLMs), especially their reasoning abilities unlocked through reinforcement learning
+(RL), have opened new opportunities for tackling tasks with long Chain-of-Thought (CoT) reasoning. However, leveraging LLM reasoning for
+time series remains in its infancy, hindered by
+the absence of carefully curated time series CoT
+data for training, limited data efficiency caused
+by underexplored data scheduling, and the lack
+of RL algorithms tailored for exploiting such
+time series CoT data. In this paper, we introduce VeriTime, a framework that tailors LLMs
+for time series reasoning through data synthesis,
+data scheduling, and RL training. First, we propose a data synthesis pipeline that constructs a
+time series–text multimodal dataset with processverifiable annotations. Second, we design a data
+scheduling mechanism that arranges training samples according to a principled hierarchy of difficulty and task taxonomy. Third, we develop
+a two-stage reinforcement finetuning featuring
+fine-grained, multi-objective rewards that leverage verifiable process-level CoT data. Extensive experiments show that VeriTime substantially boosts LLM performance across diverse
+time series reasoning tasks. Notably, it enables
+compact 3B–4B models to achieve reasoning
+capabilities on par with or exceeding those of
+larger proprietary LLMs. The code for VeriTime
+is available at https://anonymous.4open.
+science/r/VeriTime-E017.
+
+Time series (TS) data is a fundamental modality pervasive
+across diverse domains, including natural phenomena, energy, finance, healthcare, transportation, and industry (Li
+et al., 2025a; Chen et al., 2025b; Lan et al., 2025; JIANG
+et al., 2025; Qin et al., 2025). With the advent of Large
+Language models (LLMs) and their success in natural language processing and beyond, researchers have recently
+shown growing interest in exploiting LLMs as a unified
+solution for tackling diverse TS tasks, such as forecasting
+(Chen et al., 2025c; Lu et al., 2025; Masserano et al., 2025),
+anomaly detection (Dai et al., 2024; Park et al., 2025b),
+classification (Huang et al., 2025; Goswami et al., 2024),
+and imputation (Fons et al., 2025; Yang et al., 2025b).
+A prevailing approach to integrate LLMs with time series tasks utilizes supervised fine-tuning (SFT) on TS-text
+datasets (Wang et al., 2025a; Niu et al., 2025a). For instance, ChatTS (Xie et al., 2025) and Time-MQA (Kong
+et al., 2025a) fine-tune models respectively using synthetic
+and real-world Q&A pairs. However, these approaches primarily focus on aligning time series representations with
+LLMs, lacking the explicit consideration (e.g., chain-ofthought and reinforcement learning) for complex reasoning.
+Accordingly, the critical research gap lies in how to adequately reflect the intricate time series patterns and fully
+integrate them into LLM reasoning processes. Real-world
+time series inherently convey complex multi-scale temporal correlations and causal dynamics (Jang et al., 2025; Liu
+et al., 2025c), making it crucial for models to explicitly comprehend the underlying relational structures before forming rationales and conclusions. However, most existing
+work adopts basic prompting techniques to interpret TS sequences and feeds observed patterns to LLM directly (Liu
+et al., 2024b; Merrill et al., 2024; Gruver et al., 2023). Inspired by the impressive reasoning performance of frontier
+models (Jaech et al., 2024; Guo et al., 2025), the reinforcement learning (RL) paradigm has recently emerged as a
+nascent yet promising direction to further enhance LLM
+time series reasoning capabilities (Zhang et al., 2025; Luo
+et al., 2025). LangTime (Niu et al., 2025b) integrates crossdomain pretraining with temporal comprehension prompts,
+
+1
+
+Sun Yat-sen University 2 Xiaomi Corporation 3 National
+University of Singapore. Correspondence to: Dan Li <lidan263@mail.sysu.edu.cn>.
+Proceedings of the 43 rd International Conference on Machine
+Learning, Seoul, South Korea. PMLR 306, 2026. Copyright 2026
+by the author(s).
+
+1
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+and introduces TimePPO to optimize forecasting. Guan et al.
+(2026) propose TimeOmni, a unified model trained on the
+human-annotated TSR-Suite using SFT and task-grounded
+RL. However, these approaches relies heavily on outcomebased rewards, overlooking the process-level signals necessary to verify intermediate reasoning steps. Overall, the
+direction of empowering LLMs for time series reasoning
+remains in its infancy and warrants further investigation into
+the validity and interpretability of the reasoning process.
+
+explicitly assess the validity and logical coherence of intermediate TS reasoning steps. Furthermore, to improve training data efficiency, we devise a data scheduling mechanism
+for RFT via a selective rollout strategy that dynamically
+identifies learnable and representative samples best suited
+to the corresponding RFT stage based on task difficulty and
+model performance.
+Our main contributions are summarized as follows:
+• We propose the TSRgen pipeline that generates highquality TS-text reasoning data tailored for enhancing
+LLMs’ ability on time series reasoning tasks. The tailored reasoning data is automatically curated based on
+both synthetic and real-world time series data and covers
+seven tasks. To the best of our knowledge, it is the first
+time series reasoning dataset that integrates TS-tailored
+CoT reasoning paths with process-verifiable annotations.
+
+Another critical gap is the lack of tailored time series reasoning data that are extensive enough to cover diverse representative time series tasks (Gu et al., 2025; Gonen et al.,
+2025). Existing benchmarks are limited by inadequate task
+diversity, unclear calibration standards, and many rely predominantly on simplified synthetic data only that cannot adequately reflect real-world complexity and variability (Kong
+et al., 2025b; Wang & Zhao, 2024). Therefore, this calls
+for a dual approach that leverages synthetic data to ensure
+coverage across diverse scenarios, while utilizing real-world
+data for knowledge-intensive domains. MTBench (Chen
+et al., 2025a) reveals that LLMs consistently struggle with
+tasks demanding nuanced temporal understanding and effective multimodal integration. This underscores the necessity
+of constructing a high-quality benchmark characterized by
+diverse hybrid data sources, tailored Chain-of-Thought reasoning paths, and process-verifiable signals to rigorously
+supervise reasoning trajectories (Rousseau et al., 2025).
+
+• We propose a two-stage Reinforcement Fine-Tuning
+(RFT) framework coming with fine-grained and multiobjective rewards that explicitly evaluate the validity of
+intermediate reasoning steps across diverse TS tasks. A
+data scheduling mechanism is further introduced to improve the efficiency and effectiveness of RFT.
+• Extensive experiments demonstrate that the generated
+time series reasoning data and the proposed VeriTime
+framework significantly enhance LLMs’ time series reasoning capabilities with an average improvement of over
+35% across tasks, highlighting the importance of supervising intermediate reasoning processes.
+
+In this work, we propose VeriTime, a time series reasoning framework that enhances LLMs’ TS reasoning capabilities through process-verifiable reasoning data synthesis
+and tailored RL effectively exploiting time series-specific
+intermediate learning signals from the generated data.
+
+2. Methodology
+2.1. TSRgen: Reasoning Data Synthesis Pipeline
+
+Time Series Reasoning Data Synthesis. We introduce
+Time Series Reasoning Generation (TSRgen) to generate
+stepwise time series reasoning data, forming TSRBench.
+TSRBench comprises time series-text Q&A pairs covering
+both scenario-based and knowledge-based tasks, and spanning synthetic and real-world time series. With a TS-specific
+CoT generation strategy that captures key aspects of processlevel performance across diverse TS tasks, TSRBench integrates valid reasoning trajectories with process-verifiable
+annotations to support both training and evaluation.
+
+We propose an automated Time Series Reasoning generation
+(TSRgen) pipeline to construct a high-quality time seriestext multimodal reasoning dataset, as depicted in Figure 1.
+TSRgen generates process-verifiable reasoning data based
+on both synthetic and real-world TS across diverse scenarios
+by integrating a rule-based extractor with LLM excelling
+at complex reasoning (e.g., DeepSeek-R1) guided by welldesigned instructions. It begins with time series filtering and
+task categorization, followed by the TS-tailored Chain-ofThought (CoT) to generate structured reasoning trajectories
+with correctness verification. Finally, TSRgen aligns and
+consolidates the corresponding time series samples, task
+descriptions, reasoning trajectories, and process-verifiable
+labels into a unified dataset TSRBench.
+
+Tailored RL for Time Series Reasoning. Next, we introduce a two-stage Reinforcement Fine-Tuning (RFT) framework to enhance LLMs’ TS reasoning capabilities by effectively exploiting TSRBench. The first supervised fine-tuning
+stage leverages the TS-tailored CoT paradigm to learn from
+the reasoning trajectories with successful task completion,
+while the second RL stage refines the model’s reasoning
+performance. Rather than merely optimizing for final prediction accuracy, we design fine-grained, multi-objective
+rewards that incorporate process-level reasoning signals to
+
+2.1.1. DATA AND TASK S ELECTION
+To enhance LLM’s time series reasoning capability, both
+scenario-based and knowledge-based reasoning tasks are
+included in the TSRBench dataset. Scenario-based tasks are
+synthesized from ChatTS (Xie et al., 2025), where reasoning
+2
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+Data Source Selection
+
+TSRBench
+
+Automatic Task Filtering & Categorization
+Task
+
+Synthetic Time Series
+
+Scenario-based
+Anomaly Detection
+
+True/False
+
+Real-world Time Series
+
+Scenario Attribution
+
+Multiple Choice
+
+Inferential Calculation
+
+Counting
+
+Task description
+
+Knowledge-based
+CTU
+
+ECG
+
+EMG
+
+RCW
+
+This is a metric called VPN Usage Metrics
+collected from Network Infrastructure …
+What might have happened during the
+period of interest? Choose from …
+
+Time Series
+TS-Tailored CoT thinking process
+1
+
+Analyzing task intent
+
+2 Selecting task-relevant key patterns
+
+This is a scenario attribution task.
+
+Sharp decline, sustained deviation…
+
+[Rational for the conclusion]
+
+[Rational for the conclusion]
+
+3
+
+Analyzing time series samples
+segment1
+
+segment2
+…
+
+[The analytical process]
+
+Thinking trajectory
+<THINK>
+<ANSWER>
+
+4 Generating preliminary answers
+Temporary system overload
+
+5
+
+Enhancing through reflection
+
+6 Summarizing thinking process
+
+[Self-reflection and verification]
+
+[The summarization process]
+
+[Rational for the conclusion]
+
+TS-tailored thinking process
+The answer is …
+
+Labels
+ground-truth label
+temporary system overload
+
+Temporary system overload
+Answer Check
+
+</THINK>
+
+</ANSWER>
+
+process verifiable label
+scenario attribution
+
+<attribute set>
+
+temporary system overload
+
+Cross-Model Validation
+
+Figure 1. The overall framework of the time series reasoning data generation pipeline TSRgen.
+
+tasks are generated under predefined conditions. The original data is filtered and reorganized into three distinct task
+categories, each representing a specific reasoning style: (1)
+Anomaly Detection (deductive reasoning), (2) Scenario Attribution (causal reasoning), and (3) Inferential Calculation
+(quantitative reasoning). On the other hand, knowledgebased tasks are derived from real-world datasets across medical (Clifford et al., 2017), healthcare (Reaz et al., 2006), energy, and bioacoustics (Abousleiman et al., 2013) domains.
+Overall, TSRBench includes true/false, multiple-choice, and
+open-ended Q&A formats. More details are in Appendix C.
+
+erates comprehensive reasoning trajectories by leveraging
+reasoning LLMs to develop structured and interpretable reasoning patterns. By assessing both the correctness of final
+predictions and the validity of intermediate reasoning steps,
+TSRgen further verified the quality of the TSRBench. The
+key steps of dataset construction are summarized as follows.
+Automatic Task-Specific Instance Selection. TSRgen employs a rule-based extractor to filter original instances that
+satisfy predefined reasoning criteria (scenario-based and
+knowledge-based) to improve annotation quality. A taskspecific keyword set is defined to automate the selection
+process for each reasoning task. For anomaly detection, for
+instance, TS-text pairs containing terms such as anomalous,
+anomalies, or extreme are selected.
+Reasoning Procedure Assessment. Generating highquality Chain-of-Thought (CoT) reasoning paths necessitates that the TS-tailored thinking strategy is both comprehensive and logically sound. To this end, TSRgen leverages
+DeepSeek-R1, offering exceptional general reasoning capabilities, as the expert model for generating reasoning trajectories. DeepSeek-R1 is instructed with curated TSRBench
+questions and guided to follow our predefined TS-tailored
+CoT steps. TSRgen automatically filters out cases where
+the LLM’s final answer aligns with the ground-truth label,
+as these instances serve as the basis for verifying the completeness and validity of intermediate reasoning steps.
+
+2.1.2. TS- TAILORED C OT T HINKING P ROCESS
+Previous works show that naive NLP reasoning techniques
+are less effective for time series reasoning tasks (Liu et al.,
+2025b; Merrill et al., 2024), making it non-trivial to leverage
+LLMs for this domain. Effective TS reasoning hinges on
+the thinking trajectory that aligns with time series properties
+and validates intermediate steps. To guide LLMs toward
+structured and interpretable time series reasoning, TSRgen
+constructs a TS-tailored reasoning process with six logically
+ordered steps illustrated in Figure 1. It first discerns task
+intent and key attributes (e.g., trends, thresholds, domainspecific terms), then isolates critical segments for analysis.
+Building upon insights from the preceding steps, the LLM
+drafts a preliminary answer, performs backtracking and
+self-reflection (Ji et al., 2023; Tyen et al., 2024) to ensure
+comprehensiveness and eliminate interfering factors, and
+finally summarizes the reasoning trajectory to ensure the
+response is coherent and traceable.
+
+Verifiable Process Annotation Extraction. To facilitate
+Reinforcement Learning (RL) for improving LLM time
+series reasoning performance, both the final label and the
+effective supervision of intermediate reasoning steps are
+crucial. TSRgen first conducts cross-LLM validation to
+evaluate the quality of reasoning steps (details presented in
+subsection C.2), and then utilizes a rule-based annotation
+extractor to derive verifiable process-level labels from the
+reasoning chains generated by DeepSeek-R1. It targets key
+
+2.1.3. AUTOMATIC R EASONING DATA A NNOTATION
+AND V ERIFICATION
+Based on the predefined TS-tailored thinking process, the
+TSRgen then crafts time series reasoning questions and gen-
+
+3
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+reasoning steps within the TS-tailored thinking process that
+can be independently verified and used to support validation
+during RL training.
+
+where time series patterns and interdependencies are inherently more complex and diverse than those of synthetic
+datasets, whose patterns are generated under simplified and
+scenario-specific conditions. This distinction is further supported by the performance of general LLMs, as depicted in
+Table 1 and Table 2. Hence, we classify Dknowledge as hard
+samples (Dhard ), while scenario-based tasks Dscenario are
+further partitioned based on the following procedure:
+
+Specifically, for task intent understanding (Step 1), TSRgen extracts the target entity as the verifiable label. For
+the key attributes extraction Step 2, TSRgen constructs a
+task-specific attribute set by integrating attributes identified by DeepSeek-R1 with target patterns extracted from
+the ChatTS dataset under a GPT selector. For preliminary answer generation and summarization (Steps 4 and
+6), process-level labels are derived from expert predictions
+and validated against ground-truth annotations. Evaluation
+is omitted for critical segment analysis and self-reflection
+steps to enable exploration flexibility.
+
+Warmup Training. We first initialize the model’s reasoning
+capability via supervised fine-tuning on a small randomly
+sampled subset Dsample ⊂ Dtrain (10% of total data). The
+base model πθ0 is fine-tuned on Dsample through supervised
+learning to obtain the warmed-up model πθ1 :
+θ1 = arg min
+
+In conclusion, the TSRgen is an automated TS-text dataset
+synthesis pipeline that integrates diverse reasoning tasks
+within a structured, TS–tailored reasoning dataset, named
+as TSRBench. Unlike existing time series reasoning benchmarks that overlook the validity and interpretability of intermediate processes during LLM training and evaluation,
+to the best of the authors’ knowledge, TSRBench is the
+first time series reasoning dataset with verifiable multi-step
+thinking process annotations.
+
+θ
+
+|Dsample |
+
+X
+
+
+LSFT πθ (xi ), yi , (2)
+
+(xi ,yi )∈Dsample
+
+where LSFT denotes the supervised fine-tuning loss. This
+stage enables the model to learn the basic reasoning format
+and structure of time series reasoning problems.
+Data Selection. Next, the warmed-up model πθ1 performs
+inference on Dscenario . Each instance is evaluated based
+on the correctness of the ground-truth label lfinal , and is
+partitioned into a normal subset Dnormal and a hard subset
+Dhard accordingly:
+Dnormal = (xi , yi , Li ) ∈ Dtrain | Acc(fθ1 (xi ), lfinal ) = 1,
+Dhard = (xi , yi , Li ) ∈ Dtrain | Acc(fθ1 (xi ), lfinal ) = 0.
+
+2.2. VeriTime: RL Fine-tuning with Data Scheduling
+Post-training for LLMs via RL typically requires substantial
+computational resources with large-scale training data. Prior
+studies have shown that, during the RL phase of reasoning
+LLMs, the quality of training data often outweighs its quantity in determining model performance (Wang et al., 2025b;
+Zheng et al., 2025; Li et al., 2025b). However, in the context
+of time series reasoning, guidance on selecting suitable data
+for reinforcement fine-tuning (RFT) remains limited. To
+address this gap, we propose a selective RFT data rollout
+strategy that identifies learnable and representative samples
+based on the difficulty hierarchy of TSRBench, enhancing
+both efficiency and effectiveness in RL-based post-training.
+The overview of VeriTime is depicted in Figure 2.
+
+(3)
+
+This step enables the model to identify normal learnable
+samples and challenging samples based on its reasoning
+performance, without excessive computational cost.
+Two-stage RFT Training. The training process consists of
+two stages, corresponding to the two subsets defined above.
+First, we fine-tune the model πθ1 on Dnormal to enhance
+stability and general reasoning capability:
+θ2 = arg min
+θ
+
+1
+|Dnormal |
+
+X
+
+
+LSFT πθ (xi ), yi . (4)
+
+(xi ,yi )∈Dnormal
+
+Subsequently, to further enhance reasoning performance,
+we apply reinforcement learning using the GRPO algorithm
+(Shao et al., 2024) on the hard subset Dhard :
+h
+i
+θfinal = arg max E(xi ,Li )∼Dhard R πθ (xi ), Li , (5)
+
+Problem Definition. Formally, we define the training
+dataset Dtrain as a collection of n instances:
+Dtrain = {(xi , yi , Li ) | i = 1, 2, . . . , n},
+
+1
+
+θ
+
+(1)
+
+where R(·) is the reward function measuring consistency
+with both the final label and intermediate process labels.
+
+where each instance consists of a time series reasoning
+problem xi , its corresponding Chain-of-Thought reasoning
+path yi , and a ground-truth label set Li . The label set Li =
+{lfinal , lprocess } comprises a final ground-truth label and a set
+of process-supervision labels. For each case, the model
+learns to map xi → (yi , Li ) through the reasoning process.
+
+Overall, the hierarchical process enables the model to enhance its reasoning ability in a progressive manner. It first
+consolidates learnable patterns and then focuses on challenging cases through targeted RL.
+2.3. Multi-Objective Reward Design of VeriTime
+
+Difficulty Hierarchy. We first categorize sample difficulty
+based on the task taxonomy of TSRBench. Knowledgebased tasks Dknowledge involve longer temporal sequences
+and are curated from real-world professional domains,
+
+To enhance LLM time series reasoning capabilities, it is
+essential to ensure correct final predictions while optimizing the intermediate reasoning trajectory when interpreting
+4
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+Warmup
+Training
+
+Reinforcement Learning
+
+SFT
+Group of generated reasoning paths
+
+TSRBench
+
+Reward function
+
+Rewards
+
+Structural Rewards
+
+TSRBench
+
+1
+
+Normal
+
+𝜃
+
+5% corpus 0
+
+Scenario-based
+
+𝜃1
+
+3
+
+Scenario-based
+Knowledge-based
+
+𝐽11
+
+𝐽21
+
+𝐽12
+
+𝐽22
+
+𝐽1𝑚
+
+𝐽2𝑚
+
+𝐽31
+
+𝐽41
+
+𝐽51
+
+𝐽61
+
+Answer
+
+𝑟len
+
+𝑟1
+
+𝐽32
+
+𝐽42
+
+𝐽52
+
+𝐽62
+
+Answer
+
+Hard Reward
+
+𝑟2
+
+𝐽3𝑚
+
+𝐽4𝑚
+
+𝐽5𝑚
+
+𝐽6𝑚
+
+Answer
+
+Process Rewards
+
+Scenario-based
+
+𝜃2
+
+𝜃1
+
+Group
+Advantage
+
+𝜃2
+
+𝐴መ
+
+𝑟hard
+
+Hard
+
+2
+
+𝑟fmt
+
+𝑟𝑚
+
+𝑟intent 𝑟pattern
+
+Knowledge-based
+
+𝑟align
+
+4
+
+𝜃final
+
+𝑟verify
+
+Figure 2. Overview of the proposed VeriTime. It consists of three stages: (1) Stage 1 leverages TSRBench to warmup a base LLM θ0 into
+θ1 , which is subsequently used to perform difficulty stratification over all TSRBench tasks. (2) Stage 2 fine-tunes θ1 on samples with
+normal difficulty to obtain θ2 , equipping the model with TS-oriented CoT thinking paradigms. (3) Stage 3 applies RL to optimize the
+accuracy of both final predictions and key intermediate reasoning steps, further enhancing reasoning quality and yielding θfinal .
+
+
++2.0,
+rpattern (y) = +1.0,
+
++0.0,
+
+task-specific time series. This requires simultaneously balancing structural discipline, coherent multi-step reasoning,
+and final-answer accuracy. VeriTime therefore adopts finegrained reward components for multi-objective optimization,
+categorized into structural rewards rstruct , the hard reward
+rhard , and process rewards rprocess .
+
+ralign (y) = 2.0 × I [ExactMatch (J4 (y), â)] .
+
+rverify (y) = I [ExactMatch (J6 (y), â)] .
+
+3. Evaluation
+In this section, we present a comprehensive evaluation of the
+proposed VeriTime framework. Experiments are designed
+to address the following Research Questions (RQs):
+
+(6)
+
+RQ1: How effectively does VeriTime improve LLM performance across diverse reasoning tasks in TSRBench?
+RQ2: How does TSRgen’s time series-tailored Chain-ofThought enhance LLM’s timer series reasoning capabilities?
+RQ3: How does the multi-objective reward design contribute to the step-wise performance of VeriTime?
+RQ4: How does the data scheduling strategy affect the
+trade-off between performance and efficiency?
+
+Critical Pattern Reward. rpattern measures the model’s
+capability to identify essential reasoning patterns for task
+resolution. Given a ground-truth set S = {s1 , s2 , ..., sm }
+and extract the model-identified patterns from J2 (y) into a
+candidate set D = {d1 , d2 , ..., dn }. Matches are counted
+if the maximum similarity with elements in S exceeds the
+threshold T2 . Pattern identification is important but less
+critical than final answer correctness, with rewards of +2
+compared to +5 in hard reward.
+
+d∈D
+
+(10)
+
+The overall reward aggregates all components uniformly, as
+their role differences are reflected in the reward score ranges
+during the design of each individual reward.
+
+Task Comprehension Reward. rintent evaluates whether
+LLM correctly grasps the core objective in its initial judgment J1 (y). A fuzzy similarity score with threshold T1
+determines correctness.
+
+s∈S
+
+(9)
+
+Answer Verification Reward. Following backtracking and
+self-reflection in J5 (y), the model produces a final, verified decision J6 (y). rverify verifies its consistency with the
+ground truth â, which reflects the model’s self-assessment
+ability and commitment to a validated conclusion.
+
+Reliable intermediate reasoning steps are crucial for interpretable time series reasoning. To comprehensively assess
+the quality of the LLM reasoning trajectory, we further
+introduce four process-level rewards aligned with the TStailored reasoning steps.
+
+
+X 
+M (y) =
+I max FuzzySim(d, s) ≥ T2
+
+(8)
+
+Answer Alignment Reward. ralign checks if the model’s
+first concrete answer in J4 (y), which is produced after primary reasoning steps, aligns with the ground truth. As process rewards emphasize the validity of intermediate results,
+correct alignment is strongly rewarded to encourage coherent reasoning, whereas misalignments are not penalized
+to maintain exploratory flexibility. With ExactMatch(u, v)
+return 1 if u = v and 0 otherwise:
+
+To encourage well-structured and complete reasoning, we
+design two structural reward components: the format
+reward rfmt enforces adherence to the required output template, while the length reward rlen encourages responses
+of appropriate detail and depth, with penalties for deviations from the desired range, as defined by the minimum
+required length Lthr and the upper tolerance threshold Ltol .
+Furthermore, the hard reward rhard evaluates the factual
+correctness of the predicted final answer A(y), serving as
+the primary optimization criterion with the highest magnitude. Detailed formulations are summarized in Appendix D.
+
+h
+i
+
+rintent (y) = I FuzzySim J1 (y), Jˆ1 ≥ T1 .
+
+M (y) ≥ 2,
+M (y) = 1,
+otherwise.
+
+3.1. Experimental Setup
+Datasets. TSRBench supports both training and evaluation of time series reasoning models, comprising two types
+
+(7)
+
+5
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+of tasks: scenario-based reasoning, where each case is set
+within a realistic scenario and paired with corresponding
+synthetic data; and knowledge-based reasoning, which is
+constructed from real-world datasets. Additionally, we evaluate VeriTime on two other open-source benchmarks, TimeSeriesExam (Cai et al., 2024) and DROP (Dua et al., 2019).
+
+Furthermore, we compare the performance of Qwen models fine-tuned on the original Q&A pairs from ChatTS, as
+shown in Table 1. Specifically, we adopt the same question set used to construct TSRBench, along with the corresponding original answers for supervised fine-tuning (SFT).
+The results indicate that while LLM finetuned by ChatTS
+achieves similar performance compared to that by TSRBench on the anomaly detection task, it underperforms on
+more complex tasks such as scenario attribution and inferential calculation. For Qwen3, the base and fine-tuned versions by the ChatTS dataset on the scenario attribution task
+perform nearly identically, revealing the limited utility of
+concise reasoning pairs for enhancing time series reasoning.
+
+Models and Baselines. We select two moderate-sized
+LLMs, Qwen2.5-3B-Instruct and Qwen3-4B-Instruct (Yang
+et al., 2025a), for training and validation of VeriTime. For
+comparison, we include baseline LLMs of comparable parameter scales from mainstream series such as Llama, Mistral, and GPT. Additionally, we evaluate time series language models Time-MQA (Kong et al., 2025a) and TimeR1 (Luo et al., 2025). For knowledge-based tasks, we also
+evaluate six representative traditional TS models.
+
+Table 2. Comparison of Accuracy (%) across four knowledgebased reasoning tasks.
+
+Table 1. Comparison of Accuracy (%) across three scenario-based
+reasoning tasks.
+Overall
+
+Anomaly Scenario Inferential
+Detection Attribution Calculation
+
+General LLMs
+DeepSeek-R1-Distill-Qwen-7B
+Qwen2.5-7B-instruct
+Meta-Llama3-8B-Instruct
+Mistral-7B-v0.3
+GPT-4o-mini
+
+52.93
+66.81
+59.22
+59.22
+70.43
+
+48.33
+70.56
+68.89
+75.00
+82.12
+
+59.66
+69.89
+64.77
+61.36
+61.36
+
+49.52
+55.24
+33.33
+28.57
+65.71
+
+Time Series Language Models
+Time-MQA (Qwen2.5-7B)
+Time-MQA (Llama3-8B)
+Time-MQA (Mistral-7B)
+Time-R1 (Qwen2.5-7B)
+
+41.00
+53.05
+53.66
+51.73
+
+32.22
+64.15
+69.81
+54.55
+
+56.25
+50.77
+49.37
+53.14
+
+30.48
+32.56
+24.62
+40.35
+
+Base: Qwen2.5-3B-Instruct
+Base
+ChatTS (SFT)
+VeriTime (SFT+RL)
+Improvement (vs. Base)
+
+40.99
+26.67
+61.36
+31.43
+78.31
+91.67
+78.98
+54.28
+90.56
+83.52
+68.57
+82.86
++102.15% +239.56% +36.11% +118.17%
+
+Base: Qwen3-4B-Instruct
+Base
+ChatTS (SFT)
+VeriTime (SFT+RL)
+Improvement (vs. Base)
+
+75.48
+77.78
+82.21
+89.44
+86.55
+91.11
++14.67% +17.14%
+
+80.68
+80.68
+87.50
++8.45%
+
+62.85
+72.38
+77.14
++22.74%
+
+3.2. Main Results (RQ1)
+
+CTU
+
+ECG
+
+EMG
+
+RCW
+
+Classical Models
+Autoformer
+FEDformer
+PatchTST
+iTransformer
+TimesNet
+DLinear
+
+67.20
+51.60
+64.00
+46.40
+64.00
+52.40
+
+23.95
+26.40
+28.39
+25.78
+28.13
+26.82
+
+50.98
+63.73
+64.71
+60.78
+73.33
+47.06
+
+58.92
+62.28
+52.14
+55.71
+59.33
+39.55
+
+General LLMs
+DeepSeek-R1-Distill-Qwen-7B
+Qwen2.5-7B-Instruct
+Meta-Llama3-8B-Instruct
+Mistral-7B-v0.3
+GPT-4o-mini
+
+34.75
+50.85
+37.29
+54.24
+53.39
+
+21.58
+16.84
+22.11
+24.74
+23.68
+
+33.58
+43.80
+33.58
+26.28
+40.88
+
+28.88
+29.95
+42.78
+41.71
+31.55
+
+Time Series Language Models
+Time-MQA (Qwen2.5-7B)
+Time-MQA (Llama3-8B)
+Time-MQA (Mistral-7B)
+Time-R1 (Qwen2.5-7B)
+
+38.40
+30.77
+37.50
+59.17
+
+25.00
+21.72
+11.62
+23.74
+
+18.94
+38.24
+28.43
+42.86
+
+36.84
+38.57
+44.62
+33.52
+
+Base: Qwen2.5-3B-Instruct
+Base
+VeriTime (SFT+RL)
+Improvement
+
+52.54
+23.16
+51.09
+43.32
+64.93
+25.79
+64.96
+64.89
++23.58% +11.36% +27.15% +49.79%
+
+Base: Qwen3-4B-Instruct
+Base
+VeriTime (SFT+RL)
+Improvement
+
+42.50
+15.15
+56.46
+43.08
+67.50
+30.30
+65.31
+63.59
++58.62% +100.00% +15.67% +47.61%
+
+Table 3. Comparison of Accuracy (%) on other benchmarks: TimeSeriesExam for synthetic time series reasoning and DROP for
+general numerical reasoning.
+
+The performance of VeriTime compared to baselines on
+scenario-based reasoning tasks is presented in Table 1. The
+results show that general LLMs, including Qwen2.5 and
+Qwen3 in their base settings, perform equally unsatisfactorily, suggesting that general-purpose LLMs lack sufficient
+capacity for time series reasoning. The time series language models, Time-MQA (Kong et al., 2025a) and TimeR1 (Luo et al., 2025), also yield suboptimal results, highlighting the necessity of integrating structured reasoning
+paths. With the VeriTime framework, Qwen2.5 achieves
+substantial improvements over the base model, with an overall gain of 102.15%, including 239.56% in anomaly detection and 118.17% in inferential calculation. Notably,
+Qwen3, which demonstrates stronger general reasoning
+abilities than Qwen2.5, consistently outperforms its original
+baseline across all tasks, achieving an overall gain of 14.67%
+and a notable 22.74% increase in inferential calculation.
+
+TimeSeriesExam
+LLM
+
+Qwen3
+
+DROP
+
+Qwen2.5 Qwen3 Qwen2.5
+
+Base
+37.98
+35.66
+73.83
+54.00
+VeriTime
+47.27
+41.67
+80.00
+82.55
+Improvement +24.46% +16.85% +8.36% +52.87%
+
+Besides, Table 2 presents the performance of VeriTime
+compared to baseline methods on knowledge-based reasoning tasks, which are inherently more challenging due to
+the need for real-world domain-specific knowledge to analyze category-wise differences in time series. VeriTime enables models to achieve significant improvements over their
+base performance, demonstrating that high-quality Chainof-Thought reasoning paths can enhance time series reason6
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+Table 4. Comparison of average token count per task during inference between the base model and VeriTime.
+Anomaly Scenario
+Inferential TimeSeries
+Detection Attribution Calculation
+Exam
+Qwen3-4b-Instruct
++VeriTime
+Token Reduction (%)
+
+2192.46
+632.67
+-71.14%
+
+1628.64
+619.88
+-61.94%
+
+3782.56
+620.30
+-83.60%
+
+ing. Additionally, VeriTime achieves performance that is
+superior to or comparable to traditional time series models.
+Notably, classical models lack generalization capabilities
+and require task-specific training and evaluation, whereas
+VeriTime can handle multiple tasks while providing detailed
+and interpretable reasoning paths for its predictions.
+
+3892.71
+695.52
+-82.13%
+
+CTU
+
+ECG
+
+EMG
+
+RCW
+
+1691.25 7093.92 4584.15 3397.33
+1055.05 964.68 1004.71 990.29
+-37.62% -86.40% -78.08% -70.85%
+
+results in lower performance in answer alignment and verification, with the warm-up model achieving only 54.3%
+accuracy compared to 68.6% for VeriTime in the inferential calculation. These results demonstrate that recognizing
+task-relevant patterns is fundamental for final results and
+supports deeper analysis of time series segments.
+The TS-tailored Chain-of-Thought improves both task performance and inference efficiency by substantially reducing
+token usage. As shown in Table 4, the base Qwen3 model
+produces excessively long reasoning processes when handling time series tasks, and often generates lengthy and
+unfocused analyses of time series segments. More challenging tasks tend to induce even longer reasoning paths
+in the base model without corresponding improvements in
+final inference accuracy. For instance, average token counts
+reach 3,782 for inferential calculation and 7,093 for ECG
+tasks. In contrast, the proposed TS-tailored CoT guides
+LLMs in a more structured manner, achieving an average
+token reduction rate of 71% across 8 tasks. This demonstrates that VeriTime enhances reasoning performance while
+significantly improving efficiency.
+
+3.3. Analysis of TS-tailored Chain-of-Thought (RQ2)
+To validate the effectiveness of the TS-tailored Chain-ofThought design, we first evaluate the performance of VeriTime on TimeSeriesExam (Cai et al., 2024), a synthetic
+dataset that includes time series understanding tasks such
+as pattern recognition and causality analysis. As shown
+in Table 3, Qwen3 and Qwen2 achieve performance improvements of 24.46% and 16.85%, respectively, indicating
+that VeriTime equips LLMs with the ability to reason about
+TS patterns that can be extended to other time series tasks.
+We further assess VeriTime on DROP (Dua et al., 2019), a
+benchmark for numerical reasoning, where it notably improves the performance of Qwen2.5 from 54.00% to 82.55%,
+thereby highlighting VeriTime’s effectiveness in extending
+LLMs’ analytical capabilities to the time series domain.
+
+(a)
+
+(b)
+
+Figure 4. Ablation results on Qwen2.5-3B-Instruct. (a) Performance without structural, hard, or process rewards. (b) Performance without task comprehension, critical pattern, or alignment&
+verification rewards.
+
+Figure 3. Step-wise Accuracy (%) comparison of Qwen2.5-3BInstruct: warm-up SFT vs. stage 1 SFT + stage 2 RL on scenariobased reasoning tasks.
+
+3.4. Studies of Reward Composition (RQ3)
+
+We further evaluate VeriTime’s reasoning quality via the
+step-level correctness metric as illustrated in Figure 3.
+Specifically, we compare the step-wise accuracy of Qwen2.5
+trained with VeriTime on critical steps, including task comprehension, pattern selection, answer alignment, and verification, to that of Qwen2.5 fine-tuned with 10% of the
+data for warm-up training. The warm-up LLM achieves accuracy comparable to VeirTime in the task comprehension
+step for anomaly detection and scenario attribution tasks.
+However, a significant gap remains in pattern selection accuracy (65.2% vs. 45.0%), suggesting that the warm-up
+LLM still struggles in identifying critical patterns. This
+
+To evaluate the effectiveness of VeriTime’s multi-objective
+reward design, we sequentially remove the structural, hard,
+and process rewards to analyze their individual contributions.
+As illustrated in Figure 4 (a), the exclusion of structural rewards yields the smallest performance degradation, primarily resulting in unstructured or overly lengthy responses due
+to the lack of format supervision. In contrast, removing hard
+or process rewards causes more pronounced declines, with
+the absence of hard rewards dropping inferential calculation
+accuracy from 68.6% to 47.6%. These results highlight the
+crucial role of multi-objective design in enhancing reason7
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+ing capabilities during RL training, as it directly influences
+the correctness of the final answer.
+
+anomaly detection and 29.5% for inferential calculation.
+
+We further analyze the impact of individual components
+within the process rewards in Figure 4 (b). Removing the
+critical pattern reward results in an 18.94% average drop
+and a noticeable decline across all tasks, indicating that
+identifying task-specific patterns is essential for answer correctness and subsequent analysis of time series segments.
+Excluding the task comprehension reward degrades anomaly
+detection and scenario attribution more than inferential calculation, likely because task understanding is more crucial
+in the former two tasks. For instance, anomaly detection
+requires distinguishing between normal or abnormal states,
+while scenario attribution relies on accurately interpreting
+the contextual conditions. Finally, removing answer alignment and verification rewards drops inferential calculation
+performance by 23.62%, indicating that quantitative reasoning relies more heavily on supervision signals aligned with
+correct numerical labels.
+
+(a)
+
+(b)
+
+Figure 6. Performance breakdown on scenario-based tasks, illustrating stage contributions to overall accuracy (%) for the modelguided data selection method for (a) Qwen2.5 and (b) Qwen3.
+
+(a)
+
+(b)
+
+Figure 7. Performance breakdown on knowledge-based reasoning
+tasks for Qwen3-4B-Instruct, illustrating stage contributions for
+(a) full RL and (b) model-guided data selection.
+
+For knowledge-based tasks, both full RL and model-guided
+data selection outperform full SFT, with full RL achieving
+over a 20% improvement on the RCW subset (Figure 7 (a)).
+Under model-guided allocation, RL receives 1.4× as many
+cases as SFT. Conversely, SFT leads to performance drops
+of 0.7% and 6.2% on EMG and RCW (Figure 7 (b)). This
+indicates that tasks that require the discrimination of subtle pattern differences across categories and involve longer
+time segments and domain expertise may not be adequately
+addressed by supervised training alone. Sufficient RL exposure provides the model with a broader exploration space,
+enabling it to better identify and reason over task-critical
+time series patterns. These findings highlight the importance
+of an adaptive SFT-RL data allocation strategy for time series reasoning tasks. Besides, we analyze the performance
+stability of VeriTime in Appendix B.
+
+Figure 5. Performance comparison of training data selection methods on scenario-based reasoning tasks and knowledge-based reasoning tasks for the Qwen3-4B-Instruct model.
+
+3.5. Analysis of Data Scheduling (RQ4)
+We analyze how data scheduling strategy influences the
+trade-off between performance and efficiency by comparing
+two strategies based on the sample difficulty hierarchy of
+TSRBench: (1) model-guided data selection for scenariobased reasoning, where a warm-up model routes failed
+cases to RL and successful ones to SFT; and (2) full RL
+for knowledge-based reasoning tasks, combining warm-up
+SFT with RL throughout. To assess the difficulty-aware
+allocation strategy, we evaluate the performance of LLMs
+trained under each allocation strategy for both task types.
+The overall performance is shown in Figure 5, with stagewise contributions detailed in Figure 6 and Figure 7.
+
+4. Conclusion
+
+For scenario-based tasks, model-guided data scheduling
+consistently outperforms naive SFT using the full dataset,
+whereas full RL leads to performance degradation. This
+indicates that extensive RL on medium-difficulty cases may
+induce overfitting and a less stable learning process. These
+tasks benefit more from general reasoning pathways learned
+through supervised training, complemented by a small number of hard cases to enhance reasoning. In the model-guided
+strategy, the number of cases allocated to RL is 0.25× of
+those allocated to SFT. As shown in Figure 6, the performance improvements for each task are predominantly driven
+by the SFT stage for Qwen2.5, with increases of 58.9% for
+
+In this paper, we propose VeriTime, a novel framework that
+enhances time series reasoning capabilities of LLMs through
+data synthesis, scheduling, and multi-objective RL training.
+We design a data synthesis pipeline to construct a multimodal dataset with process-verifiable annotations, followed
+by a two-stage RFT strategy incorporating multi-objective
+rewards and selective rollout to balance performance and efficiency. Extensive experiments demonstrate that VeriTime
+enables moderate-sized LLMs to achieve substantial performance improvements, establishing a promising direction for
+leveraging LLM reasoning in time series analysis.
+8
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+Impact Statement
+
+Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long
+and Short Papers), pp. 2368–2378”, 2019.
+
+This paper aims to advance the reasoning capabilities of
+LLMs in the time series domain. There are many potential
+societal consequences of our work, none of which we feel
+must be specifically highlighted here.
+
+Fons, E., Sztrajman, A., El-Laham, Y., Ferrer, L., Vyetrenko,
+S., and Veloso, M. LSCD: Lomb–scargle conditioned
+diffusion for time series imputation. In Forty-second
+International Conference on Machine Learning, 2025.
+
+References
+Abousleiman, R., Qu, G., and Rawashdeh, O. North atlantic
+right whale contact call detection, 2013.
+
+Gonen, T., Pemper, I., Naiman, I., Berman, N., and Azencot,
+O. Time series generation under data scarcity: A unified generative modeling approach. In The Thirty-ninth
+Annual Conference on Neural Information Processing
+Systems, 2025.
+
+Cai, Y., Choudhry, A., Goswami, M., and Dubrawski, A.
+Timeseriesexam: A time series understanding exam. In
+NeurIPS Workshop on Time Series in the Age of Large
+Models, 2024.
+
+Goswami, M., Szafer, K., Choudhry, A., Cai, Y., Li, S., and
+Dubrawski, A. Moment: a family of open time-series
+foundation models. In Proceedings of the 41st International Conference on Machine Learning, ICML’24.
+JMLR.org, 2024.
+
+Chen, J., Feng, A., Zhao, Z., Garza, J., Nurbek, G., Qin,
+C., Maatouk, A., Tassiulas, L., Gao, Y., and Ying, R.
+Mtbench: A multimodal time series benchmark for temporal reasoning and question answering. arXiv preprint
+arXiv:2503.16858, 2025a.
+
+Gruver, N., Finzi, M., Qiu, S., and Wilson, A. G. Large
+language models are zero-shot time series forecasters.
+Advances in Neural Information Processing Systems, 36:
+19622–19635, 2023.
+
+Chen, J., Zhao, Z., Nurbek, G., Feng, A., Maatouk, A., Tassiulas, L., Gao, Y., and Ying, R. TRACE: Grounding
+time series in context for multimodal embedding and retrieval. In The Thirty-ninth Annual Conference on Neural
+Information Processing Systems, 2025b.
+
+Gu, S., Li, C., Jing, B., and Ren, K. VerbalTS: Generating
+time series from texts. In Forty-second International
+Conference on Machine Learning, 2025.
+
+Chen, M., Shen, L., Li, Z., Wang, X. J., Sun, J., and Liu,
+C. VisionTS: Visual masked autoencoders are free-lunch
+zero-shot time series forecasters. In Forty-second International Conference on Machine Learning, 2025c.
+
+Guan, T., Meng, Z., Li, D., Wang, S., Yang, C.-H. H.,
+Wen, Q., Liu, Z., Siniscalchi, S. M., Jin, M., and Pan,
+S. Timeomni-1: Incentivizing complex reasoning with
+time series in large language models. In The Fourteenth
+International Conference on Learning Representations,
+2026.
+
+Cheng, M., Chen, Y., Liu, Q., Liu, Z., Luo, Y., and Chen,
+E. Instructime: Advancing time series classification with
+multimodal language modeling. In Proceedings of the
+Eighteenth ACM International Conference on Web Search
+and Data Mining, pp. 792–800, 2025.
+
+Guo, D., Yang, D., Zhang, H., Song, J., Zhang, R., Xu, R.,
+Zhu, Q., Ma, S., Wang, P., Bi, X., et al. Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement
+learning. arXiv preprint arXiv:2501.12948, 2025.
+
+Clifford, G. D., Liu, C., Moody, B., Lehman, L.-w. H.,
+Silva, I., Li, Q., Johnson, A. E., and Mark, R. G. Af
+classification from a short single lead ecg recording: The
+physionet/computing in cardiology challenge 2017. In
+2017 computing in cardiology (CinC), pp. 1–4. IEEE,
+2017.
+
+Huang, B., Jin, M., Liang, Y., Barthelemy, J., Cheng, D.,
+Wen, Q., Liu, C., and Pan, S. Shapex: Shapelet-driven
+post hoc explanations for time series classification models. In The Thirty-ninth Annual Conference on Neural
+Information Processing Systems, 2025.
+Jaech, A., Kalai, A., Lerer, A., Richardson, A., El-Kishky,
+A., Low, A., Helyar, A., Madry, A., Beutel, A., Carney, A., et al. Openai o1 system card. arXiv preprint
+arXiv:2412.16720, 2024.
+
+Dai, Z., He, L., Yang, S., and Leeke, M. Sarad: Spatial
+association-aware anomaly detection and diagnosis for
+multivariate time series. Advances in Neural Information
+Processing Systems, 37:48371–48410, 2024.
+
+Jang, H., Kim, C., and Yang, E. TIMING: Temporalityaware integrated gradients for time series explanation.
+In Forty-second International Conference on Machine
+Learning, 2025.
+
+Dua, D., Wang, Y., Dasigi, P., Stanovsky, G., Singh, S., and
+Gardner, M. DROP: A reading comprehension benchmark requiring discrete reasoning over paragraphs. In
+9
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+Ji, Z., Yu, T., Xu, Y., Lee, N., Ishii, E., and Fung, P. Towards
+mitigating llm hallucination via self reflection. In Findings of the Association for Computational Linguistics:
+EMNLP 2023, pp. 1827–1843, 2023.
+
+Conference of the North American Chapter of the Association for Computational Linguistics, pp. 7602–7635.
+Association for Computational Linguistics, 2024.
+Li, X., Zou, H., and Liu, P. Limr: Less is more for rl scaling.
+arXiv preprint arXiv:2502.11886, 2025b.
+
+JIANG, Y., Chen, Y., Li, X., Chao, Q., LIU, S., and Cong, G.
+FSTLLM: Spatio-temporal LLM for few shot time series
+forecasting. In Forty-second International Conference on
+Machine Learning, 2025.
+
+Liu, H., Xu, S., Zhao, Z., Kong, L., Prabhakar Kamarthi,
+H., Sasanur, A., Sharma, M., Cui, J., Wen, Q., Zhang,
+C., et al. Time-mmd: Multi-domain multimodal dataset
+for time series analysis. Advances in Neural Information
+Processing Systems, 37:77888–77933, 2024a.
+
+Kong, Y., Yang, Y., Hwang, Y., Du, W., Zohren, S., Wang,
+Z., Jin, M., and Wen, Q. Time-mqa: Time series multitask question answering with context enhancement. In
+Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pp. 29736–29753. Association for Computational
+Linguistics, 2025a.
+
+Liu, H., Zhao, Z., Wang, J., Kamarthi, H., and Prakash,
+B. A. Lstprompt: Large language models as zero-shot
+time series forecasters by long-short-term prompting. In
+Findings of the Association for Computational Linguistics: ACL 2024, pp. 7832–7840. Association for Computational Linguistics, 2024b.
+
+Kong, Y., Yang, Y., Wang, S., Liu, C., Liang, Y., Jin, M.,
+Zohren, S., Pei, D., Liu, Y., and Wen, Q. Position: Empowering time series reasoning with multimodal llms.
+arXiv preprint arXiv:2502.01477, 2025b.
+
+Liu, H., Liu, C., and Prakash, B. A. A picture is worth a thousand numbers: Enabling LLMs reason about time series
+via visualization. In Proceedings of the 2025 Conference
+of the Nations of the Americas Chapter of the Association for Computational Linguistics: Human Language
+Technologies (Volume 1: Long Papers), pp. 7486–7518,
+2025a.
+
+Kou, F., Wang, J., Shi, L., Yao, Y., Li, Y., Zhu, S., Zhang,
+Z., and Du, J. CFPT: Empowering time series forecasting
+through cross-frequency interaction and periodic-aware
+timestamp modeling. In Forty-second International Conference on Machine Learning, 2025.
+Lan, X., Wu, F., He, K., Zhao, Q., Hong, S., and Feng, M.
+GEM: Empowering MLLM for grounded ECG understanding with time series and images. In The Thirty-ninth
+Annual Conference on Neural Information Processing
+Systems, 2025.
+
+Liu, H., Zhao, Z., Li, S., and Prakash, B. A. Evaluating
+system 1 vs. 2 reasoning approaches for zero-shot time
+series forecasting: A benchmark and insights. arXiv
+preprint arXiv:2503.01895, 2025b.
+Liu, P., Wu, B., Hu, Y., Li, N., Dai, T., Bao, J., and Xia, S.-T.
+Timebridge: Non-stationarity matters for long-term time
+series forecasting, 2025c.
+
+Laurençon, H., Saulnier, L., Wang, T., and et al. The
+bigscience roots corpus: a 1.6tb composite multilingual
+dataset. In Proceedings of the 36th International Conference on Neural Information Processing Systems, NIPS
+’22, Red Hook, NY, USA, 2022. Curran Associates Inc.
+ISBN 9781713871088.
+
+Liu, X., Hu, J., Li, Y., Diao, S., Liang, Y., Hooi, B., and
+Zimmermann, R. Unitime: A language-empowered unified model for cross-domain time series forecasting. In
+Proceedings of the ACM Web Conference 2024, pp. 4095–
+4106, 2024c.
+
+Lee, G., Yu, W., Shin, K., Cheng, W., and Chen, H. Timecap: Learning to contextualize, augment, and predict
+time series events with large language model agents. In
+Proceedings of the AAAI Conference on Artificial Intelligence, volume 39, pp. 18082–18090, 2025.
+
+Liu, X., Liu, J., Woo, G., Aksu, T., Liang, Y., Zimmermann,
+R., Liu, C., Li, J., Savarese, S., Xiong, C., and Sahoo,
+D. Moirai-moe: Empowering time series foundation
+models with sparse mixture of experts. In Forty-second
+International Conference on Machine Learning, 2025d.
+
+Li, H., Deng, B., Xu, C., Feng, Z., Schlegel, V., Huang,
+Y.-H., Sun, Y., Sun, J., Yang, K., Yu, Y., and Bian, J.
+MIRA: Medical time series foundation model for realworld health data. In The Thirty-ninth Annual Conference
+on Neural Information Processing Systems, 2025a.
+
+Liu, Y., Qin, G., Shi, Z., Chen, Z., Yang, C., Huang, X.,
+Wang, J., and Long, M. Sundial: A family of highly
+capable time series foundation models. In Forty-second
+International Conference on Machine Learning, 2025e.
+
+Li, M., Zhang, Y., Li, Z., Chen, J., Chen, L., Cheng, N.,
+Wang, J., Zhou, T., and Xiao, J. From quantity to quality:
+Boosting llm performance with self-guided data selection for instruction tuning. In Proceedings of the 2024
+
+Liu, Z., Han, P., Yu, H., Li, H., and You, J. Time-r1: Towards comprehensive temporal reasoning in llms, 2025f.
+10
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+Lu, J., Sun, Y., and Yang, S. In-context time series predictor.
+In The Thirteenth International Conference on Learning
+Representations, 2025.
+
+Qin, J., Li, C., Cui, J., Wang, L., Liu, Z., and Liao, Q.
+Bridging time and linguistics: LLMs as time series analyzer through symbolization and segmentation. In The
+Thirty-ninth Annual Conference on Neural Information
+Processing Systems, 2025.
+
+Luo, Y., Zhou, Y., Cheng, M., Wang, J., Wang, D., Pan,
+T., and Zhang, J. Time series forecasting as reasoning:
+A slow-thinking approach with reinforced llms. Under
+review at the International Conference on Learning Representations (ICLR) 2026, 2025.
+
+Qiu, X., Li, Z., Qiu, W., Hu, S., Zhou, L., Wu, X., Li,
+Z., Guo, C., Zhou, A., Sheng, Z., Hu, J., Jensen, C. S.,
+and Yang, B. Tab: Unified benchmarking of time series
+anomaly detection methods. Proc. VLDB Endow., 18(9):
+2775–2789, May 2025. ISSN 2150-8097. doi: 10.14778/
+3746405.3746407.
+
+Masserano, L., Ansari, A. F., Han, B., Zhang, X., Faloutsos,
+C., Mahoney, M. W., Wilson, A. G., Park, Y., Rangapuram, S. S., Maddix, D. C., and Wang, B. Enhancing
+foundation models for time series forecasting via waveletbased tokenization. In Forty-second International Conference on Machine Learning, 2025.
+
+Reaz, M. B. I., Hussain, M. S., and Mohd-Yasin, F. Techniques of emg signal analysis: detection, processing, classification and applications. Biological procedures online,
+8(1):11–35, 2006.
+
+Merrill, M. A., Tan, M., Gupta, V., Hartvigsen, T., and
+Althoff, T. Language models still struggle to zero-shot
+reason about time series. In Findings of the Association
+for Computational Linguistics: EMNLP 2024, pp. 3512–
+3533. Association for Computational Linguistics, 2024.
+
+Rousseau, C., Boschi, T., Cornacchia, G., Salwala, D., Pascale, A., and Moreno, J. B. Forging time series with
+language: A large language model approach to synthetic
+data generation. In The Thirty-ninth Annual Conference
+on Neural Information Processing Systems, 2025.
+
+Ning, K., Pan, Z., Liu, Y., Jiang, Y., Zhang, J. Y., Rasul, K.,
+Schneider, A., Ma, L., Nevmyvaka, Y., and Song, D. TSRAG: Retrieval-augmented generation based time series
+foundation models are stronger zero-shot forecaster. In
+The Thirty-ninth Annual Conference on Neural Information Processing Systems, 2025.
+
+Schulman, J., Wolski, F., Dhariwal, P., Radford, A., and
+Klimov, O. Proximal policy optimization algorithms.
+arXiv preprint arXiv:1707.06347, 2017.
+Shao, Z., Wang, P., Zhu, Q., Xu, R., Song, J., Bi, X., Zhang,
+H., Zhang, M., Li, Y., Wu, Y., et al. Deepseekmath: Pushing the limits of mathematical reasoning in open language
+models. arXiv preprint arXiv:2402.03300, 2024.
+
+Niu, S., Ma, J., Lin, H., Bai, L., Wang, Z., Bi, W., Xu,
+Y., Li, G., and Yang, X. ProMedTS: A self-supervised,
+prompt-guided multimodal approach for integrating medical text and time series. In Findings of the Association for
+Computational Linguistics: ACL 2025, pp. 5915–5928,
+2025a.
+
+Shi, X., Wang, S., Nie, Y., Li, D., Ye, Z., Wen, Q., and
+Jin, M. Time-moe: Billion-scale time series foundation
+models with mixture of experts. In The Thirteenth International Conference on Learning Representations, 2025.
+
+Niu, W., Xie, Z., Sun, Y., He, W., Xu, M., and Hao, C. Langtime: A language-guided unified model for time series
+forecasting with proximal policy optimization. In Fortysecond International Conference on Machine Learning,
+2025b.
+
+Tang, H., Zhang, C., Jin, M., Yu, Q., Wang, Z., Jin, X.,
+Zhang, Y., and Du, M. Time series forecasting with llms:
+Understanding and enhancing model capabilities. ACM
+SIGKDD Explorations Newsletter, 26(2):109–118, 2025.
+Tao, X., Pan, T., Cheng, M., Luo, Y., Liu, Q., and Chen,
+E. Hierarchical multimodal llms with semantic space
+alignment for enhanced time series classification. ACM
+Trans. Intell. Syst. Technol., 2026.
+
+Park, J., Lee, H., Lee, D., Gwak, D., and Choo, J. Revisiting LLMs as zero-shot time series forecasters: Small
+noise can break large models. In Proceedings of the 63rd
+Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers), pp. 906–922, 2025a.
+
+Team, K., Du, A., Gao, B., Xing, B., Jiang, C., Chen, C.,
+Li, C., Xiao, C., Du, C., Liao, C., et al. Kimi k1. 5:
+Scaling reinforcement learning with llms. arXiv preprint
+arXiv:2501.12599, 2025.
+
+Park, M.-Y., Lee, W.-J., Kim, S. T., and Park, G.-M. When
+will it fail?: Anomaly to prompt for forecasting future
+anomalies in time series. In Forty-second International
+Conference on Machine Learning, 2025b.
+
+Tyen, G., Mansoor, H., Cărbune, V., Chen, Y. P., and Mak, T.
+Llms cannot find reasoning errors, but can correct them
+given the error location. In Findings of the Association for
+Computational Linguistics: ACL 2024, pp. 13894–13908,
+2024.
+
+Parker, F., Chan, N., Zhang, C., and Ghobadi, K. Eliciting
+chain-of-thought reasoning for time series analysis using
+reinforcement learning, 2025.
+11
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+Wang, C., Qi, Q., Wang, J., Sun, H., Zhuang, Z., Wu, J.,
+Zhang, L., and Liao, J. Chattime: A unified multimodal
+time series foundation model bridging numerical and
+textual data. In Proceedings of the AAAI Conference
+on Artificial Intelligence, volume 39, pp. 12694–12702,
+2025a.
+
+Zhang, J., Feng, L., Guo, X., Wu, Y., Dong, Y., and Xu, D.
+Timemaster: Training time-series multimodal LLMs to
+reason via reinforcement learning. In Proceedings of the
+NeurIPS 2025 Workshop on BERT2S: Recent Advances
+in Time Series Foundation Models Have We Reached the
+’BERT Moment’?, 2025.
+
+Wang, Y. and Zhao, Y. Tram: Benchmarking temporal
+reasoning for large language models. In Findings of the
+Association for Computational Linguistics: ACL 2024, pp.
+6389–6415. Association for Computational Linguistics,
+2024. doi: 10.18653/v1/2024.findings-acl.382.
+
+Zheng, H., Zhou, Y., Bartoldson, B. R., Kailkhura, B., Lai,
+F., Zhao, J., and Chen, B. Act only when it pays: Efficient
+reinforcement learning for LLM reasoning via selective
+rollouts. In Proceedings of the ICML 2025 Workshop on
+ES-FoMo-III: Efficient Systems for Foundation Models,
+2025.
+
+Wang, Y., Yang, Q., Zeng, Z., Ren, L., Liu, L., Peng, B.,
+Cheng, H., He, X., Wang, K., Gao, J., et al. Reinforcement learning for reasoning in large language models
+with one training example. In The Thirty-ninth Annual
+Conference on Neural Information Processing Systems,
+2025b.
+
+Zhong, S., Ruan, W., Jin, M., Li, H., Wen, Q., and Liang,
+Y. Time-VLM: Exploring multimodal vision-language
+models for augmented time series forecasting. In Fortysecond International Conference on Machine Learning,
+2025.
+Zhou, T., Niu, P., Sun, L., Jin, R., et al. One fits all: Power
+general time series analysis by pretrained lm. Advances in
+neural information processing systems, 36:43322–43355,
+2023.
+
+Xia, T., Yu, B., Dang, K., Yang, A., Wu, Y., Tian, Y., Chang,
+Y., and Lin, J. Rethinking data selection at scale: Random
+selection is almost all you need. In Findings of the Association for Computational Linguistics: EMNLP 2025,
+2025.
+
+Zhou, Z. and Yu, R. Can llms understand time series anomalies? In The Thirteenth International Conference on
+Learning Representations, 2025.
+
+Xie, Z., Li, Z., He, X., Xu, L., Wen, X., Zhang, T., Chen,
+J., Shi, R., and Pei, D. Chatts: Aligning time series
+with llms via synthetic data for enhanced understanding
+and reasoning. In Proceedings of the VLDB Endowment,
+2025, 2025.
+Xue, H. and Salim, F. D. Promptcast: A new promptbased learning paradigm for time series forecasting. IEEE
+Transactions on Knowledge and Data Engineering, 36
+(11):6851–6864, 2023.
+Yang, A., Li, A., Yang, B., Zhang, B., Hui, B., Zheng, B.,
+Yu, B., Gao, C., Huang, C., Lv, C., et al. Qwen3 technical
+report. arXiv preprint arXiv:2505.09388, 2025a.
+Yang, J., Zhang, K., Zhang, G., Yu, P. S., and Ding, K. Glocal information bottleneck for time series imputation. In
+The Thirty-ninth Annual Conference on Neural Information Processing Systems, 2025b.
+Yang, Y., Liu, Z., Song, L., Ying, K., Wang, Z., Bamford, T.,
+Vyetrenko, S., Bian, J., and Wen, Q. Time-ra: Towards
+time series reasoning for anomaly with llm feedback.
+arXiv preprint arXiv:2507.15066, 2025c.
+Ye, W., Liu, J., Cao, D., Yang, W., and Liu, Y. When
+LLM meets time series: Can LLMs perform multistep
+time series reasoning and inference. In NeurIPS 2025
+Workshop on Evaluating the Evolving LLM Lifecycle:
+Benchmarks, Emergent Abilities, and Scaling, 2025.
+12
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+Appendix
+This appendix contains: 1) Section A: deferred related work; 2) Section B: additional experiment results and analysis; 3)
+Section C: details of the TSRBench reasoning dataset; 4) Section D: implementation details of VeriTime; 5) Section E:
+limitations; and 6) Section F: prompt templates for TSRBench curation. The code for VeriTime is available at https:
+//anonymous.4open.science/r/VeriTime-E017.
+
+A. Related Work
+A.1. LLM Reasoning for Time Series
+The attempts to explore the potentials of LLMs in the TS domain are two-fold: (1) directly adapting LLMs to TS tasks
+(Tang et al., 2025; Liu et al., 2025a; Niu et al., 2025a), and (2) training Time Series Foundation Models (TSFMs) from
+scratch (Liu et al., 2025d; Ning et al., 2025; Liu et al., 2025e; Shi et al., 2025). For example, PromptCast (Xue & Salim,
+2023) transforms numerical time series into prompts and formulates the TS forecasting task in a natural language generation
+manner. LLMTIME (Gruver et al., 2023) demonstrates that LLMs such as GPT-3 and LLaMA-2 can perform zero-shot time
+series extrapolation via prompting TS numbers as text tokens. LSTPrompt (Liu et al., 2024b) combines the Chain-of-Thought
+(CoT) process to capture the dynamic nature of data when prompting LLMs to forecast time series. Despite the effectiveness,
+LLMs’ reasoning ability is inadequately elicited via plain prompting techniques since the general linguistic knowledge
+often fails to align with the TS feature and patterns (Park et al., 2025a). Merrill et al. (2024) find that current LLMs exhibit
+unsatisfactory zero-shot reasoning ability on TS data. In etiological reasoning tasks, human annotators outperform LLMs by
+over 30%, with advanced models such as GPT-4 only marginal improvements.
+On the other hand, current TSFMs are still struggling in finding their way towards acquiring emergent and reasoning
+ability (Chen et al., 2025b). TS tasks often exhibit substantial domain-specific complexity and require tailored feature
+representations and pattern modeling to achieve robust performance (Zhong et al., 2025; Qiu et al., 2025; Kou et al., 2025).
+This highlights the necessity to build a unified framework that can effectively leverage large models for understanding and
+reasoning about time series data, thereby improving the performance and practicality of downstream time series tasks. Thus,
+several studies employ supervised fine-tuning (SFT) to enhance TS reasoning capabilities of LLMs (Lee et al., 2025; Liu
+et al., 2024c; Kong et al., 2025b). Alternatively, some approaches focus on the task-specific adaptation of LLM backbones
+for diverse time series applications (Cheng et al., 2025; Lee et al., 2025). GPT4TS (Zhou et al., 2023) adapts language
+models backbones to various TS tasks via fine-tuning, and HiTime Tao et al. (2026) introduces a multimodal architecture
+with additional encoders to embed time series data for classification. Chattime (Wang et al., 2025a) proposes a unified
+framework for joint time series and text modeling, enabling both pre-training and fine-tuning to improve TS reasoning.
+Reinforcement learning (RL) (Guo et al., 2025; Team et al., 2025) has emerged as an effective paradigm for enhancing
+LLM capabilities. To meet the growing demand for reliable time series reasoning, several studies have explored applying
+RL to time series domains (Niu et al., 2025b; Parker et al., 2025). For example, Guan et al. (2026) find that RL performs
+reliably when the LLM is anchored with fundamental temporal priors. Luo et al. (2025) propose a two-stage RL framework
+to enhance the multi-step reasoning ability of LLMs for time series forecasting. TimeMaster (Zhang et al., 2025) introduces
+an RL-based approach that enables time series MLLMs to perform structured and interpretable reasoning directly over
+visualized time series inputs and task prompts. Liu et al. (2025f) further demonstrates that carefully designed progressive
+RL fine-tuning can endow a 3B-parameter LLM with robust time series reasoning skills. Despite these advances, existing
+RL-based methods in the TS domain focus primarily on optimizing final predictions, while overlooking the evaluation of
+reasoning processes, particularly their structural coherence and logical consistency.
+A.2. Time Series Reasoning Dataset
+Recently, diverse time series datasets have been proposed to assess the reasoning capabilities of LLMs across various
+domains and task types. Several studies construct synthetic datasets to target specific reasoning objectives. For instance,
+Zhou & Yu (2025) introduces four anomaly detection datasets that emulate distinct time series patterns and abnormal
+behaviors, and Merrill et al. (2024) creates multiple-choice benchmarks based on GPT4-generated descriptions. However,
+a substantial gap remains between synthetic and real-world data, as synthetic datasets alone cannot fully reflect LLMs’
+reasoning performance under realistic conditions. To address this issue, multimodal benchmarks such as MTBench (Chen
+et al., 2025a) and Time-Bench (Liu et al., 2025f) integrate textual and temporal information, spanning domains including
+finance, weather, and news. They primarily assess long-text understanding, with time series serving only as an auxiliary
+13
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+modality. TSAIA (Ye et al., 2025) and TSQA (Kong et al., 2025a) shift toward evaluating compositional reasoning and
+multi-step analysis through forecasting, anomaly detection, and open-ended Q&A tasks. RATs40K (Yang et al., 2025c)
+provides a real-world multimodal benchmark explicitly annotated for anomaly reasoning. Overall, existing datasets mainly
+emphasize the correctness of final predictions and lack mechanisms to verify or interpret intermediate reasoning processes.
+Moreover, there is still no unified and generalizable framework for advancing TS reasoning in a principled manner.
+
+B. Additional Experimental Results
+In the section, we present extended analyses of VeriTime. Subsection B.1 examines the performace stability of VeriTime
+across parameter sensitivity, prompt sensitivity, and generation settings. Subsection B.2 analyzes the data selection strategy.
+Subsection B.3 evaluates the zero-shot reasoning performance of VeriTime on real-world time series data. Subsection B.4
+illustrates the training dynamics of VeriTime.
+B.1. Performance Stability Analysis of VeriTime
+Inference Parameter Sensitivity. To assess the stability of VeriTime across different inference configurations, we evaluate
+the model’s performance under varying temperature settings (0.2, 0.4, 0.6, and 0.8). As reported in Table 5, standard
+deviations remain negligible (0.00% to 0.78%) on scenario-based tasks. For knowledge-based tasks, while the standard
+deviations are slightly higher, with the ECG task reaching 2.05%, they remain within acceptable ranges. The results indicate
+that the performance of VeriTime remains stable despite variations in temperature settings.
+Table 5. Average performance and standard deviation of Qwen3-4b-Instruct model inference over different temperature settings.
+Scenario-based
+
+Average Accuracy (%)
+Standard Deviation (%)
+
+Knowledge-based
+
+Anomaly
+Detection
+
+Scenario
+Attribution
+
+Inferential
+Calculation
+
+CTU
+
+ECG
+
+EMG
+
+RCW
+
+91.11
+0.00
+
+87.22
+0.57
+
+76.19
+0.78
+
+67.34
+0.98
+
+31.91
+2.05
+
+64.91
+1.13
+
+63.59
+0.00
+
+Prompt Sensitivity. We investigate the performance of VeriTime to prompt variations through ablation studies: (1)
+paraphrasing the system prompt while preserving its semantic meaning, and (2) introducing minor modifications to the
+question (e.g., removing the you are a time series expert statement).
+The results presented in Table 6 indicate that VeriTime exhibits robustness to system prompt paraphrasing. While the
+paraphrased system prompt exhibits greater sensitivity relative to paraphrased task instructions on knowledge-based tasks,
+the model achieves 71.13% accuracy on the EMG task. These observations show that VeriTime does not exhibit strong
+dependence on phrasing conventions, indicating its robustness to prompt variations across different tasks.
+Table 6. Performance evaluation of VeriTime across prompt variations with task-wise Accuracy (%) on Qwen3-4B-Instruct.
+Scenario-based
+
+Knowledge-based
+
+Anomaly Scenario Inferential
+CTU ECG EMG RCW
+Detection Attribution Calculation
+Original Prompt
+Paraphrased System Prompt
+Paraphrased Question
+
+91.11
+87.15
+89.39
+
+87.50
+84.09
+85.23
+
+77.14
+74.29
+80.77
+
+67.50 30.30 65.31 63.59
+59.63 24.74 71.13 56.92
+60.00 27.41 61.70 58.85
+
+Generation Setting. For parameter analysis, we further conduct an ablation study on the number of generations G per input
+during GRPO training. Table 7 shows how varying G affects performance on scenario-based tasks. Performance generally
+increases with larger G, as more generations yield more stable and representative reward estimates across different reasoning
+trajectories. A slight drop emerges when G = 5, likely due to overthinking on medium-difficulty tasks, which aligns with
+our findings in RQ4. To balance performance and computational cost, we set G = 4 as the default in all main experiments.
+14
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+Table 7. Effect of generation number G on performance (Accuracy %) across scenario-based tasks.
+Generation Number
+
+Overall
+
+Anomaly Detection
+
+Scenario Attribution
+
+Inferential Calculation
+
+2
+3
+4
+5
+
+85.47
+86.33
+86.55
+83.30
+
+90.00
+93.33
+91.11
+87.78
+
+86.93
+84.66
+87.50
+85.80
+
+75.24
+77.14
+77.14
+71.43
+
+Table 8. Performance Comparison of different data selection strategies on scenario-based tasks for Qwen3-4B-Instruct.
+
+Random
+Token Length
+Perplexity
+IFD
+Model-guided
+
+Overall
+
+Anomaly Detection
+
+Scenario Attribution
+
+Inferential Calculation
+
+83.30
+85.25
+84.82
+84.16
+86.55
+
+86.67
+88.89
+90.56
+88.33
+91.11
+
+84.09
+86.93
+83.52
+81.82
+87.50
+
+76.19
+76.19
+77.14
+80.95
+77.14
+
+B.2. Analysis of Data Selection Strategy
+Furthermore, we compare the model-guided data selection strategy with several baselines on scenario-based tasks: (1)
+Random Sampling; (2) TokenLength (Xia et al., 2025), which ranks samples by token length; (3) PPL (Laurençon et al.,
+2022), which selects samples with the highest perplexity under a pretrained model; and (4) Instruction-Following Difficulty
+(IFD) (Li et al., 2024), which measures the difficulty of instructional samples for the model. For a fair comparison, each
+method selects the same amount of SFT data as the model-guided strategy, with the remaining samples allocated to RL.
+Results are provided in Table 8, where the random sampling consistently underperforms. The model-guided strategy shows
+robust performance and generalization across tasks, reliably identifying high-quality RL data to enhance LLM time series
+reasoning with minimal training overhead while maintaining efficiency.
+B.3. Case Study of VeriTime on Real-World Time Series
+To evaluate the zero-shot reasoning capabilities of LLMs on real-world time series data and examine their practicality for
+real-world deployment, we conduct case studies on the Qwen3-4B-Instruct model trained under VeriTime on TSRBench.
+Specifically, we utilize the Time-MMD (Liu et al., 2024a) dataset, which integrates multiple rigorously curated and verified
+data sources up to May 2024, to perform an in-depth assessment of time series performance in real-world applications.
+For anomaly detection tasks, we assess the model’s ability to identify abnormal patterns in TS from both holistic and
+threshold-based perspectives. As illustrated in Figure 8, the model first analyzes a financial series where a normal trend
+is defined as free of sharp, atypical declines. It successfully pinpoints two significant drops within the overall upward
+trend, accurately locating the sharpest decline and quantifying its magnitude. This demonstrates the model’s fine-grained
+understanding of temporal dynamics and its effectiveness in zero-shot anomaly detection. When applied to the PM2.5
+AQI index under a threshold-based setting, the model further detects value spikes, reports corresponding timestamps
+and magnitudes, and reasons that sustained high AQI levels pose greater health risks than isolated peaks. These results
+collectively highlight the model’s potential for real-world anomaly detection applications.
+For inferential calculation tasks, the model is first prompted to analyze the 532-month retail broiler composite from 1980 to
+2024 and identify distinct upward trends over the entire period. As illustrated in Figure 9, it successfully recognizes three
+major trends based on directional movement, duration, and amplitude, and accurately estimates their approximate start and
+end times. When applied to a traffic volume dataset with clear annual cycles, the model further segments the data by year,
+detects primary and secondary peaks within each cycle, and correctly determines the month in which traffic volume typically
+reaches its maximum. These results demonstrate the model’s capability to reason over long temporal horizons and capture
+complex periodic patterns.
+B.4. VeriTime Training Dynamics
+To evaluate the training dynamics of VeriTime, Figure 10 presents the accuracy of Qwen3-4B-Instruct during RL training
+across four knowledge-based reasoning tasks. To reduce evaluation cost during RL, we report performance on a subset of
+the test set, which may exhibit slight variance compared to the full experiment results. The curves reveal initial performance
+15
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+Economy
+
+Environment
+254
+
+116661
+
+180
+88092.1
+
+161
+
+174
+151
+
+74643.6
+
+79818
+74
+
+32444
+28662.9
+
+User: Please analyze the provided economic time-series dataset, which details the international
+trade balance of 267 monthly data points. The benchmark for a 'normal' series is a general
+upward trend that is free of sharp, atypical declines. Based on your analysis, state whether the
+data is normal. <ts><ts/>
+LLM: <THINK> [Detailed information for time series analysis.]
+• General upward trend: The series starts at ~32k, peaks at ~116k, and ends at ~79k. While
+the final segment shows a decline, the overall trajectory is upward.
+• Sharp declines: A sharp drop occurs at index ~260 (value: 28,662.9), followed by a recovery.
+This decline is abrupt (magnitude: ~50k drop) and atypical compared to the series’ volatility.
+The series contains a sharp, atypical decline, violating the benchmark’s requirement of being
+"free of sharp, atypical declines." Despite the overall upward trend, this anomaly disqualifies
+normality. [Detailed information …]
+</THINK> <ANSWER>The answer is No. </ANSWER>
+
+User: Based on environmental data recording the 265 days of PM2.5 Air Quality Index (AQI),
+where each data point represents the AQI for a single day, The AQI classifications are as
+follows: below 50 is good; 50–100 is moderate; 100–150 is unhealthy for sensitive groups;
+150–200 is unhealthy; and above 200 is very unhealthy. Could the indicated period be
+harmful to health? <ts><ts/>
+LLM: <THINK>[Detailed information …]
+Threshold values: The AQI classifications explicitly define "unhealthy" (100–200) and "very
+unhealthy" (>200) ranges. These thresholds are critical because exceeding them directly
+indicates potential health risks.
+• Days 1–200: Values range between 30–100 (mostly moderate to good).
+• Days 201–240: Values spike to 151, 161, 180, 174, 254, 200+ (unhealthy/very unhealthy).
+• Days 241–265: Values drop to 70–100 (moderate).
+Temporal continuity: Sustained high AQI values (e.g., multiple consecutive days above 100)
+may indicate prolonged exposure, which is more harmful than isolated spikes.
+• The period from days 201–240 includes consecutive days exceeding 150 (unhealthy), with
+254 being "very unhealthy." This indicates prolonged exposure to hazardous levels.
+[Detailed information …]
+</THINK> <ANSWER>The answer is Yes. </ANSWER>
+
+Figure 8. Case studies on anomaly detection tasks in economy and environment domains.
+
+Agricultural
+
+Traffic
+278372
+241.07
+
+285160
+277972
+
+288566
+
+282558
+
+283417
+
+289390
+
+270839
+
+197.1
+
+159.1
+
+187.0
+
+141.1
+
+93.3
+
+User: The dataset comprises 532 monthly data points for the retail broiler composite, spanning
+from January 1980 to April 2024. Please analyze the time series and determine how many
+typical upward trends occurred over the entire period. For each identified trend, please also
+output its approximate start time in Year-Month format. <ts><ts/>
+LLM: <THINK>Keywords like "upward trends" and "typical" indicate the need to identify
+sustained increases in values over time, excluding noise or short-term fluctuations.
+• Trend direction: Upward (values increase over time). The series starts at ~93.3 and ends at
+~241.0, showing a general upward trajectory.
+• Trend duration: Sustained increases (e.g., 3+ consecutive months).
+• Trend amplitude: Significant deviations from the mean (e.g., >10% increase). These
+patterns align with the task’s focus on identifying "typical" trends, requiring both persistence
+and magnitude.
+[Detailed information for time series analysis.]
+Three distinct upward trends:
+• 1980–1990 (Year-Month: 1980-01 to 1990-12).
+• 2002–2012 (Year-Month: 2002-01 to 2012-12).
+• 2020–2024 (Year-Month: 2020-01 to 2024-04).
+[Detailed information …] </THINK> <ANSWER>The answer is 3. </ANSWER>
+
+User: Below is the monthly traffic volume time series from January 1, 2015, to January
+1, 2019. Please identify in which month the traffic volume usually reaches its highest
+point each year. <ts><ts/>
+
+LLM: <THINK> [Detailed information …]
+• Monthly peaks: Critical to identify the highest value in each year.
+• Yearly cycles: Required to group data into annual segments (2015–2018) and
+compare peaks.
+• Amplitude: The magnitude of monthly values determines the "highest point"
+criterion.
+Analyzing time series samples using selected key patterns:
+• 2015: Peaks at 270,839 (May) and 279,372 (July).
+• 2016: Peaks at 277,972 (May) and 285,160 (July).
+• 2017: Peaks at 288,566 (July) and 282,558 (August).
+• 2018: Peaks at 283,417 (May) and 289,390 (July).
+The analysis identified July as the month with the highest traffic volume in every year
+(2015–2019), supported by consistent peak values and exclusion of noise.
+[Detailed information …]
+</THINK> <ANSWER>The answer is July. </ANSWER>
+
+Figure 9. Case studies on inferential calculation tasks in agricultural and traffic domains.
+
+Figure 10. Accuracy (%) over training steps on knowledge-based reasoning tasks.
+
+16
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+Figure 11. Reinforcement Learning training dynamics for VeriTime.
+
+fluctuations in the early training phase, followed by consistent improvement as training progresses. Overall, all subsets
+demonstrate a clear view of accuracy gains, indicating stable and effective optimization.
+Besides, Figure 11 presents the reinforcement learning training dynamics of VeriTime, illustrating four key metrics: length
+reward, final answer reward, process answer reward, and total reward. The black trend lines indicate consistent optimization
+as training progresses across all reward components, showing the performance of VeriTime remains stable and improve
+gradually with training steps increase.
+
+C. Details of TSRBench
+C.1. Data Statistics
+The scale of the TSRBench dataset for each task is summarized in Table 9. For scenario-based tasks, the training-to-test
+ratio is approximately 5:1, and the instances for training and testing are randomly selected under the data curation pipeline.
+For knowledge-based reasoning tasks, the training–test split follows the original partitioning of their respective datasets.
+Table 9. Statistics of TSRBench.
+Category
+
+Scenario-based Reasoning
+
+Knowledge-based Reasoning
+
+Task
+
+Total
+
+Anomaly
+Detection
+
+Scenario
+Attribution
+
+Inferential
+Calculation
+
+Total
+
+CTU
+
+ECG
+
+EMG
+
+RCW
+
+# Samples
+# Avg. Time Points
+# Avg. Token Count
+
+2520
+2784
+
+1180
+300
+2759
+
+930
+300
+2932
+
+410
+324
+2783
+
+1820
+4627
+
+270
+720
+5942
+
+780
+500
+4239
+
+450
+600
+4990
+
+320
+500
+4201
+
+C.2. Cross-Model Validation
+To validate the quality of TSRBench synthesized by our data generation pipeline TSRgen, we conduct a cross-model
+evaluation of the intermediate reasoning steps produced by the expert model (DeepSeek-R1). Specifically, we use three
+state-of-the-art LLMs: Qwen3-235B, GPT-5, and Gemini-2.5, which serve as independent judges to assess the reasoning
+quality of the teacher model’s Chain-of-Thought trajectories. The full template is provide in subsection F.2.
+Evaluation Protocol. For each subtask in TSRBench, we randomly sample 100 instances for quality evaluation and
+subsequently compute the average score for each LLM. Each judge model assesses reasoning quality across five dimensions.
+The first two dimensions focus on verifying the correctness of process-verifiable labels extracted from the expert model,
+while the latter three evaluate the quality of the reasoning process itself:
+1. Task Intent Alignment: Whether Step 1 correctly identifies the task objective and required outcome.
+2. Key Pattern Relevance: Whether Step 2 captures task-relevant temporal cues (e.g., thresholds, trends, patterns).
+3. Logical Coherence: Whether reasoning transitions and justifications in Steps 3–6 maintain consistency without logical
+gaps or contradictions.
+4. Robustness vs. Shortcuts: Whether the reasoning avoids spurious shortcuts or lucky guesses and performs necessary
+verification checks.
+17
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+5. Bias/Artifact Check: Whether the reasoning contains unwarranted assumptions or biases unrelated to the data or task.
+The scoring rubric is defined as follows: 5 — fully correct, precise, and well-justified with no hallucinations; 4 — overall
+correct and well-grounded, with only minor omissions; 3 — mixed quality, containing unsupported claims or missing
+checks; 2 — major issues, including key omissions or likely use of shortcuts; 1 — largely incorrect or hallucinated.
+Results. Table 10 presents the cross-model evaluation results. The scores indicate a strong inter-judge agreement and
+consistently high quality across all dimensions. Notably, all three judge models assign high scores (> 4.5) for Intent
+Alignment and Pattern Relevance in both reasoning task categories, validating the correctness of the process-verifiable labels
+extracted from DeepSeek-R1’s reasoning trajectories. The remaining three dimensions, which assess the overall quality of
+TS-tailored Chain-of-Thought in terms of logical coherence and robustness, also achieve consistently high scores, with only
+GPT-5 showing slightly lower scores on knowledge-based tasks. These results provide strong evidence for the reliability and
+quality of the intermediate reasoning paths of TSRBench.
+Table 10. Cross-model evaluation of DeepSeek-R1’s reasoning quality on TSRBench.
+Evaluation Metrics
+
+LLM
+Intent Alignment
+
+Pattern Relevance
+
+Logical Coherence
+
+Robustness
+
+Bias Check
+
+4.99
+4.97
+5.00
+
+4.96
+4.85
+4.98
+
+4.70
+4.50
+4.31
+
+4.56
+4.30
+4.38
+
+4.70
+4.62
+4.62
+
+Knowledge-based Task
+Qwen3-235B
+5.00
+GPT-5
+4.94
+Gemini-2.5
+5.00
+
+4.99
+4.58
+4.99
+
+4.21
+3.92
+4.07
+
+4.18
+3.68
+4.14
+
+4.05
+4.03
+4.99
+
+Scenario-based Task
+Qwen3-235B
+GPT-5
+Gemini-2.5
+
+Table 11. Illustrative examples of the reasoning tasks in TSRBench.
+Task
+
+Examples
+
+Deductive Reasoning
+Anomaly Detection
+
+You are a time series analysis expert. This is a metric called Cloud Cover collected from Weather
+Forecasting with length of 256: <ts><ts/>. If a sudden and significant increase in cloud cover is
+considered an anomaly, should the behavior at point 204 to point 206 be treated as an anomaly?
+
+Causal Reasoning
+Scenario Attribution
+
+You are a time series analysis expert. This is a metric called Carbon Emissions collected from Energy
+with length of 256: <ts><ts/>. Considering the temporal correlation in the Carbon Emissions time
+series, which of the following could be a potential cause for the observed rapid rise in emissions
+followed by a slow decline starting around point 219? Choose from: A) Introduction of new industrial
+activities, B) Implementation of strict environmental regulations, C) Seasonal decrease in industrial
+activities.
+
+Quantitative Reasoning
+Inferential Calculation
+
+You are a time series analysis expert. This is a metric called Parallel Query Performance collected
+from Oracle Database with length of 256: <ts><ts/>. In a database system, the Parallel Query
+Performance is monitored to ensure optimal operation. The performance data starts from June 1, and
+each point represents a minute. During normal operation, the performance is expected to remain steady.
+However, there are rare instances where the system experiences a sudden drop in performance. How
+many such critical performance drops, defined as a rapid decline from a peak, are observed in the time
+series?
+
+Inductive Reasoning
+Classification
+
+You are analyzing an audio signal to determine the presence of right whale vocalizations. Up-calls are
+the most commonly documented right whale vocalisation with an acoustic signature of approximately
+60Hz-250Hz, typically lasting 1 second. Right whale calls can often be difficult to hear as the lowfrequency band can become congested with anthropogenic sounds such as ship noise, drilling, piling,
+or naval operations. The signal shows a two-second waveform sampled at 2kHz, resulting in a time
+series of length 500: <ts><ts/>. Your goal is to classify whether the waveform segment contains a
+right whale call. Based on the analysis, choose the best matching label for the full signal from: A) Right
+Whale Present, B) No Right Whale.
+
+18
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+C.3. Dataset Construction and Illustrative Examples
+The objective of TSRBench is to curate process-verifiable TS–text reasoning tasks that encompass diverse domains. To
+achieve this, we design two categories of reasoning tasks: scenario-based and knowledge-based tasks, derived from
+synthetic datasets and real-world datasets, respectively.
+For scenario-based tasks, previous work like ChatTS (Xie et al., 2025) primarily focuses on training LLMs to understand TS
+patterns rather than to address more complex reasoning tasks, resulting in non-trivial variance in difficulty and annotation
+quality. Building on this, we filter and reorganize the original data to construct three distinct types of scenario-based
+reasoning tasks: anomaly detection, scenario attribution, and inferential calculation. For knowledge-based tasks, we aim to
+evaluate the ability of LLMs to analyze real-world, domain-specific time series. To this end, we curate four representative
+datasets from various domains and standardize the raw data into Q&A classification tasks. Examples of the generated
+reasoning questions are provided in Table 11.
+• Anomaly Detection: Given predefined conditions (e.g., market share, energy import volumes, memory usage) and
+anomaly detection criteria (e.g., threshold values, sudden drops, significant fluctuations), the LLM is tasked with
+determining whether the time series data is normal or contains anomalies.
+• Scenario Attribution: Given a specific scenario (e.g., SSL handshake rates, solar radiation, port throughput) and time
+series segments that exhibit unusual patterns either throughout or within specific intervals (e.g., the initial period or
+final phase), the LLM is tasked with analyzing the pattern variations of the time series and identifying the most probable
+incident that caused or influenced these changes.
+• Inferential Calculation: Given a predefined scenario, time series segments, and specified time intervals (e.g., each
+time point represents a minute, day, or week), the LLM is tasked with identifying and quantifying specific time series
+elements (e.g., time points or intervals) based on predefined criteria, with a focus on counting the occurrences of relevant
+events or phenomena.
+• CTU (Energy): The Computer Type Usage (CTU) dataset aims to enable LLMs to identify computer device types based
+on consumer behavior, using 24-hour electricity consumption patterns from 251 users.
+• ECG (Medical): The Electrocardiogram (ECG) Record Diagnosis dataset focuses on evaluating LLMs to diagnose
+arrhythmias through waveform analysis. It includes single-lead ECG recordings that measure four different cardiac
+arrhythmias, each influenced by multiple factors.
+• EMG (Healthcare): The Electromyogram (EMG) Signal Diagnosis dataset is designed to detect muscle disorders using
+neuromuscular signal data. It comprises muscle response recordings to neural stimulation with three types: healthy,
+neuropathy, and myopathy.
+• RCW (Bioacoustics): The Right Whale Calls (RCW) detection dataset focuses on identifying right whale calls in audio
+recordings by analyzing distinctive whoop sounds amidst oceanic environmental noise.
+Overall, TSRBench evaluates LLMs across multiple reasoning abilities, such as deductive reasoning involves inferring
+conclusions from predefined conditions, causal reasoning identifies the most plausible cause based on the observed series,
+quantitative reasoning requires accurate numerical analysis, and inductive reasoning compares time series patterns to predict
+categories in real-world data.
+
+D. Implementation Details of VeriTime
+D.1. More details of Multi-Objective Reward Design
+VeriTime adopts a set of fine-grained reward components designed for multi-objective optimization, categorized into
+structural rewards rstruct , the hard reward rhard , and process rewards rprocess . The overview of the multi-objective reward
+design is provided in Table 12.
+Format Reward. rfmt enforces adherence to the required output template by verifying that the reasoning path is within
+<THINK> tags and the final answer in <ANSWER> tags. Fully compliant outputs receive a positive reward, while structural
+19
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+Table 12. Overview of the reward components in the VeriTime RL training framework.
+Category
+
+Reward Component
+
+Symbol
+
+Description
+
+Structural Rewards
+
+Format Reward
+
+rfmt
+
+Length Reward
+
+rlen
+
+Enforces strict adherence to the required <THINK> and
+<ANSWER> structure.
+Encourages responses within a desirable length range, discouraging both insufficient analysis and or redundant content.
+
+Hard Reward
+
+Hard Reward
+
+rhard
+
+Provides strong supervision on final-answer correctness via exact
+matching of the ground truth.
+
+Process Rewards
+
+Task Comprehension Reward
+
+rintent
+
+Critical Pattern Reward
+
+rpattern
+
+Answer Alignment Reward
+
+ralign
+
+Answer Verification Reward
+
+rverify
+
+Measures whether the model correctly interprets the task objective
+and underlying requirements.
+Assesses identification of key reasoning patterns, assigning a
+higher reward for capturing more essential patterns.
+Rewards intermediate answers that correctly align with the ground
+truth.
+Rewards correctness of the final self-verified answer produced
+after self-reflection.
+
+violations are penalized, with stronger incentives for valid structures over discouraging violations.
+(
++3.0, y ∈ Svalid ,
+rfmt (y) =
+−2.0, otherwise.
+
+(11)
+
+Length Reward. rlen encourages responses of appropriate detail and depth, penalizing outputs that are too short or overly
+long with repetitive or meaningless content. Let L(y) denote the token length of output y, with penalties for deviations from
+the desired range defined by Lthr (minimum length) and Ltol (upper tolerance threshold):
+
+
+−2.0, L(y) ≥ Ltol ,
+rlen (y) = +1.0, Lthr ≤ L(y) < Ltol ,
+(12)
+
+ L(y)
+,
+L(y)
+<
+L
+.
+thr
+Ltol
+The values are set to balance positive reinforcement for desirable lengths with penalties for violations. The structural rewards
+rstruct (y) is defined as:
+rstruct (y) = rfmt (y) + rlen (y).
+(13)
+Hard Reward. rhard evaluates the factual correctness of the predicted final answer A(y) from the <ANSWER> tags. As the
+primary optimization criterion, it has the highest magnitude and provides strong supervision for end-task accuracy. Correct
+answers receive a high reward, while incorrect ones are moderately penalized to encourage exploration, allowing the model
+to retain exploratory behavior. Let â denote the ground truth:
+(
++5.0, A(y) = â,
+rhard (y) =
+(14)
+−2.0, otherwise,
+Together with the process reward described in subsection 2.3, we aggregate the three reward components into the global
+reward signal R(y) to ensure structural fidelity, answer correctness, and validity of intermediate reasoning steps. The
+aggregation uses a uniform average, as the relative importance of each component is reflected in their designed magnitudes.
+The GRPO training pipeline for VeriTime is detailed in Algorithm 1.
+r(y) = rstruct (y) + rhard (y) + rprocess (y).
+
+(15)
+
+D.2. Policy Optimization Using GRPO
+VeriTime adopts the Group Relative Policy Optimization (GRPO) (Shao et al., 2024) algorithm to improve the stability and
+efficiency of the training process. Unlike PPO (Schulman et al., 2017) that relies on a separately trained value network,
+20
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+Algorithm 1 GRPO Training Pipeline of VeriTime
+Require: Initial time-series LLM πθ , dataset D, group size G, temperature τ , learning rate η
+1: Supervised fine-tune πθ on structured time-series data with format tags ⟨THINK⟩, ⟨ANSWER⟩
+2: for each RL iteration do
+3:
+Update the reference model: πref ← πθ
+4:
+for Step = 1, 2, . . . do
+5:
+Sample a mini-batch B from D
+6:
+Update the old model: πold ← πθ
+7:
+Sample G outputs {yi }G
+i=1 ∼ πθold (· | X, q) for each time-series instance (X, q) ∈ B
+8:
+for each sampled yi do
+9:
+Parse tags: ⟨THINK⟩i , ⟨ANSWER⟩i = ĉi
+10:
+Compute format reward: rifmt = I[tags well-formed and non-empty]
+11:
+Compute length reward: rilen = I[threshold < |yi | < max len]
+12:
+Compute hard reward: rihard = I[ĉi = c∗ ]
+PNsteps
+13:
+Compute process reward: riproc = j=1
+I[stepj -judgment ≈ labelj ]
+14:
+Compute composite reward: ri = λfmt rifmt + λlen rilen + λhard rihard + λproc riproc
+15:
+end for
+16:
+Compute {Âi }G
+i=1 for each group via advantage estimation
+P
+PG
+1
+17:
+Update πθ by maximizing L(θ) = G|B|
+i=1 Âi log πθ (yi | X, q)
+(X,q)∈B
+18:
+end for
+19: end for
+20: return πθ
+
+GRPO normalizes advantages across a group of rollouts, providing a more stable and self-contained optimization framework.
+Formally, let πθ denote the curren model policy with parameters θ, and πref be a frozen reference policy (e.g., a pretrained or SFT model). For each input context x, we sample a group of G complete output sequences from the old policy
+{yi }G
+i=1 ∼ πold (·|x), and assign each generated sequence a scalar reward ri based on our composite reward function. The
+group-normalized advantage is computed as:
+v
+u
+G
+G
+u1 X
+ri − µr
+1 X
+Âi =
+, µr =
+rj , σr = t
+(rj − µr )2 + ε.
+(16)
+σr
+G j=1
+G j=1
+where each token within the same sequence yi shares the same normalized advantage Âi , ensuring stable gradient scaling
+across contexts.
+To update the policy πθ using this advantage, we employ a clipped counterpart, which helps prevent large, detrimental policy
+updates. The per-sample clipped objective is given by:
+
+
+Lclip (θ) = min ρi,k Âi , clip(ρi,k , 1 − ϵ, 1 + ϵ)Âi ,
+(17)
+where ρi,k is the importance sampling ratio for each token, and ϵ controls the clipping range:
+ρi,k =
+
+πθ (yi,k | yi,<k , x)
+.
+πold (yi,k | yi,<k , x)
+
+(18)
+
+The overall objective function LGRPO (θ) is then maximized during training. This objective balances the expected clipped
+advantage with a KL-divergence penalty against the reference policy πref :
+G
+
+LGRPO (θ) =
+
+|yi |
+
+i
+1 X 1 Xh
+Lclip (θ) − β KL [πθ ∥ πref ] ,
+G i=1 |yi |
+
+(19)
+
+k=1
+
+where β controls the strength of the KL penalty and ensures that the policy update remains close to the reference model.
+This objective guides the policy toward higher rewards, leveraging stable GRPO advantage estimates within a constrained
+optimization framework.
+21
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+D.3. Training Configuration
+All training and inference for VeriTime and baseline models are performed on 2×A100 80G GPUs. The base LLM for
+VeriTime training is Qwen2.5-3B-Instruct, and Qwen3-4B-Instruct, which exhibit stronger general reasoning abilities than
+the Qwen2.5 series. The maximum sequence length for the LLMs is set to 10K tokens. Key hyperparameters of the overall
+training and inference process are summarized in Table 13.
+Table 13. Key hyperparameters for RFT training and inference of VeriTime.
+
+GRPO training
+max prompt length
+LoRA rank
+learning rate
+number of generations
+Optimizer
+
+6190
+32
+5e-6
+4
+Adamw
+
+SFT
+max sequence length
+LoRA rank
+learning rate
+LR scheduler
+Optimizer
+training epoch
+
+max response length
+temperature
+LR scheduler
+per-device batch size
+training epoch
+
+3809
+0.8
+Linear
+4
+1
+
+Inference
+10000
+32
+2e-4
+Linear
+Adamw
+1
+
+temperature
+
+0.2
+
+E. Limitations
+In this study, we investigate the impact of data scheduling on the trade-off between performance and efficiency, highlighting
+that the quality and hierarchical complexity of reasoning datasets are more pivotal to performance than sheer dataset volume.
+Given the scarcity of high-quality reasoning datasets in the time series domain, future work could focus on expanding
+TSRBench to cover a broader range of domains and more complex scenarios. Additionally, VeriTime demonstrates
+that specialized RL training enables moderate-sized LLMs to achieve notable improvements. However, due to resource
+constraints, VeriTime focuses on compact models to underscore the trade-off between cost-effectiveness and performance.
+We foresee that applying the framework to larger foundation models could unlock greater performance gains, with
+improvements likely scaling positively with model size.
+
+F. Prompt Design in TSRgen for Curating TSRBench
+F.1. TS-Tailored Chain-of-Thought
+We propose a TS-tailored reasoning framework that enforces a tightly guided thought process consisting of six interdependent
+and logically ordered steps. All tasks in TSRBench adhere to this chain-of-thought procedure, with only minor task-specific
+modifications. The complete template for the inferential calculation task is provided as follows.
+Prompt Template for TS-Tailored Chain-of-Thought Reasoning for Inferential Calculation Task
+
+### Task Description
+You are a time series expert. Please think step by step and strictly follow the specified output format for each step:
+Step 1. Analyzing task intent:
+Analyze the intent of the given problem and identify its core objective in the context of time series reasoning.
+Specifically, determine the specific object that needs to count in the numerical calculation task.
+Output Format:
+Step 1. Analyzing task intent:
+[Judgement] <The specific counting object (e.g., days, occasions, siginifcant drops). >
+[Description] <Provide a rationale for the judgement based on the given problem context. Cite specific keywords or
+
+22
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+
+requirements from the problem and explain how these details align with the judgement. >
+Step 2. Selecting task-relevant key patterns:
+Align with the task’s core objective to identify core features that directly support task completion. These features
+must be actionable and critical to deriving valid conclusions. Valid pattern categories include temporal patterns (e.g.,
+trend; amplitude; fluctuation; continuity), judgment criteria (e.g., task-specific definitions of patterns), threshold
+values (e.g., upper bounds; lower bounds; percentage deviations), and other decisive patterns or criteria that are
+critical for resolving the task.
+Output Format:
+Step 2. Selecting task-relevant key patterns:
+[Judgement] <Only list the names of the selected key patterns (no extra details, analysis, or conclusions); separate
+multiple items with semicolons. >
+[Description] <For each selected pattern: Clarify the pattern’s specific details; explain how it aligns with the task’s
+core objective; elaborate on why it is critical to match the task’s core objective. >
+Step 3. Analyzing time series samples using selected key patterns:
+Clarify the specific characteristics (e.g., occurrence timing, duration, intensity) and inherent rules of the selected key
+patterns. Then evaluate whether the time series sample conforms to these task-relevant patterns and criteria. You can
+analyze the entire series holistically, or split it into meaningful segments (e.g., by time period, event node) based on
+task requirements.
+Output Format:
+Step 3. Analyzing time series samples using selected key patterns:
+[Analysis] <Your analysis process. >
+Step 4. Generating preliminary answers by combining task intent and key patterns:
+Based on the analysis of task requirements, patterns, and time series data from prior steps, formulate preliminary
+answers.
+Output Format:
+Step 4. Generating preliminary answers by combining task intent and key patterns:
+[Judgement] <Preliminary conclusion (e.g., calculated value X). >
+[Description] <Provide a rationale for the judgement. >
+Step 5. Enhancing answers through reflection:
+Verify whether the selection of key patterns is comprehensive, ensuring no relevant features are omitted. Check the
+correctness of the analysis. Eliminate interfering factors that may affect the validity of the analysis.
+Output Format:
+Step 5. Enhancing answers through reflection:
+[Analysis] <Your reflection and verification process. >
+Step 6. Summarizing the thinking process to output the answer:
+Integrate the entire analytical process, clearly presenting the complete logic from understanding the task, analyzing
+patterns, generating conclusions to verifying results. Finally, output an answer that meets the task requirements.
+Output Format:
+Step 6. Summarizing the thinking process to output the answer:
+[Description] <Summary of the reasoning process across all steps. >
+[Judgment] <Final answer.(e.g., calculated value X) (The calculated numerical value must be in digit form.) >
+
+F.2. Cross-LLM Validation
+We present the cross-model validation template designed for advanced LLMs to evaluate the reasoning trajectories of
+DeepSeek-R1 across five dimensions, using a five-level rubric.
+
+23
+
+Time Series Reasoning via Process-Verifiable Thinking Data Synthesis and Scheduling for Tailored LLM Reasoning
+Prompt Template for Cross-Model Validation
+
+### Task Description
+You are an expert time-series analyst and reasoning auditor. Given:
+– Task type: [Task]
+– Question: [Question]
+– Ground-truth label: [Label]
+– Time series data: [Time series]
+– Teacher CoT (DeepSeek-R1): [Reasoning trajectory]
+– Teacher final answer: [Final Answer]
+Judge ONLY the reasoning quality of the teacher CoT. Be concise.
+### Dimensions (score 1–5, integers)
+1) Task-Intent Alignment: Did Step 1 correctly identify the task and required outcome?
+2) Key-Pattern Relevance: Did Step 2 capture task-relevant cues/features (e.g., thresholds, trends)?
+3) Logical Coherence (Steps 3–6): Are transitions and justifications consistent, with no gaps/contradictions?
+4) Robustness vs Shortcuts: Does the reasoning avoid shortcuts/lucky guesses and cover necessary checks?
+5) Bias/Artifact Check: Any unwarranted assumptions or biases unrelated to data/task?
+### Rubric (per dimension)
+– 5: Fully correct, precise, and justified; no hallucinations.
+– 4: Minor omissions but overall correct and grounded.
+– 3: Mixed quality; some unsupported or missing checks.
+– 2: Major issues; key omissions or likely shortcut.
+– 1: Mostly incorrect or hallucinated.
+### Answer Format
+Return ONLY valid JSON in this exact format:
+{
+"scores": {
+"task_intent": 1-5,
+"key_patterns": 1-5,
+"data_grounding": 1-5,
+"logical_coherence": 1-5,
+"robustness": 1-5,
+"bias_check": 1-5
+},
+"overall_comment": "1-3 sentences, cite concrete evidence for your judgement"
+}
+
+24
+
+

@@ -1,0 +1,2821 @@
+Tree-of-Evidence: Efficient "System 2" Search for Faithful Multimodal
+Grounding
+Micky C. Nnamdi♠ , Benoit L. Marteau♠ , Yishan Zhong♠ , J. Ben Tamo♠ ,
+and May D. Wang♠
+♠
+
+Georgia Institute of Technology
+
+arXiv:2604.07692v2 [cs.LG] 29 Apr 2026
+
+Abstract
+Large Multimodal Models (LMMs) achieve
+state-of-the-art performance in high-stakes domains like healthcare, yet their reasoning remains opaque. Current interpretability methods, such as attention mechanisms or post-hoc
+saliency, often fail to faithfully represent the
+model’s decision-making process, particularly
+when integrating heterogeneous modalities like
+time-series and text. We introduce Tree-ofEvidence (ToE), an inference-time search algorithm that frames interpretability as a discrete optimization problem. Rather than relying on soft attention weights, ToE employs
+lightweight Evidence Bottlenecks that score
+coarse groups or units of data (e.g., vital-sign
+windows, report chunks) and performs a beam
+search to identify the compact evidence set required to reproduce the model’s prediction. We
+evaluate ToE across six tasks spanning three
+datasets and two domains: four clinical prediction tasks on MIMIC-IV, cross-center validation on eICU, and non-clinical fault detection
+on LEMMA-RCA. ToE produces auditable evidence traces while maintaining predictive performance, retaining over 98% of full-model
+AUROC with as few as five evidence units
+across all settings. Under sparse evidence budgets, ToE achieves higher decision agreement
+and lower probability fidelity error than other
+approaches. Qualitative analyses show that
+ToE adapts its search strategy: it often resolves
+straightforward cases using only vitals, while
+selectively incorporating text when physiological signals are ambiguous. ToE therefore provides a practical mechanism for auditing multimodal models by revealing which discrete
+evidence units support each prediction.
+
+1
+
+Introduction
+
+Multimodal predictors, such as Large Multimodal
+Models (LMMs), have achieved remarkable performance by fusing heterogeneous data streams, including text, time series, and imaging, into unified
+
+representations (Chen et al., 2024; Huang et al.,
+2024; Tu et al., 2024). However, as these models grow in complexity, their decision-making processes become increasingly opaque (Rudin, 2019;
+Wornow et al., 2023). In high-stakes domains like
+healthcare, "black box" accuracy is insufficient;
+deployment requires auditable reasoning where a
+model’s prediction explicitly traces back to specific,
+verifiable pieces of evidence (Rudin, 2019).
+Current interpretability methods often fail to
+meet this standard. Attention-based heatmaps
+are frequently unfaithful to the actual logic of
+the model (Wiegreffe and Pinter, 2019; Jain and
+Wallace, 2019), while post-hoc explanation methods provide approximations rather than guarantees (Rudin, 2019). Concept Bottleneck Models (CBMs) offer a step forward by aligning hidden states with human-interpretable concepts (Koh
+et al., 2020; Vandenhirtz et al., 2024). Yet, CBMs
+typically require predefined concept annotations
+and remain static during inference, failing to adaptively search for evidence when data is ambiguous
+or synergistic. Rationale extraction methods aim
+to solve this by selecting a subset of input features that are sufficient for the prediction (Lei et al.,
+2016; DeYoung et al., 2020). Yet, existing rationale
+methods are typically limited to single modalities,
+mainly text, and rely on greedy selection strategies
+that fail to capture the synergistic dependencies between different data types (Xu et al., 2024). For
+instance, a radiology note of pulmonary edema can
+reframe a drop in SpO2 as volume overload — a
+cross-modal link that unimodal methods miss.
+To bridge this gap, we introduce Tree-ofEvidence (ToE), an inference-time search algorithm for multimodal grounding. Inspired by
+deliberative branching procedures like Tree-ofThoughts (Yao et al., 2023), ToE treats interpretability as a discrete search problem over meaningful
+evidence units. We use "System 2" to denote this
+multi-step, deliberative search process, in which
+
+Phase I: Time-Series (TS) and Notes classifiers training
+Time Series
+Notes
+
+Projection
+
+BERT Encoder
+
+Projection
+
+Contextual Data: ECG and CXR
+
+Contextual Data Concatenation
+
+Classifier
+
+𝑃𝑚𝑜𝑟𝑡𝑎𝑙𝑖𝑡𝑦
+
+Contextual Data Concatenation
+
+Classifier
+
+𝑃𝑚𝑜𝑟𝑡𝑎𝑙𝑖𝑡𝑦
+
+BCE Loss
+
+BioClinicalBERT Fine-Tuning
+
+Phase II: Selector Training
+𝑾𝟏
+
+Notes Evidence
+Units (Chunks)
+𝑵𝟏 𝑵𝟐 𝑵𝟑 𝑵𝟒 …
+
+𝑾𝟐
+
+Frozen
+
+Mask (k=2)
+
+𝑾𝟑
+
+𝑾𝟒 …
+
+Time-Series Evidence
+Units (Time Windows)
+
+TS-Selector
+(MLP)
+
+𝟎. 𝟖 0.3 𝟎. 𝟗 0.1 …
+
+STE
+Top-k
+
+𝟏
+
+…
+
+𝟏
+
+Update Weights
+
+Frozen
+
+𝒆𝟏 𝒆𝟐 𝒆𝟑 𝒆𝟒 …
+
+Notes-Selector
+(MLP)
+
+0.2 𝟎. 𝟖 𝟎. 𝟗 0.1 …
+
+Scoring Function
+
+𝒆𝟏 𝒆𝟐 𝒆𝟑 𝒆𝟒 …
+
+Notes-Selector
+(MLP)
+
+STE
+Top-k
+
+𝟏
+
+𝟏
+
+…
+
+𝟏 𝟏
+
+…
+
+∅
+
+Step 0
+(∅)
+Step 1
+(𝒌 = 𝟏)
+
+𝒔𝒄𝒐𝒓𝒆 𝒎 = 𝑪 𝒎 + 𝝀. 𝐒 𝐦 − 𝝁𝚱(𝒎)
+STE
+Top-k
+
+Projection
++ Classifier
+
+𝑃𝑚𝑜𝑟𝑡𝑎𝑙𝑖𝑡𝑦
+BCE Loss
+
+Phase III: Tree of Evidence (Inference Search)
+
+TS-Selector
+(MLP)
+
+…
+
+𝟏
+
+𝟏
+
+Update Weights
+
+Caching the embeddings
+
+𝑾𝟏 𝑾𝟐 𝑾𝟑 𝑾𝟒 …
+
+STE
+Top-k
+
+𝑃𝑚𝑜𝑟𝑡𝑎𝑙𝑖𝑡𝑦
+BCE Loss
+
+Frozen
+
+Mask (k=2)
+
+BERT
+Encoder
+
+Projection
++ Classifier
+
+Top evidence unit kept
+
+𝑾𝟏 𝑾𝟑 𝑵𝟐 𝑵𝟑 …
+
+Step 2
+(𝒌 = 𝟐)
+
+Step 3
+(𝒌 = 𝟑)
+
+𝑊5
+𝑠 = 0.89
+
+𝑊3
+𝑠 = 0.82
+
+Beam width of 3
+
+𝑁2
+𝑠 = 0.78
+
+𝑊8
+𝑠 = 0.71
+
+𝑁3
+𝑠 = 0.65
+
+{𝑊5, 𝑊3} {𝑊3 , 𝑁2 } {𝑊3 , 𝑊5 } {𝑊3, 𝑁2} {𝑁2, 𝑊5} {𝑁2 , 𝑊3 }
+𝑠 = 0.91
+
+𝑠 = 0.88
+
+{𝑊5 , 𝑊3 , 𝑁2 }
+𝑠 = 0.94
+
+𝑠 = 0.91
+
+𝑠 = 0.85
+
+{𝑊3 , 𝑁2 , 𝑊5 }
+𝑠 = 0.94
+
+𝑠 = 0.88
+
+𝑠 = 0.85
+
+{𝑁2, 𝑊5, 𝑁3 }
+𝑠 = 0.88
+
+Figure 1: Overview of the Tree-of-Evidence (ToE) Framework. Phase I: Modality-specific classifiers are trained
+independently, with BioClinicalBERT (Alsentzer et al., 2019) encoding notes and contextual data (CXR/ECG)
+concatenated as fixed priors. Phase II: Lightweight MLP selectors learn to score evidence units using StraightThrough Estimator (STE) top-k masking with frozen encoders. Phase III: At inference, beam search iteratively
+constructs compact evidence set by optimizing the scoring function, balancing decision agreement, probability
+stability, and sparsity.
+
+the algorithm explicitly evaluates and scores candidate evidence combinations via beam search, in
+contrast to "System 1" single-pass heuristics such
+as greedy top-k ranking by individual unit scores.
+Crucially, we structure the multimodal space into
+two distinct roles: (1) Global Context (e.g., baseline pathology from Chest X-Ray (CXR)/ Electrocardiogram (ECG)), which serves as a fixed prior,
+and (2) Searchable Evidence (e.g., dynamic Vitals
+and Notes), which is actively selected. Instead
+of relying on soft attention weights, we first train
+lightweight Evidence Bottlenecks (EB) that score
+coarse units of data–hourly windows of Intensive
+Care Unit (ICU) time-series and radiology report
+chunks. At inference time, ToE performs a beam
+search to construct a compact evidence set that preserves the full-input decision, explicitly trading off
+(i) agreement with the original prediction, (ii) stability of the predicted probability, and (iii) evidence
+sparsity. This separation allows the search to focus
+on "what changed" (dynamic evidence) while remaining grounded in "who the patient is" (global
+context). The result is an auditable trace of how
+evidence is accumulated to justify a decision.
+We evaluate ToE across six tasks spanning three
+datasets and two domains: four clinical prediction
+tasks on MIMIC-IV (Johnson et al., 2024, 2023;
+
+Goldberger et al., 2000; Gow et al., 2023), crosscenter validation on eICU (208 hospitals) (Pollard
+et al., 2018), and non-clinical fault detection on
+LEMMA-RCA (Zheng et al., 2024). Our experiments demonstrate that ToE yields discrete rationales that (i) remain sufficient for the model’s decision under strict evidence budgets, (ii) exhibit
+strong decision agreement with the full-input prediction, and (iii) provide an auditable trace of the
+search process that can be inspected by domain
+experts. Our contribution can be summarized as:
+1. Model-faithful multimodal grounding via
+inference-time search. We formulate grounding as selecting a compact multimodal evidence set that reproduces the full-input
+model’s decision and confidence, and we propose Tree-of-Evidence (ToE) to solve this
+with an auditable search trace.
+2. Bottleneck-guided discrete evidence units.
+We develop lightweight Evidence Bottlenecks that score clinically meaningful, coarsegrained units (hourly windows; report chunks)
+and provide efficient heuristics for search,
+while incorporating CXR/ECG signals as
+context-only features rather than searchable
+evidence.
+
+Table 1: Comparison of Interpretability Frameworks.
+ToE is distinct in offering an auditable trace (search
+history) over multimodal hard evidence.
+Method
+
+Type
+
+Hard Evidence?
+
+Multimodal?
+
+Faithfulness?
+
+Auditable Trace?
+
+Attention Weights
+Gradient Saliency
+LIME / SHAP
+Concept Bottleneck
+
+Intrinsic (Soft)
+Post-hoc
+Post-hoc Surrogate
+Intrinsic (Concepts)
+
+✗
+✗
+✗
+✓
+
+~
+~
+~
+~
+
+✗
+✗
+~
+~
+
+✗
+✗
+✗
+~
+
+Tree-of-Evidence (Ours)
+
+Inference Search
+
+✓
+
+✓
+
+✓
+
+✓
+
+3. Comprehensive faithfulness evaluation under evidence budgets. We evaluate explanations using sufficiency, comprehensiveness,
+and probability-agreement metrics under strict
+evidence constraints across three datasets, six
+tasks, and two domains. We compare against
+Local Interpretable Model-Agnostic Explanations (LIME), SHapley Additive exPlanations
+(SHAP), Concept Bottleneck Models, gradient saliency, and LLMs up to 70B parameters,
+and provide ablations showing ToE better preserves full-input behavior at a given sparsity
+than all baselines.
+
+2
+
+Related Work
+
+Faithful Rationale Extraction.
+Rationale extraction seeks a subset of input features that justifies a prediction (Lei et al., 2016). A
+central evaluation goal is faithfulness: the selected
+rationale should be causally tied to the model’s behavior rather than merely plausible to humans (Jacovi and Goldberg, 2020). Common operationalizations include Sufficiency (does the model make
+the same prediction when restricted to the rationale?) and Comprehensiveness (does removing the
+rationale change the prediction?) (DeYoung et al.,
+2020). Post-hoc attribution methods such as LIME
+and SHAP approximate feature importance via local surrogates or Shapley values, but provide no
+hard selection mechanism and can yield unstable
+explanations. Information Bottleneck-style methods encourage concise rationales by penalizing information passed from the input (Paranjape et al.,
+2020), but are most often studied in unimodal settings. Concept Bottleneck Models (CBMs) (Koh
+et al., 2020; Vandenhirtz et al., 2024) align hidden
+states with human-interpretable concepts, yet require predefined annotations and remain static at
+inference time. Recent work further emphasizes
+that faithfulness metrics can be sensitive to evaluation design (Chan et al., 2022; Edin et al., 2025).
+Table 1 summarizes these distinctions: ToE is the
+only framework that combines hard evidence selec-
+
+tion, multimodal support, faithfulness guarantees,
+and an auditable search trace.
+Search-Based Reasoning and Interpretability. Systematic search procedures such as Tree-ofThoughts (Yao et al., 2023) apply branching strategies to improve reasoning, typically in the tokengeneration space. More closely related are methods
+that apply search in the evidence selection space.
+In computer vision tasks, Shitole et al. (2021) use
+beam search to identify diverse attention maps that
+are individually sufficient for classification (Shitole
+et al., 2021). Zhou and Shah show that standard
+faithfulness objectives (e.g., sufficiency/comprehensiveness) can be directly optimized and propose
+search-based explainers (Zhou and Shah, 2023),
+raising the question of what should distinguish new
+methods beyond metric optimization. ToE is motivated by these insights but differs in goal and
+setting: we search for a compact, decision- and
+probability-preserving subset of multimodal clinical evidence units, guided by learned Evidence
+Bottlenecks that efficiently propose and score candidate units. This contrasts with model-agnostic
+approaches such as Anchors (Ribeiro et al., 2018)
+and counterfactual explanations (Wachter et al.,
+2017), which typically require extensive perturbation/sampling or additional optimization at query
+time rather than using jointly trained unit-level selectors.
+Multimodal Learning and Explainability in
+Healthcare. Integrating heterogeneous clinical data remains a core challenge in medical
+AI (Acosta et al., 2022). Many multimodal architectures combine text encoders (e.g., BERT-style
+models) with structured time-series encoders (e.g.,
+LSTMs or Transformers) via late fusion, gating,
+or cross-attention (Huang et al., 2020; Seki et al.,
+2021; Golas et al., 2018). While these designs can
+improve predictive performance, explanations are
+often provided via modality-specific post-hoc attributions (e.g., token saliency or feature importance)
+and rarely yield a single cross-modal evidence set
+that can be audited end-to-end. In contrast, our
+approach introduces a discrete evidence-selection
+layer over multimodal representations: ToE constructs an auditable evidence trace over time-series
+windows and radiology report chunks, enabling
+teacher-faithfulness checks via sufficiency, comprehensiveness, and probability-agreement metrics without constraining the underlying predictive
+backbone.
+
+3
+
+Method
+
+We formulate interpretable clinical prediction as a
+search problem. Our framework, ToE, separates
+the reasoning process into two stages: (1) learn efficient, differentiable heuristics for evidence scoring
+via EB, and (2) perform an inference-time discrete
+search to identify a compact, high-scoring evidence
+set required for a robust diagnosis. We represent
+an overview of our approach in Figure 1.
+3.1
+
+Problem Setup and Evidence Units
+
+We define a binary classification task y ∈ {0, 1}
+over an observation window [t0 , t0 + ∆] (default
+∆=24h). The input space X consists of two searchable modalities and two context modalities. While
+we present the formulation using ICU data as a
+running example, the framework applies to any setting where inputs can be decomposed into discrete
+units across one or more modalities; we evaluate
+on non-ICU settings in Section 4.
+Structured ICU Time Series (searchable evidence). We represent ICU measurements (vital
+signs and lab values) as a fixed-length sequence
+xts = (xts1 , . . . , xtsT ) with T = 24 hourly bins and
+xtst ∈ RD . Each bin contains summary statistics
+(e.g., mean, min, max) over vitals and labs in that
+hour, along with missingness indicators. Evidence
+Units are the discrete time windows {Wt }Tt=1 corresponding to these bins.
+Radiology Reports (searchable evidence). Let
+xnote be the concatenation of all radiology report
+text within the window [t0 , t0 + ∆]. We segment
+this text into a sequence of chunks (c1 , . . . , cM )
+(e.g., 3-sentence segments), padded or truncated
+to a fixed length Mmax . Let a ∈ {0, 1}Mmax be
+a presence mask indicating valid (non-padding)
+chunks. Evidence Units are the discrete chunks
+max
+{Nj }M
+j=1 .
+CXR and ECG Context (Global Priors). To
+ground the search in the patient’s broader physiological state, we include fixed context vectors that
+are not subject to selection: (i) xcxr ∈ RDcxr , a
+label vector from the most recent CXR (e.g., CheXpert) with indicator has_cxr; and (ii) xecg ∈ RDecg ,
+machine measurements from the most recent ECG
+with indicator has_ecg.
+We deliberately model these signals as fixed priors rather than searchable units to mirror clinical
+reasoning. CXR and ECG typically represent the
+
+patient’s baseline physiological state (chronic/background), whereas notes and vitals represent acute
+evolution (dynamic). By conditioning the search on
+fixed context, ToE forces the model to identify dynamic evidence that explains the outcome given the
+patient’s baseline risk, preventing the search from
+wasting budget on static confirmational signals.
+Evidence Set. We formally define an explanation as a tuple of indices E = (E ts , E note ), where
+E ts ⊆ {1, . . . , T } indexes selected time windows
+and E note ⊆ {1, . . . , Mmax } indexes selected note
+chunks.
+3.2
+
+Evidence Bottleneck Predictors
+
+We employ a modular architecture with two EB
+streams, corresponding to the searchable modalities (xts and xnote ). Each stream consists of: (i) a
+Selector that scores discrete evidence units to produce a hard top-k mask; and (ii) a Predictor that
+estimates the diagnosis using only the selected subset. This separation ensures that the model cannot
+“cheat” by accessing information it has not explicitly selected.
+3.2.1 Differentiable Top-k Selector
+Let U = {u1 , . . . , un } be the set of evidence
+units (time windows or chunk embeddings). A
+lightweight MLP selector fθ assigns a scalar relevance score si = fθ (ui ) to each unit. For variablelength inputs (notes), we enforce validity by setting
+si = −∞ wherever the presence mask ai = 0,
+ensuring padding is never selected.
+To enable end-to-end training with discrete selection, we utilize the Straight-Through Estimator (STE). We compute a hard top-k mask m =
+TopK(s, k) ∈ {0, 1}n for the forward pass, but
+approximate gradients via a softmax relaxation
+m̃ = softmax(s/τSTE ) during backpropagation:
+m̂ = m − sg(m̃) + m̃,
+
+(1)
+
+where τSTE is the STE temperature (default
+τSTE = 1.0; see Appendix E), sg(·) denotes the
+stop-gradient operator. This allows the selector to
+update its ranking logic θ based on the downstream
+predictor’s performance.
+The STE introduces a forward-backward gradient mismatch by construction. Our two-phase
+training design mitigates this: in Phase I, the predictor trains with all evidence selected (k = T ),
+so the STE is never invoked; in Phase II, the predictor is frozen, and only the selector MLP (98K
+
+of 109M total parameters) is updated. Because
+the frozen predictor’s weights are fixed, the selector needs only to learn a correct ranking of units,
+which units the predictor finds most informative,
+rather than propagating calibrated classification gradients end-to-end. Gradient mismatch affects magnitude but not ordering, preserving the ranking objective. Empirically, sufficiency Area Under the
+Receiver Operating Characteristic curve (AUROC)
+varies less than 1% across a 50× temperature range
+(τSTE ∈ {0.1, 5.0}; Appendix E).
+3.2.2 Modality-Specific Encoders
+Time-Series Stream. The selector scores raw feature vectors ut = xtst . We apply the mask elementwise, x̃tst = m̂tst · xtst , effectively zeroing out nonselected hours. The sequence is encoded via a
+Bidirectional Gated Recurrent Unit (GRU) to obtain a final representation vts (concatenated hidden
+states). While we employ a GRU for computational
+efficiency, our framework is model-agnostic and
+compatible with continuous-time encoders such as
+Latent ODEs (Rubanova et al., 2019). Finally, we
+inject global context by concatenating the projected
+context vectors:
+zts = [vts ; ψ cxr (xcxr ); ψ ecg (xecg )],
+
+(2)
+
+where ψ are lightweight projection MLPs. A classifier gϕts maps zts to the logit ℓts .
+Notes Stream. We embed text chunks using a frozen BioClinicalBERT encoder, ej =
+BERT(cj )[CLS] . The selector scores these embeddings to obtain a mask m̂note . The predictor computes a masked mean pool over the selected valid
+chunks:
+P note
+aj ϕnote (ej )
+j m̂j
+note
+v
+= P note
+,
+(3)
+aj + ϵ
+j m̂j
+where ϕnote is a learnable projection MLP. Similar
+to the time-series stream, we inject global context:
+znote = [vnote ; ψ cxr (xcxr ); ψ ecg (xecg )],
+
+(4)
+
+and pass znote to a classifier g note to produce the
+logit ℓnote .
+3.2.3 Training and Inference Fusion
+We train the streams separately using classbalanced Binary Cross-Entropy. This isolation ensures that each modality learns independent grounding logic without over-relying on the other.
+
+At inference, we fuse the streams via logit summation. We define the predicted probability for
+binary evidence masks mts and mnote as:
+
+p(mts , mnote ) = σ ℓts (mts ) + ℓnote (mnote ) ,
+(5)
+where ℓ(·) denotes the logit output of a stream
+given a specific mask. We define the Full-Input
+Decision as the prediction using all available units
+(m = 1), denoted as pfull = p(1ts , 1note ) with
+predicted class ŷfull .
+3.3
+
+Faithfulness Evaluation
+
+We quantify interpretability using the Evaluating Rationales And Simple English Reasoning (ERASER) benchmark standards for faithfulness (DeYoung et al., 2020).
+Sufficiency. Measures if the selected evidence is
+adequate to reproduce the prediction. We report
+the model’s performance (AUROC, Area Under the
+Precision-Recall Curve or AUPRC) when masking
+out all non-selected units (i.e., keeping only the
+top-k evidence).
+Comprehensiveness. Measures if the model relies on the selected evidence. We calculate the drop
+in confidence for the originally predicted class ŷfull
+when the selected evidence is removed. Let msel be
+the selected evidence mask and mrem = 1 − msel
+be the complement. We compute:
+N
+i
+1 Xh
+(i)
+(i)
+(i)
+Pr(ŷfull | 1) − Pr(ŷfull | mrem ) .
+N
+i=1
+(6)
+A higher ∆comp indicates that the model’s prediction relied heavily on the removed evidence.
+
+∆comp =
+
+3.4
+
+Tree-of-Evidence (ToE): Inference-Time
+Search
+
+Standard top-k selection is brittle because it assumes evidence units are independent. However,
+clinical evidence is often synergistic (e.g., a radiology finding of alveolar edema contextualizes a
+subsequent drop in SpO2 ). To address this, we
+propose ToE, a discrete beam search algorithm that
+identifies a compact evidence set to reproduce the
+full-input decision. Following the terminology introduced in Section 1, this constitutes the “System 2” component of our framework: a multi-step
+deliberative search that explicitly evaluates candidate evidence combinations, in contrast to “System 1” single-pass greedy ranking.
+
+Search Objective
+
+We seek a state that maximizes confidence in the
+original decision while minimizing evidence cost.
+For a state m, we define the scoring function:
+
+C(m) = Pr(ŷfull | m),
+
+(7)
+
+S(m) = 1 − |pfull − p(m)|,
+
+(8)
+
+ts
+
+(9)
+
+K(m) = ∥m ∥0 + ∥m
+
+note
+
+∥0 ,
+
+3.4.3
+
+Algorithm and Efficiency
+
+The search proceeds as follows (Algorithm 1, Appendix A.4):
+1. Initialization: Start with an empty evidence
+set.
+2. Expansion: At each step, generate candidate
+states by adding exactly one unit from the
+candidate list W ∪ N .
+
+0.25
+
+Fidelity MAE
+
+0.70
+0.65
+
+0
+
+5
+
+10
+
+15
+
+Number of Evidence Units (k)
+
+20
+
+0.20
+0.15
+0.10
+
+ToE (Ours)
+LIME
+SHAP
+Top-k Ranking
+Saliency
+Random
+
+0.60
+
+0.05
+25
+
+0.00
+
+0
+
+5
+
+10
+
+15
+
+Number of Evidence Units (k)
+
+20
+
+25
+
+Figure 2: The Faithfulness-Sparsity Frontier. Performance across evidence budgets k on MIMIC-IV
+(E1: In-Hospital Mortality, 5 seeds). (a) Sufficiency:
+ToE (Red ⋆) matches the full model’s predictive power
+(AUROC ≈ 0.80) with as few as k=5 units. (b) Fidelity: ToE achieves the lowest Fidelity MAE at sparse
+budgets (k ≤ 5), reducing error by >50% compared
+to Top-k Ranking (Blue •) and Saliency (Gold ▲) at
+sparse budgets, proving it captures the model’s actual
+confidence rather than just label correlations.
+
+score(m) = C(m) + λ S(m) − µ K(m), (10)
+where C is the model’s confidence in the full-input
+predicted class (Sufficiency), S encourages probability stability (Calibration), and K penalizes evidence cost.
+We define the stability term S(m) in probability
+space (Eq. 8) rather than logit space. This choice
+reflects three considerations. First, near p = 0 or
+p = 1, where most ICU patients fall, given class
+prevalences of 7–14%, large logit deviations produce negligible probability changes; probabilityspace stability appropriately assigns low cost to
+these clinically irrelevant shifts. Second, the resulting metric is bounded in [0, 1] and directly interpretable as “mortality risk shifted by X percentage
+points.” Third, it is numerically stable, avoiding
+the divergences that logit-space distances exhibit
+near saturation. By including the stability term,
+the search does not merely maximize confidence
+(which could lead to selecting evidence that inflates
+a prediction) but explicitly aims to match the calibration of the full model. This ensures the selected
+evidence is not just “sufficient” in isolation, but
+faithful to the model’s complete decision.
+
+ToE (Ours)
+LIME
+SHAP
+Top-k Ranking
+Saliency
+Random
+
+0.30
+
+0.75
+
+0.55
+
+(b) Fidelity vs. Sparsity
+
+0.35
+
+0.80
+
+A search state is a pair of binary masks m =
+(mts , mnote ). To keep the search tractable, we restrict actions to the top-N candidates per modality
+(ranked by selector scores) to control computation.
+3.4.2
+
+(a) Sufficiency vs. Sparsity
+
+0.85
+
+Search Space and Candidates
+Sufficiency (AUROC)
+
+3.4.1
+
+3. Pruning: Evaluate candidates via frozen EB
+predictors and retain the top-B states (Beam
+Width).
+4. Termination: Stop if a state meets sufficiency thresholds (τconf , τsuff ) or max steps are
+reached.
+Note that beam search finds high-scoring evidence
+sets under the scoring heuristic (Eq. 10), not globally optimal ones. Exhaustive enumeration confirms optimality gaps below 0.001 AUROC at small
+k on MIMIC-IV (Appendix G).
+Efficiency via Caching: Since the BERT backbone is frozen, we cache the embeddings {ej } for
+all note chunks once per patient. During search,
+state evaluation requires only lightweight pooling
+and MLP passes, making ToE computationally efficient and suitable for deployment.
+
+4
+
+Experiment
+
+4.1
+
+Dataset and Implementation Details
+
+Dataset and Cohort.
+MIMIC-IV. Our primary evaluation uses the
+MIMIC-IV dataset (Johnson et al., 2024, 2023).
+The cohort consists of adult patients with at least
+24 hours of ICU observation data. The final dataset
+comprises N = 74,829 unique ICU stays, split into
+training (N = 52,597), validation (N = 11,053),
+and testing (N = 11,179). We evaluate on four
+prediction tasks: (E1) Hospital Mortality (prevalence 11.5%), (E2) Long Length of Stay (>7 days;
+14.1%), (E3) ICU Mortality (7.4%), and (E4) PostObservation Mortality (11.2%). All MIMIC-IV
+
+results report mean ± std across 5 random seeds
+unless otherwise noted.
+eICU. To test cross-center generalization, we
+evaluate on the eICU Collaborative Research
+Database (Pollard et al., 2018), spanning 208 hospitals across the United States. We apply the same
+pipeline with no architectural modifications.
+LEMMA-RCA. To test domain transfer beyond
+healthcare, we evaluate on LEMMA-RCA (Zheng
+et al., 2024), a microservice fault detection benchmark (prevalence 22%). Time-series evidence units
+correspond to service-level metrics and text units
+to log message chunks. The ToE pipeline is applied
+without modification.
+Reproducibility and Hyperparameters. For the
+ToE beam search, we set beam width B = 8, maximum search depth Smax = 10, and restrict candidates to the top Nts = 24 time-series windows
+and Nnote = 20 note chunks per instance. The
+search objective weights are λ = 1.0 (stability)
+and µ = 0.05 (sparsity cost), with stopping thresholds τconf = 0.9 and τsuff = 0.9. All experiments
+use a batch size of 32 on a single NVIDIA A100
+GPU.
+4.2
+
+Baseline Comparisons
+
+We compare ToE against six baselines: Top-K
+Ranking, which selects the k units with the highest individual selector scores; Saliency (Gradient),
+which ranks units by Input × Gradient magnitude;
+LIME (Ribeiro et al., 2016) and SHAP (Lundberg
+and Lee, 2017), which select the top-k units by
+local surrogate coefficients and Shapley-value attributions, respectively; a Hard Concept Bottleneck
+Model (CBM) (Koh et al., 2020) with 24 binary
+clinical concepts grounded in established scoring
+systems; and Random selection as a lower bound.
+Faithfulness–Sparsity Frontier. Figure 2 and
+Table 2 compare all methods across evidence budgets. ToE matches the full model’s predictive
+power (AUROC ≈ 0.800) with as few as k=5 units
+(Fig. 2a) while maintaining the lowest fidelity error and ECE at every sparsity level (Fig. 2b). At
+k=1, ToE reduces fidelity Mean Absolute Error
+(MAE) by 39% relative to Top-k Ranking (0.158
+to 0.096) and by 58% relative to LIME, and outperforms LIME by 22 AUROC points. SHAP is the
+strongest attribution baseline, matching ToE’s AUROC and MAE at k ≥ 5, but exhibits 22% higher
+fidelity MAE at k = 1 (0.123 vs. 0.096) and higher
+
+Table 2: Comparison with LIME and SHAP (E1: Hospital Mortality, 5 seeds). ToE achieves the best fidelity–
+sufficiency tradeoff at every budget k. Full results across
+all k in Appendix B, Figure A3.
+k
+
+Method
+
+AUROC
+
+Fidelity MAE (↓)
+
+ECE (↓)
+
+1
+
+LIME
+SHAP
+ToE
+
+0.564 ± 0.006
+0.764 ± 0.009
+0.783 ± 0.013
+
+0.229 ± 0.022
+0.123 ± 0.006
+0.096 ± 0.005
+
+0.406 ± 0.011
+0.320 ± 0.010
+0.297 ± 0.019
+
+5
+
+LIME
+SHAP
+ToE
+
+0.695 ± 0.010
+0.801 ± 0.014
+0.800 ± 0.017
+
+0.171 ± 0.016
+0.039 ± 0.002
+0.040 ± 0.003
+
+0.332 ± 0.018
+0.302 ± 0.025
+0.280 ± 0.023
+
+10
+
+LIME
+SHAP
+ToE
+
+0.743 ± 0.011
+0.802 ± 0.017
+0.803 ± 0.017
+
+0.126 ± 0.011
+0.024 ± 0.002
+0.035 ± 0.002
+
+0.308 ± 0.020
+0.299 ± 0.029
+0.283 ± 0.025
+
+ECE at every budget, indicating weaker calibration
+alignment. ToE, by explicitly optimizing for probability stability (Eq. 8), captures the model’s actual
+confidence rather than just label correlations. The
+gap between methods narrows at higher budgets
+as the evidence space saturates. Multi-seed ECE
+results across all four MIMIC-IV tasks confirm that
+ToE achieves comparable or lower calibration error
+than the full model (Appendix B; Figure A3).
+Comparison with Concept Bottleneck Models.
+The Hard CBM with 24 clinical concepts achieves
+AUROC 0.775 (AUPRC 0.349). ToE exceeds CBM
+on AUROC with a single evidence unit (k = 1 :
+0.783) and widens the gap at k = 5 (0.800), while
+requiring no predefined concept annotations —
+though CBM retains an AUPRC edge from its curated concepts. This highlights a key advantage:
+CBMs require domain experts to define a fixed
+concept vocabulary before training, whereas ToE
+discovers relevant evidence units from learned representations at inference time.
+Comparison with LLMs. We compare against
+10 open-source (M)LLMs (1B–70B parameters),
+including medical fine-tunes and vision-language
+models, evaluated on E1 via zero-shot prompting
+with the full test set. Table 3 reports a representative subset; full results are in Appendix C; Figure A4. Even the strongest model, Med42-v2-70B
+(AUROC of 0.745), underperforms ToE at k = 5
+(AUROC of 0.800) despite having 640× more parameters. Vision-language models (Gemma-2-12B
+(V), MedGemma-27B (V) (Team et al., 2024))
+underperform their text-only counterparts on this
+task, suggesting that current Multimodal Large Language Models (MLLMs) struggle to extract discriminative signals from raw clinical images for
+structured prediction.
+
+Table 3: LLM/MLLM comparison (E1: Hospital Mortality). ToE with 109M parameters outperforms all models
+up to 70B. Full 10-model results in Appendix C; Figure A4.
+Model
+
+Type
+
+Params
+
+AUROC
+
+AUPRC
+
+Llama-3.2-1B
+Llama-3.1-8B
+Med42-v2-70B
+MedGemma-27B (V)
+
+text
+text
+text
+vision
+
+1.2B
+8.0B
+70B
+27B
+
+0.532 ± 0.009
+0.691 ± 0.008
+0.745 ± 0.009
+0.630 ± 0.009
+
+0.135 ± 0.005
+0.206 ± 0.008
+0.293 ± 0.014
+0.190 ± 0.008
+
+ToE k=5
+
+multi
+
+109M
+
+0.800 ± 0.017
+
+0.310 ± 0.067
+
+Table 4: Cross-task and cross-dataset evaluation. ToE
+retains ≥98% of full-model AUROC at k=5 across all
+settings. MIMIC-IV results: mean ± std over 5 seeds;
+eICU and LEMMA-RCA results are from a single seed.
+Task
+
+Full AUROC
+
+ToE k=5
+
+Fid. MAE
+
+MIMIC-IV
+MIMIC-IV
+MIMIC-IV
+MIMIC-IV
+
+Hosp. mort.
+Long LOS
+ICU mort.
+Post-obs.
+
+0.806 ± 0.015
+0.747 ± 0.041
+0.816 ± 0.009
+0.794 ± 0.021
+
+0.800 ± .017
+0.740 ± .046
+0.808 ± .011
+0.784 ± .023
+
+0.040 ± 0.003
+0.031 ± 0.002
+0.042 ± 0.004
+0.041 ± 0.001
+
+eICU
+LEMMA
+
+ICU mort.
+Fault det.
+
+0.822
+0.741
+
+0.808
+0.730
+
+0.124
+0.106
+
+Dataset
+E1
+E2
+E3
+E4
+
+4.3
+
+Cross-Task and Cross-Dataset
+Generalization
+
+A primary concern is whether ToE generalizes beyond a single task and dataset. Table 4 reports
+results across all six evaluation settings.
+Three observations merit emphasis. First, ToE
+retains 98.5–99.3% of full-model AUROC at k = 5
+across all four MIMIC-IV tasks, with fidelity MAE
+consistently in the narrow range 0.031–0.042, despite substantial differences in clinical semantics
+and class balance (7.4–14.1%). Second, eICU replicates the core finding on an independent multicenter dataset spanning 208 hospitals with different
+EHR systems and documentation practices. Third,
+LEMMA-RCA demonstrates that the same pipeline
+generalizes beyond healthcare entirely, with no architectural modifications.
+Table 5: Modality Ablation Results (k = 5). NotesOnly fails to ground predictions, while the Multimodal
+(Both) approach maintains high predictive power and
+stability comparable to the strong TS-Only baseline.
+Modality
+
+AUROC
+
+AUPRC
+
+Fidelity MAE
+
+TS Only
+Notes Only
+Both
+
+0.7876 ± 0.0075
+0.5590 ± 0.0077
+0.8001 ± 0.0165
+
+0.3912 ± 0.0151
+0.1338 ± 0.0047
+0.3096 ± 0.0672
+
+0.0445 ± 0.0730
+0.3432 ± 0.2915
+0.0403 ± 0.0027
+
+4.4
+
+Ablation Studies
+
+To validate the components of the ToE framework,
+we analyzed the contribution of different modalities
+and the scoring objective.
+
+Modality Necessity. Table 5 examines modality
+contributions at k=5. The Notes-Only baseline
+fails (AUROC ≈ 0.56, MAE > 0.3), confirming
+that radiology text alone is insufficient for grounding without physiological context. The multimodal
+approach matches the predictive power of the timeseries backbone (AUROC ≈ 0.80) while maintaining low fidelity error (MAE ≈ 0.04), validating
+ToE’s design of using robust vitals to anchor the
+search while selectively retrieving text for semantic
+explanation.
+Search & Objective Analysis. Table 6 validates
+the deliberative search design: removing the stability objective (λ = 0) more than doubles the
+fidelity error, confirming that faithful explanations
+require matching the model’s calibration, not just
+maximizing confidence.
+Table 6: Search Objective Ablation (k = 5, MIMICIV Mortality, 5 seeds). The full ToE objective achieves
+the lowest Fidelity MAE. Removing stability (λ=0)
+doubles the error. At fixed k, the sparsity cost µ has no
+effect (identical to Full). Top-k Ranking without beam
+search doubles the MAE (+100%).
+Configuration
+Full (λ=1.0, µ=0.05)
+No Stability (λ=0.0, µ=0.05)
+No Sparsity (λ=1.0, µ=0.0)
+Top-k Ranking (no search)
+
+AUROC
+
+AUPRC
+
+Fidelity MAE
+
+Comp.
+
+0.8001 ± 0.0165
+0.7738 ± 0.0338
+0.7915 ± 0.0385
+0.7735 ± 0.0339
+
+0.3096 ± 0.0672
+0.3069 ± 0.0622
+0.3191 ± 0.0682
+0.3066 ± 0.0625
+
+0.0403 ± 0.0027
+0.0800 ± 0.0052
+0.0408 ± 0.0015
+0.0806 ± 0.0054
+
+0.1112 ± 0.0143
+0.1371 ± 0.0153
+0.1025 ± 0.0115
+0.1357 ± 0.0158
+
+Search vs. Ranking. To isolate the contribution
+of combinatorial search from the scoring function,
+we compare beam search against Top-k Ranking using identical selector scores (Appendix D). The advantage is most pronounced under strict sparsity: at
+k=1, beam search achieves AUROC 0.783 ± 0.013
+versus 0.768 ± 0.036 for ranking, with fidelity
+MAE reduced by 11% (0.096 vs. 0.107). At k=5,
+the gap widens to +0.027 AUROC and 50% lower
+MAE (0.040 vs. 0.081). The gap narrows at higher
+budgets as the evidence space saturates, confirming
+that combinatorial search matters most at sparse
+budgets where the model must identify the most
+decisive evidence units.
+4.5
+
+Auditing Model Reliability via Search
+Behavior
+
+ToE is faithful to the model’s logic, not to clinical
+ground truth; if the base predictor relies on spurious
+correlations or biases, ToE will faithfully surface
+them. We argue this is a feature rather than a limitation: ToE’s search behavior provides a built-in
+diagnostic for prediction reliability.
+
+Table 7: Search exhaustion rates for true positive (TP)
+vs. false positive (FP) predictions. When the model
+is wrong, the search exhausts its budget 4–26× more
+often.
+Metric
+
+eICU
+
+MIMIC-IV
+
+TP search exhaustion rate
+FP search exhaustion rate
+FP / TP exhaustion ratio
+
+0.3%
+7.3%
+25.6×
+
+7.2%
+30.2%
+4.2×
+
+Among positive predictions, we observe a systematic divergence between true positives and false
+positives (Table 7). When the model is correct,
+ToE finds supporting evidence almost immediately.
+When the model is wrong, the search struggles
+and exhausts its budget 4-26× more often. This
+asymmetry enables selective abstention: flagging
+predictions where the search exhausted its budget
+catches 7.3% of false positives on eICU while losing only 0.3% of true positives, improving precision with negligible sensitivity loss. A spurious
+feature injection experiment further validates this
+signal: a model retrained with a deliberately spurious feature (80/20 correlated in training, 0% in
+test) requires 4.5× more evidence to converge and
+halves its convergence rate (Appendix H).
+4.6
+
+Efficiency Analysis
+
+A common concern with search-based methods is
+latency. Our timing analysis reveals that ToE adds
+only ∼13ms of overhead per patient compared to
+the full forward pass. This efficiency, achieved via
+caching BERT embeddings and lightweight GRU
+updates, makes ToE suitable for real-time clinical
+deployment.
+4.7
+
+Qualitative Analysis
+
+To understand how ToE navigates the multimodal
+landscape, we visualize search traces for two representative patients in Table 8.
+Case A: Efficient Triage (Vitals-Only). For Patient A, the model identifies a clear physiological deterioration solely from time-series data. The
+search selects a single vital-sign window (W5) showing acute instability. This evidence alone yields a
+sufficiency score of 0.998, triggering the stopping
+criterion immediately (k = 1). By recognizing that
+the vitals are unambiguous, ToE avoids processing
+the clinical notes entirely, reducing computational
+cost.
+
+Case B: Multimodal Resolution. In contrast,
+Patient B presents a more complex picture. The
+search initially retrieves multiple time-series windows (W23, W1, ..., W11), but the sufficiency score
+plateaus around 0.84, indicating the physiological
+signals alone do not fully explain the model’s highrisk prediction. At this plateau, ToE expands to
+the clinical notes, retrieving a specific radiology
+report segment (N2) that documents "...bilateral
+perihilar opacities reflect alveolar edema... suggest volume overload." While sufficiency remains
+stable (0.833), this textual evidence provides the
+causal context (Volume Overload) that grounds the
+physiological signals in a clinically interpretable
+explanation — demonstrating ToE’s ability to surface relevant cross-modal evidence even when the
+vitals alone carry the predictive signal.
+Comparison with Zero-Shot LLM Evidence Selection. To contextualize ToE evidence selection
+against a strong "clinician-like" baseline, we compare ToE to a zero-shot LLM that selects hourly
+evidence windows from the same 24-hour observation period. We summarize results on ICU stays
+where both methods produce an explicit set of windows.1 Across these cases, ToE achieves higher
+predictive accuracy than the LLM (0.655 ± 0.064
+vs. 0.619 ± 0.070), while also selecting similarly
+small evidence sets on average (5.0 ± 0.0 vs. 4.9 ±
+1.1 windows). To quantify agreement between the
+two evidence traces, we compute Jaccard similarity
+between the selected window sets. Agreement remains modest overall, with a mean Jaccard similarity of 0.125 ± 0.106 for time-series evidence, 0.310
+± 0.462 for clinical notes, and 0.112 ± 0.090 when
+combining all modalities. Table 9 highlights five
+patients, and shows a consistent sparsity–context
+tradeoff: ToE selects fewer evidence windows on
+average while maintaining non-trivial overlap with
+the LLM’s selections (mean Jaccard 0.365). Importantly, when the model is wrong, ToE’s trace
+remains valuable because it reveals which evidence
+the model actually relied on, enabling targeted auditing.
+A critical divergence occurred with Patient 5
+(Died), where the LLM correctly predicted "High
+Risk" by identifying persistent neurological failure (Glasgow Coma Scale (GCS) 8-10). In con1
+We use "evidence size" to denote the number of selected
+hourly windows. For ToE, this corresponds to the final evidence set returned by the beam search. For the LLM, this
+corresponds to the set of windows it explicitly marked as
+supporting evidence.
+
+Table 8: Qualitative comparison of ToE traces. (Left) ToE efficiently solves clear-cut cases using only vitals. (Right)
+ToE dynamically integrates clinical notes to surface interpretable clinical context, extracting specific medical
+concepts (e.g., “Alveolar Edema”) to ground the prediction.
+Case A: Efficient Triage (Patient A)
+
+Case B: Multimodal Synergy (Patient B)
+
+Task: Mortality Prediction
+Full Model Prob: 0.0005 (Low Risk)
+Final Trace: k = 1 (Vitals Only)
+
+Task: Mortality Prediction
+Full Model Prob: 0.861 (High Risk)
+Final Trace: k = 10 (8 Vitals + 2 Notes)
+
+Search Step 1: Add Vitals W5
+,→ Evidence: [Physiological Window 5]
+,→ Sufficiency: 0.998 (Threshold Met)
+
+Search Steps 1–8: Add Vitals W23, W1, . . . , W11
+,→ Evidence: [Multiple Physiological Windows]
+,→ Sufficiency: 0.840 (Plateau)
+
+Outcome: The search terminates immediately. The model
+determines that the vital signs alone are sufficient to justify
+the “Low Risk” prediction. No notes are processed.
+
+Search Step 9: Add Note N2
+,→ Evidence: “. . . Coalescent, bilateral, perihilar opacities
+reflect alveolar edema. . . suggest volume overload.”
+,→ Sufficiency: 0.833 (Stable)
+Search Step 10: Add Note N3
+,→ Evidence: [Additional Radiology Report]
+,→ Sufficiency: 0.833 (No Change)
+Outcome: Vitals carry the primary predictive signal but
+plateau below the sufficiency threshold. The search retrieves
+the “Volume Overload” finding to provide clinically interpretable grounding for the high mortality risk. The slight
+sufficiency dip (0.840 → 0.833) falls within noise; since
+τsuf f = 0.9 is unmet, the search continues and surfaces
+cross-modal evidence.
+
+Table 9: ToE vs Zero-Shot LLM. Comparison on a representative subset of 5 patients. While the LLM achieves
+perfect prediction accuracy by leveraging external medical knowledge, ToE remains faithful to the underlying
+model’s logic. ToE selects significantly sparser evidence (Avg 6.2 vs. 9.0 windows) while maintaining reasonable
+overlap with the LLM’s clinical reasoning.
+Patient ID
+
+Outcome
+
+ToE
+1
+2
+3
+4
+5
+
+Survived
+Survived
+Died
+Survived
+Died
+
+✓
+✓
+✓
+✓
+✗
+
+-
+
+80% Acc
+
+Average
+
+Prediction
+
+Evidence Size (k)
+
+Jaccard
+
+LLM
+
+ToE
+
+LLM
+
+Overlap
+
+✓
+✓
+✓
+✓
+✓
+
+1
+6
+8
+8
+8
+
+5
+9
+11
+9
+11
+
+20.0%
+50.0%
+46.2%
+30.8%
+35.7%
+
+ToE solved via single vital; LLM was cautious.
+Strong agreement on deterioration intervals.
+Both flagged critical physiological decline.
+LLM prioritized stable periods differently.
+Audit Win: ToE exposed model blindness to GCS.
+
+100% Acc
+
+6.2
+
+9.0
+
+36.5%
+
+ToE is ∼ 30% more sparse than LLM.
+
+trast, ToE faithfully revealed that the underlying
+EB model predicted "Low Risk" because it prioritized stable respiratory signals (SpO2 ∼100%) and
+ignored the GCS trajectory. This failure case highlights the danger of using LLMs as explanations:
+the LLM "hallucinated" a correct reasoning path
+that the model did not actually use. ToE, by contrast, successfully exposed the model’s blind spot
+regarding neurological status.
+
+5
+
+Conclusion
+
+We introduced ToE, an inference-time search
+framework for generating faithful multimodal rationales. By formulating interpretability as a discrete optimization problem over evidence units
+
+Key Insight
+
+and combining Evidence Bottlenecks with beam
+search, ToE produces auditable traces that identify
+which evidence units support a model’s prediction.
+Across six tasks spanning three datasets (MIMICIV, eICU, LEMMA-RCA) and two domains, ToE
+retains at least 98% of full-model AUROC with
+as few as five evidence units. Under sparse evidence budgets, ToE achieves lower fidelity error
+than LIME, SHAP, Top-k Ranking, and greedy
+baselines, and outperforms CBMs without requiring predefined annotations. ToE also outperforms
+LLMs up to 70B parameters on clinical prediction tasks with a 109M-parameter model. Beyond
+explanation, ToE’s search behavior provides a practical diagnostic for prediction reliability: search ex-
+
+haustion rates are 4-26× higher for false positives
+than true positives, enabling selective abstention.
+These results indicate that search-based rationale
+extraction can more accurately recover a model’s
+decision logic than methods based on evidence
+ranking or post-hoc attribution. ToE is currently
+validated on late-fusion architectures with separable evidence streams. Extending the framework
+to cross-attention and early-fusion models, for example, through attention-head decomposition or
+adapter layers, is an important direction for future
+work.
+
+6
+
+Limitations
+
+ToE produces evidence sets that are faithful to the
+underlying model’s decision logic, not to clinical
+ground truth. If the base predictor relies on spurious correlations or biases, ToE will surface them
+rather than correct them, though, as shown in Section 4.5, this model-faithfulness itself serves as a
+diagnostic for unreliable predictions. More broadly,
+ToE is an interpretability wrapper: it cannot fix errors in the base model, and its coarse evidence
+units (hourly windows, report chunks) may omit
+finer-grained clinically relevant signals.
+The framework is currently validated on latefusion architectures with separable evidence
+streams; extending to cross-attention or earlyfusion models requires additional design. Beam
+search finds near-optimal evidence sets under the
+scoring heuristic, not globally optimal ones, though
+exhaustive enumeration confirms gaps below 0.001
+AUROC at small k on MIMIC-IV (Appendix G).
+Finally, while ToE’s ∼ 13ms overhead is practical
+for most settings, runtime may increase with longer
+note histories or larger beam widths.
+
+7
+
+Ethical Considerations
+
+Clinical Safety and Intended Use. This research
+presents a prototype for clinical decision support
+and is not intended for autonomous diagnosis or
+treatment planning. False negatives in mortality
+prediction could lead to reduced care, while false
+positives could cause alarm fatigue. ToE is designed explicitly to mitigate these risks by forcing
+the model to show its work, allowing clinicians to
+verify or reject the machine’s rationale. We emphasize that the selected evidence is a mathematical
+construct reflecting the model’s confidence, not a
+comprehensive summary of the patient’s clinical
+state.
+
+Data Privacy and Compliance. Our models
+were developed using the MIMIC-IV dataset,
+which contains de-identified electronic health
+records from Beth Israel Deaconess Medical Center. We adhered to the PhysioNet Credentialed Data
+Use Agreement, ensuring no attempt was made to
+re-identify patients. Any deployment of this technology in a live clinical setting would require strict
+adherence to local regulations (e.g., HIPAA in the
+US, GDPR in Europe) and rigorous external validation.
+Bias and Fairness. Clinical datasets are known
+to harbor demographic and socioeconomic biases. A model trained on MIMIC-IV (collected
+in Boston, MA) may underperform or rely on different feature sets for underrepresented populations.
+A key advantage of ToE is its ability to audit these
+biases; by inspecting the evidence trees, stakeholders can detect if the model relies on impermissible
+proxies (e.g., insurance status or language barriers)
+for its predictions. However, the search algorithm
+itself does not remove these biases, and deploying
+the model without fairness audits could perpetuate
+existing healthcare disparities.
+
+Acknowledgments
+This research was supported in part through research cyberinfrastructure resources and services,
+including the AI Makerspace of the College of Engineering (RRID:SCR_028058), provided by the
+Partnership for an Advanced Computing Environment (PACE) at the Georgia Institute of Technology, Atlanta, Georgia, USA (RRID:SCR_027619).
+We also gratefully acknowledge funding and fellowships that contributed to this work, including
+a Wallace H. Coulter Distinguished Faculty Fellowship, a Petit Institute Faculty Fellowship, and
+research funding from Amazon and Microsoft Research awarded to Professor May D. Wang.
+
+References
+Julián N Acosta, Guido J Falcone, Pranav Rajpurkar,
+and Eric J Topol. 2022. Multimodal biomedical ai.
+Nature medicine, 28(9):1773–1784.
+Emily Alsentzer, John Murphy, William Boag, WeiHung Weng, Di Jindi, Tristan Naumann, and
+Matthew McDermott. 2019. Publicly available clinical bert embeddings. In Proceedings of the 2nd clinical natural language processing workshop, pages
+72–78.
+
+Chun Sik Chan, Huanqi Kong, and Liang Guanqing.
+2022. A comparative study of faithfulness metrics
+for model interpretability methods. In Proceedings
+of the 60th Annual Meeting of the Association for
+Computational Linguistics (Volume 1: Long Papers),
+pages 5029–5038, Dublin, Ireland. Association for
+Computational Linguistics.
+Zheyi Chen, Liuchang Xu, Hongting Zheng, Luyao
+Chen, Amr Tolba, Liang Zhao, Keping Yu, and Hailin
+Feng. 2024. Evolution and prospects of foundation
+models: From large language models to large multimodal models. Computers, Materials & Continua,
+80(2).
+Jay DeYoung, Sarthak Jain, Nazneen Fatema Rajani,
+Eric Lehman, Caiming Xiong, Richard Socher, and
+Byron C Wallace. 2020. Eraser: A benchmark to
+evaluate rationalized nlp models. In Proceedings
+of the 58th annual meeting of the association for
+computational linguistics, pages 4443–4458.
+Joakim Edin, Andreas Geert Motzfeldt, Casper L. Christensen, Tuukka Ruotsalo, Lars Maaløe, and Maria
+Maistro. 2025. Normalized AOPC: Fixing misleading faithfulness metrics for feature attributions explainability. In Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics
+(Volume 1: Long Papers), pages 1715–1730, Vienna,
+Austria. Association for Computational Linguistics.
+
+deep learning: a systematic review and implementation guidelines. NPJ digital medicine, 3(1):136.
+Alon Jacovi and Yoav Goldberg. 2020. Towards faithfully interpretable nlp systems: How should we define and evaluate faithfulness? In Proceedings of the
+58th annual meeting of the association for computational linguistics, pages 4198–4205.
+Sarthak Jain and Byron C Wallace. 2019. Attention is
+not explanation. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers), pages 3543–3556.
+A Johnson, L Bulgarelli, T Pollard, B Gow, B Moody,
+S Horng, LA Celi, and R Mark. 2024. Mimic-iv
+(version 3.1). physionet. rrid: Scr_007345.
+Alistair EW Johnson, Lucas Bulgarelli, Lu Shen, Alvin
+Gayles, Ayad Shammout, Steven Horng, Tom J Pollard, Sicheng Hao, Benjamin Moody, Brian Gow, and
+1 others. 2023. Mimic-iv, a freely accessible electronic health record dataset. Scientific data, 10(1):1.
+Pang Wei Koh, Thao Nguyen, Yew Siang Tang, Stephen
+Mussmann, Emma Pierson, Been Kim, and Percy
+Liang. 2020. Concept bottleneck models. In International conference on machine learning, pages
+5338–5348. PMLR.
+
+Sara Bersche Golas, Takuma Shibahara, Stephen Agboola, Hiroko Otaki, Jumpei Sato, Tatsuya Nakae,
+Toru Hisamitsu, Go Kojima, Jennifer Felsted, Sujay
+Kakarmath, and 1 others. 2018. A machine learning
+model to predict the risk of 30-day readmissions in
+patients with heart failure: a retrospective analysis
+of electronic medical records data. BMC medical
+informatics and decision making, 18(1):44.
+
+Tao Lei, Regina Barzilay, and Tommi Jaakkola. 2016.
+Rationalizing neural predictions. In Proceedings of
+the 2016 Conference on Empirical Methods in Natural Language Processing, pages 107–117, Austin,
+Texas. Association for Computational Linguistics.
+
+Ary L Goldberger, Luis AN Amaral, Leon Glass, Jeffrey M Hausdorff, Plamen Ch Ivanov, Roger G Mark,
+Joseph E Mietus, George B Moody, Chung-Kang
+Peng, and H Eugene Stanley. 2000. Physiobank,
+physiotoolkit, and physionet: components of a new
+research resource for complex physiologic signals.
+circulation, 101(23):e215–e220.
+
+Bhargavi Paranjape, Mandar Joshi, John Thickstun,
+Hannaneh Hajishirzi, and Luke Zettlemoyer. 2020.
+An information bottleneck approach for controlling
+conciseness in rationale extraction. In Proceedings
+of the 2020 Conference on Empirical Methods in
+Natural Language Processing (EMNLP), pages 1938–
+1952.
+
+Brian Gow, Tom Pollard, Larry A Nathanson, Alistair
+Johnson, Benjamin Moody, Chrystinne Fernandes,
+Nathaniel Greenbaum, Jonathan W Waks, Parastou
+Eslami, Tanner Carbonati, Ashish Chaudhari, Elizabeth Herbst, Dana Moukheiber, Seth Berkowitz,
+Roger Mark, and Steven Horng. 2023. MIMIC-IVECG: Diagnostic Electrocardiogram Matched Subset.
+PhysioNet. Version 1.0.
+
+Tom J Pollard, Alistair EW Johnson, Jesse D Raffa,
+Leo A Celi, Roger G Mark, and Omar Badawi. 2018.
+The eicu collaborative research database, a freely
+available multi-center database for critical care research. Scientific data, 5(1):180178.
+
+Dawei Huang, Chuan Yan, Qing Li, and Xiaojiang Peng.
+2024. From large language models to large multimodal models: A literature review. Applied Sciences,
+14(12):5068.
+Shih-Cheng Huang, Anuj Pareek, Saeed Seyyedi, Imon
+Banerjee, and Matthew P Lungren. 2020. Fusion of
+medical imaging and electronic health records using
+
+Scott M Lundberg and Su-In Lee. 2017. A unified approach to interpreting model predictions. Advances
+in neural information processing systems, 30.
+
+Marco Tulio Ribeiro, Sameer Singh, and Carlos
+Guestrin. 2016. " why should i trust you?" explaining
+the predictions of any classifier. In Proceedings of
+the 22nd ACM SIGKDD international conference on
+knowledge discovery and data mining, pages 1135–
+1144.
+Marco Tulio Ribeiro, Sameer Singh, and Carlos
+Guestrin. 2018. Anchors: High-precision modelagnostic explanations. In Proceedings of the AAAI
+conference on artificial intelligence, volume 32.
+
+Vivswan Shitole, Fuxin Li, Minsuk Kahng, Prasad Tadepalli, and Alan Fern. 2021. One explanation is not
+enough: structured attention graphs for image classification. Advances in Neural Information Processing
+Systems, 34:11352–11363.
+Gemma Team, Morgane Riviere, Shreya Pathak,
+Pier Giuseppe Sessa, Cassidy Hardin, Surya Bhupatiraju, Léonard Hussenot, Thomas Mesnard, Bobak
+Shahriari, Alexandre Ramé, and 1 others. 2024.
+Gemma 2: Improving open language models at a
+practical size. arXiv preprint arXiv:2408.00118.
+Tao Tu, Shekoofeh Azizi, Danny Driess, Mike Schaekermann, Mohamed Amin, Pi-Chuan Chang, Andrew
+Carroll, Charles Lau, Ryutaro Tanno, Ira Ktena, and
+1 others. 2024. Towards generalist biomedical ai.
+Nejm Ai, 1(3):AIoa2300138.
+Moritz Vandenhirtz, Sonia Laguna, Ričards Marcinkevičs, and Julia Vogt. 2024. Stochastic concept bottleneck models. Advances in Neural Information
+Processing Systems, 37:51787–51810.
+Sandra Wachter, Brent Mittelstadt, and Chris Russell.
+2017. Counterfactual explanations without opening
+the black box: Automated decisions and the gdpr.
+Harv. JL & Tech., 31:841.
+Sarah Wiegreffe and Yuval Pinter. 2019. Attention is not
+not explanation. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference
+on Natural Language Processing (EMNLP-IJCNLP),
+pages 11–20, Hong Kong, China. Association for
+Computational Linguistics.
+Michael Wornow, Yizhe Xu, Rahul Thapa, Birju Patel,
+Ethan Steinberg, Scott Fleming, Michael A Pfeffer,
+Jason Fries, and Nigam H Shah. 2023. The shaky
+foundations of large language models and foundation models for electronic health records. npj digital
+medicine, 6(1):135.
+Xi Xu, Jianqiang Li, Zhichao Zhu, Linna Zhao, Huina
+Wang, Changwei Song, Yining Chen, Qing Zhao,
+Jijiang Yang, and Yan Pei. 2024. A comprehensive review on synergy of multi-modal data and ai
+technologies in medical diagnosis. Bioengineering,
+11(3):219.
+
+E1: Hospital Mort.
+
+E2: Long LOS
+
+E3: ICU Mort.
+
+E4: Post-Obs Mort.
+
+1
+3
+5
+8
+12
+16
+20
+24
+
+0.0413 ± 0.0050
+0.0885 ± 0.0104
+0.1112 ± 0.0143
+0.1293 ± 0.0177
+0.1417 ± 0.0199
+0.1489 ± 0.0216
+0.1549 ± 0.0233
+0.1612 ± 0.0186
+
+0.0447 ± 0.0107
+0.0939 ± 0.0094
+0.1199 ± 0.0104
+0.1431 ± 0.0117
+0.1582 ± 0.0125
+0.1644 ± 0.0123
+0.1681 ± 0.0119
+0.1616 ± 0.0097
+
+0.0326 ± 0.0050
+0.0749 ± 0.0092
+0.0961 ± 0.0131
+0.1138 ± 0.0159
+0.1270 ± 0.0180
+0.1342 ± 0.0190
+0.1390 ± 0.0201
+0.1307 ± 0.0403
+
+0.0441 ± 0.0037
+0.0908 ± 0.0051
+0.1139 ± 0.0067
+0.1334 ± 0.0089
+0.1463 ± 0.0108
+0.1541 ± 0.0121
+0.1596 ± 0.0137
+0.1539 ± 0.0287
+
+Calibration Analysis: Full Model vs Tree-of-Evidence
+Calibration Curves
+
+1.0
+
+1.0
+
+0.8
+
+0.8
+
+0.6
+0.4
+0.2
+0.0
+0.0
+
+0.4
+
+0.6
+
+Mean Predicted Probability
+
+0.8
+
+Prediction Distribution
+
+1.0
+
+Full Model
+ToE
+Decision threshold
+
+5
+4
+
+0.6
+0.4
+
+0.0
+0.0
+
+3
+2
+
+0.2
+
+Perfectly calibrated
+Full Model (ECE=0.2588)
+ToE (ECE=0.2540)
+
+0.2
+
+Reliability Diagram
+Perfect
+Full Model
+ToE
+
+Density
+
+Tomohisa Seki, Yoshimasa Kawazoe, and Kazuhiko
+Ohe. 2021. Machine learning-based prediction of inhospital mortality using admission laboratory data: A
+retrospective, single-site study using electronic health
+record data. PloS one, 16(2):e0246640.
+
+k
+
+Observed Frequency
+
+Cynthia Rudin. 2019. Stop explaining black box machine learning models for high stakes decisions and
+use interpretable models instead. Nature Machine
+Intelligence, 1(5):206–215.
+
+Table A1: ToE Comprehensiveness (↑) across evidence
+budgets and four MIMIC-IV tasks (mean ± std, 5
+seeds).
+
+Fraction of Positives
+
+Yulia Rubanova, Ricky TQ Chen, and David K Duvenaud. 2019. Latent ordinary differential equations for
+irregularly-sampled time series. Advances in neural
+information processing systems, 32.
+
+1
+0.2
+
+0.4
+
+0.6
+
+Predicted Probability (binned)
+
+0.8
+
+1.0
+
+0
+
+0.0
+
+0.2
+
+0.4
+
+0.6
+
+Predicted Probability
+
+0.8
+
+Figure A1: Calibration Analysis. Full Model (Blue)
+vs. ToE at k=5 (Red). ToE preserves calibration (ECE
+0.254 vs. 0.259) while using sparse evidence.
+
+Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran,
+Tom Griffiths, Yuan Cao, and Karthik Narasimhan.
+2023. Tree of thoughts: Deliberate problem solving
+with large language models. Advances in neural
+information processing systems, 36:11809–11822.
+Lecheng Zheng, Zhengzhang Chen, Dongjie Wang,
+Chengyuan Deng, Reon Matsuoka, and Haifeng
+Chen. 2024. Lemma-rca: A large multi-modal
+multi-domain dataset for root cause analysis. arXiv
+preprint arXiv:2406.05375.
+Yilun Zhou and Julie Shah. 2023. The solvability of
+interpretability evaluation metrics. In Findings of the
+Association for Computational Linguistics: EACL
+2023, pages 2399–2415.
+
+A
+
+Appendix
+
+A.1
+
+Detailed Performance Across Budgets
+
+Figure A3 and Table A1 detail the performance of
+ToE across varying evidence budgets (k). Notably,
+Sufficiency AUROC saturates at k = 5, indicating
+that a handful of clinical events are often sufficient
+for robust diagnosis.
+A.2
+
+Calibration Analysis
+
+We evaluated calibration using Expected Calibration Error (ECE). As shown in Figure A1, ToE
+achieves comparable calibration to the full model
+(ECE 0.254 vs. 0.259), with both models exhibiting similar reliability curves across probability bins.
+The prediction distributions confirm that ToE preserves the full model’s confidence profile while
+operating on only k=5 evidence units.
+
+A.3
+
+Evidence Size Distribution
+
+Figure A2 illustrates the distribution of selected evidence sizes at budget k=5, stratified by patient
+outcome and prediction correctness. When the
+model is correct (n=8,032), ToE frequently finds
+sufficient evidence before exhausting the budget,
+with notable mass at k=1–4. When the model is
+incorrect (n=3,147), the search almost universally
+consumes the full budget (k=5), reflecting the absence of a coherent evidence subset that supports
+the (wrong) prediction. This asymmetry makes evidence utilization a diagnostic signal for prediction
+reliability.
+Evidence Size by Mortality Outcome
+
+Evidence Size by Prediction Correctness
+
+Survived (n=9,889)
+Died (n=1,290)
+
+8000
+7000
+
+5000
+4000
+
+5000
+
+Count
+
+Count
+
+6000
+
+4000
+3000
+
+3000
+2000
+
+2000
+
+1000
+
+1000
+0
+
+Correct (n=8,032)
+Incorrect (n=3,147)
+
+6000
+
+0
+
+1
+
+2
+
+3
+
+4
+
+Total Evidence Size (TS + Notes)
+
+5
+
+0
+
+0
+
+1
+
+2
+
+3
+
+4
+
+Total Evidence Size (TS + Notes)
+
+5
+
+Figure A2: Evidence Size Distribution (k=5, MIMICIV Mortality). Left: By mortality outcome, both
+groups concentrate at the budget cap, with survivors
+showing slightly more early stopping. Right: By prediction correctness, correct predictions exhibit greater
+evidence efficiency (more mass at k < 5), while incorrect predictions exhaust the full budget in 97% of
+cases, indicating the search struggles to find supporting
+evidence when the model is wrong.
+
+Algorithm 1 Tree-of-Evidence (ToE) Inference
+Search
+Require: Trained models; Candidates W, N ;
+Beam width B
+1: Compute target pfull and ŷfull using all data
+2: Cache note chunk embeddings {ej }
+3: Beam ← [(0ts , 0note )]
+4: for step = 1 to Smax do
+5:
+Candidates ← ∅
+6:
+for state (mts , mnote ) in Beam do
+Expand by adding one unused w ∈ W
+7:
+or n ∈ N
+8:
+Compute score(·) via Eq. (10)
+9:
+Candidates ← Candidates ∪
+{NewState}
+10:
+end for
+11:
+Beam ← Top-B(Candidates)
+12:
+if Beam[0] meets thresholds τconf , τsuff
+then
+13:
+return Beam[0] ▷ Minimal Sufficient
+Set
+14:
+end if
+15: end for
+16: return Best state in Beam
+evidence budgets (E1: Hospital Mortality).
+Table A2: Search vs Ranking Comparison Across Evidence Budgets (MIMIC-IV Mortality, 5 seeds).
+Beam Search (ToE)
+
+A.4
+
+Tree of Evidence (ToE) Algorithm
+
+We provide below an algorithm for the ToE (Algorithm 1).
+
+B
+
+Full LIME/SHAP Comparison
+
+Figure A3 extends the main-paper comparison (Table 2) to all evidence budgets k ∈
+{1, 3, 5, 10, 15, 20, 25} with AUROC, AUPRC, Fidelity MAE, and ECE.
+
+C
+
+Full LLM and CBM Comparison
+
+Figure A4 reports the complete comparison against
+10 open-source LLMs, CBM, and multimodal
+LLMs on E1 (Hospital Mortality), evaluated via
+zero-shot prompting on the full test set. All models
+are run locally via vLLM.
+
+D
+
+Search vs. Ranking: Full Comparison
+
+Table A2 provides the full comparison between
+ToE beam search and Top-k Ranking across all
+
+Top-k Ranking
+
+k
+
+AUROC
+
+Fidelity MAE
+
+AUROC
+
+Fidelity MAE
+
+1
+3
+5
+8
+12
+16
+20
+24
+
+0.7833 ± 0.0128
+0.7967 ± 0.0152
+0.8001 ± 0.0165
+0.8028 ± 0.0162
+0.8039 ± 0.0167
+0.8046 ± 0.0160
+0.8048 ± 0.0156
+0.8043 ± 0.0159
+
+0.0958 ± 0.0053
+0.0481 ± 0.0023
+0.0403 ± 0.0027
+0.0367 ± 0.0023
+0.0333 ± 0.0022
+0.0307 ± 0.0022
+0.0284 ± 0.0019
+0.0254 ± 0.0016
+
+0.7676 ± 0.0362
+0.7739 ± 0.0343
+0.7735 ± 0.0339
+0.7722 ± 0.0325
+0.7713 ± 0.0314
+0.7723 ± 0.0311
+0.7766 ± 0.0319
+0.7837 ± 0.0346
+
+0.1073 ± 0.0071
+0.0798 ± 0.0054
+0.0806 ± 0.0054
+0.0840 ± 0.0056
+0.0859 ± 0.0060
+0.0848 ± 0.0061
+0.0783 ± 0.0059
+0.0459 ± 0.0047
+
+E
+
+STE Temperature Sensitivity
+
+Table A3 reports the effect of STE temperature
+τSTE on selector performance, with full retraining
+per temperature (eICU, ICU Mortality).
+
+F
+
+Probability-Space vs. Logit-Space
+Stability
+
+Table A4 compares probability-space and logitspace definitions of the stability term S(m) across
+evidence budgets (E1: Hospital Mortality, MIMICIV).
+Probability-space stability yields 44% lower fidelity MAE at k=5. Notably, logit-space MAE
+
+E1: In-Hospital Mortality
+
+AUROC
+
+0.85
+
+0.80
+
+0.80
+
+0.80
+
+0.75
+
+0.75
+
+0.75
+
+0.70
+
+0.70
+
+0.70
+
+0.70
+
+0.65
+
+0.65
+
+0.65
+
+0.65
+
+0.60
+
+0.60
+
+0.60
+
+0.55
+
+0.55
+
+0.55
+
+0.50
+
+0.50
+
+0.50
+
+0.45
+
+0.45
+
+0.45
+
+0.45
+
+0.40
+
+0.40
+
+0.40
+
+0.40
+
+0.35
+
+0.35
+
+0.35
+
+0.35
+
+0.30
+
+0.30
+
+0.30
+
+0.30
+
+0.25
+
+0.25
+
+0.25
+
+0.25
+
+0.20
+
+0.20
+
+0.20
+
+0.20
+
+0.15
+
+0.15
+
+0.15
+
+0.15
+
+0.10
+
+0.10
+
+0.10
+
+0.10
+
+0.05
+
+0.05
+
+0.05
+
+0.05
+
+0.25
+
+0.25
+
+0.25
+
+0.25
+
+0.20
+
+0.20
+
+0.20
+
+0.20
+
+0.15
+
+0.15
+
+0.15
+
+0.15
+
+0.10
+
+0.10
+
+0.10
+
+0.10
+
+0.05
+
+0.05
+
+0.05
+
+0.05
+
+0.00
+
+0.00
+
+0.00
+
+0.00
+
+0.45
+
+0.45
+
+0.45
+
+0.45
+
+0.40
+
+0.40
+
+0.40
+
+0.40
+
+0.35
+
+0.35
+
+0.35
+
+0.35
+
+0.30
+
+0.30
+
+0.30
+
+0.30
+
+0.25
+
+0.25
+
+0.25
+
+0.25
+
+ToE (Ours)
+LIME
+SHAP
+
+AUPRC
+
+0.50
+
+0.20
+
+0
+
+5
+
+10
+
+15
+
+Evidence Budget (k)
+
+20
+
+25
+
+0.20
+
+0
+
+5
+
+10
+
+15
+
+Evidence Budget (k)
+
+20
+
+25
+
+0.20
+
+0
+
+5
+
+10
+
+15
+
+Evidence Budget (k)
+
+E4: Post-Obs Mortality
+
+0.85
+
+0.75
+
+0.55
+
+Fidelity MAE
+
+E3: ICU Mortality
+
+0.85
+
+0.80
+
+0.60
+
+ECE
+
+E2: Long Length-of-Stay
+
+0.85
+
+20
+
+25
+
+0.20
+
+0
+
+5
+
+10
+
+15
+
+Evidence Budget (k)
+
+20
+
+25
+
+Figure A3: Complete comparison of ToE, LIME, and SHAP across four MIMIC-IV tasks (E1–E4, 5 seeds,
+k ∈ {1, 3, 5, 10, 15, 20, 25}). Rows: AUROC, AUPRC, Fidelity MAE, ECE. Columns: E1 (In-Hospital Mortality),
+E2 (Long LOS), E3 (ICU Mortality), E4 (Post-Obs Mortality). Shaded regions denote ±1 std. ToE consistently
+achieves the best ECE across all tasks and competitive AUROC at sparse budgets (k ≤ 5), while SHAP converges
+at higher k with lower MAE.
+Table A3: STE temperature sensitivity (eICU). Performance varies <1% across a 50× range.
+τSTE
+
+Suff. AUROC (k=6)
+
+AUPRC (k=6)
+
+Suff. AUROC (k=1)
+
+0.1
+0.5
+1.0
+2.0
+5.0
+
+0.792
+0.797
+0.799
+0.799
+0.790
+
+0.316
+0.321
+0.325
+0.319
+0.313
+
+0.741
+0.740
+0.753
+0.745
+0.748
+
+plateaus at ∼0.05 regardless of budget, whereas
+probability-space MAE continues decreasing with
+more evidence. This pattern is confirmed on eICU.
+
+Table A4: Probability-space vs. logit-space stability.
+Probability-space achieves consistently lower fidelity
+MAE.
+k
+
+Space
+
+AUROC
+
+Fid. MAE
+
+Comp.
+
+1
+
+Probability
+Logit
+
+0.755
+0.749
+
+0.090
+0.100
+
+0.029
+0.040
+
+5
+
+Probability
+Logit
+
+0.773
+0.768
+
+0.030
+0.054
+
+0.097
+0.131
+
+12
+
+Probability
+Logit
+
+0.773
+0.769
+
+0.014
+0.051
+
+0.130
+0.189
+
+Text LLM
+
+0.800
+
+0.80
+
+0.775
+
+0.684
+
+0.647
+
+0.631
+
+0.630
+
+0.60
+
+0.316
+
+0.279
+
+0.244
+
+0.20
+
+0.189
+
+0.199
+
+0.190
+
+0.135
+
+0.10
+
+0.00
+Lla
+
+mm
+
+Ge
+
+ma
+-3.2
+-1
+mm B
+a-2
+Me
+-27
+dG
+B
+em
+ma
+-27
+Me
+B
+dG
+em
+ma
+-4B
+Lla
+ma
+-3.3
+-70
+Me
+B
+d4
+2-v
+2-7
+0B
+Lla
+ma
+-3
+Ge
+mm .1-8B
+a-2
+-12
+Ge
+mm B (V
+)
+a-2
+Me
+-27
+dG
+B (V
+em
+)
+ma
+-27
+B
+(24 H (V)
+co ard
+nc CB
+ep M
+ts)
+ToE
+k=
+1
+ToE
+k=
+5
+ToE
+k=
+10
+
+0.45
+a-2
+Me
+-27
+dG
+B
+em
+ma
+-27
+Me
+B
+dG
+em
+ma
+-4B
+Lla
+ma
+-3.3
+-7
+0
+Me
+B
+d4
+2-v
+2-7
+0B
+Lla
+ma
+-3
+Ge
+mm .1-8B
+a-2
+-12
+Ge
+mm B (V
+)
+a-2
+Me
+-27
+dG
+B (V
+em
+)
+ma
+-27
+B
+(24 H (V)
+co ard
+nc CB
+ep M
+ts)
+ToE
+k=
+1
+ToE
+k=
+5
+ToE
+k=
+10
+
+0.05
+
+ma
+-3.2
+-1B
+
+0.229
+
+0.233
+
+0.206
+
+0.50
+
+Lla
+
+0.258
+
+0.25
+
+0.15
+0.532
+
+0.310
+
+0.349
+0.293
+
+0.30
+
+0.691
+
+0.65
+
+0.55
+
+Table A6: Hyperparameter sensitivity summary.
+
+(b) AUPRC Comparison
+
+0.35
+
+0.714
+
+0.706
+
+ToE (Ours)
+Full Model (0.325)
+
+0.40
+
+0.783
+
+AUPRC
+
+0.707
+
+0.70
+
+CBM
+0.45
+
+0.803
+
+0.745
+
+0.75
+
+AUROC
+
+Vision LLM
+
+(a) AUROC Comparison
+Full Model (0.806)
+
+Figure A4: LLM/MLLM, CBM, and ToE Comparison on E1 (In-Hospital Mortality, MIMIC-IV).
+(a) AUROC and (b) AUPRC for 7 text-only LLMs (1B–
+70B), 3 vision LLMs (12–27B), Hard CBM (24 clinical concepts), and ToE at k=1, 5, 10 (109M parameters). Error bars denote ±1 std (bootstrap for LLMs/CBM, 5 seeds for ToE). Dashed line indicates the
+full model. ToE k=5 outperforms the best 70B LLM
+(Med42) by +0.048 AUROC with 640× fewer parameters, and adding vision to LLMs degrades performance.
+Table A5: Optimality gap: ToE vs. exhaustive search.
+Dataset
+
+k
+
+ToE AUROC
+
+Exhaustive
+
+Gap
+
+MIMIC-IV
+MIMIC-IV
+LEMMA-RCA
+
+1
+3
+all
+
+0.7550
+0.7706
+0.7181
+
+0.7543
+0.7697
+0.7252
+
++0.0007
++0.0009
+−0.0071
+
+G
+
+Optimality Gap Analysis
+
+To assess how close beam search comes to the
+global optimum, we compare ToE against exhaustive enumeration at small k where enumeration is
+tractable (Table A5).
+At k=1 and k=3, ToE matches the global optimum (gap < 0.001 AUROC, within bootstrap
+confidence intervals). Exhaustive search becomes
+infeasible for k ≥ 5 (>1M subsets per patient at
+k=5 on MIMIC-IV).
+
+H
+
+Hyperparameter
+
+Range
+
+Dataset(s)
+
+Key Finding
+
+Stability space
+τsuff
+λ (stability)
+
+Prob vs. Logit
+.70, .80, .90, .95
+0, 1.0
+
+MIMIC + eICU
+eICU
+MIMIC
+
+Prob-space 44% lower MAE
+Higher → better fidelity
+λ=0 doubles MAE
+
+Ge
+
+0.85
+
+Spurious Feature Injection
+
+To test whether ToE’s search behavior can detect
+model reliance on spurious features, we retrain the
+model with a deliberately spurious binary feature
+that is 80% correlated with mortality in the training
+set but has 0% correlation in the test set.
+The corrupted model requires 4.5× more evidence to converge (p < 0.001) and has half the
+convergence rate (46% vs. 93%). Within the corrupted model, the asymmetry between flag=1 and
+flag=0 patients (55% vs. 37% convergence) reveals
+the specific source of bias. This confirms that ToE’s
+search difficulty is a reliable signal for detecting
+spurious model reasoning.
+
+I
+
+Hyperparameter Sensitivity
+
+Table A6 summarizes sensitivity to key hyperparameters beyond the λ/µ ablation reported in the
+main paper (Table 6).
+At fixed evidence budgets, stopping thresholds
+(τconf , τsuff ) have zero effect since they only control dynamic stopping. The method is robust to
+stability-space choice and threshold values but sensitive to λ, which is a core design parameter.
+
+

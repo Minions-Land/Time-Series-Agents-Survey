@@ -15,15 +15,17 @@ Architectures, and Evaluation*. People open this repository with a coding agent 
 | Bibliography | `TS_AGENT_HARNESS_SURVEY.bib` |
 
 `query_cards.py` is the fastest entry point: `--layer {LLM,GH,GTS,TSK}`, `--function {data_management,processing,
-context_memory,validation}`, `--task <family>`, `--dimension <text>`, `--reuse {demonstrated,inferred}`, `--text <kw>`,
+context_memory,validation}`, `--task <family label>` (ledger labels; group them with `scripts/task_groups.py`), `--dimension <text>`, `--reuse {demonstrated,inferred}`, `--text <kw>`,
 `--role <role_of_work>`, `--criterion <evaluation criterion>`, `--work <key>` (full card), `--stats`, `--json`.
 
 ## How to answer
 
 1. Ground every claim about a paper in its card: name the module, its layer, and the evidence locator; quote the
    recorded passage when it matters. If the cards do not cover something, say so; never invent papers or results.
-2. Use the survey's terms exactly: Time Series Agent; LLM side; General Harness; General Time Series Harness;
-   Task-Specific Harness; the five mechanism dimensions; the four temporal functions; the four task families; the four
+2. Use the survey's terms exactly: Time Series Agent = LLM + General Harness + Time Series Harness, where Time Series
+   Harness = General Time Series Harness + Task-Specific Harness; LLM side; General Harness; General Time Series Harness;
+   Task-Specific Harness; the five mechanism dimensions; the four temporal functions; the four task groups (analysis of observed series, forecasting, generation, decision
+   making; mapping in `scripts/task_groups.py`); the four
    evaluation criteria (process validity, temporal validity, task performance, decision utility). "time series" is
    never hyphenated.
 3. Distinguish what a source demonstrates from what is inferred (`reuse_evidence`: demonstrated vs inferred).

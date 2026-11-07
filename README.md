@@ -79,7 +79,7 @@ Every other label describes one term, and none is a new classification:
 | **LLM side** | Temporal representation and alignment · temporal instruction and reasoning · learning to operate temporal workflows | Where the model enters the Agent loop $a_k=\pi_\theta(s_k)$: the state it reads, its parameters, its action policy |
 | **General Harness** | Interface and Interaction · Memory and Context · Tools and Execution · Planning and Orchestration · Optimization and Evolution | Synthesized from Agent and Harness research (CoALA, Wang et al., code-harness and agentic-harness surveys) |
 | **General Time Series Harness** | Temporal Data Management · Temporal Processing · Temporal Context and Memory · Temporal Validation | The availability record $(x_i,t_i,v_i)$: store it, operate on it over windows, admit outside context, check $v_i\le\tau$ |
-| **Task-Specific Harness** | Forecasting and Prediction · Data Augmentation and Synthesis · Anomaly Detection and Diagnosis · Decision Support | Task grouping of Chen et al. (2026) |
+| **Task-Specific Harness** | Analysis of Observed Series (classification · imputation · anomaly detection · question answering) · Forecasting · Generation · Decision Making | What the output refers to relative to the decision time τ; task names from TimesNet/TSLib and Time-MQA |
 | **Evaluation** | Process Validity · Temporal Validity · Task Performance · Decision Utility | One check per term |
 
 <p align="center">
@@ -136,17 +136,19 @@ A Paper Card records what a work contributes, module by module, with the passage
   <img src="docs/assets/trends.png" width="88%" alt="Module contributions over time: cumulative counts and doubling times by layer, share of new modules by period, and paths showing where temporal functions are implemented.">
 </p>
 
-- **Agents automate; fewer solve time series problems.** In 163 of 196 work–task pairs the Agent takes over analytical
-  steps. Only 70 of the 143 method works test a time series obstacle (leakage, regime change, data quality, context,
-  decision consequences, verifiability or deployment) in an experiment built for it. The rest report a score gain or
-  automation alone.
-- **The hard obstacles are claimed more than tested.** Verifiability is claimed in 49 work–task pairs and tested in 14.
-  Information availability is tested in 9, enforced only by design in 12 and asserted in 20. Deployment is tested in 4.
-  Anomaly diagnosis is the weakest family: 9 of its 45 works test any obstacle.
+- **How to assess a new work.** Place its modules in the formula; check the claimed scope (a general mechanism
+  presented as task-specific, or a task procedure presented as general); then read the contribution off the map:
+  automation, another implementation, a filled empty cell, or consolidation into a shared time series module.
+- **Most works automate; fewer meet a time series requirement under test.** 136 of 162 works automate an analysis.
+  Only 70 of the 143 method works test the requirement their modules address (leakage, regime change, data quality,
+  context, decision consequences, verifiability or deployment).
+- **Generality is often claimed, less often shown.** Reuse across at least two task groups is demonstrated for 89 of
+  the 189 General Harness and General Time Series Harness modules. Of 12 rejected layer changes in the re-audit, 10
+  would have moved a general mechanism into a more specific layer.
 - **Effort is moving from the model to the runtime.** The LLM side supplied about a third of new modules until the
   end of 2024 and 7–17% in each later period. Shared temporal modules grow fastest, doubling about every 5 months.
 - **Solutions stay inside tasks.** There are 325 task-specific modules for 97 shared temporal ones. Of the module
-  links to a tested obstacle, 108 of 181 are task procedures. Only temporal data management is mostly shared (43 vs 10).
+  links to a tested requirement, 108 of 181 are task modules. Generation has no shared data-management module.
 
 ## 🤝 Contribute
 

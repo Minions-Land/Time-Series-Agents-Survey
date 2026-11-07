@@ -1,0 +1,2764 @@
+arXiv:2506.13705v1 [cs.LG] 16 Jun 2025
+
+TimeMaster: Training Time-Series Multimodal LLMs
+to Reason via Reinforcement Learning
+
+Junru Zhang1∗ Lang Feng2∗ Xu Guo3 Yuhan Wu1 Yabo Dong1
+1
+Zhejiang University, China
+2
+Nanyang Technological University, Singapore
+3
+KTH Royal Institute of Technology, Sweden
+
+Duanqing Xu1
+
+Abstract
+Time-series reasoning remains a significant challenge in multimodal large language
+models (MLLMs) due to the dynamic temporal patterns, ambiguous semantics, and
+lack of temporal priors. In this work, we introduce TimeMaster, a reinforcement
+learning (RL)-based method that enables time-series MLLMs to perform structured,
+interpretable reasoning directly over visualized time-series inputs and task prompts.
+TimeMaster adopts a three-part structured output format, reasoning, classification,
+and domain-specific extension, and is optimized via a composite reward function
+that aligns format adherence, prediction accuracy, and open-ended insight quality.
+The model is trained using a two-stage pipeline: we first apply supervised finetuning (SFT) to establish a good initialization, followed by Group Relative Policy
+Optimization (GRPO) at the token level to enable stable and targeted rewarddriven improvement in time-series reasoning. We evaluate TimeMaster on the
+TimerBed benchmark across six real-world classification tasks based on Qwen2.5VL-3B-Instruct. TimeMaster achieves state-of-the-art performance, outperforming
+both classical time-series models and few-shot GPT-4o by over 14.6% and 7.3%
+performance gain, respectively. Notably, TimeMaster goes beyond time-series
+classification: it also exhibits expert-like reasoning behavior, generates contextaware explanations, and delivers domain-aligned insights. Our results highlight
+that reward-driven RL can be a scalable and promising path toward integrating
+temporal understanding into time-series MLLMs.
+
+1
+
+Introduction
+
+Time series analysis is a fundamental technique in data mining, enabling the modeling of temporal
+patterns and informing decision-making across critical domains such as healthcare [1, 2], industrial
+monitoring [3, 4], and environmental surveillance [5]. While the advancements of deep learning have
+propelled progress in classical time series tasks like forecasting [6, 7, 8, 9, 10] and classification [7, 9],
+the recent surge of large language models (LLMs) [11, 12, 13, 14] invites a broader question: can the
+rich reasoning abilities of LLMs be extended to the temporal domain, yielding a general-purpose
+time series analysis that not only predicts but also reasons, explains and advises?
+Reasoning is an emergent capability of modern LLMs, enabled by their strong natural language
+understanding and instruction-following abilities, as represented by Chain-of-Thought Prompting
+[15]. These strengths provide a natural foundation for moving beyond traditional tasks toward
+interpretable time-series reasoning (TsR) [16]. Despite this, current approaches on time-series
+multimodal LLMs (MLLMs) face fundamental limitations in achieving deep, robust reasoning.
+Prompt-based methods [17, 18, 19], while flexible and capable of zero- and few-shot generalization,
+∗
+
+Equal contribution.
+Code: https://github.com/langfengQ/TimeMaster
+
+Preprint. Under review.
+
+Question: <image>
+<image> You are examining a short-duration EMG waveform image. You MUST first reason step
+by step about the observed time-series patterns. After completing your reasoning, select the ONE most
+appropriate label from the predefined class list and clearly state your final prediction: Healthy, Myopathy, or
+Neuropathy. Based on this reasoning and classification, what clinical recommendations would you suggest?
+
+<numeric>
+
+User
+
+Plot
+
+<image>
+
+TimeMaster
+
+A n s w e r : <think>
+<think>1. Amplitude analysis: The waveform ranges from approximately -3 mV to 3 mV,
+showing wide amplitude variation and indicating significant electrical activity, which is characteristic of
+neuropathic conditions. 2. Morphology and temporal patterns: The waveform displays irregular, highamplitude, sharp spikes without a consistent pattern, suggesting a loss of motor unit recruitment—typical
+in neuropathic . . . . 3. Comparison with conditions: Healthy waveforms are consistent, low-amplitude . . . ;
+Myopathy shows low-amplitude, low-frequency, irregular waveforms due to . . . ; Neuropathy is marked
+by .. . . 4. Conclusion: The high amplitude, irregular spikes, and lack of consistent patterns are consistent
+with neuropathic conditions where motor units fire abnormally due to nerve damage. </think>
+</think>
+<class> Neuropathy </class>
+<class>
+</class>
+</extension>This waveform suggests neuropathy, with high amplitude and irregular spikes indicating
+<extension>
+abnormal motor unit firing from nerve damage. Recommended next steps: 1. Additional diagnostic tests:
+EMG to assess recruitment patterns and motor unit potentials; NCS to evaluate nerve integrity and detect
+damage; MRI to visualize nerve structures and identify abnormalities. 2. Specialist referrals: Neurologist
+for detailed evaluation and treatment planning; Physiotherapist for targeted therapy to manage
+neuropathy and improve muscle function. 3. Initial treatment strategies: Physical therapy ....</extension>
+</extension>
+
+(a)
+
+(b)
+
+Figure 1: Example of TimeMaster. (a) A plot of a raw EMG signal (1500 time points), labeled
+’Neuropathy’, from the motor disorder diagnosis domain. (b) The signal image, combined with a task
+description, is input into TimeMaster for classification, reasoning, and clinical suggestions.
+
+often struggle with the lack of time-series priors and temporal dynamics, even in frontier MLLMs
+like GPT-4o [20]. This could lead to shallow or inconsistent reasoning over time-series data. On
+the other hand, post-training strategies, including supervised fine-tuning (SFT) on synthetic [21, 22]
+or human-annotated [23, 24, 25, 26, 27, 28, 22] time series datasets, can introduce better domain
+alignment. Yet, these approaches often suffer from limited data diversity, overfitting to template-like
+patterns, and constrained generalizability. Critically, these datasets with aligned time-series and text
+pairs often fail to fully capture the breadth of reasoning skills and domain knowledge necessary for
+robust temporal comprehension. As such, training time-series MLLMs solely on static datasets tends
+to produce superficial outputs that lack the depth, reliability, and interpretability required for effective
+time series reasoning.
+In this work, we propose TimeMaster, a reinforcement learning (RL) [29]-based method for multimodal time series reasoning. TimeMaster addresses critical limitations of existing approaches,
+including dependence on large-scale manually collected datasets, weak reasoning capabilities, and
+poor performance across diverse time series domains. Instead, TimeMaster learns through iterative RL
+training, enabling the model to progressively acquire, refine, and generalize its time-series reasoning
+abilities in a self-improving manner.
+Central to our approach is a structured output format that unifies the model’s response into three
+components: reasoning, classification, and extension. Given a time series input, the model first
+generates a coherent chain of thought to explain its analysis, then outputs a classification result,
+and optionally provides an extension such as suggestions, diagnostics, or actionable insights based
+on specific task requirements. To optimize the model, TimeMaster employs a two-stage learning
+pipeline. First, we initialize the model with basic task alignment through SFT on a high-quality
+dataset containing just 1k samples, a fraction of the scale used in prior work (e.g., approximately
+200k in [27]). Then, TimeMaster adopts RL training driven by a composite reward function: a
+format reward to enforce structural consistency, a hard reward to ensure classification accuracy, and
+a soft reward to evaluate the quality of open-ended extension. Both the format and hard rewards
+provide strict binary feedback. The soft reward, due to the open-ended nature of the extension, is
+computed using an LLM-as-a-Judge [30]. This reward design enables RL to shape both precision and
+expressiveness in multimodal time series reasoning. Figure 1 illustrates an example of TimeMaster
+applied to a complex reasoning task on electromyography (EMG) signal classification, highlighting
+its ability to perform structured reasoning and informed classification.
+We evaluate TimeMaster on T IMER B ED [17], a comprehensive benchmark designed to assess timeseries reasoning across six real-world classification tasks. Empirical results show that TimeMaster
+achieves state-of-the-art performance, surpassing both traditional time-series baselines and strong
+multimodal LLMs: it outperforms few-shot GPT-4o by 7.3% and classical time-series models by
+over 14.6% on average. More importantly, TimeMaster exhibits emergent expert-like reasoning
+behaviors, including iterative self-correction, temporal pattern recognition, and the articulation of
+causal explanations. These capabilities substantially enhance the interpretability and real-world
+2
+
+applicability of MLLMs in temporal domains. For instance, in sports monitoring or healthcare
+scenarios, TimeMaster moves beyond outputting simple labels; it generates rich, human-aligned
+explanations that reflect domain reasoning, improving both transparency and trustworthiness. Overall,
+this work demonstrates a promising step toward equipping multimodal LLMs with time-series
+reasoning capabilities, facilitating more context-aware, interpretable, and actionable insights in
+real-world applications.
+
+2
+
+Related Work
+
+Time-series foundation models. Recent studies have explored diverse paradigms for leveraging
+large language models (LLMs) in time series analysis, with a particular focus on enhancing predictive
+performance. A prominent direction [31, 25, 32, 33, 34] involves reprogramming pre-trained LLMs,
+such as GPT-2 [35] and LLaMA-7B [14], as feature extractors by reformulating time series data into
+textual sequences. This formulation enables direct inference or forecasting by leveraging LLMs’
+strong sequential modeling abilities. To support more expressive and context-rich time series analysis,
+recent work has also emphasized the multimodal nature of real-world applications, integrating intraseries semantics with external contextual signals [36]. Typical strategies include augmenting time
+series with domain-relevant textual descriptions [31, 37, 32, 33], aligning physiological signals with
+medical documentation [38], linking stock price trends to financial news [23, 39], and incorporating
+geographic information [40], traffic records [41], or extra event data [42] into traffic flow modeling.
+Reasoning in time-series LLMs. With the growing integration of language models into temporal
+modeling, the field is moving toward a unified reasoning paradigm centered on explanation and
+causal inference. Despite its promise, time series reasoning (TsR) remains in an early stage. Recent
+efforts [18, 43, 19] explore prompting strategies tailored to structured reasoning in time series tasks.
+For example, VL-Time [17] introduces visualized time series directly into GPT-4o for zero-shot or
+few-shot reasoning, offering an alternative to purely numerical inputs. Nevertheless, such methods
+are constrained by the absence of temporal priors and domain-specific inductive biases in standard
+LLM pretraining. To address these limitations, some approaches adopt post-training strategies using
+synthetic time-series–text paired corpora. For example, Time-MQA [27] aggregates 200k timeseries–text pairs annotated by GPT-4o across various domains for supervised fine-tuning. However,
+constructing such datasets remains resource-intensive, often relying on manual schema design or
+commercial LLM APIs. This poses challenges to encompassing broad domain knowledge and
+capturing the full diversity of real-world temporal phenomena. Our work proposes a cost-efficient yet
+effective strategy to equip multimodal LLMs with time-series reasoning capabilities, using only a
+small amount of task-specific supervision.
+RL in large language models. Reinforcement learning (RL) [29] has emerged as a powerful
+framework for advancing the capabilities of LLMs. One of the most influential approaches in
+this domain is Reinforcement Learning from Human Feedback (RLHF) [44, 45, 46, 47], which
+introduces human preference as a guiding signal during the fine-tuning stage. By optimizing model
+outputs against reward models trained on human judgments, RLHF enables LLMs to generate
+responses that are more aligned with human expectations in terms of helpfulness, coherence, and
+ethical appropriateness. In addition, RL is increasingly used to enhance the reasoning abilities of
+LLMs [48, 49, 50]. Recent work, such as DeepSeek-R1 [51], incorporates RL objectives to encourage
+logical reasoning and structured problem-solving. Instead of solely optimizing for linguistic fluency,
+these models are trained to maximize rule-based rewards, such as correctness in mathematical
+derivations, enabling LLMs to perform complex reasoning tasks with greater accuracy and internal
+consistency. Given the growing demand for reliable decision-making in the time-series domain, we
+propose leveraging the potential of RL by developing strategies that address key gaps in time-series
+reasoning with multimodal LLMs.
+
+3
+
+TimeMaster
+
+Time-series data, collected from diverse sources such as scientific experiments, industrial systems,
+and healthcare monitoring, underpins a wide range of classification tasks critical to real-world
+decision-making. Beyond conventional classification, practical decision-making often demands
+3
+
+models capable of reasoning over temporal patterns, articulating causal relationships, and proposing actionable insights. While recent time-series models [9, 52, 52, 53] have achieved substantial
+progress, they predominantly focus on optimizing numeric prediction objectives, often at the expense of interpretability and explainability. Meanwhile, LLMs such as [14, 13] excel in natural
+language generation but are not inherently equipped for structured temporal reasoning, limiting their
+effectiveness in understanding and reasoning about the complex dynamics of real-world time series.
+In this section, we present TimeMaster, an RL-enhanced time-series MLLM that acquires expert-level
+reasoning over time-series signals. It accepts multimodal inputs and outputs a structured explanation,
+classification, and optional extension, optimized for both accuracy and interpretability.
+3.1
+
+Multimodal Input
+
+Time series reasoning refers to the open-ended and structured capability of an MLLM to interpret
+and analyze temporal patterns by jointly considering raw time series data X and auxiliary contextual
+information q for classification tasks. Formally, let X = {xt }Tt=1 denote a multivariate time series
+of length T , where each xt ∈ RD represents a D-dimensional observation at time step t. Let
+q = {q1 , q2 , . . . } be a sequence of textual tokens, such as natural language instructions or domain
+knowledge, where each qi ∈ Vtext is sampled from a textual vocabulary specific to the MLLM. Unlike
+traditional approaches [31, 25, 32, 33, 34, 9, 52] that focus solely on predictions, our formulation
+of time series reasoning empowers the model to uncover latent temporal structures, infer causal
+relationships, and generate interpretable insights through natural language. It bridges low-level
+numerical signals with high-level reasoning objectives within a unified, multimodal framework.
+We formally define a time-series MLLM as πθ parameterized by θ, which specifies a conditional
+probability distribution over the output sequence y = {y1 , y2 , . . . , yK }, given the inputs X and q:
+YK
+πθ (y | X, q) =
+πθ (yk | y<k , X, q).
+(1)
+k=1
+
+The autoregressive factorization enables the MLLM to generate structured, context-aware outputs
+by attending to multimodal inputs and prior outputs sequentially. To reduce token cost and enhance
+perceptual efficiency, we adopt the visualization-based input strategy proposed by VL-Time [17],
+wherein the time series X is transformed into an image representation (a line plot), as illustrated in
+Fig. 1 (a). These visualized inputs are then processed by the MLLM, leveraging its visual reasoning
+capabilities while maintaining an intuitive, compact, and semantically rich input format [54].
+3.2
+
+Structured Output for Time-Series Reasoning
+
+Rather than producing a single label or forecast, TimeMaster generates a textual output formatted in
+a structured manner using special XML-style tags. The full output is a sequence of natural language
+tokens organized into three defined segments:
+⟨think⟩ · · · ⟨/think⟩
+|
+{z
+}
+Reasoning
+
+⟨class⟩ · · · ⟨/class⟩
+|
+{z
+}
+Classification
+
+⟨extension⟩ · · · ⟨/extension⟩ .
+|
+{z
+}
+
+(2)
+
+Optional Extension
+
+The think block expresses open-ended time-series reasoning in a “chain-of-thought” [15] style. This
+includes pattern recognition, trend analysis, causal inference, or domain-specific signal interpretation.
+For example, in an EMG signal, the model might describe amplitude variation, waveform shape, and
+frequency shifts before concluding. The class block outputs a discrete label, indicating the predicted
+class (e.g., Normal, Myopathy, Neuropathy). This enables rigorous evaluation against ground truth
+during training. The extension block optionally provides follow-up insights or suggestions, such
+as diagnostics, forecasts, remediation plans, or next-step actions. This facilitates practical usability,
+especially in domains like medicine and industrial monitoring.
+3.3
+
+Reward Modeling
+
+Training TimeMaster to generate high-quality reasoning outputs requires balancing multiple objectives
+simultaneously: structural correctness, classification accuracy, and the open-ended relevance of advice.
+To impose these multifaceted requirements, we construct a composite reward that decomposes along
+three axes: format reward, hard reward, and soft reward. Each targets a distinct dimension of output
+quality, as visualized in Figure 2.
+4
+
+Question :
+
+<image> You are examining a short-duration EMG waveform image, recorded using a concentric needle
+electrode in the tibialis anterior muscle. The recording captures the amplitude (mV) of the electrical activity generated by
+muscle fibers. Based on the EMG image’s waveform morphology and temporal patterns, your task is to classify the
+neuromuscular condition as one of the following: Healthy, Myopathy, or Neuropathy.
+You must first reason step-by-step about the current situation. This reasoning process MUST be enclosed within <think>
+and </think> tags. Once you've finished your reasoning, you must choose ONE of the classifications and present it within
+<class> and </class> tags. Finally, provide clinical suggestions based on your reasoning and prediction, enclosed within
+<extension> and </extension> tags.
+
+<image>
+
+Answer: Healthy
+Format Reward
+Answer: Myopathy
+Answer: Healthy
+
+Soft Reward
+
+...
+
+...
+
+...
+
+TimeMaster
+
+Group
+Advantage
+Estimation
+
+Hard Reward
+
+Answer: Neuropathy
+Answers:
+<think> The waveform shows a relatively low
+amplitude, with the maximum amplitude reaching
+approximately 0.4 mV .…
+Format error
+<think>The waveform shows frequent and
+large amplitude spikes, which are consistent
+with the firing patterns observed in neuropathic
+conditions. The presence of these spikes
+suggests a disruption in the normal motor unit
+action potential firing.</think>
+<class>Neuropathy</class>
+<extension>Given the clinical presentation of
+the EMG signal, it is strongly recommended to
+conduct a detailed electromyography (EMG)
+study, including needle EMG and nerve
+conduction studies, to identify the specific type
+of neuropathy (e.g., peripheral, cranial ) …
+Format
+patient's quality of life.</extension>
+
+correct
+
+<think>The waveform is polyphasic, meaning it
+has multiple peaks...a hallmark of myopathic units.
+The amplitude of the waveform is increased…
+suggest a neurogenic process. </think>
+Prediction
+<class>Neuropathy</class>
+<extension>Given… of life.</extension> error
+
+<think> The waveform is characterized by small,
+low-amplitude spikes that are typical of
+myopathy. Myopathy is often associated with
+reduced motor unit action potentials (MUAPs)
+due to muscle fiber weakness or loss. There is also
+a consistent temporal pattern of low amplitude
+spikes, indicating that the motor units are firing at
+a lower rate, which is consistent with the reduced
+recruitment and firing frequency seen in
+Prediction
+myopathy.</think>
+<class>Myopathy</class>
+correct
+<extension>Give...specific cause.</extension>
+
+<think>The EMG … myopathic units.</think>
+<class>Myopathy</class>
+<extension> Clinical advice includes monitoring
+strength.</extension>
+
+Soft reward: 0.2
+
+<think>The EMG … myopathic units.</think>
+<class>Myopathy</class>
+<extension> Given the EMG signal, the most
+appropriate diagnostic label is Myopathy.
+Recommendations: Perform additional EMG studies
+to assess recruitment patterns and motor unit
+action potentials. Use MRI to evaluate muscle
+structure and identify atrophy or inflammation.
+Order blood tests to measure muscle enzymes and
+troponin levels as markers of muscle damage...Start
+a tailored physical therapy regimen to maintain
+muscle strength and function, focusing on
+endurance and flexibility.</extension>
+
+Soft reward: 0.8
+
+Figure 2: Overview of the proposed TimeMaster.
+Format reward rfmt . The format reward enforces strict adherence to the predefined output
+structure. A regex-based parser automatically checks if the generated response contains correctly
+nested and ordered <think>, <class>, and <extension> tags, with non-empty reasoning and
+classification spans. If the format is fully correct, a binary reward of rfmt (y) = 1 is assigned;
+otherwise, rfmt (y) = 0. Figure 2 (left) demonstrates a case of format reward, where clinically valid
+reasoning is penalized if the tag structure is broken (format error), ensuring that the model maintains
+syntactic discipline throughout training.
+Hard reward rhard . The hard reward evaluates the factual correctness of the model’s classification
+results. Given ground-truth labels c⋆ ∈ C, an exact match between the predicted <class> tag and the
+true label grants a reward of rhard = 1; any mismatch yields a reward of rhard = 0. Formally, let
+ĉ(y) ∈ C denote the class extracted from the <class> tag, we define
+
+rhard ĉ, c⋆ = I[ĉ = c⋆ ],
+(3)
+where I[·] is the indicator function. This hard reward ensures that correct reasoning steps are aligned
+with accurate final classification. Figure 2 (middle) illustrates this design: although the reasoning
+mentions myopathy features, the model incorrectly predicts Neuropathic, leading to a prediction
+error and a zero hard reward.
+Soft reward rsoft . As the content of <extension>, such as suggestions, diagnostics, or actionable
+insights tailored to specific task requirements, is inherently open-ended, there is often no single
+definitive notion of right or wrong. To robustly assess such outputs, we introduce a soft reward
+grounded in the LLM-as-a-Judge paradigm [30]. Specifically, we utilize GPT-4o [20], prompted
+to evaluate each extension along four dimensions: (1) Specificity: Assess whether the extension
+is tailored to the given context, rather than offering generic or broadly applicable suggestions.
+(2) Appropriateness: Determine whether the extension is reasonable and well-aligned with the
+preceding reasoning and prediction. (3) Relevance: Evaluate whether the extension logically follows
+from the prior context, avoiding fallback or disconnected recommendations. (4) Depth: Judge
+5
+
+whether the extension reflects domain-specific understanding, such as suggesting detailed next steps,
+considerations, or nuanced insights. Formally, let ϕ denote the LLM judge and e(y) denote the
+extension content extracted from the <extension> tag, we define the soft reward as
+rsoft (e(y), c⋆ ) = I[ĉ = c⋆ ]·mean{sspec , sappr , srel , sdep }, where {sspec , sappr , srel , sdep } = ϕ(e(y), c⋆ ).
+(4)
+Each dimension is rated on a continuous scale [0, 1], and the mean score is used as the soft reward,
+conditional on correct classification. As illustrated in Figure 2 (right), even when the primary
+classification is correct, an extension that is generic or vague (e.g., “monitor strength”) receives a low
+soft reward. In contrast, extensions that are specific and actionable (e.g., “recommend blood tests to
+measure muscle enzymes and troponin levels”) achieve higher scores, better reflecting their clinical
+appropriateness and practical utility.
+Composite reward. Finally, we combine the three reward components into an overall reward signal
+to guarantee format fidelity, classification correctness, and extension utility of time-series reasoning:
+r = λfmt rfmt + λhard rhard + λsoft rsoft .
+fmt
+
+hard
+
+(5)
+
+soft
+
+where λ , λ
+,λ
+≥ 0, trading off the relative importance of each term. This composite reward
+enables TimeMaster to optimize jointly for output format precision, decision-making accuracy, and
+time-series reasoning expressiveness, which is essential for robust, interpretable time-series analysis
+in practical domains.
+3.4
+
+Optimization for Time-Series Reasoning
+
+To enable TimeMaster to generate high-quality, structured reasoning over time-series inputs, we
+adopt a two-stage training pipeline. We begin with SFT on a low-resource dataset consisting of 1k
+high-quality examples sampled from GPT-4o outputs 2 . This stage provides a strong initialization
+by aligning the model with the desired structured output format and domain semantics. We then
+proceed to RL, where we optimize the model using token-level Group Relative Policy Optimization
+(GRPO) [49, 51], which leverages group-wise statistics to normalize advantage estimates without
+requiring a separate value network.
+Formally, for each training context (X, q), we sample a group of G complete output sequences
+G
+{yi }G
+i=1 ∼ πθold (· | X, q), and compute their scalar rewards {ri }i=1 via the composite reward
+function defined in Equation (5). We then calculate the group mean µr and standard deviation σr ,
+and normalize the advantages as:
+v
+u
+G
+X
+u1 G
+ri − µr
+1 X
+Âi =
+, µr =
+rj , σr = t
+(rj − µr )2 + ε,
+(6)
+σr
+G j=1
+G j=1
+Each token yi,k in sequence yi shares the same normalized advantage Âi . This normalization ensures
+that advantage estimates remain on a comparable scale across different contexts.
+We then update the parameters θ of time-series MLLM by maximizing the following clipped surrogate
+objective with an explicit KL-divergence regularization against a frozen reference MLLM πref :
+|y |
+
+L(θ) =
+
+G
+i
+
+
+
+1 X 1 X
+min ρi,k Âi , clip(ρi,k , 1 − ϵ, 1 + ϵ)Âi − β KL πθ ∥ πref ,
+G i=1 |yi |
+
+(7)
+
+k=1
+
+π (y
+
+|y
+
+,X,q)
+
+θ
+i,k i,<k
+where ρi,k = πold
+(yi,k |yi,<k ,X,q) is the importance sampling ratio for each generated token, ϵ is the
+clipping threshold, and β controls the strength of KL regularization. We provide the pseudo code of
+the training TimeMaster in Appendix C.
+
+4
+
+Experiment
+
+Datasets We evaluate our model on T IMER B ED [17], a recent benchmark for time-series reasoning
+(TsR), comprising six real-world classification datasets grouped by three reasoning patterns: 1)
+2
+
+See Appendix I for the collected details and cases used in training.
+
+6
+
+Table 1: Accuracy (%) of different methods on T IMER B ED. “Simple Determ.” denotes simple
+deterministic reasoning and “Complex Determ.” denotes complex deterministic reasoning.
+Modality
+
+Type
+
+Method
+
+Simple Determ.
+
+Complex Determ.
+
+Probabilistic
+
+RCW
+
+TEE
+
+ECG
+
+EMG
+
+CTU
+
+HAR
+
+64.12
+62.59
+75.51
+76.59
+82.11
+76.92
+80.23
+56.96
+
+59.52
+26.19
+59.52
+42.86
+57.14
+21.43
+61.90
+47.63
+
+25.00
+23.95
+22.39
+26.40
+24.82
+24.48
+26.20
+23.61
+
+86.67
+46.67
+66.66
+73.33
+60.00
+46.67
+73.33
+46.67
+
+59.20
+67.20
+67.20
+51.60
+64.00
+46.40
+64.00
+52.40
+
+87.26
+75.04
+85.83
+89.88
+79.60
+89.49
+88.65
+48.97
+
+63.63
+50.27
+62.85
+60.11
+61.28
+50.90
+65.72
+46.04
+
+Avg.
+
+Numeric
+
+Classical
+
+Transformer
+Autoformer
+Informer
+FEDformer
+PatchTST
+iTransformer
+TimesNet
+DLinear
+
+Base: GPT-4o
+Numeric+Text
+Image+Text
+Numeric+Text
+Image+Text
+
+Prompting
+Prompting
+Prompting
+Prompting
+
+GPT-4o (Zero-shot)
+VL-Time (Zero-shot)
+GPT-4o (Few-shot)
+VL-Time (Few-shot)
+
+50.00
+70.02
+50.00
+91.03
+
+21.43
+24.88
+35.71
+64.29
+
+25.00
+26.33
+31.25
+43.75
+
+33.33
+33.33
+33.33
+91.67
+
+45.45
+50.71
+50.00
+63.64
+
+29.17
+37.50
+12.50
+66.67
+
+34.06
+40.46
+35.47
+70.18
+
+Time-MQA
+
+36.84
+
+10.48
+
+25.00
+
+18.94
+
+38.40
+
+16.83
+
+24.42
+
+47.66
+49.29
+72.53
+75.56
+
+13.70
+19.18
+13.70
+68.49
+
+20.00
+21.92
+25.00
+60.00
+
+17.03
+34.15
+48.78
+100.00
+
+46.40
+50.00
+54.00
+84.40
+
+16.49
+21.95
+34.55
+63.29
+
+26.88
+32.75
+41.43
+75.29
+
+Base: Qwen2.5-7B-Instruct
+Numeric+Text Training
+
+Base: Qwen2.5-VL-3B-Instruct
+Image+Text
+Prompting Qwen2.5-VL
+Image+Text
+Training
+Qwen2.5-VL (SFT)
+Image+Text
+Training
+TimeMaster (RL)
+Image+Text
+Training
+TimeMaster (SFT+RL)
+
+Simple deterministic reasoning: RCW detects whale calls based on distinct "whoop" sounds in audio;
+TEE classifies satellite-captured electromagnetic patterns for space event recognition; 2) Complex
+deterministic reasoning: ECG diagnoses arrhythmias via waveform analysis; EMG detects muscle
+disorders from neuromuscular signals and 3) Probabilistic reasoning: HAR predicts physical activities
+(e.g., walking) from sensor data; CTU infers device type from electricity usage patterns. Unlike
+conventional benchmarks focused solely on accuracy, T IMER B ED requires models to reason and
+explain their predictions, emphasizing interpretability across domains like biology and healthcare.
+Detailed descriptions and corresponding prompts are provided in Appendices E and H.
+Baselines We compare TimeMaster against a wide range of baselines, following the evaluation setup
+in T IMER B ED [17]: 1) Classical Time-Series Models: We evaluate eight strong baselines with diverse
+architectures (e.g., transformer-based models), including: Transformer [55], Autoformer [56], Informer [57], FEDformer [58], PatchTST [53], iTransformer [52], TimesNet [9], and DLinear [59]. 2)
+LLM-based Reasoning Methods: Following a recent survey on time-series reasoning with LLMs [36],
+we evaluate several representative approaches. These include GPT-4o, which processes raw numerical
+time-series inputs [17], and VL-Time [17], which leverages visualized time-series data. Both are
+evaluated under zero-shot and few-shot prompting settings. We also include Time-MQA [27], a
+recent TsR model fine-tuned on 200k time-series–text pairs with Qwen2.5-7B-Instruct.
+Training Setups We use Qwen2.5-VL-3B-Instruct [60] as the base time-series MLLM. Time-series
+inputs are visualized as RGB plots following the VL-Time [17] recipe and paired with task-specific
+textual prompts. 1) In the SFT phase, we use GPT-4o (temperature = 1.0) to generate around 1k
+samples per dataset for each task. These samples are used to adapt the model to time-series reasoning
+via instruction tuning. 2) In the RL phase, we optimize the model using GRPO with group size
+G = 5, a clipping threshold ϵ = 0.2, and KL penalty weight β = 0.001. The reward is computed
+using Eq. 5 with weights λfmt = 0.1 and λhard = 0.9, and we set λsoft = 1.0 in case studies to
+encourage extension contents. We evaluate the base Qwen2.5-VL, its SFT version, i.e., Qwen2.5-VL
+(SFT), our RL-trained version, i.e., TimeMaster (RL), and our full model, i.e., TimeMaster(SFT+RL),
+which combines both SFT and RL. More details are provided in Appendix G.
+4.1
+
+Main Results
+
+Table 1 presents the performance of different methods on the T IMER B ED benchmark [17]. Our proposed method, TimeMaster, achieves a new state-of-the-art in time-series reasoning with multimodal
+LLMs, attaining an average accuracy of 75.29%, which surpasses classical time-series models and
+7
+
+Time Series
+
+(a) HAR
+
+Time Series
+
+(b) ECG
+
+Time Series
+
+(c) EMG
+
+VL-Time (Zero-shot)
+<think>variations in all three axes
+x, y, and z→relatively small
+movements→associated
+with
+stationary activities like sitting,
+standing, or laying→lack of
+significant swings or symmetrical
+patterns→ suggests a stationary
+activity laying (no justification
+for choosing LAYING over other
+stationary options like SITTING
+or STANDIN) </think>
+<class>LAYING</class>
+
+Qwen2.5-VL (SFT)
+<th ink >x, y, and z axes...These ranges
+indicate minimal movement→consistent
+with stationary activities...low variability
+and close-zero value in all axes→no
+significant changes in elevation ...lack of
+pronounced peaks and troughs typical of
+dynamic activities like walking or
+running (applies correct domain prior,
+but follows fixed template)→supports
+'STANDING.. </think>
+<class>STANDING</class>
+
+TimeMaster (Ours, SFT+RL)
+< t h i n k > WALKING involves significant changes in
+acceleration.→see small fluctuations across all three
+axes... →WALKING_UPSTAIRS/DOWNSTAIRS… larger
+and more pronounced fluctuations in zaxis→SITTING/LAYING: very low variability, minimal
+changes in all axes (contrastive reasoning with
+similar classes)→STANDING: very low-paced
+changes due to stability→Typical accelerometer data
+for standing will show minuscule fluctuations and low
+variability→These small ranges show little fluctuation
+and are consistent with low activity involving stability
+(aligns observed data with standing class
+prototype)→standing</think>
+<class>STANDING</class>
+
+Qwen2.5-VL(SFT)
+
+TimeMaster (RL)
+
+TimeMaster (Ours, SFT+RL)
+
+< t h i n k > … P waves not clearly
+identifiable → atrial activity may be
+inconsistent or absent (uncertainty
+n o t e d )… QRS complexes present but
+irregular in shape and timing → may
+indicate
+arrhythmia…
+Rhythm is
+irregular → characteristic of atrial
+fibrillation…RR interval variability…→PR
+interval not clearly measurable…
+Waveform shows fluctuations →i ndicate
+significant noise
+(noise n o t e d )→
+Irregular RR intervals, absent P waves,
+and irregular QRS complexes (summary
+ignores prior uncertainty and noise)→
+strongly suggests atrial fibrillation
+</think>
+<class>atrial fibrillation</class>
+
+< t h i n k >…P waves are not clearly
+distinguishable → atrial depolarization
+may be absent or irregular (uncertainty
+n o t e d )…RR intervals are irregular →
+suggests arrhythmia (no definitive
+conclusion yet drawn)…PR interval is not
+measurable…mild baseline fluctuations are
+present → possible noise (noise noted) →
+irregular RR intervals and absent P waves
+does not match expected patterns of sinus
+rhythm or atrial fibrillation (structured
+exclusion)→ The irregularity and absence
+of distinct P waves suggest an atypical
+rhythm pattern→ “other cardiac rhythms”
+(integration of uncertainty and N o i s e )
+</think>
+<class>other cardiac rhythms</class>
+
+< t h i n k > P waves are difficult to identify → atrial
+activity may be obscured or absent (uncertainty
+noted) → Baseline shows low-amplitude
+undulations between QRS complexes → possible f
+waves → RR irregularity does not fully match atrial
+fibrillation pattern → Baseline remains mostly
+clean with minimal visible noise (noise noted) →
+Overall pattern deviates from known rhythm types
+like normal sinus rhythm or atrial fibrillation
+(structured exclusion) → The combination of
+irregular RR intervals, absent P waves but
+organized baseline activity suggests an atypical
+arrhythmia (integration of multiple indicators) →
+other cardiac rhythms</think>
+<class>other cardiac rhythms</class>
+
+Qwen2.5-VL(SFT)
+<think>
+Amplitude… approximately -2.5 mV
+to 0.5 mV
+→indicates a wide amplitude range
+→waveform
+morphology
+is
+consistent with normal recruitment
+and morphology
+(template-based reasoning)
+→amplitude range is consistent with
+normal motor unit potentials.
+</think>
+<class>Healthy</class>
+
+TimeMaster (RL)
+
+TimeMaster (Ours, SFT+RL)
+
+<think> Amplitude… around -2.5 mV to
+0.5 mV
+→significant variation in amplitude
+( overinterpreted; lacks healthy
+baseline comparison)
+→a key characteristic of neuropathy
+→waveform is polyphasic
+→typical in neuropathy due to
+reinnervation ( causal interpretation )
+→observe sharp onset and brief duration
+→characteristic of neuropathy</think>
+<class>Neuropathy</class>
+
+< t h i n k > Amplitude… peaks ~0.5 mV, troughs ~-2.5
+mV → Amplitude variation observed→sharp onset and
+brief duration→rapid firing, typical of motor unit
+potentials→polyphasic…
+multiple
+peaks
+and
+troughs→interpreted
+as
+reinnervation-related
+morphology→ no indication of variability or changes
+in waveform morphology over time (temporal
+stability no t e d ) →temporal consistency supports
+pathological
+interpretation→waveform
+matches
+characteristics of neuropathy (multi-scale-supported
+conclusion: amplitude, shape, time)</think>
+<class>Neuropathy</class>
+
+Figure 3: Comparison of various models’ reasoning on three time-series tasks. Shown are key
+reasoning outputs (Appendix D.3 provides the complete model outputs); italic text in parentheses
+provides commentary and is not generated by the models.
+few-shot GPT-4o baselines by 14.6% and 7.3%, respectively. Notably, this performance is achieved
+with only a 3B-parameter model, demonstrating significantly greater parameter efficiency compared
+to GPT-4o and Qwen2.5-7B-Instruct. We further observe that TimeMaster (RL), even without SFT,
+achieves performance comparable to GPT-4o with VL-Time zero-shot prompting. This highlights
+the effectiveness of RL in improving reasoning quality without relying on massive pretraining. In
+contrast, Time-MQA underperforms across all tasks, likely due to a distribution gap between its
+training data and the test data in T IMER B ED, as well as the difficulty in handling long numerical
+time-series inputs. However, on HAR, our model slightly lags behind classical methods, likely due to
+the complex inter-variable dependencies in sensor data. This suggests that incorporating fine-grained
+temporal reasoning supervision could be a promising direction for future improvements. Overall, the
+results confirm that TimeMaster delivers strong classification performance with high accuracy and
+exceptional parameter efficiency.
+4.2
+
+Key Insights from Empirical Evaluations
+
+In this section, we distill key insights from our some empirical findings to highlight the core challenges
+of TsR with MLLMs and to demonstrate the effectiveness of TimeMaster in addressing them.
+Takeaway I: Training is Essential for Structured Time-Series Reasoning. We begin by comparing
+the reasoning chains of three models, i.e., VL-Time (Zero-shot), Qwen2.5-VL (SFT), and TimeMaster
+(SFT+RL), as shown in Fig. 3(a). The results show that trained Qwen2.5-VL (SFT) and TimeMaster
+(SFT+RL) exhibit clear, structured reasoning patterns that map latent temporal cues to domain
+concepts. For example, in the HAR case labeled standing (Fig. 3a), Qwen2.5-VL (SFT) detects
+low variance across accelerometer axes, links it to a static-posture pattern, and selects standing
+accordingly. The full TimeMaster model goes further: it performs contrastive elimination of dynamic
+activities, explicitly mentions the symmetry of micro-fluctuations, and justifies its decision with a
+8
+
+causal chain that mirrors expert diagnostic logic. This demonstrates the RL stage’s ability to refine
+decision-making beyond the SFT prior. But VL-Time, despite using GPT-4o, offers only a shallow
+description and prematurely predicts laying. These findings underscore that training is essential for
+incorporating task-specific time-series priors and enabling structured, context-aware TsR.
+Takeaway II: RL Unlocks Expert-Level Time-Series Reasoning. We evaluate three models on
+two physiological signals: an ECG labeled as other cardiac rhythms (Fig. 3(b)) and an EMG labeled
+as neuropathy (Fig. 3(c)). Qwen2.5-VL (SFT) shows basic feature recognition, such as identifying
+absent P waves or amplitude variations. However, its reasoning remains shallow and templatedriven, leading to misclassifications. For example, it predicts the ECG as atrial fibrillation based on
+“irregular RR intervals” while ignoring noted noise and uncertainty, and mislabels the EMG as healthy
+using the amplitude range alone. TimeMaster (RL) demonstrates improved diagnostic reasoning
+by incorporating contextual cues and prototype deviation analysis. In the ECG case, it integrates
+multiple uncertain cues (e.g., possible noise, irregular RR intervals) to rule out standard arrhythmia
+classes. For the EMG, it captures both morphological and temporal markers, such as sharp onset
+and brief duration, to support a neuropathic interpretation. Yet, pure RL may be limited by slow
+exploration and convergence due to the lack of temporal priors. TimeMaster (RL+SFT) mitigates
+this by using lightweight SFT as a warm-up to inject basic domain knowledge. This provides a
+good initialization for the follow-up RL training, steers RL toward clinically salient dimensions
+early, and improves convergence and stability. As shown, RL with warm-up further facilitates the
+emergence of structured diagnostic reasoning via reward-guided exploration, alleviating dependence
+on predefined templates and enabling expert-level interpretations through multi-scale pattern synthesis
+(e.g., amplitude, waveform morphology, and temporal stability) into a cohesive reasoning framework.
+Takeaway III: Beyond Reasoning, RL Enables
+<extension> Given the high amplitude spikes and regular temporal patterns
+observed in the EMG waveform, we strongly suspect neuropathic disorder.
+Flexible Extensions such as Insightful, ActionHere are recommended next steps in patient care: 1. Additional Diagnostic
+Tests: - EMG (Electromyography) with needle examination to confirm the
+able Suggestion Generation. As shown in Figpattern and suggest the type of neuropathy. - An MRI of the spine and
+ure 4, TimeMaster not only excels at core tasks
+peripheral nerves to investigate any underlying structural abnormalities. 2.
+Specialist Referral: - Referral to a neurologist for a comprehensive neurological
+such as reasoning and classification, but also acevaluation. - Consultation with an orthopedic specialist if there’s evidence of
+muscle weakness or joint involvement. 3. Initial Treatment Strategies: quires flexible, value-added capabilities, such as
+Physical therapy to maintain muscle strength and flexibility. - Medications as
+prescribed by the neurologist to manage neuropathic pain and symptomatic
+generating high-quality, domain-appropriate clintreatment. - Lifestyle modifications, including ergonomic adjustments for work
+or home tasks if applicable. 4. Monitoring: - Regular follow-up appointments to
+ical suggestions, driven by soft rewards. In the
+monitor the progression of symptoms and effectiveness of treatment. neuropathy case, its recommendations are speDocumentation of any changes in symptoms or response to treatment. The
+patient should be closely monitored and receive a tailored treatment plan by a
+cific (e.g., spinal MRI), appropriate (well-aligned
+multidisciplinary team comprising a neurologist, physiotherapist, and possibly
+a specialist in neuromuscular disorders. </extension>
+with the diagnosis), relevant (logically grounded
+Soft reward: 0.875
+in the preceding reasoning), and deep (covering
+diagnostics, specialist referral, treatment plan- Figure 4: Extension output of TimeMaster via
+ning, and longitudinal monitoring). This reflects <extension> tags on a neuropathic EMG signal.
+an emergent capacity for structured, contextaware reasoning aligned with real-world clinical workflows. This capability arises from our rewardshaped RL. The soft reward, evaluated via an LLM-as-a-Judge, explicitly encourages suggestions
+that are coherent, relevant, domain-appropriate, and practically actionable. Through RL, TimeMaster
+internalizes these preferences and progressively acquires the ability to perform temporal reasoning for
+downstream clinical tasks. This contrasts with models that rely on fixed heuristics or shallow pattern
+recognition. Overall, these results demonstrate that our design enables multimodal LLMs to move
+beyond classification and basic reasoning toward comprehensive, flexible, expert-level generation of
+time-series insights in complex decision-making scenarios.
+
+5
+
+Conclusion
+
+In this work, we present TimeMaster, a novel RL-enhanced time-series MLLMs designed for
+structured reasoning over visualized time-series data. Our design integrates a two-stage training
+pipeline: beginning with SFT for foundational alignment, followed by token-level RL optimization,
+which jointly optimizes for format adherence, predictive accuracy, and the generation of open-ended
+suggestions. Our empirical evaluations verify that TimeMaster achieves state-of-the-art performance,
+outperforming both classical time-series models and few-shot GPT-4o. More importantly, it exhibits
+emergent expert-level reasoning abilities, such as causal pattern inference, while also generating
+context-aware, clinically meaningful extensions. Our results suggest that RL can be a powerful
+9
+
+catalyst to unlock the deep, interpretable temporal reasoning capabilities in time-series MLLMs,
+laying a scalable and promising foundation for building robust time-series MLLMs.
+
+References
+[1] Shibo Zhang, Yaxuan Li, Shen Zhang, Farzad Shahabi, Stephen Xia, Yu Deng, and Nabil
+Alshurafa. Deep learning in human activity recognition with wearable sensors: A review on
+advances. Sensors, 22(4):1476, 2022.
+[2] Junru Zhang, Lang Feng, Zhidan Liu, Yuhan Wu, Yang He, Yabo Dong, and Duanqing Xu.
+Diverse intra-and inter-domain activity style fusion for cross-person generalization in activity
+recognition. In Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery
+and Data Mining, pages 4213–4222, 2024.
+[3] Yucheng Wang, Yuecong Xu, Jianfei Yang, Zhenghua Chen, Min Wu, Xiaoli Li, and Lihua Xie.
+Sensor alignment for multivariate time-series unsupervised domain adaptation. In Proceedings
+of the AAAI conference on artificial intelligence, volume 37, pages 10253–10261, 2023.
+[4] Mohamed Ragab, Zhenghua Chen, Wenyu Zhang, Emadeldeen Eldele, Min Wu, Chee-Keong
+Kwoh, and Xiaoli Li. Conditional contrastive domain generalization for fault diagnosis. IEEE
+Transactions on Instrumentation and Measurement, 71:1–12, 2022.
+[5] Wenjie Hu, Yang Yang, Jianbo Wang, Xuanwen Huang, and Ziqiang Cheng. Understanding
+electricity-theft behavior via multi-source data. In Proceedings of The Web Conference 2020,
+pages 2264–2274, 2020.
+[6] Alexandre Drouin, Étienne Marcotte, and Nicolas Chapados. Tactis: Transformer-attentional
+copulas for time series. In International Conference on Machine Learning, pages 5447–5493.
+PMLR, 2022.
+[7] Emadeldeen Eldele, Mohamed Ragab, Zhenghua Chen, Min Wu, and Xiaoli Li. Tslanet:
+Rethinking transformers for time series representation learning. In International Conference on
+Machine Learning, pages 12409–12428. PMLR, 2024.
+[8] Junru Zhang, Lang Feng, Haowen Zhang, Yuhan Wu, and Yabo Dong. Adacket: Adaptive
+convolutional kernel transform for multivariate time series classification. In Joint European
+Conference on Machine Learning and Knowledge Discovery in Databases, pages 189–204.
+Springer, 2023.
+[9] Haixu Wu, Tengge Hu, Yong Liu, Hang Zhou, Jianmin Wang, and Mingsheng Long. Timesnet: Temporal 2d-variation modeling for general time series analysis. arXiv preprint
+arXiv:2210.02186, 2022.
+[10] Michael Hüsken and Peter Stagge. Recurrent neural networks for time series classification.
+Neurocomputing, 50:223–235, 2003.
+[11] Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni
+Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et al. Gpt-4
+technical report. arXiv preprint arXiv:2303.08774, 2023.
+[12] Gemini Team, Rohan Anil, Sebastian Borgeaud, Jean-Baptiste Alayrac, Jiahui Yu, Radu Soricut,
+Johan Schalkwyk, Andrew M Dai, Anja Hauth, Katie Millican, et al. Gemini: a family of highly
+capable multimodal models. arXiv preprint arXiv:2312.11805, 2023.
+[13] Jinze Bai, Shuai Bai, Yunfei Chu, Zeyu Cui, Kai Dang, Xiaodong Deng, Yang Fan, Wenbin Ge,
+Yu Han, Fei Huang, et al. Qwen technical report. arXiv preprint arXiv:2309.16609, 2023.
+[14] Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, et al. Llama: Open
+and efficient foundation language models. arXiv preprint arXiv:2302.13971, 2023.
+[15] Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed Chi, Quoc V Le,
+Denny Zhou, et al. Chain-of-thought prompting elicits reasoning in large language models.
+Advances in neural information processing systems, 35:24824–24837, 2022.
+10
+
+[16] Yaxuan Kong, Yiyuan Yang, Shiyu Wang, Chenghao Liu, Yuxuan Liang, Ming Jin, Stefan
+Zohren, Dan Pei, Yan Liu, and Qingsong Wen. Position: Empowering time series reasoning
+with multimodal llms. arXiv preprint arXiv:2502.01477, 2025.
+[17] Haoxin Liu, Chenghao Liu, and B Aditya Prakash. A picture is worth a thousand numbers:
+Enabling llms reason about time series via visualization. arXiv preprint arXiv:2411.06018,
+2024.
+[18] Yushan Jiang, Wenchao Yu, Geon Lee, Dongjin Song, Kijung Shin, Wei Cheng, Yanchi Liu,
+and Haifeng Chen. Explainable multi-modal time series prediction with llm-in-the-loop. arXiv
+preprint arXiv:2503.01013, 2025.
+[19] Mike A Merrill, Mingtian Tan, Vinayak Gupta, Tom Hartvigsen, and Tim Althoff. Language
+models still struggle to zero-shot reason about time series. arXiv preprint arXiv:2404.11757,
+2024.
+[20] OpenAI. Gpt-4o, 2024. Accessed: 2025-04-21.
+[21] Zhe Xie, Zeyan Li, Xiao He, Longlong Xu, Xidao Wen, Tieying Zhang, Jianjun Chen, Rui
+Shi, and Dan Pei. Chatts: Aligning time series with llms via synthetic data for enhanced
+understanding and reasoning. arXiv preprint arXiv:2412.03104, 2024.
+[22] Geon Lee, Wenchao Yu, Kijung Shin, Wei Cheng, and Haifeng Chen. Timecap: Learning to
+contextualize, augment, and predict time series events with large language model agents. In
+Proceedings of the AAAI Conference on Artificial Intelligence, volume 39, pages 18082–18090,
+2025.
+[23] Xinlei Wang, Maike Feng, Jing Qiu, Jinjin Gu, and Junhua Zhao. From news to forecast:
+Integrating event analysis in llm-based time series forecasting with reflection. Advances in
+Neural Information Processing Systems, 37:58118–58153, 2024.
+[24] Zhijian Xu, Yuxuan Bian, Jianyuan Zhong, Xiangyu Wen, and Qiang Xu. Beyond trend and
+periodicity: Guiding time series forecasting with textual cues. arXiv preprint arXiv:2405.13522,
+2024.
+[25] Haoxin Liu, Shangqing Xu, Zhiyuan Zhao, Lingkai Kong, Harshavardhan Kamarthi, Aditya B
+Sasanur, Megha Sharma, Jiaming Cui, Qingsong Wen, Chao Zhang, et al. Time-mmd: A new
+multi-domain multimodal dataset for time series analysis. arXiv preprint arXiv:2406.08627,
+2024.
+[26] Kai Kim, Howard Tsai, Rajat Sen, Abhimanyu Das, Zihao Zhou, Abhishek Tanpure, Mathew
+Luo, and Rose Yu. Multi-modal forecaster: Jointly predicting time series and textual data. arXiv
+preprint arXiv:2411.06735, 2024.
+[27] Yaxuan Kong, Yiyuan Yang, Yoontae Hwang, Wenjie Du, Stefan Zohren, Zhangyang Wang,
+Ming Jin, and Qingsong Wen. Time-mqa: Time series multi-task question answering with
+context enhancement. arXiv preprint arXiv:2503.01875, 2025.
+[28] Furong Jia, Kevin Wang, Yixiang Zheng, Defu Cao, and Yan Liu. Gpt4mts: Prompt-based large
+language model for multimodal time-series forecasting. In Proceedings of the AAAI Conference
+on Artificial Intelligence, volume 38, pages 23343–23351, 2024.
+[29] Richard S Sutton and Andrew G Barto. Reinforcement learning: An introduction. MIT press,
+2018.
+[30] Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang,
+Zi Lin, Zhuohan Li, Dacheng Li, Eric Xing, et al. Judging llm-as-a-judge with mt-bench and
+chatbot arena. Advances in Neural Information Processing Systems, 36:46595–46623, 2023.
+[31] Ming Jin, Shiyu Wang, Lintao Ma, Zhixuan Chu, James Y Zhang, Xiaoming Shi, Pin-Yu
+Chen, Yuxuan Liang, Yuan-Fang Li, Shirui Pan, et al. Time-llm: Time series forecasting by
+reprogramming large language models. arXiv preprint arXiv:2310.01728, 2023.
+11
+
+[32] Yong Liu, Guo Qin, Xiangdong Huang, Jianmin Wang, and Mingsheng Long. Autotimes: Autoregressive time series forecasters via large language models. Advances in Neural Information
+Processing Systems, 37:122154–122184, 2024.
+[33] Peiyuan Liu, Hang Guo, Tao Dai, Naiqi Li, Jigang Bao, Xudong Ren, Yong Jiang, and Shu-Tao
+Xia. Calf: Aligning llms for time series forecasting via cross-modal fine-tuning. In Proceedings
+of the AAAI Conference on Artificial Intelligence, volume 39, pages 18915–18923, 2025.
+[34] Chenxi Sun, Hongyan Li, Yaliang Li, and Shenda Hong. Test: Text prototype aligned embedding
+to activate llm’s ability for time series. In The Twelfth International Conference on Learning
+Representations.
+[35] Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al.
+Language models are unsupervised multitask learners. OpenAI blog, 1(8):9, 2019.
+[36] Haoxin Liu, Harshavardhan Kamarthi, Zhiyuan Zhao, Shangqing Xu, Shiyu Wang, Qingsong
+Wen, Tom Hartvigsen, Fei Wang, and B Aditya Prakash. How can time series analysis benefit
+from multiple modalities? a survey and outlook. arXiv preprint arXiv:2503.11835, 2025.
+[37] Chenxi Liu, Qianxiong Xu, Hao Miao, Sun Yang, Lingzheng Zhang, Cheng Long, Ziyue Li,
+and Rui Zhao. Timecma: Towards llm-empowered multivariate time series forecasting via
+cross-modality alignment. In Proceedings of the AAAI Conference on Artificial Intelligence,
+volume 39, pages 18780–18788, 2025.
+[38] Zhongwei Wan, Che Liu, Xin Wang, Chaofan Tao, Hui Shen, Zhenwu Peng, Jie Fu, Rossella
+Arcucci, Huaxiu Yao, and Mi Zhang. Meit: Multi-modal electrocardiogram instruction tuning
+on large language models for report generation. arXiv preprint arXiv:2403.04945, 2024.
+[39] Mahsa Tavakoli, Rohitash Chandra, Fengrui Tian, and Cristián Bravo. Multi-modal deep
+learning for credit rating prediction using text and numerical data streams. Applied Soft
+Computing, page 112771, 2025.
+[40] Wei Chen, Xixuan Hao, Yuankai Wu, and Yuxuan Liang. Terra: A multimodal spatio-temporal
+dataset spanning the earth. Advances in Neural Information Processing Systems, 37:66329–
+66356, 2024.
+[41] Chengyang Zhang, Yong Zhang, Qitan Shao, Jiangtao Feng, Bo Li, Yisheng Lv, Xinglin Piao,
+and Baocai Yin. Bjtt: A large-scale multimodal dataset for traffic prediction. IEEE Transactions
+on Intelligent Transportation Systems, 2024.
+[42] Xiao Han, Zhenduo Zhang, Yiling Wu, Xinfeng Zhang, and Zhe Wu. Event traffic forecasting
+with sparse multimodal data. In Proceedings of the 32nd ACM International Conference on
+Multimedia, pages 8855–8864, 2024.
+[43] Haoxin Liu, Zhiyuan Zhao, Shiduo Li, and B Aditya Prakash. Evaluating system 1 vs. 2
+reasoning approaches for zero-shot time-series forecasting: A benchmark and insights. arXiv
+preprint arXiv:2503.01895, 2025.
+[44] Daniel M Ziegler, Nisan Stiennon, Jeffrey Wu, Tom B Brown, Alec Radford, Dario Amodei,
+Paul Christiano, and Geoffrey Irving. Fine-tuning language models from human preferences.
+arXiv preprint arXiv:1909.08593, 2019.
+[45] Nisan Stiennon, Long Ouyang, Jeffrey Wu, Daniel Ziegler, Ryan Lowe, Chelsea Voss, Alec
+Radford, Dario Amodei, and Paul F Christiano. Learning to summarize with human feedback.
+Advances in neural information processing systems, 33:3008–3021, 2020.
+[46] Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin,
+Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. Training language models to
+follow instructions with human feedback. Advances in neural information processing systems,
+35:27730–27744, 2022.
+[47] Rafael Rafailov, Archit Sharma, Eric Mitchell, Christopher D Manning, Stefano Ermon, and
+Chelsea Finn. Direct preference optimization: Your language model is secretly a reward model.
+Advances in Neural Information Processing Systems, 36, 2024.
+12
+
+[48] Kimi Team, Angang Du, Bofei Gao, Bowei Xing, Changjiu Jiang, Cheng Chen, Cheng Li,
+Chenjun Xiao, Chenzhuang Du, Chonghua Liao, et al. Kimi k1. 5: Scaling reinforcement
+learning with llms. arXiv preprint arXiv:2501.12599, 2025.
+[49] Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang,
+Mingchuan Zhang, YK Li, Y Wu, et al. Deepseekmath: Pushing the limits of mathematical
+reasoning in open language models. arXiv preprint arXiv:2402.03300, 2024.
+[50] Qiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xiaochen Zuo, Yu Yue, Tiantian Fan,
+Gaohong Liu, Lingjun Liu, Xin Liu, et al. Dapo: An open-source llm reinforcement learning
+system at scale. arXiv preprint arXiv:2503.14476, 2025.
+[51] Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Ruoyu Zhang, Runxin Xu, Qihao Zhu,
+Shirong Ma, Peiyi Wang, Xiao Bi, et al. Deepseek-r1: Incentivizing reasoning capability in
+llms via reinforcement learning. arXiv preprint arXiv:2501.12948, 2025.
+[52] Yong Liu, Tengge Hu, Haoran Zhang, Haixu Wu, Shiyu Wang, Lintao Ma, and Mingsheng Long.
+itransformer: Inverted transformers are effective for time series forecasting. arXiv preprint
+arXiv:2310.06625, 2023.
+[53] Yuqi Nie, Nam H Nguyen, Phanwadee Sinthong, and Jayant Kalagnanam. A time series is
+worth 64 words: Long-term forecasting with transformers. arXiv preprint arXiv:2211.14730,
+2022.
+[54] Xiongxiao Xu, Yue Zhao, S Yu Philip, and Kai Shu. Beyond numbers: A survey of time series
+analysis in the era of multimodal llms. Authorea Preprints, 2025.
+[55] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez,
+Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. Advances in neural information
+processing systems, 30, 2017.
+[56] Haixu Wu, Jiehui Xu, Jianmin Wang, and Mingsheng Long. Autoformer: Decomposition transformers with auto-correlation for long-term series forecasting. Advances in neural information
+processing systems, 34:22419–22430, 2021.
+[57] Haoyi Zhou, Shanghang Zhang, Jieqi Peng, Shuai Zhang, Jianxin Li, Hui Xiong, and Wancai
+Zhang. Informer: Beyond efficient transformer for long sequence time-series forecasting. In
+Proceedings of the AAAI conference on artificial intelligence, volume 35, pages 11106–11115,
+2021.
+[58] Tian Zhou, Ziqing Ma, Qingsong Wen, Xue Wang, Liang Sun, and Rong Jin. Fedformer:
+Frequency enhanced decomposed transformer for long-term series forecasting. In International
+conference on machine learning, pages 27268–27286. PMLR, 2022.
+[59] Ailing Zeng, Muxi Chen, Lei Zhang, and Qiang Xu. Are transformers effective for time series
+forecasting? In Proceedings of the AAAI conference on artificial intelligence, volume 37, pages
+11121–11128, 2023.
+[60] Shuai Bai, Keqin Chen, Xuejing Liu, Jialin Wang, Wenbin Ge, Sibo Song, Kai Dang, Peng Wang,
+Shijie Wang, Jun Tang, et al. Qwen2. 5-vl technical report. arXiv preprint arXiv:2502.13923,
+2025.
+
+13
+
+A
+
+Limitations
+
+Our work still has some limitations. We have only provided an initial implementation of a quantifiable
+reasoning evaluation framework, where our composite reward combines structural validity, classification accuracy, and suggestion quality. However, the model may still exhibit occasional mismatches
+between the reasoning chain and the final decision. Future research could explore trajectory-aware or
+symbolic rewards to explicitly align intermediate reasoning steps with final outputs and to promote
+diverse yet internally consistent reasoning patterns. In addition, we only incorporate the task description that accompanies each time series instance. While this supports contextual alignment to some
+extent, enriching the input with broader domain narratives or linking it to external knowledge sources
+(e.g., news reports) may enhance decision granularity and improve generalization across domains.
+Nevertheless, our work demonstrates a promising step toward equipping MLLMs with structured and
+interpretable reasoning capabilities in time-series domains.
+
+B
+
+Broader Impacts
+
+One of the major impacts of our study is that it establishes a feasible and scalable research pathway
+for time-series multimodal large language models (MLLMs). By integrating a lightweight supervised
+warm-up phase using a small set of annotated examples with a token-level reinforcement learning
+pipeline (GRPO) guided by composite rewards, we demonstrate that reinforcement learning can effectively enable strong temporal reasoning capabilities without incurring prohibitive annotation costs.
+Remarkably, even a single 3B-parameter model is sufficient to achieve state-of-the-art performance
+across diverse domains (e.g., healthcare and electricity monitoring), highlighting the advantages of
+our data- and compute-efficient methodology for developing temporal foundation models. While
+these results are encouraging, we acknowledge that robust reasoning and suggestion capabilities must
+be supported by human expert oversight, and that the model remains inadequate for deployment in
+high-stakes decision-making scenarios. We highlight our contribution as a valuable foundation for
+future research in time-series MLLMs and a meaningful step toward the broader development of
+foundation models for time-series data.
+
+C
+
+Pseudo Code
+
+Algorithm 1 Training pipeline of TimeMaster
+Require: Initial time-series MLLM πθ , judge J, dataset D, group size G, PPO clip ϵ, KL weight β
+1: Supervised fine-tune πθ on cold-start data with structured outputs
+2: for each RL iteration do
+3:
+Update the reference model: πref ← πθ
+4:
+for Step = 1, 2, . . . do
+5:
+Sample a mini-batch B from D
+6:
+Update the old model: πold ← πθ
+7:
+Sample G outputs {yi }G
+i=1 ∼ πθold (· | X, q) for each time-series instance (X, q) ∈ B
+8:
+for each sampled yi do
+9:
+Parse tags: <think>i , <class>i = ĉi , <extension>i = ei
+10:
+Compute format reward: rifmt = I[tags well-formed and non-empty]
+11:
+Compute hard reward: rihard = I[ĉi = c⋆ ]
+12:
+Compute soft reward: risoft = rihard · mean{ϕ(ei , c⋆ )}
+13:
+Compute composite reward: ri = λfmt rifmt + λhard rihard + λsoft risoft
+14:
+end for
+15:
+Compute {Âi }G
+i=1 for each group via Eq. (6)
+16:
+Update πθ by maximizing L(θ) via Eq. (7)
+17:
+end for
+18: end for
+19: return πθ
+
+14
+
+D
+
+Detailed and Additional Results
+
+D.1
+
+Discussion
+
+Table 2: Impact of extension option and reward composition on EMG classification accuracy and
+average extension quality.
+Extension Option
+
+Reward Composition
+
+Accuracy (%)
+
+Soft Reward
+
+✗
+✗
+✗
+
+39.02
+85.36
+100.00
+
+–
+–
+–
+
+✗
+✓
+
+100.00
+100.00
+
+0.45
+0.72
+
+Format
+
+Hard
+
+Soft
+
+✗
+✗
+✗
+
+✓
+✗
+✓
+
+✗
+✓
+✓
+
+✓
+✓
+
+✓
+✓
+
+✓
+✓
+
+90
+
+Accuracy (%)
+
+86.00
+Parameter analysis. We conducted an ablation
+TEE
+84.40
+85
+CTU
+study on the parameter G, which controls the num80.40
+80
+ber of generations per input during GRPO training.
+76.40
+75
+72.60
+Figure 5 illustrates how varying G affects model per71.60
+68.49
+70
+formance on the TEE and CTU datasets. We ob63.01
+65
+serve a clear upward trend: increasing G consistently
+60
+improves classification accuracy for both datasets.
+57.53
+56.16
+These improvements stem from the group-based base55
+line mechanism in GRPO: larger G values provide a
+50
+2
+3
+4
+5
+6
+more stable and representative reward estimate across
+G
+diverse reasoning paths, reducing variance in the pol- Figure 5: Effect of generation number G on
+icy gradient and facilitating more effective learning. accuracy (%) during GRPO training for TEE
+In contrast, smaller G values yield noisier baselines and CTU.
+and impede convergence. Nevertheless, increasing G
+also leads to higher computational costs. To strike a practical balance between performance and
+efficiency, we set G = 5 as the default in all main experiments.
+
+Effect of Composite Reward Components. Table 2 presents an ablation study on the effects of
+the extension module and reward composition in reinforcement learning. Without the extension
+module, the model only performs classification. Using the format or hard reward alone yields
+accuracies of 39.02% and 85.36%, respectively, while combining both reaches 100%, showing
+their complementarity: the format reward ensures structural regularity, and the hard reward guides
+accurate prediction. With the extension module enabled, the model also generates <extension>
+outputs. Adding the soft reward improves semantic quality, increasing the soft reward score from
+0.45 to 0.72, while maintaining 100% classification accuracy. This demonstrates that the soft reward
+enhances informativeness without harming decision accuracy. These results show that the format
+reward ensures structure, the hard reward is essential for classification, and the soft reward refines
+open-ended generation. The extension module is crucial for realizing the benefits of soft reward,
+validating our structured output and multi-level reward design.
+D.2
+
+More Results
+Table 3: Performance and standard deviation of TimeMaster over three random seeds.
+
+Reasoning Pattern
+
+Simple Deterministic
+
+Complex Deterministic
+
+Reasoning Task
+
+RCW
+
+TEE
+
+ECG
+
+EMG
+
+CTU
+
+HAR
+
+75.56 ± 1.30
+
+68.49 ± 2.09
+
+60.00 ± 0.77
+
+100.0 ± 1.41
+
+84.40 ± 0.40
+
+63.29 ± 0.74
+
+TimeMaster (Ours, SFT+RL)
+
+Probabilistic
+
+We also present the standard deviation of our classification performance using three random seeds in
+Table 3, demonstrating that the performance of TimeMaster is stable.
+15
+
+VL-Time (Zero-shot)
+
+<think> The accelerometer data shows variations in all
+three axes (x, y, and z). The value ranges are
+approximately: X-axis: -0.02 to 0.01, Y-axis: -0.01 to 0.01,
+Z-axis: -0.02 to 0.01. These values indicate relatively
+small movements, often associated with stationary
+activities like sitting, standing, or laying. The lack of
+significant swings or symmetrical patterns, typical in
+walking activities, suggests a stationary activity. Given
+the slight variations and the continuous low values, the
+most likely activity is 'LAYING'. </think>
+<class>LAYING</class>
+
+Qwen2.5-VL(SFT)
+
+<think> The accelerometer readings for the x, y, and z
+axes are as follows: X-axis ranges from approximately 0.01 to 0.01, the y-axis ranges from about -0.02 to 0.02,
+and the z-axis ranges from about -0.01 to 0.01. These
+ranges indicate minimal movement, which is consistent
+with stationary activities. The low variability and closezero value in all axes suggest no significant changes in
+elevation or speed. The lack of pronounced peaks and
+troughs typical of dynamic activities like walking or
+running supports the classification as "STANDING."
+STANDING implies minimal movement and is consistent
+with the observed acceleration patterns.</think>
+<class>STANDING </class>
+
+TimeMaster (Ours, SFT+RL)
+
+<think> To determine the physical activity, we should consider the patterns
+of the acceleration data across the x, y, and z axes. The chart shows data
+points labeled as 'HAR signal', indicating acceleration measurements. The
+goal is to identify a pattern consistent with the activity of each class.
+1. WALKING: walking involves significant changes in acceleration due to the
+forward and side movements. The x-axis should reflect forward motion,
+while the y and z axes can show lateral and vertical changes. Observing the
+trends in the chart, we see small fluctuations across all three axes, but the
+fluctuations also appear to be symmetric and relatively small.
+2. WALKING_UPSTAIRS/DOWNSTAIRS: Both activities involve rhythmic
+changes typically seen in walking, but they include vertical motion. The
+fluctuations would be larger and more pronounced in z-axis data due to the
+changes in vertical motion.
+3. SITTING/LAYING: These activities show very low variability, with
+minimal changes in all axes due to the lack of forward movement.
+4. STANDING: This involves very low-paced changes due to stability and
+lack of dynamic activity. Typical accelerometer data for standing will show
+minuscule fluctuations and low variability on all axes. In the provided data,
+the acceleration values for x, y, and z axes range approximately from -0.02
+to 0.02, -0.02 to 0.02, and -0.02 to 0.02, respectively. These small ranges
+show little fluctuation and are consistent with low activity involving
+stability. Thus, the observed trends do not align with the expected patterns
+of dynamic activities like walking, particularly as neither x, y, nor z axes
+shows significant movement or substantial fluctuations. Therefore,
+considering the small and consistent fluctuations in all axes, the data likely
+represents a more static activity. </think>
+<class>STANDING</class>
+
+Figure 6: Comparison of reasoning outputs on a standing-labeled HAR test instance across three
+models: VL-Time (Zero-shot, left), Qwen2.5-VL(SFT, middle), and TimeMaster (SFT+RL, right).
+D.3
+
+Details of Reasoning and Suggestion Ability
+
+In this section, we present the complete reasoning outputs and more suggestion cases corresponding
+to the examples illustrated in Fig. 3.
+Takeaway I: Training is Essential for Structured Time-Series Reasoning Adaptation. In Fig. 6,
+VL-Time (Zero-shot) provides shallow reasoning and misclassifies the instance as “LAYING” based
+on vague cues like “relatively small movements” . Qwen2.5-VL (SFT) introduces domain-relevant
+priors (e.g., “low variability. . . consistent with stationary activities”) but still follows a fixed, templatelike reasoning path . In contrast, TimeMaster (SFT+RL) performs contrastive elimination of dynamic
+classes and articulates structured justifications grounded in class prototypes (e.g., “does not align
+with the expected patterns of dynamic activities like walking. . . Thus. . . likely represents a more
+static activity”) . This illustrates that even advanced models like GPT-4o (used in VL-Time) can
+perform poorly without time-series priors. SFT acts merely as a warm-up catalyst to inject minimal
+prior knowledge and accelerate convergence. RL, however, is the core enabler of structured and
+context-aware temporal reasoning.
+Takeaway II: RL Unlocks Expert-Level Time-Series Reasoning. In Fig.7 and Fig.8, Qwen2.5VL (SFT) relies on surface-level cues and often misclassifies cases, for example, labeling “other
+cardiac rhythms” as “atrial fibrillation” based on heuristics like “irregular RR intervals. . . strongly
+suggests atrial fibrillation” , or misclassifying a neuropathic EMG signal as “healthy” based solely
+on amplitude, without proper morphological analysis . In contrast, TimeMaster (RL) demonstrates
+contextual awareness, incorporating uncertainty, noise, and contrastive features into its reasoning (e.g.,
+“f waves. . . but RR interval regularity doesn’t match atrial fibrillation”) . TimeMaster (SFT+RL)
+further integrates amplitude, waveform morphology, and temporal dynamics into expert-level interpretations (e.g., “polyphasic morphology. . . consistent with neuropathy”) . While pure RL can
+suffer from inefficient exploration due to a lack of domain priors, even a low-resource SFT warm-up
+significantly accelerates convergence and stabilizes the learning process by steering RL toward the
+correct reasoning subspace from the outset.
+Takeaway III: Beyond Reasoning, RL Enables Flexible Extensions such as Insightful, Actionable
+Suggestion Generation. As seen in Fig. 9, TimeMaster generates domain-specific suggestions with
+high soft reward, including structured diagnostics and treatment plans (e.g., “MRI. . . blood work. . .
+tailored physical therapy program”) . These outputs are context-aware (e.g., "low amplitude and
+16
+
+Qwen2.5-VL(SFT)
+
+< t h i n k > 1. Amplitude Analysis: The ECG waveform shows
+amplitude values ranging approximately from -2 mV to 6 mV. This
+range is typical for ECG signals but may indicate significant noise
+if the waveform is erratic or irregular. 2. P Waves: The presence of
+P waves is not clearly identifiable, which could suggest atrial
+activity is not consistent or present. 3. QRS Complexes: The QRS
+complexes appear to be present, but they are irregular in shape
+and timing. This irregularity could indicate an arrhythmia. 4.
+Rhythm Regularity: The rhythm is irregular, with no consistent
+pattern or regular intervals between QRS complexes. This
+irregularity is characteristic of atrial fibrillation. 5. RR Interval
+Variability: There is significant variability in the RR intervals,
+which is a hallmark of atrial fibrillation. 6. PR Interval: The PR
+interval is not clearly identifiable due to the lack of consistent P
+waves. 7. Signal Noise: The waveform shows some irregularities
+and fluctuations, which might suggest noise interference. 8.
+Overall Rhythm Pattern: The combination of irregular RR
+intervals, absence of P waves, and irregular QRS complexes
+strongly suggests atrial fibrillation. </think>
+<class>atrial fibrillation</class>
+
+TimeMaster (RL)
+
+< t h i n k > 1. Amplitude Values: The ECG waveform shows amplitude
+values ranging approximately from -2 mV to +6 mV. This is within a
+typical range for ECG signals. 2. QRS Complexes: The waveform displays
+distinct QRS complexes, which are the most prominent features of an ECG.
+The QRS complexes are visible and appear to be of normal morphology. 3.
+P Waves: P waves are not clearly distinguishable in this waveform, which
+might indicate an absence of normal atrial depolarization or an irregular
+atrial rhythm. 4. RR Interval Variability: The intervals between the QRS
+complexes appear irregular, suggesting possible atrial or ventricular
+arrhythmias. 5. PR Interval: The PR interval is not easily measurable due
+to the absence of distinct P waves. 6. Noise: The signal does not appear
+excessively noisy, but there is some baseline fluctuation that might
+indicate some level of noise. 7. Heart Rate Trends: The heart rate appears
+irregular, which could be indicative of an arrhythmia. 8. Overall Rhythm
+Pattern: The combination of irregular QRS complexes and the absence of
+clear P waves suggests an atypical rhythm pattern, which could be
+classified as "other cardiac rhythms." Given these observations, the
+waveform does not fit the typical patterns of normal sinus rhythm or
+atrial fibrillation. The irregularity and absence of distinct P waves suggest
+an atypical rhythm pattern, leading to the classification of "other cardiac
+rhythms." </think>
+<class>other cardiac rhythms</class>
+
+TimeMaster (Ours, SFT+RL)
+
+<th ink > Analyzing the ECG waveform: 1. Amplitude Range: The yaxis shows amplitude in millivolts ranging from approximately -2 mV
+to +6 mV. 2. QRS Complexes: Distinct QRS complexes appear at regular
+intervals. The large amplitude and sharp spikes indicate ventricular
+depolarization, typical for QRS complexes. These appear irregular in
+both amplitude and frequency. 3. P Waves: It is difficult to identify
+distinct P waves preceding each QRS complex, suggesting possible
+atrial issues or overlapping signals. 4. R-R Interval Regularity: There is
+noticeable variability in the R-R intervals (time between successive
+QRS complexes), with some intervals being longer or shorter than
+others. 5. PR Interval: The absence of discernible P waves makes it
+challenging to evaluate PR interval consistency. 6. f Waves: There is a
+presence of baseline undulations between the QRS complexes
+suggestive of f waves, which are typical in atrial fibrillation. However,
+the RR interval regularity doesn't match atrial fibrillation. 7. Noise:
+There is minimal visible noise, as the baseline is mostly stable except
+for the f-wave-like undulations. Based on the above observations, the
+waveform does not definitively match the characteristics of a "normal
+sinus rhythm" or "atrial fibrillation." The irregular rhythm and lack of
+consistent P waves suggest that this is not a typical pattern for these
+rhythms. The stable baseline and apparent organized activity indicate
+it isn't just "noise." Therefore, the appropriate classification would be
+"other cardiac rhythms" due to the variability in R-R intervals and the
+absence of definite P waves.</think>
+<class>other cardiac rhythms</class>
+
+Figure 7: Comparison of model reasoning on an ECG instance labeled as “other cardiac rhythms,”
+across three configurations: Qwen2.5-VL(SFT, left), TimeMaster (RL, middle), TimeMaster
+(SFT+RL, right).
+
+Qwen2.5-VL(SFT)
+
+<th ink> 1. Amplitude Analysis: The waveform shows a
+range of amplitudes from approximately -2.5 mV to 0.5
+mV. This indicates a wide amplitude range.
+2. Morphology and Temporal Patterns: The waveform
+appears to have sharp onset and brief duration, which are
+typical of motor unit potentials. The waveform
+morphology is consistent with normal recruitment and
+morphology of motor unit potentials.
+3. Conclusion: The waveform shows sharp onset and brief
+duration, consistent with normal recruitment and
+morphology of motor unit potentials. The amplitude
+range is consistent with normal motor unit potentials.
+</think>
+<class>Healthy</class>
+
+TimeMaster (RL)
+
+TimeMaster (Ours, SFT+RL)
+
+< t h i nk > 1. Amplitude Analysis: The waveform shows a
+range of amplitudes, with the minimum amplitude being
+around -2.5 mV and the maximum amplitude being
+approximately 0.5 mV. This indicates a significant variation
+in amplitude, which is a key characteristic of neuropathy.
+2. Waveform Morphology: The waveform is polyphasic,
+meaning it has multiple peaks. This is typical in
+neuropathy due to reinnervation and the presence of
+motor units with abnormal recruitment patterns.
+3. Temporal Patterns: The waveform shows a consistent
+pattern of sharp onset and brief duration, which is
+characteristic of neuropathy. The polyphasic nature of the
+waveform is indicative of reinnervation, where motor units
+are recruited in a different manner than in a healthy state.
+4.Comparison with Conditions: - Healthy: Typically shows
+smaller amplitude, regular, and continuous motor unit
+potentials. - Myopathy: Usually shows smaller amplitude,
+more regular, and continuous motor unit potentials. Neuropathy: Shows larger amplitude, irregular, and
+fragmented motor unit potentials.
+5. Conclusion: The waveform's characteristics—polyphasic
+morphology, increased amplitude, and long duration—are
+consistent with neuropathy. </think>
+<class>Neuropathy</class>
+
+< t h i n k >1. Amplitude Analysis: The waveform shows a
+range of amplitudes, with peaks reaching approximately
+0.5 mV and troughs reaching approximately -2.5 mV.
+2. Morphology Analysis: The waveform has sharp onset
+and brief duration, indicating a rapid rise and fall of the
+electrical activity. The waveform is polyphasic, meaning it
+has multiple peaks and troughs within the waveform.
+3. Temporal Patterns: The waveform shows consistent
+amplitude and morphology, with no indication of
+variability or changes in waveform morphology over
+time.
+4. Comparison with Conditions: - Healthy: Typically
+shows normal recruitment and morphology of motor unit
+potentials, sharp onset, brief duration, and consistent
+amplitude. - Myopathy: Typically shows small amplitude
+and short duration, indicating a loss or dysfunction of
+muscle fibers. - Neuropathy: Tends to show increased
+amplitude, long duration, and polyphasic waveforms due
+to reinnervation after denervation.
+5. Conclusion: The waveform shows sharp onset and brief
+duration, consistent amplitude, and polyphasic
+morphology, which aligns with the characteristics of
+neuropathy. </think>
+<class>Neuropathy</class>
+
+Figure 8: Comparison of reasoning outputs on a neuropathy-labeled EMG test instance across three
+configurations: Qwen2.5-VL(SFT, left), TimeMaster (RL, middle), TimeMaster (SFT+RL, right).
+
+17
+
+<extension> Based on the analysis, the waveform is
+consistent with normal neuromuscular activity, indicating that
+the patient likely has a healthy neuromuscular system. There
+are no signs of myopathy or neuropathy based on the
+waveform morphology and amplitude. 1. Additional
+Diagnostic Tests: No additional tests are necessary at this
+stage as the waveform suggests normal neuromuscular
+activity. 2. Specialist Referrals: There are no specific referrals
+needed based on this waveform alone. 3. Initial Treatment: No
+immediate treatment is required. The patient should continue
+with their current physical therapy regimen and maintain a
+healthy lifestyle to support muscle health. 4. Monitoring: The
+patient should be monitored for any changes in muscle
+function or symptoms that might indicate the onset of
+neuromuscular issues. If there are any concerns or changes in
+the patient's condition, further diagnostic evaluations such as
+EMG, MRI, or blood work may be considered.</extension>
+
+<extension>Given the low amplitude and small spike
+morphology of the EMG waveform, the most appropriate
+diagnostic label is Myopathy. 1. Additional Diagnostic Tests:
+Conduct further EMG studies to assess the recruitment
+pattern and motor unit action potential characteristics. 2.
+MRI: Consider performing an MRI to evaluate muscle
+structure and identify any potential abnormalities such as
+atrophy or inflammation. 3. Blood Work: Evaluate muscle
+enzymes and troponin levels to assess muscle damage and
+inflammation. 4. Specialist Referral: Refer the patient to a
+neurologist for detailed evaluation and to discuss potential
+treatment options, which may include physical therapy,
+medication management, and lifestyle modifications to
+support muscle health. 5. Physical Therapy: Implement a
+tailored physical therapy program to maintain muscle
+strength and function, focusing on exercises that are
+appropriate for the patient's condition. </extension>
+
+Soft reward: 0.800
+
+Soft reward: 0.825
+
+Figure 9: TimeMaster’s suggestions via <extension> tags on EMG signals for two cases: healthy
+(left) and myopathy (right).
+Qwen2.5-VL(SFT)
+
+< t h i n k > To classify the physical activity, we need to
+examine the acceleration values along the x, y, and z axes.
+The plot shows three distinct curves, each representing
+the acceleration along one of the axes. The x-axis shows
+fluctuations around -0.2 to 0.4, the y-axis ranges from 0.2 to 0.4, and the z-axis ranges from -0.2 to 0.4. These
+ranges indicate periodic oscillations, which are
+characteristic of dynamic activities like walking or
+walking upstairs/downstairs. The presence of these
+oscillations suggests movement, as static activities like
+sitting, standing, or laying would show less variation in
+acceleration values. The value ranges and the periodic
+nature of the curves align with the expected motion
+patterns of walking or walking upstairs/downstairs.
+Therefore, based on the observed acceleration values, the
+activity is likely to be "WALKING_UPSTAIRS" or
+"WALKING_DOWNSTAIRS". </think>
+<class>WALKING_UPSTAIRS</class>
+
+TimeMaster (RL)
+
+< t h i n k > To classify the physical activity, we need to
+analyze the values of the x, y, and z acceleration channels
+over the time period. The values of acceleration are
+typically in units of meters per second squared (m/s²). 1.
+Walking: Walking is characterized by moderate
+acceleration values, with the x and y axes showing some
+variability but not extreme values. The z-axis might show
+some acceleration, but not as much as the x and y axes. 2.
+Walking Upstairs: This activity involves more vertical
+acceleration, with the z-axis showing significant values,
+while the x and y axes might show moderate values. 3.
+Walking Downstairs: Similar to walking up, but with
+more emphasis on the z-axis, which shows significant
+acceleration. 4. Sitting: Sitting typically involves minimal
+acceleration, with all axes showing low values. 5.
+Standing: Standing involves some acceleration, but not as
+much as walking, with all axes showing moderate values.
+6. Laying: Laying involves minimal acceleration, with all
+axes showing low values. Given the plot, the x and y axes
+show moderate values, while the z-axis shows significant
+values. This suggests that the activity involves significant
+vertical movement, which is characteristic of walking up
+or down stairs. Therefore, the most likely activity is
+"walking up stairs" or "walking down stairs". </think>
+<class>WALKING_UPSTAIRS</class>
+
+TimeMaster (Ours, SFT+RL)
+
+< t h i n k > To classify the physical activity, we need to
+examine the acceleration values along the x, y, and z axes.
+The x-axis shows periodic fluctuations, ranging
+approximately from -0.2 to 0.4. The y-axis shows similar
+fluctuations, ranging from about -0.1 to 0.4. The z-axis
+shows less variation, ranging from about -0.1 to 0.3.
+These fluctuations suggest dynamic movement, which is
+characteristic of activities involving repetitive motion.
+The periodicity and range of the x and y axes suggest a
+rhythmic pattern, which is typical of walking. The z-axis
+shows less variation, which is consistent with the ground
+being relatively stable, as would be expected during
+walking. Therefore, the observed acceleration patterns
+are consistent with the activity of WALKING. </think>
+<class>WALKING</class>
+
+Figure 10: Comparison of reasoning outputs on a walking-labeled HAR test instance under three
+models: Qwen2.5-VL(SFT, left), TimeMaster (RL, middle), and TimeMaster (SFT+RL, right).
+small spike morphology of the EMG waveform") and closely align with the underlying reasoning.
+While supervised fine-tuning produces grammatically correct and coherent responses, reinforcement
+learning with reward shaping enhances the model’s ability to generate actionable and clinically
+relevant insights.
+D.4
+
+More Case Studies on Reasoning Ability
+
+In this section, we provide more case studies to compare various models’ reasoning ability, to further
+support our advancement.
+More Case Studies on HAR. Fig. 10 presents the outputs of three models on a HAR sample labeled
+as “WALKING.” TimeMaster (RL) demonstrates improved temporal awareness by distinguishing
+axis-specific dynamics and narrowing down to stair-related classes. While the prediction is not
+18
+
+Qwen2.5-VL(SFT)
+
+< t h i n k > 1. Frequency of peaks: Desktop computers
+typically use energy more sporadically, with occasional
+peaks corresponding to periods of activity. Laptops, on the
+other hand, can be more consistent in their energy
+consumption, with more frequent and less pronounced
+peaks. 2. Duration of peaks: Desktops often have longer
+periods of high consumption, which can last for several
+minutes. Laptops usually have shorter peaks, lasting less
+than a minute. 3. Pattern consistency: Desktops might show
+a more consistent pattern of activity throughout the day,
+with multiple peaks corresponding to different activities.
+Laptops might show a more sporadic pattern with fewer but
+more frequent peaks. Given the nature of the signal in the
+plot: there are multiple peaks, which suggests activity. The
+peaks are relatively short, indicating frequent but short
+periods of use. The signal shows a consistent pattern of
+activity throughout the day, with multiple peaks. Based on
+these observations, the signal is more consistent and has
+multiple short peaks, which is characteristic of a laptop's
+usage pattern. Therefore, the most appropriate classification
+for this signal is: Laptop.</think>
+<class>Laptop</class>
+
+TimeMaster (RL)
+
+< t h i n k > To classify the device usage pattern, we need to
+analyze the characteristics of the signal. The signal shows a
+series of spikes and a general trend that can be indicative of
+different types of devices. 1. Desktop usage typically has a
+more consistent and lower energy consumption pattern
+compared to laptops. Desktops are generally used for tasks
+that require more processing power and are less likely to be
+used for extended periods of time without a significant
+increase in usage. 2. Laptop usage tends to have a more
+sporadic and higher energy consumption pattern. They are
+often used for tasks that require more frequent and variable
+usage, such as web browsing, video streaming, and
+multitasking. Given the nature of the signal, which shows
+multiple spikes and a general trend that is more consistent
+and lower, it is more likely to represent desktop usage. </
+think>
+<class>Desktop</class>
+
+TimeMaster (Ours, SFT+RL)
+
+< t h i n k > 1. Signal Characteristics: The signal shows a
+significant increase in energy consumption around the
+300th timestamp and remains relatively high for the next
+100 timestamps. 2. Desktop vs. Laptop Usage: Desktops
+typically have higher energy consumption due to larger
+components and more powerful hardware. Laptops, on
+the other hand, are designed to be more energy-efficient.
+3. Pattern Analysis: The pattern shows a sustained high
+energy usage, which aligns with desktop usage. Desktops
+often have consistent power usage due to their larger
+components and higher power requirements. 4.
+Conclusion: The sustained high energy usage pattern
+suggests the device is likely a desktop computer, as
+laptops generally have more variable usage patterns due
+to battery charging and power-saving features. Therefore,
+the signal pattern is more consistent with a desktop
+computer. </think>
+<class>Desktop</class>
+
+Figure 11: Comparison of reasoning outputs on a desktop-labeled CTU test instance under three
+models: Qwen2.5-VL(SFT, left), TimeMaster (RL, middle), and TimeMaster (SFT+RL, right)
+correct, it reflects better sensitivity to motion cues. TimeMaster (SFT+RL) further refines this process,
+offering more structured reasoning and class selection, showing the benefit of combining SFT priors
+with reward-guided refinement. In addition, we observe that the inter-variable relationships in the
+HAR data are highly complex, often overlapping and unclear, which may hinder the model’s ability
+to recognize fine-grained patterns.
+More Case Studies on CTU. Fig. 11 shows the outputs of three models on a CTU sample with
+moderate but sustained energy usage. Qwen2.5-VL (SFT) misclassifies the device as a Laptop,
+focusing on general spike frequency without considering the short duration and regular pattern of
+usage, leading to a superficial conclusion. TimeMaster (RL) correctly identifies it as a Desktop,
+citing the short, regular peaks. However, its explanation lacks depth and misses a broader temporal
+context. TimeMaster (SFT+RL) gives the correct classification (Desktop) with a more comprehensive
+explanation, considering peak frequency, duration, and overall rhythm, aligning well with typical
+desktop usage.
+More Case Studies on ECG. As shown in Fig. 12, the reasoning chains of each model reveal
+clear differences in their ability to interpret noisy ECG signals. VL-Time (Zero-shot), despite being
+powered by GPT-4o, identifies irregular RR intervals and unclear P waves, leading to a prediction of
+"atrial fibrillation." However, its reasoning lacks depth and fails to account for the chaotic morphology
+of the waveform, missing critical contextual cues. Qwen2.5-VL (SFT) offers a superficial judgment,
+labeling the signal as "noise" with minimal justification and without engaging with the waveform’s
+structural or temporal features. In contrast, TimeMaster (SFT+RL) demonstrates a more robust and
+structured reasoning process by integrating multiple temporal indicators—such as irregular rhythm,
+absence of distinguishable P and QRS waves, and waveform disorganization. This comprehensive
+analysis leads to a well-grounded prediction of "noise."
+More Case Studies on TEE. Fig. 13 shows the reasoning outputs of VL-Time (Zero-shot),
+Qwen2.5-VL (SFT), and TimeMaster (SFT+RL) on a TEE signal with gradual intensity change.
+Qwen2.5-VL (SFT) and VL-Time (Zero-shot) both misclassify the signal as IR Negative, focusing too
+much on the peak while overlooking the gradual rise and fluctuating pattern. TimeMaster (SFT+RL)
+correctly identifies the signal as Gradual Intra-Cloud, providing a well-structured explanation that
+highlights the smooth ramp-up and lack of sharp peaks.
+More Case Studies on RCW. Fig. 14 presents the outputs of VL-Time (Zero-shot), Qwen2.5-VL
+(SFT), and TimeMaster (SFT+RL) on an audio waveform sample for right whale detection. VL-Time
+and Qwen2.5-VL (SFT) both identify signal structure and amplitude range but fail to associate
+19
+
+VL-Time (Zero-shot)
+
+< t h i n k > 1. P Waves: The presence of P waves indicates
+normal atrial depolarization. In this waveform, it is challenging
+to distinguish distinct P waves before each QRS complex,
+making the identification of normal sinus rhythm difficult. 2.
+QRS Complexes: The QRS complexes appear relatively narrow
+and consistent in terms of shape and timing, typical of normal
+ventricular depolarization. However, the spacing between QRS
+complexes is somewhat irregular, which could suggest an
+arrhythmia. 3. Rhythm Regularity: The RR intervals (i.e., the
+time between successive R peaks) show variability. In a
+normal sinus rhythm, the RR intervals should be relatively
+regular, while atrial fibrillation is characterized by irregular
+intervals. 4. Signal Noise: There doesn't appear to be
+significant noise that could classify the ECG as purely noise.
+The waveform is clear enough to interpret basic rhythm
+features. 5. Amplitude Values: The y-axis indicates amplitude
+in millivolts. The waveform varies between approximately -2
+mV to +5 mV. This range is typical for ECG recordings and does
+not suggest excessive noise or interference. 6. Heart Rate
+Trends: The variability in the RR intervals suggests that the
+heart rate is not consistently regular. Considering these
+observations, the irregularity in RR intervals along with the
+difficulty in identifying consistent P waves is suggestive of
+"atrial fibrillation." </think>
+<class>atrial fibrillation</class>
+
+Qwen2.5-VL(SFT)
+
+< t h i n k >1. Amplitude Analysis: The ECG waveform shows a
+range of approximately -2.5 mV to +4.5 mV. This indicates
+significant variability in the amplitude, which is not typical for
+a normal sinus rhythm or atrial fibrillation. 2. P Waves: The
+waveform does not clearly display distinct P waves, which are
+usually present in normal sinus rhythm. This absence suggests
+the possibility of other cardiac rhythms or noise. 3. QRS
+Complexes: The QRS complexes are not clearly identifiable,
+which could indicate noise or an abnormal rhythm. 4. Rhythm
+Regularity: There is no consistent pattern or regularity in the
+rhythm, which is characteristic of noise or other cardiac
+rhythms. 5. Signal Noise: The waveform appears erratic and
+lacks the structured pattern of a normal ECG. The
+irregularities and lack of distinct features suggest the presence
+of noise. 6. RR Interval Variability: There is significant
+variability in the RR intervals, which is not typical for a regular
+rhythm like atrial fibrillation or normal sinus rhythm. 7. PR
+Interval: There is no clear PR interval that can be measured,
+further suggesting the presence of noise or an atypical rhythm.
+Given these observations, the waveform lacks the structured
+and consistent features of a normal sinus rhythm or atrial
+fibrillation, and the irregularities and lack of distinct features
+strongly suggest the presence of noise. </think>
+<class>noise</class>
+
+TimeMaster (Ours, SFT+RL)
+
+< t h i n k > 1. Amplitude Analysis: The y-axis of the ECG
+waveform is labeled in millivolts (mV). The amplitude ranges
+approximately from -2 mV to +4 mV. 2. Waveform
+Morphology: The waveform shows irregular, erratic
+fluctuations without distinct P waves, QRS complexes, or
+consistent RR intervals. The irregularities suggest the absence
+of a regular cardiac rhythm. 3. Signal Noise: The waveform is
+highly irregular and lacks any structured pattern typical of a
+normal ECG. The fluctuations are inconsistent and do not
+follow a predictable pattern, indicating significant noise
+interference. 4. RR Interval Variability: There is no discernible
+pattern in the RR intervals, which would be expected in a
+normal sinus rhythm. The variability in the waveform suggests
+irregular heartbeats. 5. PR Interval Changes: The absence of
+clear P waves and QRS complexes makes it impossible to
+assess PR interval changes. 6. Presence of f Waves: The
+waveform does not show the characteristic f waves of atrial
+fibrillation, which are typically irregularly irregular. 7. Heart
+Rate Trends: The irregularity and lack of structured pattern
+suggest inconsistent heart rate trends. 8. Overall Rhythm
+Pattern: The irregular, erratic nature of the waveform,
+combined with the absence of recognizable cardiac cycles,
+strongly indicates that the rhythm is not normal or atrial
+fibrillation. The waveform lacks the structured, repetitive
+nature of other cardiac rhythms. 9. Conclusion: The waveform
+is characterized by extreme irregularity and lack of discernible
+cardiac cycles, which are typical of noise interference. Given
+the waveform's characteristics, the most appropriate
+classification is "noise." </think>
+<class>noise</class>
+
+Figure 12: Comparison of reasoning outputs on a noise-labeled ECG test instance under three models:
+VL-Time(left), Qwen2.5-VL(SFT, middle), and TimeMaster(SFT+RL, right).
+
+VL-Time (Zero-shot)
+
+< t h i n k > 1. Signal Analysis: The waveform starts with a flat
+section, then gradually increases in power, reaches a peak, and
+gradually declines. This behavior indicates a gradual process
+with a sharper peak midway. 2. Comparing Signal Types: - CG
+Positive: Sharp turn-on followed by noise. This waveform
+lacks the sharp initial turn-on. - IR Negative: Gradual ramp-up,
+sharp peak, exponential decline. The waveform matches this
+description. - Subsequent Return Stroke: Similar to IR, but
+without the ramp-up, which does not match the observed data.
+- Impulsive: Characterized by a sudden sharp peak. This signal
+is too gradual and spread out. - Impulsive Pair: Two sharp
+peaks closely spaced. This is not evident in the waveform. Gradual Intra-Cloud: More spread out with gradual increase,
+matching somewhat, but less sharp than the observed peak. Off-record: Incomplete records. The waveform seems
+complete within the window. 3. Waveform Features: Minimum Value: Around -1. - Maximum Value: Approximately
+3.5. 4. Conclusion: The signal's gradual increase and sharp
+peak strongly indicate an "IR Negative" type. </think>
+<class>IR Negative</class>
+
+Qwen2.5-VL(SFT)
+
+< t h i n k > 1. Signal Characteristics: The waveform shows a
+gradual ramp-up, peaks sharply, and then declines
+exponentially. This pattern is typical of an IR Negative event. 2.
+Comparison with Event Types: - CG Positive: Characterized by
+a sharp turn-on followed by noise, which is not observed here.
+- Subsequent Return Stroke: Lacks a ramp-up phase, which is
+present here. - Impulsive: Characterized by a sudden, sharp
+peak, which is not present. - Impulsive Pair: Would show two
+sharp peaks, not observed here. - Gradual Intra-Cloud: Would
+show a gradual increase, which is present. - Off-record: The
+event fits within the window, so this is not applicable. 3.
+Approximate Value Ranges: The signal's value ranges from
+approximately -1 to 3, with a sharp peak around the middle of
+the time period. 4. Conclusion: The waveform matches the
+description of an IR Negative event, characterized by a gradual
+ramp-up, sharp peak, and exponential decline. </think>
+<class>IR Negative</class>
+
+TimeMaster (Ours, SFT+RL)
+
+< t h i n k > 1. Signal Characteristics: The waveform shows a
+gradual increase in signal strength over time, with a noticeable
+ramp-up followed by fluctuations. The signal does not show a
+sharp turn-on or a single sharp peak. 2. Comparison with
+Event Types: - CG Positive: Characterized by a sharp turn-on
+followed by extended noise. The signal here shows a gradual
+ramp-up, not a sharp onset. - IR Negative: Shows a gradual
+ramp-up, a sharp peak, and then an exponential decline. The
+signal lacks the sharp peak and exponential decline. Subsequent Return Stroke: Lacks the ramp-up phase, similar
+to IR Negative but without the ramp-up. - Impulsive: Features
+a sudden, sharp peak, which is not present here. - Impulsive
+Pair: Would show two sharp, closely spaced peaks, not present
+here. - Gradual Intra-Cloud: Characterized by a gradual
+increase in power, more spread out than impulsive types. This
+matches the gradual ramp-up seen here. - Off-record: The
+signal is complete within the window, so this is not applicable.
+3. Approximate Value Ranges: The minimum value is
+approximately -1, and the maximum value is around 3. 4.
+Conclusion: The signal shows a gradual ramp-up followed by
+fluctuations, matching the characteristics of a Gradual IntraCloud event. </think>
+<class>Gradual Intra-Cloud</class>
+
+Figure 13: Comparison of reasoning outputs on a Gradual Intra-Cloud-labeled TEE test instance
+under three models: VL-Time(left), Qwen2.5-VL(SFT, middle), and TimeMaster(SFT+RL, right).
+
+20
+
+VL-Time (Zero-shot)
+
+< t h i n k > To determine if the signal contains right whale
+vocalizations, we need to consider the characteristics of right
+whale up-calls. These calls typically have a frequency range of
+60Hz–250Hz and last about 1 second. The waveform should
+show pronounced variations within this frequency range. 1.
+Visual Inspection: The waveform appears dense without clear
+distinguishing features. This could indicate background noise.
+2. Frequency Consideration: Right whale calls would manifest
+as regular up-calls with distinct peaks and valleys over
+approximately one second. 3. Signal Density: The waveform's
+variations do not exhibit clear periodicity that matches the
+expected 1-second duration of right whale calls. 4. Noise
+Presence: The waveform could be obscured by low-frequency
+noise from other sources like ships or drilling. However, the
+lack of distinctive up-calls suggests noise rather than whale
+calls. 5. Approximate Values: The waveform values range from
+approximately -0.011 to 0.010. Considering these points, the
+waveform does not display the characteristics of a right whale
+up-call. </think>
+<class>NoWhale/class>
+
+Qwen2.5-VL(SFT)
+
+< t h i n k > To classify the audio signal, we need to analyze the
+waveform for the presence of right whale up-calls. These calls
+typically have a frequency range of 60Hz–250Hz and last around 1
+second. Given the waveform is sampled at 2kHz, we can
+determine the frequency content by looking at the periodicity of
+the waveform. 1. Frequency Analysis: Right whale calls would
+manifest as periodic patterns in the waveform. The waveform
+should show a clear, consistent pattern that lasts about 1 second,
+with a frequency range of 60Hz–250Hz. 2. Signal Range: The
+waveform is sampled at 2kHz, so the frequency content should be
+visible within the 0–1000Hz range. The amplitude of the
+waveform should show variations that could correspond to the
+frequency of the whale calls. 3. Amplitude and Pattern: The
+waveform appears to have a consistent amplitude range of
+approximately -0.01 to 0.01. This amplitude variation could
+suggest the presence of a signal, but the lack of clear, periodic
+patterns typical of whale calls suggests noise or other
+interference. 4. Ground Truth: The ground truth is labeled as
+"NOWHALE," indicating that no right whale calls are present.
+Given the ground truth and the lack of clear periodic patterns, it is
+reasonable to conclude that the signal does not contain right
+whale vocalizations. </think>
+<class>NoWhale</class>
+
+TimeMaster (Ours, SFT+RL)
+
+<think> To classify the audio signal, we need to consider the
+characteristics of right whale up-calls: 1. Frequency Range:
+Right whale up-calls typically have a frequency range of 60Hz–
+250Hz. Given the sampling rate of 2kHz, this frequency range
+can be analyzed using a Fourier Transform to confirm the
+presence of these frequencies. 2. Duration: Right whale calls
+typically last around 1 second. Since the waveform is 2
+seconds long, we should look for a pattern that spans about
+half the length of the waveform. 3. Signal Characteristics: The
+waveform should show distinct patterns that match the
+expected characteristics of right whale calls. These patterns
+should be smooth and consistent with the expected duration
+and frequency range. 4. Noise Consideration: Low-frequency
+noise from ships or other sources might obscure the calls.
+However, the waveform should still show a clear pattern that
+stands out from the noise. Given the waveform, the signal
+appears to have distinct peaks and troughs that might
+correspond to the expected duration and frequency of right
+whale calls. The amplitude of the signal is relatively consistent
+throughout the 2-second duration, suggesting that the
+presence of a whale call is likely. The ground truth is
+RightWhale, which aligns with the visual characteristics of the
+waveform. The peaks and troughs are consistent with the
+expected pattern of a right whale call. </think>
+<class>RightWhale</class>
+
+Figure 14: Comparison of reasoning outputs on a RightWhale-labeled RCW test instance under three
+models: VL-Time(left), Qwen2.5-VL(SFT, middle), and TimeMaster(SFT+RL, right).
+
+these with the expected frequency and duration characteristics of right whale up-calls. As a result,
+they misclassify the signal as "NoWhale." In contrast, TimeMaster (SFT+RL) integrates frequency
+domain expectations, temporal duration, and amplitude consistency to support a correct prediction of
+"RightWhale." While the model’s prediction aligns with the ground truth, the high noise level in the
+RCW sample results in a less discernible time-series pattern, which may hinder the interpretability
+and robustness of the overall reasoning process. Nevertheless, this comparison still highlights the
+advantage of our method in handling noisy samples and maintaining accurate, biologically grounded
+reasoning.
+D.5
+
+Failure Cases
+Failure Cases on CTU labeled ’Desktop’
+<think> 1. Signal Characteristics: The signal shows a gradual
+increase in energy consumption followed by a sharp spike and then
+a return to baseline. This pattern is typical of a device that
+is turned on and used for a short period. 2. Energy Consumption
+Level: The overall energy consumption level is relatively low, which
+is consistent with a laptop, as laptops generally have lower power
+requirements compared to desktops. 3. Duration and Pattern: The
+pattern suggests that the device was used for a short duration, with
+a spike indicating active use, followed by a period of inactivity.
+This pattern aligns with typical laptop usage where the device is
+used intermittently. 4. Comparison with Desktop: Desktops often
+have higher and more consistent energy usage due to their larger
+components and higher power requirements. The pattern observed
+here is more consistent with laptop usage. 5. Conclusion: The
+pattern of gradual increase, sharp spike, and return to baseline is
+more characteristic of laptop usage, where devices are often used
+intermittently and have lower power consumption. Based on these
+observations, the signal pattern is more consistent with laptop usage.
+</think> <class>Desktop</class>
+
+21
+
+Table 4: Summary of datasets in T IMER B ED, including domain, number of variables, series length,
+number of classes, sample size, and reasoning type.
+Dataset
+
+Domain
+
+# Variables
+
+Length
+
+# Classes
+
+# Samples
+
+RCW
+TEE
+ECG
+EMG
+HAR
+CTU
+
+Bioacoustics
+Geophysics
+Healthcare
+Healthcare
+Sports Monitoring
+Energy/Usage
+
+1
+1
+1
+1
+3
+1
+
+4000
+319
+1500
+1500
+128
+720
+
+2
+7
+4
+3
+6
+2
+
+30,000
+143
+43,673
+205
+10,299
+500
+
+Reasoning Type
+Simple Deterministic
+Simple Deterministic
+Complex Deterministic
+Complex Deterministic
+Probabilistic
+Probabilistic
+
+While the final predictions are often correct, we observe occasional mismatches between the model’s
+reasoning and its chosen label. In some cases, the explanation supports one class, but the final
+output selects another. This suggests that the model can recognize relevant patterns but may lack full
+coherence between interpretation and decision. Such inconsistencies may arise from training objectives that treat reasoning and classification separately. Future work could explore joint supervision
+strategies, symbolic consistency constraints, or decision-aware decoding to better align explanations
+with predictions, especially in borderline or ambiguous cases.
+
+E
+
+Dataset Statistics
+
+In this section, we provide additional details on the real-world time-series classification datasets used
+in our experiments, drawn from T IMER B ED [17]. These datasets span a wide range of domains,
+signal characteristics, and reasoning complexities. Their key statistics are summarized in Table 4,
+while detailed descriptions are provided below.
+• Right Whale Call Detection (RCW)3 involves identifying North Atlantic right whale vocalizations from underwater acoustic recordings. A distinctive short, rising “whoop” sound serves as
+a necessary and sufficient indicator of whale presence, enabling direct mapping between signal
+features and class labels.
+• Transient Electromagnetic Events (TEE)4 contains satellite-collected power density signals
+from the FORTE satellite, used to classify various types of lightning-related electromagnetic
+discharges. Each class corresponds to a well-defined physical signature in the waveform, making
+the task pattern-centric and signal-driven.
+• Electrocardiogram (ECG)5 includes single-lead ECG recordings used to diagnose cardiac
+arrhythmias. Accurate classification requires holistic interpretation of multiple waveform components—such as P-wave absence, irregular R-R intervals, and atrial fibrillation indicators.
+• Electromyogram (EMG)6 comprises EMG signals used to distinguish healthy subjects from
+patients with neuropathic or myopathic disorders. The task involves reasoning over diverse
+waveform features including long-duration, high-amplitude motor unit potentials and polyphasic
+activity.
+• Human Activity Recognition (HAR)7 uses tri-axial accelerometer data from smartphones to
+classify six daily physical activities such as walking, standing, and lying. Labels are automatically
+generated and reflect latent user-dependent patterns, adding complexity to the modeling process.
+• Computer Type Usage (CTU)8 aims to differentiate between desktop and laptop usage based on
+24-hour electricity consumption traces. Although labels are programmatically derived, classification relies on subtle temporal usage signatures influenced by individual behavior.
+As shown in Table 4, each dataset in T IMER B ED is associated with one of three reasoning types,
+reflecting varying levels of complexity and semantic abstraction:
+3
+
+https://www.kaggle.com/competitions/whale-detection-challenge/data
+https://www.timeseriesclassification.com/description.php?Dataset=Lightning7
+5
+https://physionet.org/content/challenge-2017/1.0.0/
+6
+https://physionet.org/content/emgdb/1.0.0/
+7
+https://archive.ics.uci.edu/dataset/240/human+activity+recognition+using+
+smartphones
+8
+https://www.timeseriesclassification.com/description.php?Dataset=Computers
+4
+
+22
+
+• Simple deterministic reasoning: Tasks where a single salient feature is sufficient to determine
+the label. The decision boundary is often explicit and rule-based, allowing for direct mapping
+from input to output. For example, the presence of a distinct acoustic pattern in whale calls or a
+spike in satellite signal indicates class membership.
+• Complex deterministic reasoning: Tasks that require the integration of multiple temporal
+patterns or signal components to make a decision. These problems demand holistic reasoning
+over structured signal relationships, such as diagnosing arrhythmias by jointly considering P-wave
+morphology, heart rate regularity, and waveform intervals.
+• Probabilistic reasoning: Tasks characterized by user-specific or hidden variables, where labels
+are automatically derived and may not be directly observable in the input. As a result, the model
+must learn to infer outcomes under ambiguity and latent context, such as predicting user activity
+or device type based on behavior-driven time series.
+
+F
+
+Baselines
+
+We follow the recent time-series reasoning benchmark [17] and the survey [36] for the selection of
+the following baselines. Except for Time-MQA, other results in Table 1 are adopted from [17].
+• Transformer-based Models ( Transformer [55], Autoformer [56],Informer [57], FEDformer [58], PatchTST [53], iTransformer [52] ): apture long-range dependencies in timedomain sequences using self-attention mechanisms. Serve as strong baselines for time-series
+modeling.
+• CNN-based Models (TimesNet [9]): Leverage convolutional operations to extract temporal
+features across different time scales.
+• MLP-based Models (DLinear [59]): Employ lightweight feedforward layers for efficient
+modeling of local patterns in time-series data.
+• GPT-4o (Numeric, Zero-shot) [17]: Receives tokenized numerical time-series data as input
+without any demonstrations. Serves as a unimodal, language-only baseline for evaluating
+zero-shot generalization.
+• GPT-4o (Numeric, Few-shot) [17]: Extends the numeric input with a few in-context examples9 per class. Evaluates the model’s few-shot reasoning capability using raw numerical
+sequences in standard prompt format.
+• VL-Time (Zero-shot) [17]: Provides multimodal LLMs with visualized time-series plots
+and natural language prompts. Assesses general reasoning ability without demonstrations.
+• VL-Time (Few-shot) [17]: Adds a few in-context examples10 to the visual-language input,
+enabling pattern generalization with minimal supervision.
+• Qwen2.5-7B-Instruct (Time-MQA) [27]: A fine-tuned Qwen2.5-7B model11 on the TSQA
+dataset (∼ 200k pairs) for time-series question answering. It enables multi-task reasoning
+and open-ended question answering via natural language prompts.
+
+G
+
+Implementation Details of TimeMaster
+
+G.1
+
+Plotting Time Series as Images
+
+Visualizing time series as images offers an intuitive and cost-efficient approach to understanding
+temporal patterns, and has been widely adopted in recent studies [54, 36]. Following the methodology
+of VL-Following Time [17], we transform time-series data into RGB line plots in the time domain to
+serve as inputs for the vision-language model, ensuring a fair comparison. Each channel is rendered
+in a distinct color and aligned along a shared timestamp axis. The x-axis represents the Timestamp,
+while the y-axis denotes the corresponding signal Value. Legends are incorporated to distinguish
+between channels (e.g., body_acc_x, body_acc_y, body_acc_z in HAR datasets).
+9
+
+Few-shot refers to fewer than six examples per class, following [17]
+Few-shot refers to fewer than six examples per class, following [17]
+11
+https://huggingface.co/Time-QA
+10
+
+23
+
+For each dataset, the signals are rendered into images with resolutions adapted to their sequence
+lengths and signal characteristics: ECG samples are plotted at 980 × 230 pixels, CTU at 562 × 230,
+TEE, RCW, and EMG at 789 × 239, and HAR at 389 × 233. All plots are saved in PNG format with
+minimal padding and a tight layout to ensure visual clarity. The time-domain signals are plotted using
+raw (non-normalized) values to faithfully preserve their original temporal dynamics.
+G.2
+
+Training Setup
+
+We initialize our backbone with the publicly available Qwen2.5-VL-3B-Instruct checkpoint [60]12 .
+Our overall training pipeline comprises two stages: warm-up through supervised fine-tuning (SFT)
+and reinforcement learning with GRPO.
+Warm-up via Supervised Fine-tuning. We first sample ∼ 1,000 time series–text paired instances
+per dataset using GPT-4o (temperature = 1.0) via the OpenAI API, where the model is prompted to
+reason over each time series and generate a corresponding answer (details are provided in Appendix I).
+These examples are used to warm-start the SFT model, which is adapted from a publicly available
+LLM training repository13 . The corresponding training hyperparameters are summarized in Table 5.
+Reinforcement Learning with GRPO. After warm-up, we train the model using the GRPO
+algorithm, adapted from a public RL training library14 . The complete GRPO configuration is provided
+in Table 6. Rewards are computed using Eq. 5, with coefficients (λfmt , λhard , λsoft ) = (0.1, 0.9, 0). In
+case studies assessing extrapolation, we set λsoft = 1.0.
+G.3
+
+System Configuration
+
+All experiments were conducted on a computing setup equipped with 4 NVIDIA A100-SXM4 GPUs
+(80GB each) for the RCW, HAR, and ECG datasets, and 4 NVIDIA RTX A6000 GPUs (48GB each)
+for the TEE, EMG, and CTU datasets.
+Table 5: Training configuration for supervised fine-tuning (SFT) using Qwen2.5-VL-3B-Instruct.
+
+Parameter
+
+Value
+
+Model
+Training mode
+Use Liger
+Batch size per device
+Number of devices
+Global batch size
+Gradient accumulation steps
+Epochs
+Learning rate (LLM)
+Learning rate (Merger)
+Learning rate (Vision)
+Weight decay
+Warmup ratio
+LR scheduler
+Precision
+Freeze vision tower
+Freeze LLM
+Tune merger
+
+Qwen/Qwen2.5-VL-3B-Instruct
+Full fine-tuning (LLM + Vision + Merger)
+True
+4
+4
+128
+8
+2
+1e-5
+1e-5
+2e-6
+0.1
+0.03
+Cosine
+bf16
+False
+False
+True
+
+12
+
+https://huggingface.co/Qwen/Qwen2.5-3B-Instruct
+https://github.com/2U1/Qwen2-VL-Finetune
+14
+https://github.com/volcengine/verl
+13
+
+24
+
+Table 6: GRPO-related hyperparameters used in TimeMaster across different time-series tasks.
+Parameter
+πθinit
+Lmax (max sequence length)
+G (group size)
+β (KL divergence coefficient)
+ϵ (PPO clip threshold)
+(λfmt , λhard , λsoft )
+Batch size
+Learning rate (RL)
+RL training epochs
+
+Value
+Qwen2.5-VL-3B
+2048
+5
+0.001
+0.2
+(0.1, 0.9, 0) or (0.1, 0.9, 1)
+16 (TEE, EMG, CTU); 32 (RCW, ECG, HAR)
+1 × 10−6
+40 (RCW, ECG, HAR); 100 (EMG, CTU); 300 (TEE)
+
+25
+
+H
+
+Designed Prompts for Experiments
+
+H.1
+
+Prompt for Reasoning and Classification
+
+We design a set of classification prompts that incorporate background task descriptions, visual
+modality instructions, and explicit class definitions tailored to each dataset. The example below
+illustrates the textual prompt used in conjunction with time-series plot images for the six datasets.
+Prompt for RCW
+<image> You are analyzing a visual representation of an audio signal
+to determine the presence of right whale vocalizations. The image
+shows a two-second waveform sampled at 2kHz, resulting in a time
+series of length 4000. Your goal is to classify whether the waveform
+segment contains a right whale call.
+Your task is to classify the signal into one of the following two
+event types:
+- Right Whale Present: The signal contains one or more right whale
+up-calls.
+- No Right Whale: The signal does not contain detectable right whale
+calls.
+You are required to identify and report the approximate value ranges
+(minimum and maximum) of the signals over the time period. Please
+select the most appropriate label for the entire waveform.
+Prompt for TEE
+<image> You are analyzing a time series signal derived from
+lightning-related electromagnetic events, recorded by the FORTE
+satellite. Your task is to classify the signal into one of the
+following seven event types:
+- CG Positive: A positive charge is lowered from a cloud to the
+ground. The waveform shows a sharp turn-on of radiation followed
+by hundreds of microseconds of noise.
+- IR Negative: A negative charge moves cloud-to-ground. The waveform
+gradually ramps up, peaks sharply (attachment point), then declines
+exponentially.
+- Subsequent Return Stroke: A follow-up negative stroke after an
+initial one. Similar waveform but without the ramp-up phase.
+- Impulsive: A sudden, sharp peak in the waveform, typical of
+intra-cloud events.
+- Impulsive Pair: Two sharp, closely spaced peaks—also known as TIPPs
+(Trans-Ionospheric Pulse Pairs).
+- Gradual Intra-Cloud: A gradual increase in power, more spread out
+than impulsive types.
+- Off-record: The signal is incomplete; the event extends beyond the
+800 microsecond window.
+You are required to identify and report the approximate value ranges
+(minimum and maximum) of the signals over the time period. Please
+choose the best matching label for the full signal.
+
+26
+
+Prompt for ECG
+<image> You are analyzing a single-lead ECG signal collected using
+a smartphone-enabled device (AliveCor). The time-series data
+represent the electrical activity of the heart, sampled at 300 Hz
+and bandpass-filtered by the device. The image displays the full
+ECG waveform in the time domain as a single continuous recording.
+Key features such as P waves, QRS complexes, rhythm regularity, and
+signal noise may be observed across the entire duration.
+Your task is to classify the heart rhythm pattern presented in this
+ECG image as one of the following:
+- "normal sinus rhythm" - "atrial fibrillation" - "other cardiac
+rhythms" - "noise"
+Please carefully analyze the waveform morphology and rhythm patterns,
+and output the ONE most likely rhythm label for the complete
+sequence.
+Prompt for EMG
+<image> You are examining a short-duration electromyography (EMG)
+waveform recorded using a concentric needle electrode inserted into
+the tibialis anterior muscle.
+The recording captures the amplitude (mV) of electrical activity
+generated by muscle fibers innervated by motor neurons.
+This EMG signal corresponds to one of the following neuromuscular
+conditions:-"Healthy".-"Myopathy".-"Neuropathy". You are required
+to analyze the approximate minimum and maximum amplitude values
+of the signal over the time period. Based on the analysis and the
+waveform’s morphology and temporal patterns, classify this EMG signal
+accordingly.
+Prompt for CTU
+<image> You are analyzing a time series signal derived from
+electricity usage patterns in UK households, recorded as part of
+the government-sponsored study "Powering the Nation". The signal
+represents energy consumption sampled every 2 minutes over a 24-hour
+period, resulting in a series length of 720. The plot shows a
+segment of the household’s daily electricity usage pattern.
+Your task is to classify the household’s device usage pattern into one
+of the following two classes:
+- Desktop: The energy consumption pattern suggests the use of a
+desktop computer.
+- Laptop: The energy consumption pattern suggests the use of a laptop
+computer.
+Please choose the label that best matches the full signal.
+
+27
+
+Prompt for HAR
+<image> You are analyzing time-series data collected from a
+smartphone’s motion sensors. The data includes three physical signal
+channels: accelerometer readings along the x, y, and z axes. The
+image shows the time-domain representation of the data. The entire
+sequence spans 2.56 seconds and contains 128 sampled data points, and
+the three sensor channels are visualized using distinct colors for
+clarity.
+Your task is to classify the physical activity and output ONE most
+likely physical activity label for the entire sequence. Possible
+physical activity classes are: “walking”, “walking_upstairs”,
+“walking_downstairs”, “sitting”, “standing”, “laying”.
+You must base your decision on the actual acceleration values shown
+in the plot. You are required to identify and report the approximate
+value ranges (minimum and maximum) of the x, y, and z channels over
+the time period. Do not make a classification based solely on the
+shape or variability of the waveform–-your reasoning must include
+explicit reference to the value ranges and how they support your
+classification.
+
+H.2
+
+Instruction Following
+
+To ensure interpretable and consistent outputs, we provide models with a structured instruction format
+applicable across all datasets. The instruction enforces step-by-step reasoning and standardized label
+selection in a consistent format.
+Instruction Format for Reasoning and Classification
+You MUST first reason step-by-step about the observed time-series
+patterns and task-specific signal characteristics. This reasoning
+process MUST be clearly written in natural language.
+After completing your reasoning, you must select ONE most appropriate
+label from the predefined class list and clearly state your final
+prediction.
+[class_1], [class_2], ...
+
+If structured output is required for external evaluation, such as soft reward scoring using an LLMas-a-Judge, we additionally enforce a clear three-part format in natural language, as shown below:
+
+Instruction Format for Reasoning, Classification, and Extension
+You MUST first reason step-by-step about the observed time-series
+patterns and task-specific signal characteristics. This reasoning
+process MUST be clearly written in natural language.
+After completing your reasoning, you must select ONE most appropriate
+label from the predefined class list and clearly state your final
+prediction: [class_1], [class_2], ...
+Finally, provide an additional recommendation, suggestion, or
+interpretation based on your reasoning and prediction. This part
+MUST be enclosed within <extension> and </extension> tags.
+
+28
+
+H.3
+
+Prompt for Soft Reward
+
+To assess the quality of open-ended model-generated suggestions (<extension> outputs), we adopt a
+soft reward mechanism based on the LLM-as-a-Judge paradigm. Specifically, we employ GPT-4o via
+the OpenAI API as a frozen expert model to evaluate each extension along four semantic dimensions.
+The judge returns a continuous score between 0.0 and 1.0, representing the averaged quality across
+the criteria below.
+General Soft Reward Prompt (LLM-as-a-Judge)
+You are an expert assistant evaluating a model-generated reasoning,
+classification, and recommendation output. The goal is to assess
+the quality of the recommendation (i.e., extension) based on the
+following structured output:
+Reasoning: [reasoning]
+Prediction: [class_X]
+Extension: [extension]
+Score the extension based on the following four criteria, each on
+a scale from 0.0 to 1.0. Then return only the average score as a
+single float (e.g., 0.625).
+Evaluation Criteria:
+1. Specificity – Is the extension clearly tailored to the predicted
+class or context, avoiding generic language?
+2. Appropriateness – Is the recommendation suitable given the
+prediction and reasoning?
+3. Relevance – Does the extension logically follow from the
+preceding reasoning and predicted class?
+4. Depth – Does the extension demonstrate domain knowledge, including
+detailed actions or next-step considerations?
+Instructions:
+- Penalize vague or generic outputs (e.g., "be careful") unless
+well-justified.
+- Reward informative, actionable, and context-aware suggestions.
+- Return only a single float between 0.0 and 1.0.
+
+I
+
+Warm-Up Data Collection via GPT-4o
+
+To construct high-quality time series–text paired reasoning data for warm-up training, we adopt
+an automated pipeline leveraging GPT-4o via the OpenAI API (with temperature set to 1.0 and
+all other parameters at default values). Using our structured prompt template for reasoning and
+classification with instruction-following, each sample is processed by GPT-4o to generate a complete
+reasoning–classification pair. Only samples whose predicted labels match the ground truth are
+retained as high-quality supervision. We collect approximately 1,000 class-balanced samples per
+dataset. For datasets with limited available instances (TEE, EMG, CTU), fewer samples are included.
+All collected data will be publicly released upon publication to support future research. Below, we
+present several cases for reference.
+29
+
+Generated Reasoning Sample (RCW)
+["from": "human", "value": "Prompt for RCW + Instruction Format for
+Reasoning and Classification"]
+"from": "gpt", "value": "<think> To classify the audio signal
+for the presence of a right whale call, we need to consider several
+characteristics:
+1. **Frequency Range**: Right whale up-calls typically range
+from 60Hz to 250Hz. Since the sampling rate is 2kHz, any frequency
+components within this range should be detectable.
+2. **Duration**: Right whale calls usually last around 1 second.
+Given the 2-second duration of the waveform, any call should be
+visible if it exists.
+3. **Signal Characteristics**: The waveform should show a distinct
+modulation corresponding to the up-call frequency. This would likely
+appear as a consistent pattern or peak within the correct frequency
+range over the duration of the call.
+4. **Noise Levels**: Low-frequency noise from other activities may
+obscure the call, making it less visible.
+In the provided waveform:
+- The waveform appears mostly consistent without distinct peaks that
+would stand out as a right whale up-call.
+- The signal amplitude ranges within approximately -0.02 to 0.02.
+However, there’s no clear modulation or pattern around 60Hz to 250Hz
+that is indicative of an up-call.
+- The waveform seems to have a random appearance rather than showing
+a periodic pattern typically associated with the structured nature of
+animal vocalizations.
+Given the absence of any noticeable patterns or frequencies that
+align with right whale calls, along with the information that the
+ground truth is NO WHALE, it is reasonable to conclude there is no
+right whale present in this segment. </think>
+<class>NoWhale</class>"]
+Generated Reasoning Sample (HAR)
+["from": "human", "value": "Prompt for HAR + Instruction Format for
+Reasoning and Classification"]
+"from": "gpt", "value": "<think> The signals show the accelerometer
+readings over 2.56 seconds with 128 sampled data points. The x-axis
+shows prominent variations ranging approximately from about -0.5
+to 1.0. This suggests a repetitive pattern typical in activities
+involving periodic motion like walking or walking downstairs. The
+y-axis values also fluctuate but with less magnitude, and range
+from about -0.3 to 0.6, indicating side motion generally seen during
+walking activities. The z-axis shows some variations as well, ranging
+approximately from -0.4 to 0.5, which might indicate body movement
+in the vertical plane. The combined range and periodic nature of
+these values, particularly the pronounced variation in the x-axis
+and moderate fluctuations in the z-axis, are more consistent with a
+stair descent activity than level walking. Furthermore, high peaks
+with moderate intervals suggest impact force experienced when stepping
+downward. Thus, the data likely corresponds to ’WALKING_DOWNSTAIRS’.
+</think>
+<class>WALKING_DOWNSTAIRS </class>"]
+
+30
+
+

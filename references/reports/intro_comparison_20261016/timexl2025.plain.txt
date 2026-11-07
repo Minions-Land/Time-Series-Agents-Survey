@@ -1,0 +1,3098 @@
+arXiv:2503.01013v4 [cs.LG] 22 Mar 2026
+
+TimeXL: Explainable Multi-modal Time Series
+Prediction with LLM-in-the-Loop
+
+Yushan Jiang1∗, Wenchao Yu2†, Geon Lee3 , Dongjin Song1†, Kijung Shin3 ,
+Wei Cheng2 , Yanchi Liu2 , Haifeng Chen2
+1
+School of Computing, University of Connecticut
+2
+Data Science & System Security Department, NEC Labs America
+3
+Kim Jaechul Graduate School of AI, KAIST
+
+Abstract
+Time series analysis provides essential insights for real-world system dynamics and
+informs downstream decision-making, yet most existing methods often overlook
+the rich contextual signals present in auxiliary modalities. To bridge this gap, we
+introduce TimeXL, a multi-modal prediction framework that integrates a prototypebased time series encoder with three collaborating Large Language Models (LLMs)
+to deliver more accurate predictions and interpretable explanations. First, a multimodal prototype-based encoder processes both time series and textual inputs to
+generate preliminary forecasts alongside case-based rationales. These outputs
+then feed into a prediction LLM, which refines the forecasts by reasoning over
+the encoder’s predictions and explanations. Next, a reflection LLM compares the
+predicted values against the ground truth, identifying textual inconsistencies or
+noise. Guided by this feedback, a refinement LLM iteratively enhances text quality
+and triggers encoder retraining. This closed-loop workflow—prediction, critique
+(reflect), and refinement—continuously boosts the framework’s performance and
+interpretability. Empirical evaluations on four real-world datasets demonstrate that
+TimeXL achieves up to 8.9% improvement in AUC and produces human-centric,
+multi-modal explanations, highlighting the power of LLM-driven reasoning for
+time series prediction.
+
+1
+
+Introduction
+
+In the modern big-data era, time series analysis has become indispensable for understanding realworld system behaviors and guiding downstream decision-making tasks across numerous domains,
+including healthcare, traffic, finance, and weather [1, 2, 3, 4]. Although deep learning models have
+demonstrated success in capturing complex temporal dependencies [5, 6, 7, 8], real-world time series
+are frequently influenced by external information beyond purely temporal factors. Such additional
+context, which may come from textual narratives (e.g., finance news [9] or medical reports [10]), can
+offer critical insights for more accurate forecasting and explainability.
+Recent multi-modal approaches for time series have shown promise by integrating rich contextual
+signals from disparate data sources, thereby improving performance across a range of tasks including forecasting, classification, imputation, and retrieval [11, 12, 13, 14]. While these approaches
+utilize supplementary data to enhance predictive accuracy, they often lack explicit mechanisms to
+systematically reason and explain about why or how contextual signals affect outcomes. This gap in
+interpretability poses significant barriers for high-stakes applications such as finance and healthcare,
+where trust and transparency are paramount.
+∗
+†
+
+Most of this work was done during the internship at NEC Labs America.
+Correspondence to: Wenchao Yu <wyu@nec-labs.com>, Dongjin Song <dongjin.song@uconn.edu>.
+
+39th Conference on Neural Information Processing Systems (NeurIPS 2025).
+
+Meanwhile, Large Language Models (LLMs) [15, 16] have risen to prominence for their remarkable
+ability to process and reason over textual data across domains, enabling tasks like sentiment analysis,
+question answering, and content generation in zero- and few-shot settings [17, 18, 19]. Recent
+advancements in agentic designs further augment LLM capabilities, facilitating structured reasoning
+and iterative decision-making for context-rich scenarios [20, 21]. Their encoded domain knowledge
+makes them natural candidates for supporting real-world multi-modal time series analyses, where
+textual context (e.g., news or expert notes) plays a vital role [22, 23, 24].
+Motivated by these observations, we introFeedback
+duce TimeXL, a novel framework that adopts
+that detects
+textual noise
+a closed-loop workflow of prediction, criMulti-modal Time Series
+(3)
+(4)
+tique (reflect), and refinement, and unifies
+Refinement LLM
+Input
+a prototype-driven time series encoder with
+Enhances text quality
+LLM-based reasoning to deliver both accurate
+and triggers encoder
+and interpretable multi-modal forecasting (Figretraining
+ure 1). Our approach first employs a multiReflection LLM
+Preliminary
+Prototype-based
+modal prototype-based encoder to generate
+prediction
+Explainable Encoder
+& case-based
+preliminary time series predictions alongside
+rationales
+(2)
+Output
+human-readable explanations, leveraging case(1)
+Textual
+based reasoning [25, 26, 27] from both the temPrediction from
+explanations
+refined rationales,
+poral and textual modalities. These explanaand ground truth
+Time series
+Prediction
+explanations
+tions not only justify the encoder’s predictions
+Prediction LLM
+but also serve as auxiliary signals to guide an
+LLM-powered component that further refines
+Figure 1: An overview of the TimeXL workflow. A
+the forecasts and contextual rationales.
+prototype-based explainable encoder first produces
+Unlike conventional methods that merely predictions and case-based rationales for both time
+fuse multi-modal inputs for better accuracy, series and text. The prediction LLM refines foreTimeXL iterates between predictive and re- casts based on these rationales (Step 1). A reflection
+finement phases to mitigate textual noise, fill LLM then critiques the output against ground truth
+knowledge gaps, and produce more faithful ex- (Step 2), providing feedback to detect textual noise
+planations. Specifically, a reflection LLM di- (Step 3). Finally, a refinement LLM updates the
+agnoses potential weaknesses by comparing text accordingly, triggering encoder retraining for
+predictions with ground-truth signals, while improved accuracy and explanations (Step 4). Note
+a refinement LLM incorporates these insights that the predictions from the encoder and the LLM
+to update textual inputs and prototypes itera- are also fused to enhance overall accuracy.
+tively. This feedback loop progressively improves both the predictive and explanatory capabilities of the entire system. Our contributions are
+summarized as follows:
+• We present a prototype-based encoder that combines time series data with textual context, producing
+transparent, case-based rationales.
+• We exploit the interpretative prowess of LLMs to reason over the encoder’s outputs and iteratively
+refine both predictions and text, leading to improved prediction accuracy and explanations.
+• Experiments on four real-world benchmarks show that TimeXL consistently outperforms baselines,
+achieving up to a 8.9% improvement in AUC while providing faithful, human-centric multi-modal
+explanations. Overall, TimeXL opens new avenues for explainable multi-modal time series analysis
+by coupling prototype-based inference with LLM-driven reasoning.
+
+2
+
+Related Work
+
+Our work is primarily related to three key areas of time series research: multi-modality, explanation,
+and the use of LLMs. A more detailed discussion of related methods is provided in Appendix H.
+Multi-modal Time Series Analysis. In recent years, multi-modal time series analysis has gained
+increasing attention in diverse domains such as finance, healthcare and environmental sciences [28,
+11, 13]. Multiple approaches have been proposed to model interactions across different modalities,
+including fusion and alignment through concatenation [29], attention mechanism [12, 30, 31], gating
+functions [32], and contrastive learning [33, 34]. These methods facilitate tasks beyond forecasting
+2
+
+and classification, such as retrieval [14], imputation [13], and causal discovery [33]. Recent research
+efforts have also advanced the field through comprehensive benchmarks and studies [35, 36, 37],
+highlighting the incorporation of new modalities to boost task performance. Meanwhile, others
+explore transforming time series to other modalities [38, 39, 40, 41, 42] or generating synthetic
+ones [32, 43] for effective analysis. Nevertheless, these studies primarily focus on improving
+numerical performance while the deeper and tractable rationale behind why or how the textual or
+other contextual signals influence time series outcomes remains underexplored.
+Time Series Explanation. Recent studies have explored diverse paradigms for time series interpretability. Gradient-based and perturbation-based saliency methods, for example, highlight important
+features at different time steps [44, 45], where some works explicitly incorporate temporal structures
+into models and objectives [46, 47]. Surrogate approaches also offer global or local explanations,
+such as applying Shapley values to time series [48], enforcing model consistency via self-supervised
+objectives [49], or using information-theoretic strategies for coherent explanations [50]. In contrast
+to saliency or surrogate-based explanations, we adopt a case-based reasoning paradigm [25, 26, 27],
+which end-to-end generates predictions and built-in explanations from learned prototypes. Our work
+extends this approach to multi-modal time series by producing human-readable reasoning artifacts
+for both the temporal and contextual modalities.
+LLMs for Time Series Analysis. The rapid development of LLMs [15, 16] has begun to inspire
+new directions in time series research [51, 52]. Many existing methods fine-tune pre-trained LLMs
+on time series tasks and achieves promising results [53, 54, 55], where textual data (e.g., domain
+instructions, metadata, summaries) are often encoded as prefix embeddings to enrich time series
+representations [56, 57, 58, 59]. These techniques also contribute to the emergence of time series
+foundation models [55, 60, 61, 62]. An alternative line of research leverages the zero-shot or fewshot capabilities of LLMs by directly prompting pre-trained language models with text-converted
+time series [63] or context-laden prompts representing domain knowledge [24], often yielding
+surprisingly strong performance in real-world scenarios. Furthermore, LLMs can act as knowledge
+inference modules, synthesizing high-level patterns or explanations that augment standard time series
+pipelines [64, 65, 66]. Building on this trend, recent works have explored time series reasoning with
+LLMs by framing tasks as natural-language problems, including time series understanding & question
+answering [67, 68, 69, 70, 71, 72], and language-guided inference [67, 69]. Compared with existing
+works, our work provides a unique synergy between an explainable model and LLMs, enhancing
+explainable prediction through iterative, grounded, and reflective interaction.
+
+3
+
+Methodology
+
+In this section, we present the framework for explainable multi-modal time series prediction with
+LLMs. We first introduce the problem statement. Next, we present the design of a time series
+encoder that provides prediction and multi-modal explanations as the basis. Finally, we introduce
+three language agents interacting with the encoder towards better prediction and reasoning results.
+3.1
+
+Problem Statement
+
+In this paper, we consider a multi-modal time series prediction problem. Each instance is represented
+by the multi-modal input (x, s), where x = (x1 , x2 , · · · , xT ) ∈ RN ×T denotes time series data with
+N variables and T historical time steps, and s denotes the corresponding text data describing the
+real-world context. The text data s can be further divided into L meaningful segments. Based on the
+historical time series and textual context, our objective is to predict the future outcome y, either as a
+discrete value for classification tasks, or as a continuous value for regression tasks. We focus on the
+classification task to reflect discrete decision-making scenarios common in real-world multi-modal
+applications, where interpretability is often essential for reliable decision support. We also include
+an evaluation of the regression setting in the Appendix G. There are four major components in
+the proposed TimeXL framework, a multi-modal prototype encoder Menc that provides an initial
+prediction and case-based explanations, a prediction LLM Mpred that provides a prediction based on
+contextual understanding with explanations, a reflection LLM Mrefl that generates feedback, and a
+refinement LLM Mrefine that refines the textual context based on the feedback. Below, we introduce
+each component and how they synergize toward better prediction and explanation.
+3
+
+Time Series
+
+Text Input
+
+Finetune
+
+Training time series
+
+Frozen
+
+Time series prototypes
+
+Once after
+training
+
+Projection
+
+Text Explanation
+
+Multi-modal
+Prototype-based
+Encoder
+
+Input: Iron ore spot prices
+have risen influenced by ...
+Prototype: indicating an
+increase of iron ore price
+Time Series Explanation
+
+Time series
+
+Prototype
+
+Input
+
++
+
+Text input
+
+Fusion
+
+Language
+Model
+
+Prediction LLM
+
+Reflection LLM
+
+Text embedding
+
+Refinement LLM
+Projection
+
+Ground Truth
+
+The Training Protocol of TimeXL
+
+Training texts
+
+Text prototypes
+
+Multi-modal
+Prototype-based
+Encoder
+
+Figure 2: The training protocol of TimeXL (left), and multi-modal prototype-based encoder (right).
+3.2
+
+Multi-modal Prototype-based Encoder
+
+We design a multi-modal prototype-based encoder that can generate predictions and explanations
+across different modalities in an end-to-end manner, as shown in Figure 2. We introduce the model
+architecture, the learning objectives that yield good explanation properties of prototypes, and the
+pipeline of case-based explanations using prototypes.
+3.2.1
+
+Multi-modal Sequence Modeling with Prototypes
+
+Sequence Encoder. To capture both temporal and semantic dependencies, we adopt separate encoders
+for time series (Eθ ) and text (Eϕ ). For x ∈ RN ×T , the time series encoder Eθ maps the entire sequence
+into one or multiple representations, which serve as candidates for prototype learning. Simultaneously,
+the text input s is first transformed by a frozen pre-trained language model, PLM (e.g., BERT [73] or
+Sentence-BERT [74]), to produce embeddings es ∈ Rds ×L . These embeddings are then processed by
+a separate encoder Eϕ to extract meaningful text features. It is worth noting that the choice of Eθ and
+Eϕ also affects the granularity of explanations. As we will introduce shortly, the prototypes are learned
+based on sequence representations and are associated with the counterparts in the input space, where
+the correspondences are determined by the encoders. In this paper, we choose convolution-based
+encoders for both modalities to capture the fine-grained sub-sequence (i.e., segment) patterns:
+
+
+Z time = z 1 , . . . , z T −w+1 = Eθ (x), Z text = z ′1 , . . . , z ′L−w′ +1 = Eϕ (es )
+(1)
+′
+
+where z i ∈ Rh and z ′j ∈ Rh denote segment-level representations learned via convolutional kernels
+of sizes w and w′ , respectively.
+Prototype Allocation. To establish interpretability, we learn a set of time series prototypes and
+(c)
+(c)
+text prototypes for each class c ∈ {1, . . . , C}. Specifically, we introduce: P time ∈ Rk×h , P text ∈
+′
+′
+′
+(c)
+′(c)
+Rk ×h so that each prototype pi ∈ Rh (time series) or pi ∈ Rh (text) resides in the same feature
+space as the relevant encoder outputs. For an input sequence, we measure the similarity between each
+prototype and the most relevant segment in the corresponding modality:
+
+
+2
+(c)
+(c)
+(c)
+(c)
+(c)
+Simi = max(Simi,1 , · · · , Simi,T −w+1 ), where Simi,j = exp − pi − z j
+∈ [0, 1] (2)
+2
+
+We aggregate similarity scores across all prototypes for each modality, yielding Simtime ∈ RkC
+′
+and Simtext ∈ Rk C . Finally, we jointly consider the cross-modal relevance and use a non-negative
+′
+fusion weight matrix W ∈ RC×(k+k ) that translates these scores into class probabilities:
+ 
+
+ŷ enc = Softmax W Simtime ∥ Simtext ∈ [0, 1]C .
+(3)
+4
+
+Tim
+E
+
+3.2.2
+
+Learning Prototypes toward Better Explanation
+
+Learning Objectives. The learning objectives include three regularization terms that reinforce
+the interpretability of multi-modal prototypes. In this paper, we focus on a predicting discrete
+label, where the basic objective
+P is the cross-entropy loss for the prediction drawn from multi-modal
+explainable artifacts LCE = x,s,y y log(ŷ enc ) + (1 − y) log(1 − ŷ enc ). Besides, we encourage a
+clustering structure of segments in the representation space by enforcing each segment representation
+to be adjacent to its closest prototype. Reversely, we regularize each prototype to be as close to a
+segment representation as possible, to help the prototype locate the most evidencing segment. Both
+regularization terms are denoted as Lc and Le , respectively, where we omit the modality and class
+notations for ease of understanding:
+X
+X
+2
+2
+Lc =
+min ∥z j − pi ∥2 , Le =
+min ∥pi − z j ∥2
+(4)
+pi ∈P (·)
+z j ∈Z (·)
+z j ∈Z (·)
+
+pi ∈P (·)
+
+Moreover, we encourage a diverse structure of prototype representations to avoid redundancy and
+maintain a compact explanation space, by penalizing their similarities via a hinge loss Ld , with a
+threshold dmin :
+
+
+XX
+2
+Ld =
+max 0, dmin − pi − pj 2
+(5)
+i=1 j̸=i
+
+The full objective is written as: L = LCE + λ1 Lc + λ2 Le + λ3 Ld , with hyperparameters λ1 , λ2 , and
+λ3 that balance regularization terms towards achieving an optimal and explainable prediction.
+Prototype Projection. After learning objectives converge, the multi-modal prototypes are wellregularized and reflect good explanation properties. However, these prototypes are still not readily
+explainable as they are only close to some exemplar segments in the representation space. Therefore,
+we perform prototype projection to associate each prototype with a training segment from its own
+class that preserves Le in the representation space, for both time series and text:
+(c)
+
+pi
+
+2
+
+(c)
+
+← arg min pi − z j
+(c)
+z j ∈Z (·)
+
+,
+2
+
+(c)
+
+∀pi
+
+(c)
+
+∈ P (·)
+
+(6)
+
+By associating each prototype with a training segment in the representation space, the multi-modal
+physical meaning is induced. During testing phase, a multi-modal instance will be compared with
+prototypes across different modalities to infer predictions, where the similarity scores and prototypes’
+class information assemble the explanation artifacts for reasoning.
+3.3
+
+Explainable Prediction with LLM-in-the-Loop
+
+To further leverage the reasoning and inference capabilities of LLMs in real-world time series contexts,
+we propose a framework with three interacting LLM agents: a prediction agent Mpred , a reflection
+agent Mrefl , and a refinement agent Mrefine . These LLM agents interact with the multi-modal
+prototype-based encoder Menc toward better prediction accuracy and explainability.
+3.3.1
+
+Model Synergy for Augmented Prediction
+
+Prediction with Enriched Contexts. The prediction LLM agent Mpred generates predictions based
+on the input text s. To improve prediction accuracy, the encoder Menc supplements s with case-based
+explanations. Specifically, Menc selects the ω prototypes that exhibit the highest relevance to any of
+the textual segments within s. Relevance is determined by the similarity scores used in Equation 2.
+These selected prototypes are then added to the input prompt of Mpred as explanations, providing
+richer real-world context and leading to more accurate predictions. The ω prototype-segment pairs,
+which construct the explanation expls of the input text s, are retrieved as follows:
+n
+
+o
+
+
+(c)
+′(c)
+expls =
+pi , sj : (i, j, c) ∈ Top-ω(Simtext ) , Top-ω(Simtext ) = argTop-ω (i,j,c) Sim′ i,j
+′(c)
+
+Note that here pi denotes a raw text segment, and i, j, c denote the prototype, segment, and class
+indices, respectively. As expls contains relevant contextual guidance, it augments the input space
+and removes semantic ambiguity for prediction agent Mpred . Therefore, the prediction is drawn as
+ŷ LLM = Mpred (s, expls ). The prompt for querying Mpred is provided in Appendix E, Figure 14.
+5
+
+Fused Predictions. We compile the final prediction based on a fusion of both the multi-modal
+encoder Menc and prediction LLM Mpred . Specifically, we linearly combine the continuous
+prediction probabilities ŷ enc and discrete prediction ŷ LLM : ŷ = αŷ enc + (1 − α)ŷ LLM , where
+α ∈ [0, 1] is the hyperparameter selected from validation data. The encoder Menc and prediction
+agent Mpred enhance each other based on their unique strengths. The Menc is fine-tuned based on
+explicit supervised signals, ensuring accuracy in capturing temporal and contextual dependencies
+of multi-modal time series. On the other hand, Mpred contributes deep semantic understanding
+drawn from extensive text corpora. By fusing predictions from two distinct perspectives, we achieve
+a synergistic augmentation toward more accurate predictions for complex multi-modal time series.
+3.3.2
+
+Iterative Context Refinement via Reflective Feedback
+
+While the prediction agent Mpred leverages the explainable artifacts to make informed predictions, it
+is not inherently designed to fit into the context of multi-modal time series data, which could lead to
+inaccurate predictions when the quality of textual context is inferior. To tackle this issue, we exploit
+another two language agents Mrefl and Mrefine to generate reflective feedback and refinements on
+the context, respectively, for better predictive insights.
+Given the prediction ŷ LLM generated by the prediction agent Mpred , the reflection agent Mrefl aims
+to understand the reasoning behind the implicit prediction logic of Mpred . Specifically, it generates a
+reflective feedback, Refl, by analyzing the input text s and its prediction ŷ LLM , against the ground
+truth y, to provide actionable insights for refinement, i.e., Refl = Mrefl (y, ŷ LLM , s). Guided by the
+feedback, the refinement agent Mrefine refines the previous text si into si+1 by selecting and emphasizing the most relevant content, ensuring that important patterns are appropriately contextualized,
+which is similar to how a domain expert would perform, i.e., si+1 = Mrefine (Refl, si ). The prompts
+for querying Mrefl and Mrefine are provided in Figures 16, 17 18, 19, and discussed in Appendix E.
+We finally integrate the refinement via reflection into the optimization loop of our
+proposed TimeXL, which is summarized
+in Algorithm 1. Once the textual context
+is improved, it is used to retrain the multimodal prototype-based encoder Menc for
+the next iteration. As such, the explanation (e.g., quality of the prototypes) and
+predictive performance of Menc can be
+improved through this iterative process.
+Consequently, the prediction agent Mpred
+could yield better prediction with more informative inputs, further enhancing the
+accuracy of ŷ. We evaluate the predictive
+performance of LLM and save the encoder
+and reflection when an improvement is observed (Eval(·) pass) when applied to the
+validation set. In the testing phase, we select the reflections with the best validation
+performance to guide Mrefine in context
+refinement, mimicking how an optimized
+deep learning model is applied to unseen
+testing data.
+
+4
+
+Experiments
+
+4.1
+
+Experimental Setup
+
+Algorithm 1 Iterative Optimization Loop of TimeXL
+Inputs: Multi-modal time series (x, s, y) with Dtrain ,
+Dval , Dtest , prototype-based encoder Menc , prediction agent
+Mpred , reflection agent Mrefl , refinement agent Mrefine , fusion parameter α, max iteration τ , improvement check Eval(·)
+Training & Validation:
+Initialize s0 = s, i = 0, M∗enc ← ∅, Refl∗ ← ∅
+while i < τ do
+Train Menc using Dtrain,val = {(x, si , y), · · · }
+ŷ enc , explsi = Menc (x, si )
+ŷ LLM = Mpred (si , explsi )
+ŷ = αŷ enc + (1 − α)ŷ LLM
+if Eval(Refl, Dval ) pass then
+M∗enc ← Menc , Refl∗ ← Refl
+Refl = Mrefl (y, ŷ LLM , si )
+si+1 = Mrefine (Refl, si )
+increment i
+return M∗enc , Refl∗
+Testing:
+s′ = Mrefine (Refl∗ , s) for Dtest
+ŷ enc , expls′ = M∗enc (x, s′ )
+ŷ LLM = Mpred (s′ , expls′ )
+ŷ = αŷ enc + (1 − α)ŷ LLM
+
+Datasets. We evaluate methods on four multi-modal time series datasets from three different realworld domains, including weather, finance, and healthcare. The detailed data statistics are summarized
+in Table 3 of Appendix A.1. The Weather dataset contains meteorological reports and the hourly
+time series records of temperature, humidity, air pressure, wind speed, and wind direction in New
+York City. The task is to predict if it will rain in the next 24 hours, given the last 24 hours of weather
+6
+
+Table 1: The F1 score (F1) and AUROC (AUC) for TimeXL and state-of-the-art baselines on multimodal time series datasets.
+Weather
+
+Finance
+
+Healthcare (TP)
+
+Healthcare (MT)
+
+AUC
+
+F1
+
+AUC
+
+F1
+
+AUC
+
+0.255
+0.565
+0.571
+0.538
+0.600
+0.465
+0.571
+0.546
+0.604
+
+0.485
+0.747
+0.775
+0.756
+0.783
+0.689
+0.776
+0.737
+0.795
+
+0.393
+0.774
+0.924
+0.794
+0.861
+0.770
+0.822
+0.887
+0.841
+
+0.500
+0.918
+0.984
+0.867
+0.931
+0.797
+0.887
+0.950
+0.934
+
+0.419
+0.683
+0.737
+0.765
+0.791
+0.808
+0.824
+0.751
+0.695
+
+0.388
+0.825
+0.913
+0.944
+0.963
+0.931
+0.935
+0.762
+0.928
+
+0.657
+0.365
+0.606
+0.647
+0.699
+0.731
+0.689
+0.718
+0.742
+
+0.519
+0.418
+0.512
+0.592
+0.589
+0.559
+0.605
+0.619
+0.611
+
+0.643
+0.607
+0.745
+0.790
+0.792
+0.727
+0.793
+0.812
+0.801
+
+0.802
+0.727
+0.774
+0.820
+0.671
+0.729
+0.926
+0.863
+0.954
+
+0.817
+0.768
+0.879
+0.891
+0.864
+0.828
+0.986
+0.968
+0.983
+
+0.769
+0.696
+0.851
+0.872
+0.733
+0.693
+0.901
+0.780
+0.942
+
+0.803
+0.871
+0.977
+0.977
+0.912
+0.843
+0.990
+0.929
+0.988
+
+0.808
+
+0.631
+
+0.797
+
+0.987
+
+0.996
+
+0.956
+
+0.997
+
+Datasets →
+Methods ↓
+
+F1
+
+AUC
+
+F1
+
+DLinear [75]
+Autoformer [76]
+Crossformer [77]
+TimesNet [78]
+iTransformer [79]
+TSMixer [80]
+TimeMixer [81]
+FreTS [82]
+PatchTST [5]
+
+0.540
+0.546
+0.500
+0.494
+0.541
+0.488
+0.577
+0.623
+0.592
+
+0.660
+0.590
+0.594
+0.594
+0.650
+0.534
+0.658
+0.688
+0.675
+
+LLMTime [83]
+PromptCast [63]
+OFA [53]
+FSCA [58]
+Time-LLM [56]
+TimeCMA [57]
+MM-iTransformer [35]
+MM-PatchTST [35]
+TimeCAP [65]
+
+0.587
+0.499
+0.501
+0.563
+0.613
+0.636
+0.608
+0.621
+0.668
+
+TimeXL
+
+0.696
+
+records and summary. The Finance dataset contains the daily record of the raw material prices
+together with 14 related indices from January 2017 to July 2024. Given the last 5 business days
+of stock price data and news, the task is to predict if the target price will exhibit an increasing,
+decreasing, or neutral trend on the next business day. The Healthcare datasets include Test-Positive
+(TP) and Mortality (MT), both comprising weekly records related to influenza activity. TP contains
+the number of respiratory specimens testing positive for Influenza A and B, while MT reports deaths
+caused by influenza and pneumonia. For both datasets, the task is to predict whether the respective
+target ratio, either the test-positive rate or the mortality ratio in the upcoming week will exceed the
+historical average, based on records and summaries from the previous 20 weeks.
+Baselines, Evaluation Metrics, and Setup We compare TimeXL with state-of-the-art baselines for
+time series prediction, including Autoformer [76], Dlinear [75], Crossformer [77], TimesNet [78],
+PatchTST [5], iTransformer [79], FreTS [82], TSMixer [80], TimeMixer [81] (classification implemented by TSlib [78]) and LLM-based methods like LLMTime [83], PromptCast [63], OFA [53],
+Time-LLM [56], TimeCMA [57] and FSCA [58], where LLMTime and PromptCast don’t need
+fine-tuning. While some methods are primarily used for time series prediction with continuous values,
+they can be easily adapted for discrete value prediction. We also evaluate the multi-modal time series
+methods. Besides the Time-LLM, TimeCMA and FSCA where input text is used for embedding reprogramming and alignment, we also evaluate Multi-modal PatchTST and Multi-modal iTransformer
+from [35], as well as TimeCAP [65]. We evaluate the discrete prediction via F1 score and AUROC
+(AUC) score, due to label imbalance in real-world time series datasets. All datasets are split 6:2:2 for
+training, validation, and testing. All results are averaged over five experimental runs. We alternate
+different embedding methods for texts based on its average length (Sentence-BERT [74] for finance
+dataset and BERT [73] for the others). More details are provided in Appendix A.2, A.3, A.4.
+4.2
+
+Performance Evaluation
+
+The results of predictive performance are shown in Table 1. It is notable that multi-modal methods
+generally outperform time series methods across all datasets. These methods include LLM methods
+(e.g., Time-LLM [56], TimeCMA [57], FSCA [58]) that leverage text embeddings to enhance time
+series predictions. Moreover, the multi-modal variants (MM-iTransformer and MM-PatchTST [35])
+improve the performance of state-of-the-art time series methods, suggesting the benefits of integrating
+7
+
+real-world contextual information. Besides, TimeCAP [65] integrates the predictions from both
+modalities, further improving the predictive performance. TimeXL constantly achieves the highest
+F1 and AUC scores, consistently surpassing both time series and multi-modal baselines by up to
+8.9% of AUC (compared to TimeCAP on the Weather dataset). This underscores the advantage of
+TimeXL, which synergizes multi-modal encoder with language agents to enhance interpretability and
+thus predictive performance in multi-modal time series.
+Not Rain
+Humidity
+(%)
+
+Multi-modal Prototypes
+Pressure
+(hPa)
+
+Temperature
+(K)
+
+Wind speed
+(m/s)
+
+Wind direction
+(°)
+
+• suggest a likelihood of dry weather, with stable pressure and
+• and the wind direction has primarily been from the west
+• westerly shifts, which typically bring cooler, drier air
+• indicating the strengthening of a high-pressure system
+• drier air moving into the area. Air pressure remained relatively
+
+Humidity
+(%)
+
+Rain
+Pressure
+(hPa)
+
+Temperature
+(K)
+
+Wind speed
+(m/s)
+
+Wind direction
+(°)
+
+• which could signal the approach of a weather system
+• low-pressure system that could lead to worsening weather
+• humidity levels were predominantly high, and wind speeds were
+• recent hours. Air pressure has been decreasing overall, which
+• wind direction started westerly, became variable, and
+
+Figure 3: Key time series prototypes and text prototypes learned on the Weather dataset. Each row in
+the figure represents a time series prototype with different channels.
+4.3
+
+Explainable Multi-modal Prototypes
+
+Next, we present the explainable multi-modal prototypes rendered by TimeXL, which establishes the
+case-based reasoning process. Figure 3 shows a subset of time series and text prototypes learned on
+the weather dataset. The time series prototypes demonstrate the typical temporal patterns aligned with
+different real-world weather conditions (i.e., rain and not rain). For example, a constant or decreasing
+humidity at a moderate level, combined with high and steady air pressure, typically indicates a
+non-rainy scenario. The consistent wind direction is also a sign of mild weather conditions. On the
+contrary, high humidity, low and fluctuating pressure, along with variable winds typically reveal an
+unstable weather system ahead. In addition to time series, the text prototypes also highlight consistent
+semantic patterns for different weather conditions, such as the channel-specific (e.g., drier air moving
+into the area, strengthening of high-pressure system) and overall (e.g., a likelihood of dry weather)
+descriptions of weather activities. In Appendix D.1, we also present more multi-modal prototypes for
+the weather dataset in Figure 9, for the finance dataset in Figure 10, and for healthcare datasets in
+Figures 11 and 12. TimeXL provides coherent and informative prototypes from the exploitation of
+time series and its real-world contexts, which facilitates both prediction and explanation.
+4.4
+
+Multi-modal Case-based Reasoning
+
+Building upon the multi-modal prototypes, we present a case study on the testing set of weather data,
+comparing the original and TimeXL’s reasoning processes to highlight its explanatory capability, as
+shown in Figure 4. In this case, the original text is incorrectly predicted as not rain. We have three
+key observations: (1) The refinement process filters the original text to emphasize weather conditions
+more indicative of rain, guided by reflections from training examples. The refined text preserves
+the statement on stability while placing more emphasis on humidity and wind as key indicators. (2)
+Accordingly, the matched segment-prototype pairs from the original text focus more on temperature
+stability and typical diurnal variations, while the matched pairs in the refined text highlights wind
+variability, moisture transport, and approaching weather system, aligning more with rain conditions.
+(3) Furthermore, the reasoning on time series provides a complementary view for assessing weather
+conditions. The matched time series prototypes identify high humidity and its drop-and-rise trends,
+wind speed fluctuations and directional shifts, and the declining phase of air pressure fluctuations,
+all of which are linked to the upcoming rainy conditions. The matched multi-modal prototypes
+8
+
+Original Text Reasoning
+
+Truth: Rain
+
+TimeXL: Time Series Reasoning
+
+Prediction: Not rain
+
+Original Text: Over the past 24 hours, New York City experienced a gradual increase in temperature
+throughout the day, peaking in the late afternoon before a modest decline towards the evening. Humidity
+levels started high in the early hours, dropped significantly during the day, and then showed a rising trend at
+the end of the period, indicating a possible increase in moisture content in the air. Air pressure remained
+relatively stable with only minor fluctuations, suggesting a period of stable weather conditions. Wind
+speeds varied, with a noticeable increase during the late afternoon, which could have contributed to a brief
+period of cooler and more turbulent conditions. Wind direction was predominantly from the southsouthwest, shifting slightly to a more south-southeast orientation later in the day, which is typical for the
+region's weather patterns during this time.
+Prototypes:
+Not rain: City has experienced relatively stable temperatures with a slight warming trend observed (0.78)
+Not rain: peak during the late afternoon before beginning to decrease slightly into the (0.64)
+Not rain: dropping again, indicative of typical diurnal variation (0.51)
+TimeXL: Text Reasoning
+
+Prediction: Rain
+
+Refined Text: Over the past 24 hours, New York City experienced a stable air pressure pattern with minor
+fluctuations, indicating stable weather conditions. The day saw a gradual increase in temperature, peaking
+in the late afternoon before declining in the evening. Humidity levels were high early on, dropped
+significantly during the day, and rose again later, suggesting increased moisture content. Wind direction
+shifted from south - southwest to south - southeast, bringing moisture-laden air, which could increase the
+likelihood of rain.
+Prototypes:
+Rain: direction was variable without a consistent pattern. These indicators suggest (0.47)
+Rain: wind direction started westerly, became variable, and (0.64)
+Rain: which could signal the approach of a weather system (0.53)
+
+Humidity (%)
+
+Pressure (hPa)
+
+Temperature (K)
+
+Wind speed (m/s)
+
+Wind direction (°)
+
+Figure 4: Multi-modal case-based reasoning example on the Weather dataset. The left part illustrates
+the reasoning process for both the original and refined text in TimeXL, with matched prototype-input
+pairs highlighted in the same color along with their similarity scores. The right part presents the time
+series reasoning in TimeXL, where matched prototypes are overlaid on the time series.
+from TimeXL demonstrate its effectiveness in capturing relevant information for both predictive and
+explanatory analysis. We also provide a case study on the Finance dataset in Figure 13, where textual
+explanations are generated at the granularity of a half-sentence.
+4.5
+
+Iterative Analysis
+
+To verify the effectiveness of overall workflow
+with reflection and refinement LLMs as shown
+in Figure 1, we conduct an iterative analysis
+of text quality and TimeXL performance, as
+shown in Figure 5. Specifically, we evaluate the text quality based on its zero-shot predictive accuracy using an LLM. Notably, the
+text quality benefits from iteration improvements and mostly saturates after one or two
+iterations. Correspondingly, TimeXL performance quickly improves and stabilizes with
+very minor fluctuations. These observations
+underscore how TimeXL alternates between
+predictive and reflective refinement phases to
+mitigate textual noise, thus enhancing its pre- Figure 5: The text quality and TimeXL performance
+dictive capability.
+over iterations.
+4.6
+
+Ablation Studies
+
+We present the component ablations of TimeXL in Table 2, where the texts are refined using the
+reflections with the best validation performance. Firstly, the multi-modal encoder consistently
+outperforms single-modality variants across all datasets, highlighting the benefit of integrating time
+series and textual modalities. Secondly, the prediction LLM exhibits better performance than text-only
+encoder, underscoring the advantage of LLM’s contextual understanding and reasoning. Furthermore,
+the text prototypes consistently improve the predictive performance of LLM, underscoring the
+effectiveness of explainable artifacts from the multi-modal encoder, in terms of providing relevant
+contextual guidance. Finally, the fusion of prediction LLM and multi-modal encoder further enhances
+the predictive performance, surpassing the best results achieved by either component alone. These
+9
+
+Table 2: Ablation studies of TimeXL on multi-modal time series datasets.
+Ablation ↓
+
+Variants
+
+Weather
+
+Finance
+
+Healthcare (Test-Positive)
+
+Healthcare (Mortality)
+
+F1
+
+AUC
+
+F1
+
+AUC
+
+F1
+
+AUC
+
+F1
+
+AUC
+
+Time Series
+Text
+Multi-modal
+
+0.602
+0.567
+0.674
+
+0.691
+0.658
+0.767
+
+0.585
+0.472
+0.619
+
+0.751
+0.636
+0.791
+
+0.889
+0.871
+0.934
+
+0.957
+0.941
+0.974
+
+0.861
+0.840
+0.937
+
+0.965
+0.887
+0.988
+
+LLM
+
+Text
+Text + Prototype
+
+0.645
+0.667
+
+0.724
+0.739
+
+0.496
+0.544
+
+0.627
+0.662
+
+0.974
+0.987
+
+0.967
+0.983
+
+0.901
+0.952
+
+0.969
+0.976
+
+Fusion
+
+Select-Best
+TimeXL
+
+0.674
+0.696
+
+0.767
+0.808
+
+0.619
+0.631
+
+0.791
+0.797
+
+0.987
+0.987
+
+0.983
+0.996
+
+0.952
+0.956
+
+0.988
+0.997
+
+Encoder
+
+observations demonstrate the advantage of our framework synergizing the time series model and
+LLM for mutually augmented prediction. In Appendix B, additional ablation and model studies
+are presented, including analyses of the multi-modal encoder (Figure 6; Table 4, 5, 6), quantitative
+evaluation of case-based explanations (Figure 7), and comparisons of base LLMs (Table 7; Figure 8).
+
+5
+
+Conclusions
+
+In this paper, we present TimeXL, an explainable multi-modal time series prediction framework
+that synergizes a designed prototype-based encoder with three collaborative LLM agents in the
+loop (prediction, reflection, and refinement) to deliver more accurate predictions and explanations.
+Experiments on four multi-modal time series datasets show the advantages of TimeXL over state-ofthe-art baselines and its excellent explanation capabilities.
+
+6
+
+Acknowledgments
+
+Dongjin Song gratefully acknowledges the support of the National Science Foundation under Grant
+No. 2338878, as well as the generous research gifts from NEC Labs America and Morgan Stanley.
+
+References
+[1] Bo Jin, Haoyu Yang, Leilei Sun, Chuanren Liu, Yue Qu, and Jianing Tong. A treatment engine
+by predicting next-period prescriptions. In Proceedings of the 24th ACM SIGKDD International
+Conference on Knowledge Discovery & Data Mining, pages 1608–1616, 2018.
+[2] Shengnan Guo, Youfang Lin, Ning Feng, Chao Song, and Huaiyu Wan. Attention based spatialtemporal graph convolutional networks for traffic flow forecasting. In Proceedings of the AAAI
+conference on artificial intelligence, volume 33, pages 922–929, 2019.
+[3] Liheng Zhang, Charu Aggarwal, and Guo-Jun Qi. Stock price prediction via discovering multifrequency trading patterns. In Proceedings of the 23rd ACM SIGKDD international conference
+on knowledge discovery and data mining, pages 2141–2149, 2017.
+[4] Yao Qin, Dongjin Song, Haifeng Cheng, Wei Cheng, Guofei Jiang, and Garrison W Cottrell. A
+dual-stage attention-based recurrent neural network for time series prediction. In Proceedings
+of the 26th International Joint Conference on Artificial Intelligence, pages 2627–2633, 2017.
+[5] Yuqi Nie, Nam H Nguyen, Phanwadee Sinthong, and Jayant Kalagnanam. A time series is worth
+64 words: Long-term forecasting with transformers. In The Eleventh International Conference
+on Learning Representations, 2023.
+[6] Ailin Deng and Bryan Hooi. Graph neural network-based anomaly detection in multivariate
+time series. In Proceedings of the AAAI conference on artificial intelligence, volume 35, pages
+4027–4035, 2021.
+[7] Xiang Zhang, Ziyuan Zhao, Theodoros Tsiligkaridis, and Marinka Zitnik. Self-supervised
+contrastive pre-training for time series via time-frequency consistency. Advances in Neural
+Information Processing Systems, 35:3988–4003, 2022.
+10
+
+[8] Yong Liu, Chenyu Li, Jianmin Wang, and Mingsheng Long. Koopa: Learning non-stationary
+time series dynamics with koopman predictors. Advances in Neural Information Processing
+Systems, 36, 2024.
+[9] Zihan Dong, Xinyu Fan, and Zhiyuan Peng. Fnspid: A comprehensive financial news dataset in
+time series. In Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery
+and Data Mining, pages 4918–4927, 2024.
+[10] Ryan King, Tianbao Yang, and Bobak J Mortazavi. Multimodal pretraining of medical time
+series and notes. In Machine Learning for Health (ML4H), pages 244–255. PMLR, 2023.
+[11] Ke Niu, Ke Zhang, Xueping Peng, Yijie Pan, and Naian Xiao. Deep multi-modal intermediate
+fusion of clinical record and time series data in mortality prediction. Frontiers in Molecular
+Biosciences, 10:1136071, 2023.
+[12] Geon Lee, Wenchao Yu, Wei Cheng, and Haifeng Chen. Moat: Multi-modal augmented time
+series forecasting. 2024.
+[13] Xiaohu Zhao, Kebin Jia, Benjamin Letcher, Jennifer Fair, Yiqun Xie, and Xiaowei Jia. Vimts:
+Variational-based imputation for multi-modal time series. In 2022 IEEE International Conference on Big Data (Big Data), pages 349–358. IEEE, 2022.
+[14] Tom Bamford, Andrea Coletta, Elizabeth Fons, Sriram Gopalakrishnan, Svitlana Vyetrenko,
+Tucker Balch, and Manuela Veloso. Multi-modal financial time-series retrieval through latent
+space projections. In Proceedings of the Fourth ACM International Conference on AI in Finance,
+pages 498–506, 2023.
+[15] Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni
+Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et al. Gpt-4
+technical report. arXiv preprint arXiv:2303.08774, 2023.
+[16] Gemini Team, Rohan Anil, Sebastian Borgeaud, Yonghui Wu, Jean-Baptiste Alayrac, Jiahui Yu,
+Radu Soricut, Johan Schalkwyk, Andrew M Dai, Anja Hauth, et al. Gemini: a family of highly
+capable multimodal models. arXiv preprint arXiv:2312.11805, 2023.
+[17] Wenxuan Zhang, Yue Deng, Bing Liu, Sinno Pan, and Lidong Bing. Sentiment analysis in the
+era of large language models: A reality check. In Findings of the Association for Computational
+Linguistics: NAACL 2024, pages 3881–3906, 2024.
+[18] Ehsan Kamalloo, Nouha Dziri, Charles Clarke, and Davood Rafiei. Evaluating open-domain
+question answering in the era of large language models. In Proceedings of the 61st Annual
+Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages
+5591–5606, 2023.
+[19] Zixuan Wang, Qinkai Duan, Yu-Wing Tai, and Chi-Keung Tang. C3llm: Conditional multimodal
+content generation using large language models. arXiv preprint arXiv:2405.16136, 2024.
+[20] Noah Shinn, Federico Cassano, Ashwin Gopinath, Karthik Narasimhan, and Shunyu Yao.
+Reflexion: Language agents with verbal reinforcement learning. Advances in Neural Information
+Processing Systems, 36, 2024.
+[21] Aman Madaan, Niket Tandon, Prakhar Gupta, Skyler Hallinan, Luyu Gao, Sarah Wiegreffe, Uri
+Alon, Nouha Dziri, Shrimai Prabhumoye, Yiming Yang, et al. Self-refine: Iterative refinement
+with self-feedback. Advances in Neural Information Processing Systems, 36, 2024.
+[22] Xin Liu, Daniel McDuff, Geza Kovacs, Isaac Galatzer-Levy, Jake Sunshine, Jiening Zhan,
+Ming-Zher Poh, Shun Liao, Paolo Di Achille, and Shwetak Patel. Large language models are
+few-shot health learners.
+[23] Kelvin JL Koa, Yunshan Ma, Ritchie Ng, and Tat-Seng Chua. Learning to generate explainable
+stock predictions using self-reflective large language models. In Proceedings of the ACM on
+Web Conference 2024, pages 4304–4315, 2024.
+11
+
+[24] Xinglei Wang, Meng Fang, Zichao Zeng, and Tao Cheng. Where would i go next? large
+language models as human mobility predictors. arXiv preprint arXiv:2308.15197, 2023.
+[25] Yao Ming, Panpan Xu, Huamin Qu, and Liu Ren. Interpretable and steerable sequence learning via prototypes. In Proceedings of the 25th ACM SIGKDD International Conference on
+Knowledge Discovery & Data Mining, pages 903–913, 2019.
+[26] Jingchao Ni, Zhengzhang Chen, Wei Cheng, Bo Zong, Dongjin Song, Yanchi Liu, Xuchao
+Zhang, and Haifeng Chen. Interpreting convolutional sequence model by learning local prototypes with adaptation regularization. In Proceedings of the 30th ACM International Conference
+on Information & Knowledge Management, pages 1366–1375, 2021.
+[27] Yushan Jiang, Wenchao Yu, Dongjin Song, Lu Wang, Wei Cheng, and Haifeng Chen. Fedskill:
+Privacy preserved interpretable skill learning via imitation. In Proceedings of the 29th ACM
+SIGKDD Conference on Knowledge Discovery and Data Mining, pages 1010–1019, 2023.
+[28] Geri Skenderi, Christian Joppi, Matteo Denitto, and Marco Cristani. Well googled is half done:
+Multimodal forecasting of new fashion product sales with image-based google trends. Journal
+of Forecasting, 43(6):1982–1997, 2024.
+[29] Zihao Li, Xiao Lin, Zhining Liu, Jiaru Zou, Ziwei Wu, Lecheng Zheng, Dongqi Fu, Yada Zhu,
+Hendrik Hamann, Hanghang Tong, and Jingrui He. Language in the flow of time: Time-seriespaired texts weaved into a unified temporal narrative, 2025.
+[30] Sameep Chattopadhyay, Pulkit Paliwal, Sai Shankar Narasimhan, Shubhankar Agarwal, and
+Sandeep P Chinchali. Context matters: Leveraging contextual features for time series forecasting.
+arXiv preprint arXiv:2410.12672, 2024.
+[31] Chen Su, Yuanhe Tian, and Yan Song. Multimodal conditioned diffusive time series forecasting.
+arXiv preprint arXiv:2504.19669, 2025.
+[32] Siru Zhong, Weilin Ruan, Ming Jin, Huan Li, Qingsong Wen, and Yuxuan Liang. Time-vlm:
+Exploring multimodal vision-language models for augmented time series forecasting. arXiv
+preprint arXiv:2502.04395, 2025.
+[33] Lecheng Zheng, Zhengzhang Chen, Jingrui He, and Haifeng Chen. Mulan: Multi-modal causal
+structure learning and root cause analysis for microservice systems. In Proceedings of the ACM
+on Web Conference 2024, pages 4107–4116, 2024.
+[34] Jun Li, Che Liu, Sibo Cheng, Rossella Arcucci, and Shenda Hong. Frozen language model
+helps ecg zero-shot learning. In Medical Imaging with Deep Learning, pages 402–415. PMLR,
+2024.
+[35] Haoxin Liu, Shangqing Xu, Zhiyuan Zhao, Lingkai Kong, Harshavardhan Kamarthi, Aditya B
+Sasanur, Megha Sharma, Jiaming Cui, Qingsong Wen, Chao Zhang, et al. Time-mmd: A new
+multi-domain multimodal dataset for time series analysis. arXiv preprint arXiv:2406.08627,
+2024.
+[36] Andrew Robert Williams, Arjun Ashok, Étienne Marcotte, Valentina Zantedeschi, Jithendaraa
+Subramanian, Roland Riachi, James Requeima, Alexandre Lacoste, Irina Rish, Nicolas Chapados, et al. Context is key: A benchmark for forecasting with essential textual information.
+arXiv preprint arXiv:2410.18959, 2024.
+[37] Yushan Jiang, Kanghui Ning, Zijie Pan, Xuyang Shen, Jingchao Ni, Wenchao Yu, Anderson
+Schneider, Haifeng Chen, Yuriy Nevmyvaka, and Dongjin Song. Multi-modal time series
+analysis: A tutorial and survey. arXiv preprint arXiv:2503.13709, 2025.
+[38] Zekun Li, Shiyang Li, and Xifeng Yan. Time series as images: Vision transformer for irregularly
+sampled time series. Advances in Neural Information Processing Systems, 36:49187–49204,
+2023.
+[39] Shi Bin Hoo, Samuel Müller, David Salinas, and Frank Hutter. The tabular foundation model
+tabpfn outperforms specialized time series forecasting models based on simple features. arXiv
+preprint arXiv:2501.02945, 2025.
+12
+
+[40] Jingchao Ni, Ziming Zhao, ChengAo Shen, Hanghang Tong, Dongjin Song, Wei Cheng,
+Dongsheng Luo, and Haifeng Chen. Harnessing vision models for time series analysis: A
+survey. arXiv preprint arXiv:2502.08869, 2025.
+[41] Xiongxiao Xu, Yue Zhao, S Yu Philip, and Kai Shu. Beyond numbers: A survey of time series
+analysis in the era of multimodal llms. Authorea Preprints, 2025.
+[42] Mouxiang Chen, Lefei Shen, Zhuo Li, Xiaoyun Joy Wang, Jianling Sun, and Chenghao Liu.
+Visionts: Visual masked autoencoders are free-lunch zero-shot time series forecasters. arXiv
+preprint arXiv:2408.17253, 2024.
+[43] Xu Liu, Taha Aksu, Juncheng Liu, Qingsong Wen, Yuxuan Liang, Caiming Xiong, Silvio
+Savarese, Doyen Sahoo, Junnan Li, and Chenghao Liu. Empowering time series analysis
+with synthetic data: A survey and outlook in the era of foundation models. arXiv preprint
+arXiv:2503.11411, 2025.
+[44] Aya Abdelsalam Ismail, Mohamed Gunady, Hector Corrada Bravo, and Soheil Feizi. Benchmarking deep learning interpretability in time series predictions. Advances in neural information
+processing systems, 33:6441–6452, 2020.
+[45] Sana Tonekaboni, Shalmali Joshi, Kieran Campbell, David K Duvenaud, and Anna Goldenberg.
+What went wrong and when? instance-wise feature importance for time-series black-box models.
+Advances in Neural Information Processing Systems, 33:799–809, 2020.
+[46] Kin Kwan Leung, Clayton Rooke, Jonathan Smith, Saba Zuberi, and Maksims Volkovs. Temporal dependencies in feature importance for time series prediction. In The Eleventh International
+Conference on Learning Representations.
+[47] Jonathan Crabbé and Mihaela Van Der Schaar. Explaining time series predictions with dynamic
+masks. In International Conference on Machine Learning, pages 2166–2177. PMLR, 2021.
+[48] João Bento, Pedro Saleiro, André F Cruz, Mário AT Figueiredo, and Pedro Bizarro. Timeshap:
+Explaining recurrent models through sequence perturbations. In Proceedings of the 27th ACM
+SIGKDD conference on knowledge discovery & data mining, pages 2565–2573, 2021.
+[49] Owen Queen, Tom Hartvigsen, Teddy Koker, Huan He, Theodoros Tsiligkaridis, and Marinka
+Zitnik. Encoding time-series explanations through self-supervised model behavior consistency.
+Advances in Neural Information Processing Systems, 36, 2024.
+[50] Zichuan Liu, Tianchun Wang, Jimeng Shi, Xu Zheng, Zhuomin Chen, Lei Song, Wenqian Dong,
+Jayantha Obeysekera, Farhad Shirani, and Dongsheng Luo. Timex++: Learning time-series
+explanations with information bottleneck. In Forty-first International Conference on Machine
+Learning, 2024.
+[51] Yushan Jiang, Zijie Pan, Xikun Zhang, Sahil Garg, Anderson Schneider, Yuriy Nevmyvaka,
+and Dongjin Song. Empowering time series analysis with large language models: A survey.
+In Kate Larson, editor, Proceedings of the Thirty-Third International Joint Conference on
+Artificial Intelligence, IJCAI-24, pages 8095–8103. International Joint Conferences on Artificial
+Intelligence Organization, 8 2024. Survey Track.
+[52] Yuxuan Liang, Haomin Wen, Yuqi Nie, Yushan Jiang, Ming Jin, Dongjin Song, Shirui Pan,
+and Qingsong Wen. Foundation models for time series analysis: A tutorial and survey. In
+Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining,
+pages 6555–6565, 2024.
+[53] Tian Zhou, Peisong Niu, Liang Sun, Rong Jin, et al. One fits all: Power general time series
+analysis by pretrained lm. Advances in neural information processing systems, 36:43322–43355,
+2023.
+[54] Yuxuan Bian, Xuan Ju, Jiangtong Li, Zhijian Xu, Dawei Cheng, and Qiang Xu. Multi-patch
+prediction: Adapting language models for time series representation learning. In Forty-first
+International Conference on Machine Learning.
+13
+
+[55] Abdul Fatir Ansari, Lorenzo Stella, Caner Turkmen, Xiyuan Zhang, Pedro Mercado, Huibin
+Shen, Oleksandr Shchur, Syama Sundar Rangapuram, Sebastian Pineda Arango, Shubham
+Kapoor, et al. Chronos: Learning the language of time series. arXiv preprint arXiv:2403.07815,
+2024.
+[56] Ming Jin, Shiyu Wang, Lintao Ma, Zhixuan Chu, James Y Zhang, Xiaoming Shi, Pin-Yu
+Chen, Yuxuan Liang, Yuan-Fang Li, Shirui Pan, et al. Time-llm: Time series forecasting by
+reprogramming large language models. In The Twelfth International Conference on Learning
+Representations, 2024.
+[57] Chenxi Liu, Qianxiong Xu, Hao Miao, Sun Yang, Lingzheng Zhang, Cheng Long, Ziyue Li,
+and Rui Zhao. Timecma: Towards llm-empowered multivariate time series forecasting via
+cross-modality alignment. In AAAI, 2025.
+[58] Yuxiao Hu, Qian Li, Dongxiao Zhang, Jinyue Yan, and Yuntian Chen. Context-alignment:
+Activating and enhancing LLMs capabilities in time series. In The Thirteenth International
+Conference on Learning Representations, 2025.
+[59] Chenxi Liu, Shaowen Zhou, Hao Miao, Qianxiong Xu, Cheng Long, Ziyue Li, and Rui Zhao.
+Efficient multivariate time series forecasting via calibrated language models with privileged
+knowledge distillation. arXiv preprint arXiv:2505.02138, 2025.
+[60] Abhimanyu Das, Weihao Kong, Rajat Sen, and Yichen Zhou. A decoder-only foundation model
+for time-series forecasting. arXiv preprint arXiv:2310.10688, 2023.
+[61] Gerald Woo, Chenghao Liu, Akshat Kumar, Caiming Xiong, Silvio Savarese, and Doyen
+Sahoo. Unified training of universal time series forecasting transformers. arXiv preprint
+arXiv:2402.02592, 2024.
+[62] Yong Liu, Haoran Zhang, Chenyu Li, Xiangdong Huang, Jianmin Wang, and Mingsheng Long.
+Timer: Transformers for time series analysis at scale. arXiv preprint arXiv:2402.02368, 2024.
+[63] Hao Xue and Flora D Salim. Promptcast: A new prompt-based learning paradigm for time
+series forecasting. IEEE Transactions on Knowledge and Data Engineering, 2023.
+[64] Zihan Chen, Lei Nico Zheng, Cheng Lu, Jialu Yuan, and Di Zhu. Chatgpt informed graph
+neural network for stock movement prediction. Available at SSRN 4464002, 2023.
+[65] Geon Lee, Wenchao Yu, Kijung Shin, Wei Cheng, and Haifeng Chen. Timecap: Learning to
+contextualize, augment, and predict time series events with large language model agents. In
+AAAI, 2025.
+[66] Xinlei Wang, Maike Feng, Jing Qiu, Jinjin Gu, and Junhua Zhao. From news to forecast:
+Integrating event analysis in llm-based time series forecasting with reflection. arXiv preprint
+arXiv:2409.17515, 2024.
+[67] Jialin Chen, Aosong Feng, Ziyu Zhao, Juan Garza, Gaukhar Nurbek, Cheng Qin, Ali Maatouk,
+Leandros Tassiulas, Yifeng Gao, and Rex Ying. Mtbench: A multimodal time series benchmark
+for temporal reasoning and question answering. arXiv preprint arXiv:2503.16858, 2025.
+[68] Yaxuan Kong, Yiyuan Yang, Shiyu Wang, Chenghao Liu, Yuxuan Liang, Ming Jin, Stefan
+Zohren, Dan Pei, Yan Liu, and Qingsong Wen. Position: Empowering time series reasoning
+with multimodal llms. arXiv preprint arXiv:2502.01477, 2025.
+[69] Yaxuan Kong, Yiyuan Yang, Yoontae Hwang, Wenjie Du, Stefan Zohren, Zhangyang Wang,
+Ming Jin, and Qingsong Wen. Time-mqa: Time series multi-task question answering with
+context enhancement. arXiv preprint arXiv:2503.01875, 2025.
+[70] Chengsen Wang, Qi Qi, Jingyu Wang, Haifeng Sun, Zirui Zhuang, Jinming Wu, Lei Zhang, and
+Jianxin Liao. Chattime: A unified multimodal time series foundation model bridging numerical
+and textual data. arXiv preprint arXiv:2412.11376, 2024.
+[71] Zhe Xie, Zeyan Li, Xiao He, Longlong Xu, Xidao Wen, Tieying Zhang, Jianjun Chen, Rui
+Shi, and Dan Pei. Chatts: Aligning time series with llms via synthetic data for enhanced
+understanding and reasoning. arXiv preprint arXiv:2412.03104, 2024.
+14
+
+[72] Yifu Cai, Arjun Choudhry, Mononito Goswami, and Artur Dubrawski. Timeseriesexam: A time
+series understanding exam. arXiv preprint arXiv:2410.14752, 2024.
+[73] Jacob Devlin Ming-Wei Chang Kenton and Lee Kristina Toutanova. Bert: Pre-training of deep
+bidirectional transformers for language understanding. In Proceedings of naacL-HLT, volume 1,
+page 2. Minneapolis, Minnesota, 2019.
+[74] Nils Reimers and Iryna Gurevych. Sentence-bert: Sentence embeddings using siamese bertnetworks. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language
+Processing. Association for Computational Linguistics, 11 2019.
+[75] Ailing Zeng, Muxi Chen, Lei Zhang, and Qiang Xu. Are transformers effective for time series
+forecasting? In Proceedings of the AAAI conference on artificial intelligence, volume 37, pages
+11121–11128, 2023.
+[76] Haixu Wu, Jiehui Xu, Jianmin Wang, and Mingsheng Long. Autoformer: Decomposition transformers with auto-correlation for long-term series forecasting. Advances in neural information
+processing systems, 34:22419–22430, 2021.
+[77] Yunhao Zhang and Junchi Yan. Crossformer: Transformer utilizing cross-dimension dependency
+for multivariate time series forecasting. In The eleventh international conference on learning
+representations, 2023.
+[78] Haixu Wu, Tengge Hu, Yong Liu, Hang Zhou, Jianmin Wang, and Mingsheng Long. Timesnet:
+Temporal 2d-variation modeling for general time series analysis. In The Eleventh International
+Conference on Learning Representations, 2023.
+[79] Yong Liu, Tengge Hu, Haoran Zhang, Haixu Wu, Shiyu Wang, Lintao Ma, and Mingsheng
+Long. itransformer: Inverted transformers are effective for time series forecasting. In The
+Twelfth International Conference on Learning Representations, 2024.
+[80] Si-An Chen, Chun-Liang Li, Sercan O Arik, Nathanael Christian Yoder, and Tomas Pfister.
+Tsmixer: An all-mlp architecture for time series forecast-ing. Transactions on Machine Learning
+Research, 2023.
+[81] Shiyu Wang, Haixu Wu, Xiaoming Shi, Tengge Hu, Huakun Luo, Lintao Ma, James Y Zhang,
+and JUN ZHOU. Timemixer: Decomposable multiscale mixing for time series forecasting. In
+The Twelfth International Conference on Learning Representations.
+[82] Kun Yi, Qi Zhang, Wei Fan, Shoujin Wang, Pengyang Wang, Hui He, Ning An, Defu Lian,
+Longbing Cao, and Zhendong Niu. Frequency-domain mlps are more effective learners in time
+series forecasting. Advances in Neural Information Processing Systems, 36, 2024.
+[83] Nate Gruver, Marc Finzi, Shikai Qiu, and Andrew Gordon Wilson. Large Language Models
+Are Zero Shot Time Series Forecasters. In NeurIPS, 2023.
+[84] Diederik P Kingma and Jimmy Ba. Adam: A method for stochastic optimization. arXiv preprint
+arXiv:1412.6980, 2014.
+[85] Jiawei Gu, Xuhui Jiang, Zhichao Shi, Hexiang Tan, Xuehao Zhai, Chengjin Xu, Wei Li,
+Yinghan Shen, Shengjie Ma, Honghao Liu, et al. A survey on llm-as-a-judge. arXiv preprint
+arXiv:2411.15594, 2024.
+[86] Mingyue Cheng, Yiheng Chen, Qi Liu, Zhiding Liu, Yucong Luo, and Enhong Chen. Instructime:
+Advancing time series classification with multimodal language modeling. In Proceedings of the
+Eighteenth ACM International Conference on Web Search and Data Mining, WSDM ’25, page
+792–800, New York, NY, USA, 2025. Association for Computing Machinery.
+
+15
+
+A
+
+Experimental Settings
+
+A.1
+
+Dataset Statistics
+
+In this subsection, we provide more details of the real-world datasets we used for the experiments.
+The data statistics are summarized in Table 3, including the meta information (e.g., domain resolution,
+duration of real-world time series records), the number of channels and timesteps and so on. We use
+the Weather and Healthcare datasets in TimeCAP [65], and a Finance dataset extended from [12].
+The Weather dataset contains the hourly time series record of temperature, humidity, air pressure,
+wind speed, and wind direction3 , and related weather summaries in New York City from October
+2012 to November 2017. The task is to predict if it will rain in the next 24 hours, given the last 24
+hours of weather records and summary.
+The Finance dataset contains the daily record of the raw material prices together with 14 related
+indices ranging from January 2017 to July 20244 with news articles. The task is to predict if future
+prices will increase by more than 1%, decrease by more than 1%, or exhibit a neutral trend on the
+next business day, given the last 5 business days of stock price data and news.
+The Healthcare datasets are related to testing cases and deaths of influenza5 . The Healthcare (TestPositive) dataset consists of the weekly records of the number of positive specimens for Influenza A
+and B, and related healthcare reports. The task is to predict if the percentage of respiratory specimens
+testing positive in the upcoming week for influenza will exceed the average value, given the records
+and summary in the last 20 weeks. Similarly, the Healthcare (Mortality) dataset contains the weekly
+records and healthcare reports of influenza and pneumonia deaths. The task is to predict if the
+mortality ratio from influenza and pneumonia will exceed the average value, given the records and
+summary in the last 20 weeks.
+Table 3: Summary of dataset statistics.
+Domain
+
+Dataset
+
+Weather
+
+New York
+
+Resolution # Channels # Timesteps
+
+Duration
+
+Ground Truth Distribution
+
+Hourly
+
+5
+
+45,216
+
+2012.10 - 2017.11 Rain (24.26%) / Not rain (75.74%)
+2012.09 - 2022.02 Inc. (36.7%) / Dec. (34.1%) / Neutral (29.2%)
+
+Finance
+
+Raw Material
+
+Daily
+
+15
+
+1,876
+
+Healthcare
+
+Test-Positive
+
+Weekly
+
+6
+
+447
+
+2015.10 - 2024.04 Not exceed (65.77%) / Exceed (34.23%)
+
+Healthcare
+
+Mortality
+
+Weekly
+
+4
+
+395
+
+2016.07 - 2024.06 Not exceed (69.33%) / Exceed (30.67%)
+
+A.2
+
+Hyperparameters
+
+First, we provide the hyperparameters of baseline methods. Unless otherwise specified, we used the
+default hyperparameters from the Time Series Library (TSLib) [78]. For LLMTime [83], OFA [53],
+Time-LLM [56], TimeCMA [57], TimeCAP [65], FSCA [58], we use their own implementations.
+For all methods, the dropout rate ∈ {0.0, 0.1, 0.2}, learning rate ∈ {0.0001, 0.0003, 0.001}. For
+transformer-based and LLM fine-tuning methods [76, 77, 79, 5, 57, 56], the number of attention layers
+∈ {1, 2}, the number of attention heads ∈ {4, 8, 16}. For Dlinear [75], moving average ∈ {3, 5}. For
+TimesNet [78] the number of layers ∈ {1, 2}. For PatchTST [5], MM-PatchTST [35] and FSCA [58],
+the patch size ∈ {3, 5} for the finance dataset. For TimeCAP [65], we use the encoder with the
+prediction LLM, given the inherent multi-modal time series input. Next, we provide the hyperparameters of TimeXL. The numbers of time series prototypes and text prototypes are k ∈ {5, 10, 15, 20}
+and k ′ ∈ [5, 10], respectively. The hyperparameters controlling regularization strengths are λ1 , λ2 ,
+λ3 ∈ [0.1, 0.3] with interval 0.05 for individual modality, dmin ∈ {1.0, 1.5, 2.0} for time series,
+dmin ∈ {3.0, 3.5, 4.0} for text. Learning rate for multi-modal encoder ∈ {0.0001, 0.0003, 0.001},
+using Adam [84] as the optimizer. The number of case-based explanations fed to prediction LLM
+ω ∈ {3, 5, 8, 10}. All results are reported as the average of five experimental runs.
+3
+
+https://www.kaggle.com/datasets/selfishgene/historical-hourly-weather-data
+https://www.indexmundi.com/commodities
+5
+https://www.cdc.gov/fluview/overview/index.html
+4
+
+16
+
+A.3
+
+Large Language Model
+
+We employed the gpt-4o-2024-08-06 version for GPT-4o in OpenAI API by default. We use the
+parameters max_tokens=2048, top_p=1, and temperature=0.7 for content generation (self-reflection
+and text refinement), and 0.3 for prediction. We keep the same setting for Gemini-2.0-Flash and
+GPT-4o-mini due to the best empirical performance.
+A.4
+
+Environment
+
+We conducted all the experiments on a TensorEX server with 2 Intel Xeon Gold 5218R Processor
+(each with 20 Core), 512GB memory, and 4 RTX A6000 GPUs (each with 48 GB memory).
+
+B
+
+More Ablation Studies and Model Analysis
+
+Ablations of learning objectives: We provide an ablation study on the learning objectives of TimeXL
+encoder, as shown in Figure 6. The results clearly show that the full objective consistently achieves the
+best encoder prediction performance, highlighting the necessity of regularization terms that enhance
+the interpretability of multi-modal prototypes. The clustering (λ1 ) and evidencing (λ2 ) objectives
+also play a crucial role in accurate prediction: the clustering term ensures distinguishable prototypes
+across different classes, while the evidencing term ensures accurate projection onto training data.
+Weather Performance
+0.750
+0.725
+
+0.70
+
+0.700
+
+0.65
+
+0.675
+0.650
+
+0.60
+
+0.50
+
+0.600
+Full
+Time
+Time
+Time
+Text
+Text
+Text
+objective ( 1 = 0) ( 2 = 0) ( 3 = 0) ( 1 = 0) ( 2 = 0) ( 3 = 0)
+
+Full
+Time
+Time
+Time
+Text
+Text
+Text
+objective ( 1 = 0) ( 2 = 0) ( 3 = 0) ( 1 = 0) ( 2 = 0) ( 3 = 0)
+
+Healthcare (TP) Performance
+
+1.000
+
+F1
+AUC
+
+Healthcare (MT) Performance
+
+F1
+AUC
+
+0.975
+
+0.96
+
+0.950
+
+Score
+
+0.94
+
+Score
+
+F1
+AUC
+
+0.55
+
+0.625
+
+0.98
+
+Finance Performance
+
+0.75
+
+Score
+
+Score
+
+0.80
+
+F1
+AUC
+
+0.775
+
+0.92
+
+0.925
+0.900
+
+0.90
+
+0.875
+
+0.88
+
+0.850
+
+0.86
+
+0.825
+0.800
+
+Full
+Time
+Time
+Time
+Text
+Text
+Text
+objective ( 1 = 0) ( 2 = 0) ( 3 = 0) ( 1 = 0) ( 2 = 0) ( 3 = 0)
+
+Full
+Time
+Time
+Time
+Text
+Text
+Text
+objective ( 1 = 0) ( 2 = 0) ( 3 = 0) ( 1 = 0) ( 2 = 0) ( 3 = 0)
+
+Figure 6: Ablation study of multi-modal encoder learning objectives.
+Sensitivity of regularization strengths: To quantitatively evaluate the sensitivity of regularization
+strengths in the learning objectives, we report the performance of the multi-modal encoder on the
+Weather dataset (using the refined test texts), as detailed in Appendix A.2. As shown in Table 4, model
+performance remains relatively stable across different values. For both modalities, moderate values
+of λ1 and λ2 tend to yield better performance, suggesting the clustering and evidencing effectively
+guide meaningful prototype learning. A slight diversity constraint (λ3 ) also helps to keep a compact
+interpretation prototype space.
+Sensitivity of prototype lengths: We evaluate the sensitivity of the multi-modal encoder to prototype
+length by varying the single-kernel sizes for both time-series and text modalities on the Weather and
+Finance datasets (using the refined test texts), as shown in Table 5 and 6. We observe that performance
+is relatively stable across a range of prototype lengths on the Weather dataset, with optimal results
+17
+
+Table 4: Sensitivity analysis of different λ values for multi-modal encoder on the Weather dataset.
+Modality
+
+Time
+
+Text
+
+0.1
+
+0.15
+
+0.2
+
+0.25
+
+0.3
+
+λ1
+
+F1
+AUC
+
+0.628±0.030
+0.733±0.022
+
+0.627±0.027
+0.731±0.026
+
+0.633±0.029
+0.736±0.026
+
+0.627±0.028
+0.731±0.024
+
+0.625±0.030
+0.729±0.023
+
+λ2
+
+F1
+AUC
+
+0.632±0.028
+0.734±0.024
+
+0.634±0.028
+0.736±0.022
+
+0.627±0.032
+0.733±0.028
+
+0.626±0.028
+0.729±0.021
+
+0.628±0.028
+0.733±0.025
+
+λ3
+
+F1
+AUC
+
+0.631±0.028
+0.736±0.022
+
+0.631±0.027
+0.735±0.024
+
+0.630±0.028
+0.733±0.024
+
+0.624±0.032
+0.727±0.026
+
+0.628±0.029
+0.733±0.025
+
+λ1
+
+F1
+AUC
+
+0.629±0.027
+0.732±0.024
+
+0.629±0.026
+0.736±0.024
+
+0.631±0.027
+0.740±0.026
+
+0.635±0.027
+0.738±0.023
+
+0.634±0.028
+0.735±0.025
+
+λ2
+
+F1
+AUC
+
+0.632±0.031
+0.734±0.027
+
+0.631±0.026
+0.736±0.021
+
+0.635±0.024
+0.740±0.024
+
+0.629±0.026
+0.735±0.021
+
+0.630±0.028
+0.736±0.028
+
+λ3
+
+F1
+AUC
+
+0.635±0.026
+0.740±0.021
+
+0.633±0.023
+0.736±0.025
+
+0.628±0.025
+0.731±0.023
+
+0.625±0.029
+0.729±0.027
+
+0.627±0.027
+0.731±0.026
+
+typically achieved at moderate lengths for both modalities. For time series, the 8-hour segments
+are often sufficient to capture the typical temporal patterns of weather conditions, and a 12-token
+text window (with BERT) provides enough local contexts for weather prediction. For the Finance
+dataset, which operates on a business-day granularity, performance improves with longer lengths
+of time series prototypes that capture important financial trends. For the textual modality, we use
+Sentence-BERT to embed financial news at the half-sentence granularity, and shorter text windows
+(1-2 segments) typically provide compact and indicative market conditions. These results suggest
+that our model maintains robust to prototype length selection across a reasonable range, guided by
+the temporal characteristics of each dataset.
+Table 5: Sensitivity analysis of prototype lengths
+for multi-modal encoder on the Weather dataset.
+Modality
+
+Length
+
+F1
+
+AUC
+
+Time
+
+4
+8
+12
+16
+
+0.632±0.018
+0.642±0.011
+0.625±0.013
+0.621±0.012
+
+0.748±0.011
+0.754±0.008
+0.746±0.007
+0.743±0.007
+
+Text
+
+4
+8
+12
+16
+
+0.619±0.014
+0.626±0.015
+0.647±0.008
+0.627±0.009
+
+0.743±0.008
+0.744±0.008
+0.757±0.004
+0.748±0.007
+
+Table 6: Sensitivity analysis of prototype lengths
+for multi-modal encoder on the Finance dataset.
+Modality
+
+Length
+
+F1
+
+AUC
+
+Time
+
+1
+2
+3
+4
+5
+
+0.430±0.002
+0.454±0.028
+0.475±0.006
+0.526±0.014
+0.588±0.029
+
+0.595±0.002
+0.630±0.021
+0.662±0.006
+0.714±0.006
+0.769±0.018
+
+Text
+
+1
+2
+3
+
+0.508±0.073
+0.496±0.061
+0.458±0.045
+
+0.666±0.074
+0.673±0.067
+0.664±0.056
+
+Effect of case-based explanations on LLM predictions and other quality assessments: Moreover,
+we assess how the number of allocated case-based explanations enhances the prediction LLM, as
+shown in Figure 7. We conduct experiments on the Weather and Finance datasets, demonstrating that
+incorporating more relevant case-based explanations consistently improves prediction performance.
+This trend highlights the effectiveness of explainable artifacts in providing meaningful contextual
+guidance. Importantly, this analysis also serves as a proxy for quantitatively evaluating explanation
+quality, where retrieving higher-quality case-based examples tends to yield greater performance gains.
+Beyond this quantitative assessment, alternative strategies can be employed to evaluate explanation
+quality more explicitly, for example, using LLM as a judge [85] to rate the relevance and helpfulness
+of explanations in a human-understandable manner, with respect to ground truth.
+Effect of different base LLMs: To explore the effect
+of different base LLMs (Gemini-2.0 Flash and GPT-4oBase LLM
+F1
+AUC
+mini), we provide the experiment results and analysis on
+GPT-4o-mini
+0.932 0.981
+the Healthcare (Test-Positive) dataset. For fair comparGemini-2.0-Flash 0.937 0.983
+isons, we used the same prompts and ran the same number
+GPT-4o (default)
+0.987 0.996
+of iterations and followed the same settings detailed in
+Appendix A.2, A.3, and A.4. The results are shown in
+Table 7. It can be observed that GPT-4o clearly outper- Table 7: Performance of different base
+forms both GPT-4o-mini and Gemini-2.0-Flash, due to its LLMs on Healthcare (Test-Positive).
+better reasoning and contextual understanding capabilities
+18
+
+(larger model size & pre-training corpus). Both GPT-4o-mini and Gemini-2.0-Flash are still competitive compared with baselines listed in Table 1. It reveals the impact of the LLM capability on the
+effectiveness of our framework, especially in tasks demanding real-world context understanding. We
+also provide the plot of iterative analysis in Figure 8, where we can also observe the performance
+improvement over iterations for different base LLMs.
+
+Weather
+
+0.74
+
+Score
+
+0.72
+
+0.735
+
+0.732
+0.724 0.722
+
+0.650
+
+0.724
+
+0.625
+
+0.70
+
+0.661
+
+0.656
+0.645
+
+0
+
+0.667
+
+10
+
+0.662
+
+F1
+AUC
+
+0.550
+
+0.541
+
+0.532
+
+0.525
+
+0.649
+
+2
+4
+6
+8
+Number of Case-Based Explanations
+
+0.635
+
+0.659
+
+0.655
+
+0.575
+
+0.68
+0.66
+
+0.627
+
+0.646
+
+0.600
+
+F1
+AUC
+
+0.648
+
+Finance
+
+0.739
+
+0.544
+
+0.520
+
+0.500 0.496
+0
+
+0.506
+
+2
+4
+6
+8
+Number of Case-Based Explanations
+
+10
+
+Figure 7: Effect of case-based explanations on LLM prediction performance.
+
+0.987
+0.974
+
+0.989
+
+0.987
+
+0.975
+
+0.986
+0.953
+
+0.936
+0.924
+0.924
+
+0.932
+
+0.937
+
+0.938
+
+0.934
+
+0.932
+
+0.981
+
+0.996
+0.983
+0.978
+
+0.997
+0.982
+0.982
+
+0.975
+
+0.952
+
+Figure 8: Iterative study of different base LLMs on the Healthcare (Test-Positive) dataset.
+
+C
+
+Computation Cost for Iterative Optimization and Inference
+
+We quantitatively analyze the token usage and runtime of the iterative process. Following the
+prompts and strategy detailed in Appendix E, each iteration over 4000 training and validation samples
+(average length of 400 tokens, around 300 words) requires about 9.74 M input tokens and yield
+1.64 M output tokens. With GPT-4o (with input latency as TTFT ≈ 0.45 seconds and output speed
+≈ 156 tokens/second), it corresponds to around 3.9 hours serially per iteration (prediction takes
+approximately 0.5 hours, reflection 0.08 hours, and refinement 3.35 hours). As prediction and
+refinement steps can also be parallelized, we can reduce the iteration time to about 12 minutes with
+20 concurrent calls. Using a more efficient LLM base model Gemini-Flash-2.0 with TTFT ≈ 0.3
+seconds and ≈ 236 output tokens/second, the iteration time can be further reduced to 8 minutes.
+In the testing stage, we apply the fixed reflections selected during validation to refine the test texts.
+Based on our prompt lengths, the refinement and prediction steps can take down to 3.46 seconds per
+sample with GPT-4o, and 2.29 seconds per sample with Gemini-2.0-Flash, which is reasonable for
+real-world deployment.
+19
+
+In addition to efficient LLM backbones and parallelized querying, we discuss further strategies to
+lower computational cost. As shown in Figure 5, 1-2 iterations often yield clear performance gains.
+In practice, the iteration loop can be adaptively controlled by monitoring validation improvements
+and stopping early once gains fall below a predefined threshold. To further reduce the cost, we can
+also do selective refinement by skipping training examples that were already predicted accurately in
+previous iterations. These strategies help make our method more computationally tractable.
+
+D
+
+Explainable Multi-modal Prototypes and Case Study
+
+D.1
+
+Multi-modal Prototypes for All Datasets
+
+We present the learned multi-modal prototypes across datasets including Weather (Figure 9), Finance
+(Figure 10), Healthcare (Test-Positive) (Figure 11), and Healthcare (Mortality) (Figure 12). It is
+noticeable that the prototypes from both modalities align well with real-world ground truth scenarios,
+ensuring faithful explanations and enhancing LLM predictions.
+D.2
+
+Case-based Reasoning Example on the Finance Dataset
+
+We provide another case-based reasoning example to demonstrate the effectiveness of TimeXL in
+explanatory analysis, as shown in Figure 13. In this example, the original text is incorrectly predicted
+as neutral instead of a decreasing trend of raw material prices. We have a few key observations
+based on the results. First, the refinement LLM filters the original text to emphasize economic
+and market conditions more indicative of a declining trend, based on the reflections from training
+examples. The refined text preserves discussions on port inventories and steel margins while placing
+more emphasis on subdued demand, thin profit margins, and bearish market sentiment as key
+indicator of prediction. Accordingly, the case-based explanations from the original text focus more on
+inventory management and short-term stable patterns, while those in the refined text highlight demand
+contraction, production constraints, and macroeconomic uncertainty, which is more consistent with
+a decreasing trend. Furthermore, the reasoning on time series provides a complementary view for
+predicting raw material price trends. The time series explanations identify declining price movements
+across multiple indices. In general, the multi-modal explanations based on matched prototypes from
+TimeXL demonstrate its effectiveness in capturing relevant raw material market condition for both
+predictive and explanatory analysis.
+Not Rain
+
+Multi-modal Prototypes
+
+• suggest a likelihood of dry weather, with stable pressure and
+• westerly shifts, which typically bring cooler, drier air
+• and the wind direction has primarily been from the west
+• indicating the strengthening of a high-pressure system
+• drier air moving into the area. Air pressure remained relatively
+• a notable dip followed by a gradual return to higher levels
+• stable with a slight downward trend. Wind speeds were mostly
+• hours in New York City, air pressure remained relatively stable
+
+Rain
+
+• which could signal the approach of a weather system
+• low-pressure system that could lead to worsening weather
+• humidity levels were predominantly high, and wind speeds were
+• recent hours. Air pressure has been decreasing overall, which
+• wind direction started westerly, became variable, and
+• brief increase, and wind direction was predominantly north and northeast
+• recent hours. Air pressure has been decreasing overall, which
+• direction was variable without a consistent pattern. These indicators suggest
+
+Figure 9: More multi-modal prototypes learned from the Weather dataset. Each row in the figure
+represents a time series prototype.
+20
+
+Multi-modal Prototypes
+Feature 1
+
+Feature 2
+
+Feature 3
+
+Feature 4
+
+Feature 5
+
+Feature 6
+
+Feature 7
+
+Feature 8
+
+Feature 9
+
+Feature 10
+
+Feature 11
+
+Feature 12
+
+Feature 13
+
+• supported by low material inventories and limited spot offers
+• In conclusion while recent restocking activities provide some support
+• The seaborne raw material market is experiencing upward price movements
+• Anticipated economic stimulus measures in China
+• Intensified restocking activities ahead of the Lunar New Year have led to increased demand and price
+Feature 1
+
+Feature 2
+
+Feature 3
+
+Feature 4
+
+Feature 5
+
+Feature 6
+
+Feature 7
+
+Feature 8
+
+Feature 9
+
+Feature 10
+
+Feature 2
+
+Feature 3
+
+Feature 4
+
+Feature 5
+
+Feature 6
+
+Feature 7
+
+Feature 8
+
+Feature 9
+
+Feature 10
+
+Feature 15
+
+Increase
+
+Feature 11
+
+Feature 12
+
+Feature 13
+
+Feature 14
+
+Feature 11
+
+Feature 12
+
+Feature 13
+
+Feature 14
+
+• Overall the combination of weak demand
+• Raw material prices have fallen below $40 per dry metric ton
+• causing cautious purchasing behavior
+• The raw material market is experiencing a downturn
+• Blast furnace operations are affected by stricter environmental regulations
+Feature 1
+
+Feature 14
+
+Feature 15
+
+Decrease
+
+• indicating balanced raw material needs
+• with notable volatility driven by various factors
+• Geopolitical and seasonal factors
+• Indian raw material supply might increase due to eased export restrictions
+• A proposed weekly spot CFR China blast furnace assessment aims to enhance pricing transparency
+
+Feature 15
+
+Neutral
+
+Figure 10: Key multi-modal prototypes learned from the Finance dataset. Each row in the figure
+represents a time series prototype.
+Exceed
+
+Multi-modal Prototypes
+
+• The week - over - week growth in positive specimens for both Influenza A and
+B suggests a significant impact on the
+• has been a significant upward trend in both the number of respiratory
+specimens tested for influenza and the number of positive cases for
+• season but continued risk due to the persistent presence of Influenza B. The
+healthcare system should maintain vigilance and resources
+• been a notable increase in the percentage of respiratory specimens testing
+positive for influenza, with the average ratio of positive specimens rising
+
+Not Exceed
+
+• trend suggests a waning influenza season, which could potentially reduce the
+burden on healthcare resources related to flu treatment and hospital
+• and 0. 63 %, respectively. This declining trend suggests decreased influenza
+activity, potentially easing healthcare resource allocation.
+• in the number of specimens tested, reaching a peak at week 6, followed by a
+decline, which suggests that the in
+• with Influenza A becoming more prevalent later. In recent weeks, there has
+been a notable decline, with the overall
+
+Figure 11: Key multi-modal prototypes learned from the Healthcare (Test-Positive) dataset. Each row
+in the figure represents a time series prototype.
+21
+
+Exceed
+
+Multi-modal Prototypes
+
+• necessitating close monitoring and potentially increased healthcare
+resources. While Influenza seems less concerning, Pneumonia remains a
+• suggests a seasonal pattern or an emerging health threat. The healthcare
+system may need to prepare for increased demand for medical care and
+• healthcare resources. This data underscores the urgent need for targeted
+healthcare interventions to manage and mitigate further mortality.
+• resources and may necessitate increased preventive measures, vaccination
+efforts, and allocation of medical care to manage
+• This escalation suggests a growing burden on the healthcare system and
+underscores the need for vigilant surveillance and
+
+Not Exceed
+
+• significant reduction in influenza or pneumonia - related mortality, indicating
+an effective response possibly through vaccination efforts or public
+• persistent presence of influenza - related deaths, despite being low, requires
+continued surveillance to manage and prevent potential outbreaks.
+• This data could reflect seasonal patterns, the effectiveness of public health
+interventions, or changes in the prevalence of these infections, which
+• These trends suggest a potential reduction in healthcare system burdens but
+require continued surveillance for potential reversals or seasonal variations.
+• is particularly noteworthy, suggesting successful containment or a natural
+decline of influenza cases, which could alleviate some pressure on healthcare
+
+Figure 12: Key multi-modal prototypes learned from the Healthcare (Mortality) dataset. Each row in
+the figure represents a time series prototype.
+Original Text Reasoning
+
+Truth: Decrease
+
+Prediction: Neutral
+
+TimeXL: Time Series Reasoning
+
+Original Text:... Recovering global demand has led to higher Asia-Pacific raw material prices, further indicating a
+resurgence in industrial activity as blast furnaces resume operation globally. Additionally port inventories are being
+carefully managed due to import quotas and vessel inflows, influencing the broader supply chain and price dynamics. ...
+These dynamics are compounded by ongoing production controls and concerns about producer margins, which may face
+further stress in response to weak demand in the construction market and other key industries. Additionally upcoming
+economic stimulus measures and potential supply chain disruptions remain critical factors to monitor, as they could
+significantly influence future prices and production levels. Asian raw material prices continue to decline due to persistent
+bearish sentiment, influencing buyers' restocking interest. Some producers are shifting from lower-quality inputs to midquality materials due to cost inefficiencies in processing, particularly among smaller facilities… In particular the real
+estate and construction sectors continue to be key influencers of industrial demand and, consequently raw material
+prices. Additionally economic stimulus measures aimed at boosting industries could lead to increased demand for raw
+material. However geopolitical tensions and economic policies, particularly those related to trade, could create volatility
+in prices. Overall many factors including producer margins, inventories and production levels will be critical in shaping the
+raw material market's trajectory in the near future.
+Prototypes:
+Increase: while domestic supply constraints continue due to delays in reactivating production facilities. On the logistical
+side the freight rates are climbing due to increased demand (0.21)
+Neutral : potentially depressing raw material prices again. Thus despite short-term strength in raw material prices driven by
+active production and disruptions in secondary material supply (0.39)
+Decrease: Raw material prices have been declining due to the weak market, leading to dampened buying interest (0.33)
+Neutral: Producers are capitalizing on high stock levels, buying less raw materials primarily using cheaper stocks (0.27)
+TimeXL: Text Reasoning
+
+Feature 1
+
+Feature 2
+
+Feature 3
+
+Feature 4
+
+Feature 5
+
+Feature 6
+
+Feature 7
+
+Feature 8
+
+Feature 9
+
+Feature 10
+
+Feature 11
+
+Feature 12
+
+Feature 13
+
+Feature 14
+
+Feature 15
+
+Prediction: Decrease
+
+Refined Text: ... Despite this, global demand recovery has bolstered Asia-Pacific raw material prices, signaling a
+resurgence in industrial activity as blast furnaces globally restart operations. Port inventories are under careful
+management due to import quotas and vessel inflows, affecting supply chain dynamics. There is a noted contraction in the
+price spread between different material grades, with a shift towards lower-grade inputs to manage costs, particularly as
+mid-grade materials command higher premiums. Asian raw material prices have decreased due to subdued demand and
+thin producer margins, deterring buyers from fixed price options. Production controls have further reduced demand,
+contributing to bearish market sentiment. Seasonal factors, such as the approaching winter heating season, are expected
+to tighten production controls, indirectly impacting raw material demand dynamics. Meanwhile, geopolitical tensions and
+economic policies, especially those related to trade, could introduce volatility into raw material prices. Economic stimulus
+measures aimed at boosting industrial activity could lead to increased demand. Overall, producer margins, port
+inventories, and production levels will be critical in determining the future trajectory of the raw material market.
+Prototypes:
+Decrease: The raw material market is experiencing a downturn (0.43)
+Decrease: Overall the combination of weak demand (0.32)
+Decrease: causing cautious purchasing behavior (0.49)
+Decrease: are expected to persist potentially capping production level and influencing raw material demand (0.54)
+
+Figure 13: Multi-modal case-based reasoning example on the Finance dataset.
+
+E
+
+Designed Prompts for Experiments
+
+In this section, we provide our prompts for prediction LLM in Figure 14 (and a text-only variant
+for comparison, in Figure 15), reflection LLM in Figures 16, 17 18, as well as refinement LLM
+in Figure 19. Note that we adopt a generate-update-summarize strategy to effectively capture the
+reflective thoughts from training samples with class imbalances, which is more structured and
+scalable. We make the whole training texts into batches. First, the reflection LLM generates the initial
+reflection (Figure 16) by extracting key insights from class-specific summaries, highlighting text
+22
+
+patterns that contribute to correct and incorrect predictions. Next, it updates the reflection (Figure 17)
+by incorporating new training data, ensuring incremental and context-aware refinements. Finally, it
+summarizes multiple reflections from each class (in Figure 18) into a comprehensive guideline for
+downstream text refinement. This strategy consolidates knowledge from correct predictions while
+learning from incorrect ones, akin to the training process of deep models.
+System Prompt
+Your job is to act as [specific role]. You will be given a summary of [data description] and related
+prototypes that you can refer to. Based on this information, your task is to predict [task description].
+User Prompt
+Your task is to [task description]. First, review the following [number of prototypes] prototype text
+segments and outcomes, so that you can refer to when making predictions.
+Prototype #1: [text prototype]
+Corresponding Segment#1: [input text segment]
+Relevance Score: [similarity score]
+Outcome #1: [options]
+Next, review the [situation] :
+Summary: [text input]
+
+…
+
+Based on your understanding, predict the outcome of [situation]. Respond your prediction with
+[options]. Response should not include other terms.
+
+Figure 14: Prompt for prediction LLM
+System Prompt
+Your job is to act as [specific role]. You will be given a summary of [data description]. Based on this
+information, your task is to predict [task description].
+User Prompt
+Your task is to [task description]. First, review the [situation] :
+Summary: [text input]
+Based on your understanding, predict the outcome of [situation]. Respond your prediction with
+[options]. Response should not include other terms.
+
+Figure 15: Prompt for prediction with text only
+System Prompt
+You are an advanced reasoning agent that can improve the quality of [domain] summary based on
+self reflection. You will be given the summaries and [correct flag] predictions of [situation]. Your task
+is to learn some reflections that guides the refinement of [domain] summaries.
+User Prompt
+Your task is to analyze the provided [domain] summaries with [correct flag] predictions, in order to
+generate a reflection report improving its quality for [situation] prediction.
+Review the following [number of summaries] [domain] summaries with [ground truth] actual
+outcomes and [prediction] predictions.
+Summary #1: [text input]
+Actual Outcome #1: [ground truth]
+Prediction #1: [prediction]
+
+…
+
+Based on your analysis, write a high-quality reflection report that summarizes key phrases or
+sentences that led to correct predictions of [situation] / commonly misinterpreted and overlooked
+phrases or sentences that led to incorrect predictions of [situation].
+Use precise terms to convey a clear and professional analysis, and avoid overly general statements.
+The report should be a comprehensive and informative paragraph, which can be generalized to refine
+similar [domain] summaries. Your response should not include other terms.
+
+Figure 16: Prompt for reflection LLM: reflection generation
+23
+
+System Prompt
+You are an advanced reasoning agent that can improve the quality of [domain] summary based on
+self reflection. You will receive a reflection report up to this point. You will also be given the
+summaries and [correct flag] predictions of [situation]. Your task is to learn some reflections and
+update the current report that guides the refinement of [domain] summaries.
+User Prompt
+Your task is to analyze the provided [domain] summaries with [correct flag] predictions, in order to
+update a reflection report improving its quality for [situation] prediction.
+First, review the following reflection report up to this point: [current reflection report]
+Next, review the following [number of summaries] [domain] summaries with [ground truth] actual
+outcomes and [prediction] predictions.
+Summary #1: [text input]
+Actual Outcome #1: [ground truth]
+Prediction #1: [prediction]
+
+…
+
+Based on your analysis, write a high-quality reflection report that summarizes key phrases or
+sentences that led to correct predictions of [situation] / commonly misinterpreted and overlooked
+phrases or sentences that led to incorrect predictions of [situation].
+Use precise terms to convey a clear and professional analysis, and avoid overly general statements.
+The report should contain incremental and context-aware updates, and can be generalized to refine
+similar [domain] summaries. Your response should not include other terms.
+
+Figure 17: Prompt for reflection LLM: reflection update
+System Prompt
+You are an advanced summarization agent that can generate high-quality summarization. You will be
+given previously generated reflections for text refinement, from the correct and incorrect predictions
+of [domain] texts. Your current task is to summarize these long reflections to better guide financial
+text refinement.
+User Prompt
+Your task is to summarize the long reflections derived from previous predictions of [domain]
+contents. The goal is to generate a high-quality report aimed at improving the [domain] text quality for
+better predictive accuracy.
+First, review the reflections from all combinations of possible predictions and actual outcomes:
+[reflection reports]
+Based on your analysis, summarize the reflections of different scenarios and write a comprehensive
+report that provides guidelines to select the most important content in new [domain] texts where the
+actual outcome is unknown. Your response should keep the enough details, yet effective, to improve
+the text quality for downstream prediction. Your response should not include other terms.
+
+Figure 18: Prompt for reflection LLM: reflection summarization
+System Prompt
+You are an advanced refinement agent designed to enhance the quality of [domain] summary. You
+will be provided with reflective thoughts analyzed from other summaries, and a summary that
+requires refinement. Your task is to generate a refined [domain] summary, by examining how
+reflective thoughts applied to the current summary.
+User Prompt
+Your task is to generate a refined weather summary from the current summary to improve its
+predictions of [situation]. First, review the following reflections that provide guidelines for refinement:
+[final reflection report]
+Next, review the current [domain] summary that describes [situation]:
+Summary #1: [text input]
+Based on your understanding, generate a new weather summary by selecting relevant content in the
+current summary, which provides insights crucial for understanding [situation]. Response should not
+include other terms.
+
+Figure 19: Prompt for refinement LLM
+24
+
+F
+
+Reflection Reports for Text Refinement
+
+In this section, we provide the reflection reports after the first iteration, to demonstrate the reflective
+thoughts by accessing real-world contexts.
+Reflection Summary – Weather (New York)
+Comprehensive Report on Refining Weather Predictions
+The review of weather summaries across various predictive scenarios reveals critical insights that can enhance the accuracy and reliability of weather forecasts. By integrating
+these refined elements, future weather texts can better anticipate actual outcomes. Below are the summarized guidelines for improving weather prediction texts:
+1.Key Indicators for Dry Conditions ("Not Rained" Predictions and Outcomes):
+1. Stable and Slightly Increasing Air Pressure: Consistent readings with minor upward trends suggest high-pressure systems, indicative of dry weather.
+2. Gentle to Moderate Wind Speeds: Observations of stable wind speeds without gusts support non-precipitative forecasts.
+3. Variable Wind Directions (Northwesterly/Westerly): Shifts from southwesterly to northwesterly/westerly directions bring cooler, drier air, reducing rain likelihood.
+4. Decreasing Daytime Humidity: High early humidity followed by daytime decreases correlates with dry conditions.
+5. Typical Diurnal Temperature Patterns: Normal temperature variations further support dry forecasts.
+6. Absence of Significant Weather Systems: Lack of major air pressure or wind pattern changes reinforces stable, dry conditions.
+2.Indicators for Rainy Conditions ("Rained" Predictions and Outcomes):
+1. Increasing Humidity Levels: Significant humidity increases are strong rain indicators.
+2. Decreasing Air Pressure: A downward pressure trend signals potential rain due to incoming low-pressure systems.
+3. Wind Conditions:
+1. Slight Wind Speed Increase: Often precedes rain, particularly if observed later.
+2. Easterly/Southeasterly Wind Directions: Bring moisture-laden air, favoring rain.
+3.Common Misinterpretations ("Rained" Predictions with "Not Rained" Outcomes):
+1. Pressure Stability Misinterpretation: Minor pressure fluctuations without other indicators are weak rain predictors.
+2. Humidity and Fog Confusion: Differentiate between humidity peaks indicating fog versus those suggesting rain.
+3. Overemphasis on Wind Changes: Focus on sustained wind patterns rather than minor variations.
+4. Misjudged Temperature Fluctuations: Evaluate temperature changes alongside corroborative indicators like pressure drops.
+5. Dynamic Weather System Misinterpretation: Recognize stable atmospheric conditions to avoid false rain predictions.
+4.Overlooked Conditions ("Not Rained" Predictions with "Rained" Outcomes):
+1. Humidity Peaks and Variability: High peaks or fluctuations often precede rain; they shouldn’t be underestimated.
+2. Wind Direction Shifts: Changes to southerly or easterly directions can signal moisture influx.
+3. Temperature and Humidity Interactions: Combined changes may offset stable pressure, indicating rain potential.
+4. Stable Pressure with Other Variables: Consider pressure stability with high humidity and wind changes collectively.
+By focusing on these detailed indicators and refining the interpretation of weather elements, future weather texts can improve prediction quality, providing more accurate and
+reliable forecasts.
+
+Figure 20: Reflection summary for text refinement on the Weather dataset.
+Reflection Summary – Finance (Raw Material)
+Comprehensive Guidelines for Enhancing Financial Text Quality in Predictive Analysis
+To improve the accuracy of financial predictions, it's crucial to refine the selection and emphasis of content in financial summaries. Based on reflections from past predictions,
+the following guidelines highlight the essential elements to consider for optimizing text quality:
+1.Key Indicators for Price Trends:
+1. For predicting increases, focus on indicators such as robust demand from major consumers, strong profit margins in key manufacturing sectors, and preferences
+for high-grade raw materials. Also, consider tight supply chains, low inventories, and economic stimulus measures.
+2. For decreases, emphasize rising inventory levels, weak demand, and operational adjustments. Bearish market sentiment and geopolitical tensions should be
+noted as well.
+3. For neutral outcomes, identify market equilibrium indicators like balanced supply-demand dynamics, stable production operations, and moderate buyer behavior.
+2.Contextual Influences:
+1. Consider the impact of seasonal trends, restocking activities, and economic stimuli on demand fluctuations. Recognize how these factors may cause temporary
+market shifts rather than long-term trends.
+2. Analyze global trade and supply chain disruptions to assess their potential to cause short-term volatility or stability rather than sustained changes.
+3.Regulatory and Policy Factors:
+1. Understand the implications of environmental regulations and geopolitical policies on supply and demand. These elements can significantly alter market dynamics
+and should be carefully integrated into analyses.
+4.Market Sentiment and Related Markets:
+1. Assess market sentiment and futures movements, recognizing that positive futures alignments often indicate underlying demand. Consider interconnected markets,
+such as related raw materials sectors , for their influence on overall demand.
+5.Strategic and Operational Adjustments:
+1. Pay attention to how producers and buyers adjust operations and procurement strategies in response to market conditions. These adjustments can affect demand
+patterns and price stability.
+6.Avoiding Common Misinterpretations:
+1. Avoid overemphasizing short-term trends as indicators of sustained market shifts. Be wary of speculative influences and temporary policy announcements that may
+not have immediate or lasting effects.
+2. Recognize high inventory levels as potential strategic buffers and consider their role in stabilizing prices during off-peak periods.
+By integrating these guidelines, financial summaries can provide a more comprehensive and balanced analysis, enhancing the predictive accuracy of unknown market
+outcomes. The focus should remain on understanding and articulating the complexities of market dynamics to better align predictions with actual trends.
+
+Figure 21: Reflection summary for text refinement on the Finance dataset.
+Reflection Summary – Healthcare (Test-Positive)
+Comprehensive Report on Improving Healthcare Text Quality for Predictive Accuracy
+Introduction
+This report synthesizes reflections from past analyses of healthcare summaries concerning influenza positivity rates. The goal is to enhance the quality of these texts to
+improve predictive accuracy for future assessments where actual outcomes are unknown.
+Key Indicators for Accurate Predictions
+1.Declining Trends for "Not Exceed" Predictions
+1. Emphasis on Decline: Correct predictions for outcomes that did not exceed the average often highlighted a clear decline in positivity rates. Terms such as
+"notable decline," "steady decrease," and "significant reduction" are crucial.
+2. Comparative Analysis: A pronounced reduction in Influenza A and B, particularly Influenza A, supports accurate assessments.
+3. Testing Volume and Ratios: A decrease in testing volume, coupled with positivity rates remaining below the average, strengthens predictions.
+4. Low Positivity Percentages: Explicit references to recent positivity rates consistently falling below the long-term average are vital.
+2.Indicators of "Exceed" Predictions
+1. Marked Increases: Substantial increases in positivity rates, highlighted by specific numerical comparisons, indicate an "exceed" outcome.
+2. Influenza Strain Dominance: Details on the predominance of Influenza A or B, with their impact on overall positivity rates, are significant.
+3. Rising Testing Volumes: Increased specimen testing, peaking with positivity rates, suggests heightened incidence and surveillance.
+4. Healthcare System Impact: References to increased hospitalizations and medical service demand provide context and validate exceeding predictions.
+5. Temporal Patterns: Tracking weekly peaks aids in understanding and predicting heightened influenza activity.
+Common Misinterpretations
+•Relative vs. Absolute Increases: Misinterpretations often arise from conflating relative increases with exceeding the average positivity rate. It is essential to compare these
+increases explicitly with historical averages.
+•Contextual Misalignment: Phrases highlighting rises in positivity rates without contextual alignment to the average threshold can mislead predictions.
+Guidelines for Text Refinement
+•Integrate Clear Comparisons: Ensure summaries incorporate direct comparisons to historical averages to avoid misjudgments.
+•Maintain Trend Clarity: Differentiate clearly between increasing trends and those that actually surpass the average positivity rate.
+•Include Contextual Analysis: Provide context for increases in positivity rates by detailing the impact on healthcare resources and system strain.
+•Highlight Temporal Data: Incorporate temporal patterns and weekly peaks to aid in nuanced predictive analysis.
+By adhering to these guidelines, healthcare texts can be refined to enhance predictive accuracy, ultimately aiding in proactive healthcare planning and resource allocation.
+
+Figure 22: Reflection summary for text refinement on the Healthcare (Test-Positive) dataset.
+25
+
+Reflection Summary – Healthcare (Mortality)
+Reflection Summary Report for Healthcare Text Refinement:
+1.Correct 'Not Exceed' Predictions:
+1. Key indicators of accurate predictions include phrases such as "general downward trend," "consistent decline," and "significant decrease" in mortality ratios,
+particularly from Influenza or Pneumonia.
+2. Terms like "below the average ratio" and "remained under the historical benchmark" effectively signal outcomes that do not surpass average mortality ratios.
+3. References to "improvement in management" and "effective public health interventions" highlight successful control measures that contribute to lower mortality
+figures.
+4. Acknowledging a "persistent burden" of Pneumonia amidst declines provides a nuanced understanding of stability in disease impact.
+2.Correct 'Exceed' Predictions:
+1. Accurate forecasts are marked by phrases such as "concerning upward trend," "significant increase," and "notable spike," indicating rising mortality ratios.
+2. Quantitative expressions like "dramatic rise" in deaths and comparisons exceeding specific averages effectively contextualize high mortality trends.
+3. Descriptions of peaks, potential outbreaks, and healthcare strain underscore the urgency and resource implications, enhancing predictive accuracy.
+3.Incorrect 'Exceed' Predictions with 'Not Exceed' Outcomes:
+1. Misinterpretations arise from emphasizing upward trends without aligning them with final ratios below the 7.84% threshold.
+2. Overemphasis on isolated peaks without considering their unsustained nature leads to overestimations.
+3. For improved accuracy, texts should differentiate between temporary increases and sustained trends, and focus on cumulative ratios relative to average
+benchmarks.
+4.Incorrect 'Not Exceed' Predictions with 'Exceed' Outcomes:
+1. Underestimations often occur by not fully considering the impact of recent historical peaks or seasonal outbreaks, even when declines are present.
+2. Incorrect predictions result from neglecting cumulative effects of influenza and pneumonia, especially when one disease overshadows the other.
+3. Future accuracy can be enhanced by emphasizing recent peaks, seasonal patterns, and comprehensive disease impacts.
+Guidelines for Future Healthcare Texts:
+•Prioritize clear identification of trends and ratios, ensuring they are contextualized against historical averages and thresholds.
+•Distinguish between short-term fluctuations and sustained trends, emphasizing cumulative impacts over isolated data points.
+•Integrate insights from public health interventions and management effectiveness to provide a holistic view of disease control.
+•Consider seasonal patterns and recent historical data to anticipate potential outbreaks or shifts in disease prevalence.
+•Ensure quantitative comparisons are explicit and supported by comprehensive data analysis to avoid misinterpretations.
+This structured approach will aid in crafting accurate healthcare summaries, enhancing predictive accuracy and improving the quality of healthcare texts for future analyses.
+
+Figure 23: Reflection summary for text refinement on the Healthcare (Mortality) dataset.
+
+G
+
+TimeXL for Regression-based Prediction: A Finance Demonstration
+
+In this section, we provide a demonstration of using TimeXL for regression tasks. Two minor
+modifications adapt TimeXL for continuous value prediction. First, we add a regression branch in
+the encoder design, as shown in Figure 24. On the top of time series prototype layers, we reversely
+ensemble each time series segment representation as a weighted sum of time series prototypes, and
+add a regression head (a fully connected layer with non-negative weights) for prediction. Accordingly,
+we add another regression loss term (i,e., MSE and MAE) to the learning objectives. Second, we
+adjust the prompt for prediction LLM by adding time series inputs and requesting continuous forecast
+values, as shown in Figure 25. As such, TimeXL is equipped with regression capability.
+
+Training time series
+
+Time series prototypes
+
+Projection
+
+Weighted Sum
+
+S1
+S2
+...
+Time series
+
+Sk
+
+Text input
+
+S' 1
+
+Language
+Model
+
+S' 2
+...
+
+Text embedding
+
+S' k
+
+Training & Testing
+
+Projection
+
+Testing
+Training texts
+
+Text prototypes
+
+Figure 24: Multi-modal prototype-based encoder design in TimeXL for regression tasks.
+
+26
+
+System Prompt
+Your job is to act as [specific role]. You will be given a summary of [data description] and related
+prototypes that you can refer to. Based on this information, your task is to predict [task description].
+User Prompt
+Your task is to [task description]. First, review the following [number of prototypes] prototype text
+segments and outcomes, so that you can refer to when making predictions.
+Prototype #1: [text prototype]
+Corresponding Segment#1: [input text segment]
+Relevance Score: [similarity score]
+Outcome #1: [options]
+Next, review the [situation] :
+Summary: [text input]
+
+…
+
+Finally, review the [domain] record of [situation] : [time series values]
+Based on your understanding, predict the outcome of [situation], followed by the value of [domain]
+record. Respond your prediction with [options] and [numerical value]. Response should not include
+other terms.
+
+Figure 25: Prompt for prediction LLM in regression tasks.
+Table 8: Performance evaluation for regression tasks.
+Model
+
+RMSE
+
+MAE
+
+MAPE(%)
+
+DLinear [75]
+Autoformer [76]
+Crossformer [77]
+TimesNet [78]
+iTransformer [79]
+TSMixer [80]
+TimeMixer [81]
+FreTS [82]
+PatchTST [5]
+
+7.871
+7.215
+7.205
+6.978
+5.877
+7.447
+6.651
+7.098
+5.676
+
+6.400
+5.680
+5.313
+4.928
+4.023
+5.509
+4.703
+4.886
+4.042
+
+4.727
+4.263
+3.808
+3.512
+2.863
+3.911
+3.349
+3.460
+2.853
+
+LLMTime [83]
+PromptCast [63]
+OFA [53]
+Time-LLM [56]
+TimeCMA [57]
+FSCA [58]
+MM-iTransformer [35]
+MM-PatchTST [35]
+TimeCAP [65]
+
+11.545
+4.728
+6.906
+6.396
+7.187
+5.511
+5.454
+5.117
+4.456
+
+5.300
+3.227
+4.862
+4.534
+5.083
+3.873
+3.789
+3.493
+3.088
+
+3.774
+2.306
+3.463
+3.238
+3.620
+2.720
+2.687
+2.491
+2.196
+
+TimeXL
+
+4.161
+
+2.844
+
+2.035
+
+We conduct the experiments on the same Finance dataset, where the target value is the raw material
+stock price. The performance of all baselines and TimeXL is presented in Table 8. Consistent with
+the classification setting, TimeXL achieves the best results, and the multi-modal variants of stateof-the-art baselines (MM-iTransformer and MM-PatchTST) benefit from incorporating additional
+text data. This observation is further supported by the ablation study in Table 9. We also note
+that the text modality offers complementary information for LLMs, enhancing numerical price
+predictions. Furthermore, the identified prototypes provide contextual guidance, leading to additional
+performance gains. Overall, TimeXL outperforms all variants, underscoring the effectiveness of
+mutually augmented prediction. We also provide an iteration analysis to show the effectiveness
+of reflective and refinement process, as shown in Table 10. The prediction performance quickly
+improves and stabilizes over iterations, which underscores the alternation steps between predictions
+and reflective refinements.
+27
+
+Original Text Reasoning
+
+Truth: Decrease, 139.10
+
+Prediction: Decrease, 143.56
+
+TimeXL: Time Series Reasoning
+
+Original Text: … The key factors influencing the future price of raw material include new local production
+restrictions, which have slightly improved market sentiments despite a generally weak market and
+bearish outlook. Production level adjustments particularly in highly industrial regions, tend to have
+significant impacts on the demand and pricing of raw material. Furthermore the narrowing spread
+between the higher- and mid-grade material indices indicates a potential shift in market preferences
+towards different quality grades of raw materials, directly affecting pricing dynamics... Additionally any
+geopolitical events or changes in economic policies could further influence the supply chain and
+production levels, adding to the complexity of predicting raw material market movements. Raw material
+prices are in decline as buyers show weak interest and favor discounted products, signaling a
+suppressive outlook on demand ... Furthermore geopolitical tensions and regulatory changes continue
+to inject volatility, influencing the trade flows and pricing of raw materials globally. Supply chain
+managers closely monitor these dynamics, especially with gradual increases in export capabilities from
+major producers, which could further influence global supply ...
+Prototypes:
+Neutral: although the overall market sentiment remains cautious (0.39)
+Neutral: All these factors combined signal potential fluctuations in material prices moving forward (0.40)
+Decrease: adding an element of uncertainty to supply dynamics (0.61)
+TimeXL: Text Reasoning
+
+Truth: Decrease, 139.10
+
+Feature 1
+
+Feature 2
+
+Feature 3
+
+Feature 4
+
+Feature 5
+
+Feature 6
+
+Feature 7
+
+Feature 8
+
+Feature 9
+
+Feature 10
+
+Feature 11
+
+Feature 12
+
+Feature 13
+
+Feature 14
+
+Feature 15
+
+Feature 7
+
+Feature 8
+
+Feature 9
+
+Prediction: Decrease, 136.94
+
+Refined Text: ... Despite expectations for increased demand during the September-October peak
+season, tight supply conditions particularly for higher-quality materials have resulted in price increases
+for alternative domestic resources. Geopolitical tensions and economic policies could further impact
+the market dynamics. Production restrictions especially in industrial regions, and the narrowing spread
+between the higher- and mid-grade material indices, indicate a potential shift in market preferences
+towards different quality grades of raw materials. Sustained production curbs are anticipated to exert
+downward pressure on raw material demand. The decline in prices is further compounded by increased
+port inventories in China, higher shipments from Brazil and reduced Chinese industrial output due to
+stricter environmental regulations. The downturn in the Chinese construction market and a sluggish real
+estate sector are additional factors contributing to weakened demand. Consequently the outlook for raw
+material prices remains bearish in the near term, influenced by high supply levels and economic shifts.
+Prototypes:
+Decrease: This reduction in production has resulted in decreased demand for raw materials (0.56)
+Decrease: The Chinese real estate market remains a significant variable (0.44)
+Decrease: The raw material market is currently facing a downward trend (0.88)
+TimeXL: Correlation Analysis between Time Series Input and Prototypes
+Feature 1
+
+Feature 2
+
+Feature 3
+
+Feature 4
+
+Feature 5
+
+Feature 6
+
+Feature 10
+
+Feature 11
+
+Feature 12
+
+Feature 13
+
+Feature 14
+
+Feature 15
+
+Figure 26: Multi-modal case-based reasoning example on the Finance dataset for regression tasks.
+Table 9: Ablation studies of TimeXL for regression tasks.
+Variants
+
+RMSE
+
+MAE
+
+MAPE(%)
+
+Time Series Prototype-based Encoder
+Multi-modal Prototype-based Encoder
+
+4.287
+4.198
+
+3.001
+2.891
+
+2.140
+2.064
+
+Prediction LLM - Time Series + Text
+Prediction LLM - Time Series + Text + Prototype
+
+4.600
+4.352
+
+3.121
+3.003
+
+2.226
+2.165
+
+TimeXL
+
+4.161
+
+2.844
+
+2.035
+
+Table 10: Iterative analysis of TimeXL for regression tasks.
+Iteration
+
+RMSE
+
+MAE
+
+MAPE(%)
+
+Original
+1
+2
+3
+
+4.344
+4.224
+4.161
+4.174
+
+2.951
+2.883
+2.844
+2.849
+
+2.103
+2.069
+2.035
+2.036
+
+Finally, we provide a case study on the test set of the Finance dataset that demonstrates the effectiveness of TimeXL’s reasoning process for regression tasks, as shown in Figure 26. We present
+28
+
+the top three most similar prototypes allocated for both time series and text modalities, where we
+have two key observations. 1) Even if the trend predictions align correctly in both original and
+refined texts, the prototype allocation varies regarding market sentiments. In the original texts,
+prototypes from the neutral class are also allocated, highlighting a mixed sentiment and potential
+fluctuations, consequently deteriorating numerical prediction accuracy from both the encoder and
+the LLM. In the refined texts, prototypes instead capture the underlying bearish market sentiment
+for raw materials, emphasizing decreased demand and weakened market conditions, effectively
+aligning bearish market sentiment with numerical predictions. 2) The allocated top similar time series
+prototypes also exhibit highly similar trends compared to the original input series, offering robust
+reference points for numerical prediction. To quantitatively assess it, we aggregate the retrieved
+prototypes using their similarity scores and compute the correlation between the input time series and
+the aggregated prototype series. The observed strong correlations underscores TimeXL’s efficacy in
+capturing intrinsic temporal patterns and providing predictive insights into future numerical stock
+values based on similar historical patterns.
+
+H
+
+More Detailed Discussions of Related Work
+
+Due to space limitations, we provide additional details on related methods here, expanding on the
+overview in the main text.
+H.1
+
+Multi-modal Time Series Analysis.
+
+In recent years, multi-modal time series analysis has gained significant traction in diverse domains
+such as finance, healthcare and environmental sciences [28, 11, 13]. Multiple approaches have been
+proposed to model interactions across different modalities, such as multi-modal fusion and crossmodal alignment and so on. Multi-modal fusion captures complementary information to enhance
+time series modeling, which are commonly implemented via addition [35] and concatenation [29]
+at the multiple levels. For example, Liu et al. [35] fuse predictions from both time series and text
+modalities via learnable linear weighted addition, further enhancing the predictive performance
+of state-of-the-art forecasters. In parallel, cross-modal alignment aims to capture the association
+between time series and other modalities for downstream tasks, where common techniques include
+attention mechanism [12, 30, 86, 31], gating functions [32], and contrastive learning [33, 34]. For
+instance, Bamford et al. [14] align time series and text in a shared latent space using deep encoders,
+enabling retrieval of specific time series sequences based on textual queries. In addition, Zheng et
+al. [33] perform causal structure learning in multi-modal time series by separating modality-invariant
+and modality-specific components through contrastive learning, enabling root cause analysis. Besides
+method developments, recent research efforts have also advanced the field through comprehensive
+benchmarks and studies [35, 36, 37], highlighting the incorporation of new modalities to boost task
+performance. Meanwhile, others explore representing time series as other modalities (e.g., image, text,
+table, graph) [38, 39, 40, 41, 42] or generating synthetic modalities [32, 43] to facilitate downstream
+tasks. Nevertheless, these studies tend to focus primarily on improving numerical accuracy. The
+deeper and tractable rationale behind why or how the textual or other contextual signals influence
+time series outcomes remains underexplored.
+H.2
+
+Time Series Explanation
+
+Recent studies have explored diverse paradigms for time series interpretability. Gradient-based and
+perturbation-based explanations leverage saliency methods to highlight important features at different
+time steps [44, 45], where some methods explicitly incorporate temporal structures into models
+and objectives [46, 47]. Meanwhile, surrogate approaches also offer global or local explanations
+by evaluating the importance of time series features with respect to prediction. These methods
+include the the generalization of Shapley value to time series [48], the formulation of model behavior
+consistency via self-supervised learning [49], and the usage of information-theoretic guided objectives
+for coherent explanations [50]. In contrast to saliency or surrogate-based explanations, we adopt a
+case-based reasoning paradigm [25, 26, 27], which end-to-end generates predictions and built-in
+explanations from learned prototypes. Our work extends this approach to multi-modal time series by
+producing human-readable reasoning artifacts for both the temporal and contextual modalities.
+29
+
+H.3
+
+LLMs for Time Series Analysis
+
+The rapid development of LLMs [15, 16] has begun to inspire new directions in time series research [51, 52]. Many existing methods fine-tune pre-trained LLMs on time series tasks and achieving
+state-of-the-art results in forecasting, classification, and beyond [53, 54, 55]. The textual data (e.g.,
+domain instructions, metadata, and dataset summaries) are often encoded as prefix embeddings to
+enrich time series representations [56, 57, 58, 59]. These techniques also contribute to the emergence
+of time series foundation models [55, 60, 61, 62]. An alternative line of research leverages the
+zero-shot or few-shot capabilities of LLMs by directly prompting pre-trained language models with
+text-converted time series [63] or context-laden prompts representing domain knowledge [24], often
+yielding surprisingly strong performance in real-world scenarios. Furthermore, LLMs can act as
+knowledge inference modules, synthesizing high-level patterns or explanations that augment standard
+time series pipelines [64, 65, 66]. For instance, Wang et al. [66] construct a large news database for
+method development and perform text-to-text prediction by fine-tuning an LLM with dynamically
+selected news, which uses reflective selection logic to incorporate matched social events and thus augment numerical prediction. Building on this trend, recent works have explored time series reasoning
+with LLMs by framing tasks as natural-language problems [68], including time series understanding
+& question answering (e.g., trend and seasonal pattern recognition, similarity comparison, causality
+analysis, etc.) [67, 69, 70, 71, 72], as well as language-guided inference for standard zero-shot
+time series tasks [67, 69]. Compared to existing LLM-based methods, our approach provides a
+unique synergy between an explainable model and LLMs through iterative, grounded, and reflective
+interaction. It explicitly provides case-based explanations from both modalities, highlighting key
+time series patterns and refined textual segments that contribute to the prediction.
+
+30
+
+

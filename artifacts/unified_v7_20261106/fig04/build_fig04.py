@@ -1,6 +1,6 @@
 """Figure 4 (fig:task-function-grid), V7 house style: from task requirements to Harness modules.
 
-(a) Columns are the four task families (Section 6), rows the four shared temporal functions (Section 5). Each cell
+(a) Columns are the four task groups (scripts/task_groups.py, Section 6), rows the four temporal functions (Section 5). Each cell
 names what that function supplies for that task (wording kept from the approved semantic revision, Figure04_Semantic).
 Shaded regions with solid boundaries mark the forecast horizon, the diagnostic interval, the information beyond the
 forecast origin t0 and the admissible action range, as the caption states.
@@ -34,19 +34,20 @@ def row_y(i):
     return ROW_Y + i * (ROW_H + GAP)
 
 
-# Task families (Section 6 headings; short forms as used across the figure set) and their clay icons.
-TASKS = [('forecast', 'Forecasting'), ('synthesis', 'Synthesis'), ('anomaly', 'Anomaly Diagnosis'),
-         ('decision', 'Decision Support')]
+# Task groups (scripts/task_groups.py, ORDER) and their clay icons; header lines as displayed.
+TASKS = [('anomaly', ['Analysis of', 'Observed Series']), ('forecast', ['Forecasting']), ('synthesis', ['Generation']),
+         ('decision', ['Decision', 'Making'])]
 # Shared temporal functions (Section 5 headings), icons as on the General Time Series Harness plate of Figure 1.
 FUNCS = [('calendar', ['Temporal Data', 'Management']), ('window', ['Temporal', 'Processing']),
          ('timeline', ['Temporal Context', 'and Memory']), ('cutoff', ['Temporal', 'Validation'])]
 # Cell content: (glyph, label). Labels are those of the approved semantic revision of this figure.
+# Columns follow TASKS: the former anomaly-diagnosis cells serve Analysis of Observed Series, synthesis -> Generation.
 CELLS = [
-    [('history', 'History'), ('icon:data', 'Samples'), ('streams', 'Streams'), ('icon:inventory_stock', 'State')],
-    [('horizon', 'Horizon'), ('transforms', 'Transforms'), ('interval', 'Intervals'), ('icon:policy', 'Actions')],
-    [('events', 'Events'), ('icon:reference_lookup', 'References'), ('icon:incident_report', 'Incidents'),
+    [('streams', 'Streams'), ('history', 'History'), ('icon:data', 'Samples'), ('icon:inventory_stock', 'State')],
+    [('interval', 'Intervals'), ('horizon', 'Horizon'), ('transforms', 'Transforms'), ('icon:policy', 'Actions')],
+    [('icon:incident_report', 'Incidents'), ('events', 'Events'), ('icon:reference_lookup', 'References'),
      ('icon:memory', 'Experience')],
-    [('cutoff', 'Cutoff'), ('fidelity', 'Fidelity'), ('icon:evidence_check', 'Evidence'), ('constraints', 'Constraints')],
+    [('icon:evidence_check', 'Evidence'), ('cutoff', 'Cutoff'), ('fidelity', 'Fidelity'), ('constraints', 'Constraints')],
 ]
 TK, TS = HUE['tsk'], HUE['gts']
 
@@ -137,7 +138,7 @@ def series(sh, x, y, w, h, color=INK, phase=0.0, amp=1.0, lw=1.6, smooth=False, 
 
 # ---- panel (a) ------------------------------------------------------------------------------------------------
 def panel_a(slide):
-    zone(slide, 0.2, 0.42, W - 0.4, 4.56, '(a)  Task Families × Shared Temporal Functions', key='ink', size=18, bw=6.4)
+    zone(slide, 0.2, 0.42, W - 0.4, 4.56, '(a)  Task Groups × Temporal Functions', key='ink', size=18, bw=6.4)
     # reading key in the empty corner
     g = group(slide); sh = g.shapes
     x, y = GX0 + 0.12, HDR_Y + 0.08
@@ -145,13 +146,13 @@ def panel_a(slide):
     tx(sh, x + 0.42, y, 2.0, 0.38, 'Column: Assemble', size=14, bold=True, color=TK[0], align='l')
     arrow(sh, x, y + 0.6, x + 0.34, y + 0.6, color=TS[0], lw=2.8)
     tx(sh, x + 0.42, y + 0.41, 2.0, 0.38, 'Row: Compare', size=14, bold=True, color=TS[0], align='l')
-    # task-family column headers
+    # task-group column headers: icon on the left, the group name (one or two lines) beside it
     g = group(slide); sh = g.shapes
     for j, (nm, lab) in enumerate(TASKS):
         x = col_x(j)
         b = box(sh, x, HDR_Y, CW, HDR_H, fill=TK[2], line=TK[1], lw=1.2, radius=0.12); shadow(b)
-        ic(sh, nm, x + CW / 2 - 0.29, HDR_Y + 0.03, 0.58)
-        tx(sh, x, HDR_Y + 0.6, CW, 0.28, lab, size=15.5, bold=True, color=TK[0])
+        ic(sh, nm, x + 0.08, HDR_Y + (HDR_H - 0.56) / 2, 0.56)
+        tx(sh, x + 0.66, HDR_Y + 0.04, CW - 0.7, HDR_H - 0.08, lab, size=14, bold=True, color=TK[0])
     # rows: function header + four cells
     for i, (nm, lab) in enumerate(FUNCS):
         g = group(slide); sh = g.shapes

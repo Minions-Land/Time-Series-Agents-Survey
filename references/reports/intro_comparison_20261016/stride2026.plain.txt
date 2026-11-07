@@ -1,0 +1,3410 @@
+Reasoning-Aware Training for Time Series
+Forecasting
+Md Atik Ahamed1, 2 , Mihir Parmar1 , Palash Goyal1 , Chun-Liang Li1 , Qiang Cheng2 , Tomas Pfister1
+and Jinsung Yoon1
+
+arXiv:2605.08625v1 [cs.LG] 9 May 2026
+
+1 Google, 2 University of Kentucky
+
+Time Series Foundation Models (TSFMs) excel at numerical forecasting but operate as black boxes
+lacking qualitative reasoning. Conversely, applying LLMs directly to temporal data introduces a modality
+gap: text tokenizers fragment continuous numerical values, degrading mathematical relationships
+and exploding sequence lengths, leading to computational overhead. To resolve this, we introduce
+STRIDE (Strategic Time-series Reasoning Injected via Distilled Embeddings), a novel framework natively
+integrating LLM reasoning into the continuous embedding space of TSFMs. Instead of discrete tokens,
+STRIDE distills reasoning traces into a lightweight LLM, dynamically projecting its mean-pooled hidden
+states as a cross-modal prior into the target numerical encoder. The architecture is jointly optimized
+using cross-entropy and quantile losses. Evaluations demonstrate STRIDE establishes state-of-the-art
+numerical forecasting on GIFT-Eval (0.674 MASE, 0.454 CRPS) compared to TSFMs and exhibits superior
+in-domain and out-of-domain numerical as well as reasoning performance on TFRBench. Specifically,
+STRIDE acts as a plug-and-play enhancement, consistently improving diverse TSFMs (e.g., Chronos-2,
+Timer-S1) across various LLM configurations. Thus, injecting semantic reasoning as a continuous prior
+equips TSFMs with human-interpretable reasoning while fundamentally improving predictive accuracy.
+
+1. Introduction
+Time Series Foundation Models (TSFMs) have recently transformed numerical forecasting by applying
+large-scale pretraining to temporal data, establishing new baselines in numerical forecasting (Ansari
+et al., 2024, 2025; Lim and Zohren, 2021; Liu et al., 2026; Shumway and Stoffer, 2017). However,
+their success relies entirely on acting as black-box mathematical extrapolators. While they effectively
+capture historical dependencies (e.g., trends), they fundamentally lack the ability to process semantic
+context, articulate predictive reasoning, or dynamically adapt to external variables such as holidays or
+economic shifts. Since TSFMs approximate the conditional distribution 𝑃 (𝑌 | 𝑋 ) using only continuous
+numerical representations, they suffer from a blind spot in qualitative reasoning.
+Motivated by this limitation, recent literature has attempted to directly apply LLMs to time
+series forecasting (Tang et al., 2025; Ye et al., 2024). Yet, emerging studies reveal a profound “LLM
+mirage”–using only LLMs for forecasting often fails to meaningfully outperform TSFMs (Tan et al.,
+2024). The root cause is a modality gap where forcing continuous temporal signals through discrete
+text tokenizers shatter numerical values into fragmented strings, degrading mathematical precision
+while introducing computational bottlenecks (Abdullahi et al., 2026; Tao et al., 2025). LLMs are
+fundamentally designed for semantic reasoning, not for autoregressive numerical calculation.
+In this work, we argue that LLMs should not be forced to act as numerical forecasters; instead, their
+utility lies in generating statistically grounded meaningful reasoning. To this end, we reformulate
+the forecasting objective to model the conditional distribution 𝑃 (𝑌 | 𝑋, 𝑅), where 𝑅 acts as an explicit
+reasoning prior (motivated from Ahamed et al. (2026)). To formalize this new objective, we introduce
+STRIDE (illustrated in Figure 1), a novel framework that fuses semantic reasoning priors from LLMs
+with continuous numerical prediction by integrating it directly into TSFMs.
+♣ Please correspond with Mihir Parmar <mihirparmar@google.com>, and Md Atik Ahamed <atikahamed@google.com>
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Figure 1 | Overview of the STRIDE. (Left) Diverse training corpus of ∼ 275 𝐾 reasoning samples
+across 23 datasets. (Right) The pipeline is jointly optimized via cross-entropy and quantile losses
+during training, enabling the framework to simultaneously output human-interpretable reasoning and
+numerical forecasts during evaluation. and
+indicate trainable and frozen modules, respectively.
+STRIDE relies on cross-modal representation distillation (Hsieh et al., 2023; Tian et al., 2025).
+During training, a teacher model with access to future ground-truth data and external events generates
+oracle reasoning, motivated by Ahamed et al. (2026). We distill this capability into a lightweight
+student LLM, teaching it to articulate equivalent insights using strictly historical context. Crucially,
+to bypass the token-limit bottlenecks and information loss of previous works (Tao et al., 2025), we
+entirely avoid passing discrete text tokens to the forecasting model. Instead, we extract the continuous
+mean-pooled hidden states of the student LLM and project them directly into the target TSFM’s
+embedding space. The entire pipeline is jointly optimized end-to-end via textual cross-entropy (Brown
+et al., 2020) and numerical quantile (Ansari et al., 2024; Lim and Zohren, 2021) losses.
+We conduct comprehensive evaluations across two large-scale benchmarks to validate both the
+numerical and reasoning performance of STRIDE. First, on the GIFT-Eval (Aksu et al., 2024), STRIDE
+establishes a state-of-the-art, achieving 0.674 MASE and 0.454 CRPS, outperforming the TSFMs.
+Second, to assess generalizability and reasoning quality, we evaluate on TFRBench (Ahamed et al.,
+2026), where STRIDE demonstrates superior numerical performance against the strongest baselines
+in both in-domain (0.615 vs. 0.765 MASE) and out-of-domain (0.724 vs. 0.778 MASE) settings.
+Beyond numerical precision, an LLM-as-a-Judge evaluation confirms that STRIDE achieves the highest
+scores across four distinct qualitative metrics, consistently generating logic-grounded reasoning that
+outperforms zero-shot LLM forecasters. Crucially, ablation studies reveal that STRIDE is model
+agnostic: it functions as a plug-and-play enhancement that consistently improves performance of
+diverse TSFMs (e.g., Chronos-2, Timer-S1). Thus, we hope that STRIDE motivates the development
+of inherently interpretable foundation models for forecasting domain.
+In summary, our contributions are three folds: (i) a Novel Cross-Modal Framework that utilizes
+a generalized latent projection mechanism to natively inject LLM reasoning into TSFM embedding
+spaces, entirely bypassing discrete token bottlenecks; (ii) a Reasoning Distillation Pipeline enabling
+a lightweight student LLM to generate high-quality analytical strategies using strictly historical
+context; and (iii) Better Numerical and Reasoning Performance, empirically demonstrating superior
+performance on GIFT-Eval, and TFRBench compared to various baselines.
+
+2
+
+Reasoning-Aware Training for Time Series Forecasting
+
+2. Related Works
+Dataset-Specific Architectures. Prior to the advent of large-scale pretraining, the state-of-theart in time series forecasting relied on training specialized deep learning architectures. Models
+such as PatchTST (Nie et al., 2023) introduced patching to preserve local temporal semantics and
+reduce computational complexity. iTransformer (Liu et al., 2024) inverted the traditional attention
+mechanism to focus on variate correlations rather than temporal tokens, while TimeMachine (Ahamed
+and Cheng, 2024) leveraged highly efficient architectures to capture long-term dependencies with
+linear complexity. While these models deliver strong performance on their specific target distributions,
+they lack zero-shot generalization capabilities. Furthermore, they operate entirely within the numerical
+domain, offering no textual interpretability or reasoning to explain their predictive strategies.
+Time-Series Foundation Models (TSFMs). The success of the Transformer architecture in NLP
+has spurred the development of Time-Series Foundation Models (TSFMs) designed for zero-shot
+generalization. Models such as TimesFM (Das et al., 2024), Chronos (Ansari et al., 2024, 2025),
+MOIRAI (Woo et al., 2024), Timer-S1 (Liu et al., 2026) and Lag-Llama (Rasul et al., 2023) have
+achieved state-of-the-art performance. These approaches typically employ specialized tokenization
+strategies, either patching numerical values (Nie et al., 2023) or discretizing them into vocabulary
+tokens (Gruver et al., 2023) to process time series as a language. While effective at capturing complex
+autoregressive dependencies and scaling laws, these models operate largely as “black boxes.” They
+do not natively leverage external semantic knowledge (e.g., holiday impacts or economic shifts)
+or qualitative reasoning capabilities. Conversely, recent attempts to replace TSFMs entirely with
+general-purpose LLMs have exposed a profound modality gap (Chang et al., 2025; Jin et al., 2024),
+where discrete text tokenization degrades mathematical precision. Our work bridges this divide:
+rather than replacing TSFMs, we introduce a joint optimization framework that trains both the
+numerical forecaster and the language model simultaneously, utilizing a latent projection mechanism
+to inject the structural reasoning of the LLM directly into the continuous embedding space of TSFM.
+Prompt-Driven and Text-to-Text Forecasting. A growing body of work explores using generalpurpose LLMs (e.g., GPT-4, Gemini, Claude) for forecasting by prompting them to analyze data
+textually. PromptCast (Xue and Salim, 2023) was among the first to frame forecasting as a sentence-tosentence generation task, and subsequent works have introduced Chain-of-Thought (CoT) prompting
+to elicit intermediate analytical steps (Wei et al., 2022). However, relying on discrete text tokens
+for numerical prediction introduces massive computational bottlenecks and severe information loss.
+Furthermore, existing CoT forecasting research suffers from a lack of rigorous evaluation; LLMs often
+“hallucinate” causal links to justify arbitrary predictions (Ji et al., 2023), and traditional benchmarks
+fail to penalize this disconnect. Our framework addresses this by distilling high-quality, verified
+reasoning from a teacher model into a lightweight student model, jointly optimizing textual generation
+and continuous numerical forecasting to ensure the reasoning strictly anchors the prediction.
+Explainable Forecasting. Traditional Explainable AI (XAI) methods for time series, such as SHAP (Lundberg and Lee, 2017) or LIME (Ribeiro et al., 2016), focus on feature attribution by identifying which
+past time steps influenced a prediction (Rojat et al., 2021). While useful for debugging, these methods
+lack causal depth; they might highlight that time step 𝑡 − 12 was important, but cannot explain why
+(e.g., a seasonal shift or event). By generating explicit natural language reasoning traces aligned with
+cross-channel dependencies, our approach achieves true “inherent interpretability” (Rudin, 2019).
+By evaluating against reasoning benchmarks like TFRBench, we ensure our framework provides users
+with a statistically grounded reasoning that builds trust in the automated forecast.
+3
+
+Reasoning-Aware Training for Time Series Forecasting
+
+3. STRIDE
+Figure 1 and Algorithm 1 illustrate the overall framework, which consists of a textual reasoning
+branch and a numerical forecasting branch fused via a generalized latent projection mechanism.
+Algorithm 1 Reasoning-Aware Joint Training for LLM and TSFM
+Require: Training time series dataset D, Large LLM, Small-LLM parameterized by Θ𝐿𝐿𝑀 , Target TSFM, Projection matrix W 𝑝𝑟𝑜 𝑗 , Loss weights 𝛼, 𝛽 ∈ [0, 1].
+1: Phase 1: Reference and Baseline Reasoning Generation (Offline)
+2: for each sampled window (X, Y) ∈ D do
+3:
+Retrieve time-bound external events E corresponding to the temporal window.
+4:
+R𝑟𝑒 𝑓 ← ReferenceLLM(X, Y, E) {Generate concrete reference reasoning via TFRBench}
+5:
+R𝑏𝑎𝑠𝑒 ← LargeLLM(X) {Generate baseline reasoning from historical context}
+6: end for
+7: Phase 2: Joint Optimization Framework (Online)
+8: while not converged do
+9:
+Sample a batch of (X, Y, R𝑟𝑒 𝑓 , R𝑏𝑎𝑠𝑒 ).
+10:
+11:
+12:
+13:
+
+{Step 1: Reasoning Distillation}
+𝑃 𝑖𝑛 ← FormatPrompt(X, metadata, R𝑏𝑎𝑠𝑒 )
+𝐿 × 𝑑 𝑙𝑙𝑚
+H ← SmallLLMℎ𝑖𝑑𝑑𝑒𝑛
+}
+_𝑠𝑡𝑎𝑡𝑒𝑠 ( 𝑃 𝑖𝑛 ) {Extract last hidden states ∈ ℝ
+Í𝑀
+Compute L𝐶𝐸 = − 𝑗=1 log 𝑃 (R𝑟𝑒 𝑓 , 𝑗 | 𝑃𝑖𝑛 , R𝑟𝑒 𝑓 ,< 𝑗 ; Θ𝐿𝐿𝑀 )
+
+14:
+15:
+16:
+
+{Step 2: Cross-Modal Latent Projection}
+Í
+h𝑅 ← 1𝐿 𝑖𝐿=1 H𝑖 {Mean-pool over the sequence dimension}
+e𝑅 ← h𝑅 W 𝑝𝑟𝑜 𝑗 {Project reasoning into TSFM embedding space ∈ ℝ𝑑𝑡𝑠 }
+
+17:
+18:
+19:
+20:
+21:
+
+{Step 3: Latent Fusion and Quantile Forecasting}
+E𝑇𝑆 ← TSFM_Embed(X) {Extract native time series sequence embeddings}
+E 𝑓 𝑢𝑠𝑒𝑑 ← e𝑅 ⊕ E𝑇𝑆 {Fuse via generalized operator and duplicate across variates}
+Ŷ𝑞 ← TSFM_Decode(E 𝑓 𝑢𝑠𝑒𝑑 ) {Predict future quantiles for levels Q}
+Compute L𝑄𝑢𝑎𝑛𝑡𝑖𝑙𝑒 between predictions Ŷ𝑞 and ground truth Y
+
+22:
+{Step 4: End-to-End Backpropagation}
+23:
+L𝑡𝑜𝑡𝑎𝑙 ← 𝛼L𝐶𝐸 + 𝛽 L𝑄𝑢𝑎𝑛𝑡𝑖𝑙𝑒
+24:
+Update W 𝑝𝑟𝑜 𝑗 , TSFM parameters, and Θ𝐿𝐿𝑀 (via LoRA) using ∇L𝑡𝑜𝑡𝑎𝑙
+25: end while
+
+3.1. Problem Formulation
+Given a historical multivariate time series context X ∈ ℝ𝑇 ×𝑉 , where 𝑇 is the context length and 𝑉 is the
+number of variates, our objective is to predict the future trajectory Y ∈ ℝ 𝐻 ×𝑉 for a forecasting horizon
+𝐻 . Standard numerical models approximate the conditional distribution 𝑃 (Y | X). To enhance both
+performance and interpretability, we introduce an explicit reasoning prior R, capturing cross-channel
+dynamics, trend shifts, and periodic events in a structured format. Consequently, our forecasting
+objective is reformulated to map the conditional distribution 𝑃 (Y | X, R).
+3.2. Theoretical Foundation
+Our framework is fundamentally inspired by the architectural success of conditional diffusion models
+and knowledge distillation (Rombach et al., 2022; Zhang et al., 2023). Unconditional time series
+models often struggle when there are multiple plausible future scenarios (i.e., multimodal trajectories),
+typically outputting a generic, averaged extrapolation. STRIDE solves this by treating the LLM’s
+4
+
+Reasoning-Aware Training for Time Series Forecasting
+
+reasoning as a control signal. By projecting explicit semantic reasoning into the forecasting model’s
+latent space, we guide the model toward the plausible future scenario, effectively collapsing predictive
+uncertainty. To mathematically ground this intuition, we demonstrate that injecting this reasoning
+prior strictly reduces the variance of the forecast:
+Theorem 1 (Variance Reduction via Reasoning Injection). Let 𝑋 be the historical time series
+and 𝐸 𝑓 𝑢𝑠𝑒𝑑 be the representation fusing 𝑋 with the continuous reasoning prior 𝑒𝑅 . Assuming the
+unconditional future distribution is a mixture of distinct plausible trajectories, the predictive variance
+satisfies 𝑉 𝑎𝑟 (𝑌 | 𝐸 𝑓 𝑢𝑠𝑒𝑑 ) ≤ 𝑉 𝑎𝑟 (𝑌 | 𝑋 ), with strict inequality holding when the reasoning prior successfully
+isolates the true future mode among distinct alternatives. The full proof and bounding assumptions
+are detailed in App. A.
+3.3. Reference Reasoning Generation and Distillation
+Phase 1: Oracle Reasoning Generation. First, we construct a high-quality reference reasoning
+dataset using the training splits of the GIFT-Eval (Aksu et al., 2024), partitioning sampled temporal
+windows into a historical context 𝑋 and a pseudo-future ground truth 𝑌 . We adapt the oracle reasoning
+generation method introduced in TFRBench (Ahamed et al., 2026) to generate target reasoning traces.
+Using a highly capable Teacher LLM (e.g., Gemini-3.1-Pro) as base model in multi-agent system, we
+retrieve time-bound external events E corresponding to the temporal span and generate a concrete,
+step-by-step oracle reasoning 𝑅𝑟𝑒 𝑓 . This reasoning qualitatively details expected trend components,
+seasonality, and residual impacts based on cross-channel dependencies and E.
+Phase 2: Reasoning Distillation. Next, we distill this reasoning capability into a lightweight
+student LLM. Crucially, while the teacher utilizes 𝑌 and E to generate 𝑅𝑟𝑒 𝑓 , the student is tasked with
+predicting equivalent analytical insights relying strictly on the historical context 𝑋 . To bridge the
+modality gap, we serialize 𝑋 into a structured textual prompt 𝑃𝑖𝑛 , augmented with global statistical
+metadata and a baseline reasoning draft. The student LLM processes 𝑃𝑖𝑛 to autoregressively generate
+a refined analytical strategy 𝑅ˆ. We supervise this generation using standard causal language modeling,
+optimizing the Cross-Entropy loss L𝐶𝐸 exclusively over the generated reasoning tokens:
+L𝐶𝐸 = −
+
+𝑀
+∑︁
+
+log 𝑃 ( 𝑅𝑟𝑒 𝑓 , 𝑗 | 𝑃𝑖𝑛 , 𝑅𝑟𝑒 𝑓 ,< 𝑗 ; Θ𝐿𝐿𝑀 )
+
+𝑗=1
+
+where 𝑀 is the total token count of the reference reasoning and Θ𝐿𝐿𝑀 represents the trainable
+parameters of the Student LLM. By masking the input prompt tokens during loss calculation, we
+structurally fine-tune the Student to independently articulate forward-looking insights prior to
+projecting them into the continuous time series space.
+3.4. Cross-Modal Fusion and End-to-End Training
+As formalized in the joint optimization phase of Algorithm 1, we bypass discrete tokenization to inject
+the generated reasoning into the numerical forecaster via a end-to-end trainable fusion pipeline.
+Step 1: Latent Projection. Let 𝐻 ∈ ℝ𝐿× 𝑑𝑙𝑙𝑚 represent the last hidden states of the Student LLM. We
+mean-pool these states over the sequence dimension to extract a global reasoning embedding ℎ𝑅 .
+A trainable linear projection matrix 𝑊𝑝𝑟𝑜 𝑗 maps ℎ𝑅 to the exact dimensionality of the target TSFM,
+creating the cross-modal reasoning prior 𝑒𝑅 = ℎ𝑅 𝑊𝑝𝑟𝑜 𝑗 .
+5
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Step 2: Generalized Latent Fusion. The historical data 𝑋 is independently processed into native
+time series embeddings 𝐸𝑇𝑆 . We integrate the modalities using a generalized fusion operator: 𝐸 𝑓 𝑢𝑠𝑒𝑑 =
+𝑒𝑅 ⊕ 𝐸𝑇𝑆 . To ensure architectural adaptability, ⊕ represents sequence prefixing for direct multistep forecasters (e.g., Chronos-2.0) or initial state substitution to preserve sequence lengths in
+autoregressive forecasters (e.g., Timer-S1). The TSFM processes 𝐸 𝑓 𝑢𝑠𝑒𝑑 to output predicted quantiles
+𝑌ˆ𝑞 , penalized by L𝑄𝑢𝑎𝑛𝑡𝑖𝑙𝑒 .
+Step 3: Joint Optimization. The architecture is optimized simultaneously for language generation
+and numerical forecasting using the combined objective:
+L𝑡𝑜𝑡𝑎𝑙 = 𝛼L𝐶𝐸 + 𝛽 L𝑄𝑢𝑎𝑛𝑡𝑖𝑙𝑒
+
+(1)
+
+Gradients flow smoothly from the TSFM decoder, through the projection layer, and directly into
+the Student LLM. To preserve linguistic knowledge while adapting to the forecasting task, we optimize
+the Student LLM exclusively via Low-Rank Adaptation (LoRA) on its attention layers.
+3.5. Evaluation Phase
+During inference, STRIDE operates autonomously, requiring neither future ground-truth data nor
+external search agents. Given an unseen historical context 𝑋 , we construct the prompt 𝑃𝑖𝑛 . The
+student LLM processes this prompt to autoregressively generate the explicit semantic reasoning 𝑅ˆ,
+providing practitioners with a human-interpretable strategic narrative for the upcoming forecast.
+Algorithm 2 Dual-Generation Inference Phase (Evaluation)
+Require: Unseen historical time series X ∈ ℝ𝑇 ×𝑉 , Large LLM, Small-LLM parameterized by Θ𝐿𝐿𝑀 , Target TSFM,
+Projection matrix W 𝑝𝑟𝑜 𝑗 .
+1: {Step 1: Baseline Context Initialization}
+2: R𝑏𝑎𝑠𝑒 ← LargeLLM(X) {Generate baseline reasoning from historical context}
+3: 𝑃 𝑖𝑛 ← FormatPrompt(X, metadata, R𝑏𝑎𝑠𝑒 )
+4: {Step 2: Strategic Directive Generation}
+5: R̂, H ← SmallLLM( 𝑃 𝑖𝑛 ) {Autoregressively generate directive for future prediction and extract hidden states
+
+∈ ℝ𝐿× 𝑑𝑙𝑙𝑚 }
+
+6: {Step 3: Cross-Modal Latent Projection}
+Í
+7: h𝑅 ← 1𝐿 𝑖𝐿=1 H𝑖 {Mean-pool over the sequence dimension}
+8: e𝑅 ← h𝑅 W 𝑝𝑟𝑜 𝑗 {Project reasoning into TSFM embedding space ∈ ℝ𝑑𝑡𝑠 }
+9: {Step 4: Latent Fusion and Numerical Forecasting}
+10: E𝑇𝑆 ← TSFM_Embed(X) {Extract native time series sequence embeddings}
+11: E 𝑓 𝑢𝑠𝑒𝑑 ← e𝑅 ⊕ E𝑇𝑆 {Fuse via sequence prefixing or initial state substitution}
+12: Ŷ𝑞 ← TSFM_Decode(E 𝑓 𝑢𝑠𝑒𝑑 ) {Predict future quantiles for levels Q}
+13: return R̂, Ŷ𝑞 {Output both the explicit analytical strategy and continuous numerical forecasts}
+
+Concurrently, the Student LLM’s continuous hidden states are mean-pooled, projected into the
+reasoning prior 𝑒𝑅 , and fused with the native time series embeddings 𝐸𝑇𝑆 . Conditioned on this
+injected strategic guide, the foundation model computes the future trajectory, outputting predicted
+quantiles 𝑌ˆ𝑞 across a discrete set of target levels Q = {0.1, 0.2, . . . , 0.9}. This dual-generation pipeline
+simultaneously yields both reasoning and continuous numerical forecasts. We provide the steps in
+more details in Algorithm 2.
+6
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Ours (+Chronos-2.0)
+Ours (+Timer-S1)
+Timer-S1
+Migas-1.0
+Chronos-2
+TimesFM-2.5
+TiRex
+Moirai2
+Toto-1.0
+Sundial-Base
+TabPFN-TS
+AutoARIMA
+AutoTheta
+AutoETS
+Naive
+0.0
+
+Ours (+Chronos-2.0)
+Ours (+Timer-S1)
+Timer-S1
+Chronos-2
+TiRex
+TimesFM-2.5
+Moirai2
+Toto-1.0
+TabPFN-TS
+Sundial-Base
+Migas-1.0
+1.074
+AutoARIMA
+1.090
+AutoTheta
+1.212
+Naive
+1.270
+AutoETS
+
+0.674
+0.674
+0.693
+0.697
+0.698
+0.705
+0.716
+0.728
+0.750
+0.750
+0.771
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+MASE
+
+1.0
+
+1.2
+
+0.0
+
+0.454
+0.463
+0.485
+0.485
+0.488
+0.490
+0.516
+0.517
+0.544
+0.559
+0.598
+0.912
+1.244
+1.591
+// 7.489
+0.5
+
+1.0
+
+CRPS
+
+1.5
+
+2.0
+
+Figure 2 | GIFT-Eval benchmark results. Integrating our framework with models like Chronos 2.0 and
+Timer-S1 significantly reduces forecasting error compared to standard baselines. Our cross modal
+design effectively grounds numerical predictions in a strategic analytical prior, consistently delivering
+highly robust forecasts. Lower values indicate better accuracy.
+
+4. Experiments and Results
+4.1. Experimental Setup
+Datasets We evaluate our framework on two benchmarks. For continuous numerical forecasting
+precision, we utilize the GIFT-Eval benchmark (Aksu et al., 2024). To assess further the generalizability
+of our framework we perform in-domain and out-of-domain forecasting as well as reasoning quality
+evaluation on TFRBench (Ahamed et al., 2026) with 10 diverse datasets from five different domains.
+These TFRBench datasets include both in-domain (i.e., tasks similar to GIFT-Eval training set) and
+out-of-domain evaluation sets. To avoid any seen data or leakage issue for in-domain evaluation on
+TFRBench, we excluded the samples, which are used during training of our framework.
+Baselines We benchmark our approach comprehensively against three distinct classes of models:
+traditional statistical methods, TSFMs, and LLMs. App. B provides details on each model categories.
+We particularly select the SOTA TSFM baselines, where their performance are known to GIFT-Eval
+and TFRBench. Several other methods (e.g., PatchTST (Nie et al., 2023), Time-LLM (Jin et al., 2024))
+are excluded from our comparison due to their per-task training and evaluation mechanism.
+Evaluation Metrics To provide a comprehensive evaluation, we utilize both quantitative and
+qualitative metrics. For numerical forecasting accuracy, we report the Mean Absolute Scaled Error
+(MASE), Mean Absolute Error (MAE), and Continuous Ranked Probability Score (CRPS) to measure
+both point-forecast precision and distributional density estimation. For reasoning quality evaluation,
+motivated from Ahamed et al. (2026), we employ an LLM-as-a-Judge protocol that scores the
+generated strategic narratives on a scale of 1 to 5 across four critical dimensions: Domain Relevance,
+Forecasting Correctness, Event Relevance, and Logic-to-Number Consistency.
+
+7
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Table 1 | Numerical performance on TFRBench. We report Mean Absolute Error (MAE) and Mean
+Absolute Scaled Error (MASE) (lower is better). To avoid cross-dataset scaling issues, we only present
+the average for MASE. Bold indicates the best performance, and underline indicates the second best.
+The detailed analysis with standard deviations and are shown in the App. H.
+TFRBench (In-Domain)
+Solar Daily
+
+Electricity
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MASE
+
+ARIMA
+TimesFM-2.5
+Chronos-2.0
+
+1.444
+1.475
+1.409
+
+0.699
+0.735
+0.685
+
+5.564
+4.758
+4.162
+
+1.536
+1.380
+1.271
+
+0.569
+0.328
+0.294
+
+0.873
+0.448
+0.413
+
+2.239
+2.142
+2.127
+
+0.789
+0.753
+0.750
+
+3.57 × 104
+2.62 × 104
+2.69 × 104
+
+0.799
+3.401
+0.708
+
+0.939
+1.343
+0.765
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Ours (+Chronos-2.0)
+
+2.166
+2.598
+2.481
+1.780
+1.603
+0.884
+
+1.037
+1.217
+1.169
+0.869
+0.779
+0.448
+
+6.271
+7.604
+8.774
+6.316
+3.944
+2.922
+
+1.785
+2.244
+2.647
+1.714
+1.184
+0.828
+
+0.460
+0.432
+0.475
+0.413
+0.476
+0.280
+
+0.662
+0.630
+0.703
+0.595
+0.671
+0.404
+
+2.675
+2.775
+3.417
+2.710
+2.341
+2.081
+
+0.904
+0.938
+1.125
+0.898
+0.801
+0.719
+
+4.62 × 104
+4.99 × 104
+1.11 × 105
+8.34 × 104
+4.16 × 104
+2.47 × 104
+
+1.110
+1.266
+3.026
+3.244
+0.833
+0.676
+
+1.100
+1.259
+1.734
+1.464
+0.854
+0.615
+
+Models
+
+Car Parts
+
+Hierarchical Sales
+
+Bitbrains Fast Storage
+
+Average
+
+TFRBench (Out-of-Domain)
+Models
+
+Web Traffic
+
+Traffic
+
+Nyc Taxi
+
+Amazon
+
+Apple
+
+Average
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MASE
+
+ARIMA
+TimesFM-2.5
+Chronos-2.0
+
+15.400
+12.000
+11.900
+
+0.788
+0.676
+0.679
+
+0.039
+0.014
+0.011
+
+2.628
+0.847
+0.664
+
+8.65 × 103
+2.70 × 103
+1.96 × 103
+
+3.429
+1.051
+0.790
+
+9.11 × 106
+6.56 × 106
+7.24 × 106
+
+0.995
+0.747
+0.821
+
+2.28 × 107
+1.86 × 107
+1.95 × 107
+
+1.100
+0.879
+0.936
+
+1.788
+0.840
+0.778
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Ours (+Chronos-2.0)
+
+23.300
+28.200
+19.900
+18.000
+13.600
+12.076
+
+1.120
+1.538
+1.211
+0.865
+1.472
+0.664
+
+0.027
+0.030
+0.024
+0.024
+0.015
+0.011
+
+1.647
+1.885
+1.450
+1.458
+1.102
+0.634
+
+5.75 × 103
+7.10 × 103
+5.31 × 103
+4.63 × 103
+1.73 × 103
+1.39 × 103
+
+2.289
+2.815
+2.085
+1.837
+0.889
+0.555
+
+1.37 × 107
+1.49 × 107
+1.34 × 107
+7.97 × 106
+1.03 × 107
+6.56 × 106
+
+1.333
+1.464
+1.511
+0.870
+1.776
+0.791
+
+3.37 × 107
+3.57 × 107
+3.54 × 107
+2.16 × 107
+2.70 × 107
+1.99 × 107
+
+1.482
+1.589
+1.651
+0.989
+1.802
+0.973
+
+1.574
+1.858
+1.582
+1.204
+1.408
+0.724
+
+Implementation Details Our pipeline utilizes Gemini-3.1-Pro to generate reference reasoning
+and optimizes a Gemma-3-4B-it student model (via LoRA) jointly with the TSFM backbone using a
+combined textual and numerical loss. Implementation specifics, including hyperparameters, hardware
+configurations, alternative model variants, and prompts are detailed in App. D and App. G.
+4.2. Numerical Performance
+4.2.1. Evaluation on GIFT-Eval
+To evaluate the numerical forecasting capabilities and architectural generalizability of our approach,
+we benchmark it against state-of-the-art foundation models and traditional statistical methods on
+the GIFT-Eval leaderboard. To demonstrate that our framework is generalizable to the underlying
+architecture, we integrated it with two distinct Time Series Foundation Models (TSFMs): Chronos2.0 (Ansari et al., 2025) and Timer-S1 (Liu et al., 2026). These specific models were selected because
+they represent recent state-of-the-art methodologies with accessible open-source code and fine-tunable
+checkpoints, unlike many proprietary alternatives that restrict required modifications.
+As illustrated in Figure 2, our approach establishes a new state-of-the-art, securing the top
+performance across both deterministic and probabilistic metrics. Specifically, our framework achieves
+a Mean Absolute Scaled Error (MASE) of 0.674 and a Continuous Ranked Probability Score (CRPS)
+of 0.454. Furthermore, to quantify the direct impact of our cross-modal projection, we compare the
+original numerical-only Timer-S1 baseline against our reasoning-augmented configuration. Integrating
+the language model’s analytical strategy yields consistent improvements over the highly optimized
+base model, reducing the MASE from 0.693 to 0.674 and the CRPS from 0.485 to 0.463. These results
+8
+
+Reasoning-Aware Training for Time Series Forecasting
+
+TFRBench (Out-of-Domain)
+
+Gemini-2.5-Flash
+
+2.68
+
+2.35
+
+1.71
+
+4.37
+
+2.56
+
+1.70
+
+1.56
+
+4.06
+
+Gemini-2.5-Pro
+
+2.98
+
+2.65
+
+2.04
+
+4.37
+
+2.73
+
+1.95
+
+1.79
+
+4.05
+
+Claude-Sonnet-4
+
+3.81
+
+2.27
+
+2.04
+
+2.84
+
+3.21
+
+1.91
+
+1.63
+
+2.87
+
+Claude-Sonnet-4.5
+
+4.26
+
+2.64
+
+2.50
+
+3.21
+
+3.99
+
+2.19
+
+2.16
+
+3.57
+
+Gemini-3.1-Pro
+
+3.36
+
+2.87
+
+2.20
+
+4.90
+
+3.25
+
+2.52
+
+2.01
+
+4.52
+
+Gemma-3-4B-it
+
+2.45
+
+2.30
+
+2.02
+
+1.21
+
+2.34
+
+1.89
+
+1.98
+
+1.24
+
+Ours (+Chronos-2.0)
+
+4.62
+
+3.30
+
+2.33
+
+4.92
+
+4.52
+
+2.66
+
+2.15
+
+4.93
+
+Domain
+Relevance
+
+Forecasting
+Correctness
+
+Event
+Relevance
+
+Logic
+Consistency
+
+Domain Forecasting
+Event
+Logic
+Relevance Correctness Relevance Consistency
+
+5
+
+4
+Average Score
+
+TFRBench (In-Domain)
+
+3
+
+2
+
+1
+
+Figure 3 | Reasoning performance on TFRBench datasets. Scores are measured on a 1–5 scale, where
+higher values indicate superior reasoning performance. Detailed results are shown in App. I.
+indicate that the latent reasoning prior successfully guides the TSFM toward more accurate forecasts
+and tighter predictive distributions. This validates that even when applied to mature foundation
+models, the explicit linguistic modeling of trend shifts and cross-channel dynamics provides a critical
+inductive bias that purely numerical encoders struggle to capture alone. Following standard practice
+from other works (Liu et al., 2026), we report the MASE and CRPS for GIFT-Eval.
+4.2.2. Evaluation on TFRBench
+To rigorously assess the generalizability of our framework, we conduct an in-domain and out-ofdomain evaluation using ten diverse datasets from TFRBench that were strictly excluded from the
+GIFT-Eval training set. As detailed in Table 1, our approach achieves the best overall performance,
+recording the lowest average Mean Absolute Scaled Error (MASE) of 0.615 for in-domain and 0.724
+for out-domain datasets. Notably, the framework tightens error margins on complex series such as
+NYC Taxi and Traffic, outperforming dedicated numerical encoders like TimesFM-2.5 and Chronos-2.0.
+By injecting the analytical strategy as a continuous latent prior, our method overcomes the pointforecasting limitations inherent in purely text-based LLMs like Gemini-3.1-Pro, proving that explicit
+reasoning serves as a powerful, transferable inductive bias for forecasting tasks.
+4.3. Reasoning Performance on TFRBench
+While quantitative metrics capture forecasting precision, the interpretability and logical coherence
+of the generated analytical strategies are equally paramount. To evaluate the generalization of
+our framework’s textual reasoning capabilities, we conducted both in-domain and out-of-domain
+assessment using the TFRBench datasets, which were excluded from the GIFT-Eval training corpus.
+We employ an LLM-as-a-Judge protocol to score the generated narratives across four critical
+dimensions on a scale of 1 to 5: Domain Relevance, Forecasting Correctness, Event Relevance, and
+Logic-to-Number Consistency. Figure 3 presents the aggregated average scores across in-domain and
+out-of-domain datasets respectively. The generated outputs are formatted for TFRBench evaluation
+using Gemini-3.1-Pro to ensure a proper structured style. Our framework consistently achieves the
+highest average performance across majority of the evaluation criteria. The strong performance in
+9
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Table 2 | Ablation analysis comparing the variants of Small
+LLMs used for reasoning distillation.
+
+Table 3 | Ablation analysis comparing the variants of Large
+LLMs used for baseline reasoning provider.
+
+Model Configuration
+
+MASE ↓
+
+CRPS ↓
+
+Model Configuration
+
+MASE ↓
+
+CRPS ↓
+
+Chronos-2.0 (Baseline)
+Ours (Small-LLM: Qwen3-4B-Instruct)
+Ours (Small-LLM: Gemma-3-4B-it)
+
+0.698
+0.685
+0.674
+
+0.485
+0.460
+0.454
+
+Chronos-2.0 (Baseline)
+Ours (Claude-Sonnet-4.5)
+Ours (Gemini-3.1-Pro)
+
+0.698
+0.684
+0.674
+
+0.485
+0.471
+0.454
+
+Forecasting Correctness and Event Relevance indicates that our framework successfully grounds its
+reasoning in actual domain dynamics, effectively avoiding the hallucinations and logical disconnects
+often observed when utilizing standard foundational LLMs for time series tasks. We also provide several
+cases studies in App. E and App. F for forecasting and reasoning respectively. The detailed, datasetby-dataset breakdown of these reasoning evaluation scores can be found in App. I (Table 6 and 7).
+While we achieve strong performance across these metrics, our framework is not without limitations.
+For a comprehensive discussion detailing these constraints and broader societal implications, please
+refer to App. C.
+
+5. Ablations and Discussions
+Small LLM Variants. To evaluate the robustness of the knowledge distillation and cross-modal
+projection, we conducted an ablation study substituting the student model. During optimization,
+the Small-LLM generates the reasoning strategy while providing its mean-pooled hidden states as a
+continuous prior to the numerical encoder. Table 2 compares GIFT-Eval performance using Gemma-34B-it versus Qwen3-4B-Instruct against the numerical Chronos-2.0 baseline. The framework remains
+highly effective across different student architectures. While Gemma-3-4B-it achieves the lowest
+errors (MASE of 0.674, CRPS of 0.454), Qwen3-4B-Instruct also yields highly competitive results
+surpassing the unaugmented baseline.
+Large LLM Variants. Table 3 confirms our framework’s improvements are not tied to a specific
+baseline LLM. Training the student (Gemma-4B-it) with reasoning from either Gemini-3.1-Pro or
+Claude-Sonnet-4.5 consistently outperforms the numerical Chronos-2.0 baseline (e.g., Claude reduces
+MASE from 0.698 to 0.684). This demonstrates explicit reasoning is a robust inductive bias, allowing
+diverse LLMs to successfully bridge the modality gap.
+5.1. Findings and Discussions
+The empirical results across the GIFT-Eval and TFRBench benchmarks, combined with our ablation
+studies, provide insights into why integrating language model reasoning improves numerical forecasting. Rather than only explanations, our framework demonstrates that explicit reasoning acts as a
+structural anchor. Several key findings highlight the strengths of this approach:
+Reasoning Acts as a Directive for Future Forecast. Our evaluation on the GIFT-Eval benchmark
+(Figure 2) establishes that semantic reasoning serves as a prior that directly tightens distributional
+accuracy. The significant improvements in CRPS (0.454) and MASE (0.674) occur because the
+embedding information acts as a directive for future prediction. By projecting this analytical strategy
+into the latent space, the model is structurally guided toward the future distribution mode, actively
+reducing predictive error before the numerical decoding step.
+10
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Resolving the Modality Gap. Forcing continuous temporal data through discrete tokenizers degrades mathematical precision and introduces autoregressive bottlenecks (e.g., Time-LLM (Jin et al.,
+2024)). STRIDE resolves this by decoupling the modalities. Rather than generating numerical forecasts token-by-token, our framework extracts the mean-pooled hidden states from the Small-LLM’s
+pre-fill phase (contextualizing the prompt and 𝑅𝑏𝑎𝑠𝑒 ). This continuous prior is projected into the TSFM
+to compute the forecast in a single forward pass. Concurrently, the Small-LLM decodes the refined
+reasoning ( 𝑅ˆ). This parallel execution avoids forcing LLMs into sequential numerical generation,
+structurally aligning the semantic narrative with the numerical output.
+Generalizability. Our ablation studies validate that the performance gains of STRIDE are not tied to
+a specific model family. The framework integrates with multiple foundation models, yielding consistent
+improvements over optimized baselines like Timer-S1 (reducing MASE from 0.693 to 0.674). This
+validates that explicit linguistic modeling provides a critical structural signal that numerical encoders
+simply cannot learn from raw arrays alone.
+Eradicating Hallucinations via Robust Distillation. By substituting various models (Tables 2
+and 3), we verified that lightweight small LLM models can generate helpful strategic directives
+when trained using our framework, overcoming their original poor performance (Gemma-3-4B-it
+in Figure 3). Furthermore, the LLM-as-a-Judge evaluations for Logic-to-Number Consistency shows
+that our cross-modal projection enforces strict alignment between the generated narrative and the
+numerical output, validating that STRIDE provides robust inductive bias for forecasting.
+
+6. Conclusions and Future Work
+In this work, we introduced STRIDE, a framework bridging qualitative reasoning and continuous
+numerical forecasting. By bypassing discrete tokenization and dynamically projecting a language
+model’s hidden states into a TSFM’s embedding space, we natively equip numerical extrapolators
+with strategic planning. STRIDE achieves state-of-the-art precision on GIFT-Eval and TFRBench while
+generating accurate, logic-grounded narratives. Ablations confirm it serves as a robust, plug-and-play
+enhancement for foundational architectures like Chronos-2.0 and Timer-S1.
+Future Work. Future research could extend this cross-modal distillation to other continuous modalities, such as spatial-temporal modeling or multi-agent reinforcement learning. Ultimately, by delivering
+interpretable narratives alongside precise predictions, STRIDE supports responsible deployment in
+high-stakes domains where transparency is critical. Discussion of the framework’s limitations and
+broader societal impacts is provided in App. C.
+
+References
+S. Abdullahi, K. U. Danyaro, H. Chiroma, M. M. Yakubu, M. S. Yahaya, and M. A. Zayyad. Hsqp: A
+plug-and-play symbolic-quantized framework for time-series tokenization in large language models.
+IEEE Access, 14:42772–42793, 2026. doi: 10.1109/ACCESS.2026.3674765.
+M. A. Ahamed and Q. Cheng. Timemachine: A time series is worth 4 mambas for long-term forecasting.
+In European Conference on Artificial Intelligence (ECAI), volume 392, page 1688, 2024.
+
+11
+
+Reasoning-Aware Training for Time Series Forecasting
+
+M. A. Ahamed, M. Parmar, P. Goyal, Y. Song, L. T. Le, Q. Cheng, C.-L. Li, H. Palangi, J. Yoon, and
+T. Pfister. TFRBench: A reasoning benchmark for evaluating forecasting systems. International
+Conference on Machine Learning (ICML), 2026.
+T. Aksu, G. Woo, J. Liu, X. Liu, C. Liu, S. Savarese, C. Xiong, and D. Sahoo. GIFT-eval: A benchmark
+for general time series forecasting model evaluation. In NeurIPS Workshop on Time Series in the Age
+of Large Models, 2024. URL https://openreview.net/forum?id=Z2cMOOANFX.
+A. F. Ansari, L. Stella, A. C. Turkmen, X. Zhang, P. Mercado, H. Shen, O. Shchur, S. S. Rangapuram, S. P.
+Arango, S. Kapoor, J. Zschiegner, D. C. Maddix, H. Wang, M. W. Mahoney, K. Torkkola, A. G. Wilson,
+M. Bohlke-Schneider, and B. Wang. Chronos: Learning the language of time series. Transactions on
+Machine Learning Research, 2024. ISSN 2835-8856. URL https://openreview.net/forum?
+id=gerNCVqqtR. Expert Certification.
+A. F. Ansari, O. Shchur, J. Küken, A. Auer, B. Han, P. Mercado, S. S. Rangapuram, H. Shen,
+L. Stella, X. Zhang, et al. Chronos-2: From univariate to universal forecasting. arXiv preprint
+arXiv:2510.15821, 2025.
+A. Auer, P. Podest, D. Klotz, S. Böck, G. Klambauer, and S. Hochreiter. Tirex: Zero-shot forecasting
+across long and short horizons with enhanced in-context learning. In The Thirty-ninth Annual
+Conference on Neural Information Processing Systems, 2026. URL https://openreview.net/
+forum?id=v7UqniC9pF.
+G. E. Box, G. M. Jenkins, G. C. Reinsel, and G. M. Ljung. Time series analysis: forecasting and control.
+John Wiley & Sons, 2015.
+T. Brown, B. Mann, N. Ryder, M. Subbiah, J. D. Kaplan, P. Dhariwal, A. Neelakantan, P. Shyam,
+G. Sastry, A. Askell, et al. Language models are few-shot learners. Advances in neural information
+processing systems, 33:1877–1901, 2020.
+C. Chang, W.-Y. Wang, W.-C. Peng, and T.-F. Chen. Llm4ts: Aligning pre-trained llms as data-efficient
+time-series forecasters. ACM Trans. Intell. Syst. Technol., 16(3), Apr. 2025. ISSN 2157-6904. doi:
+10.1145/3719207. URL https://doi.org/10.1145/3719207.
+B. Cohen, E. Khwaja, K. Wang, C. Masson, E. Ramé, Y. Doubli, and O. Abou-Amal. Toto: Time series
+optimized transformer for observability. arXiv preprint arXiv:2407.07874, 2024.
+G. Comanici, E. Bieber, M. Schaekermann, I. Pasupat, N. Sachdeva, I. Dhillon, M. Blistein, O. Ram,
+D. Zhang, E. Rosen, et al. Gemini 2.5: Pushing the frontier with advanced reasoning, multimodality,
+long context, and next generation agentic capabilities. arXiv preprint arXiv:2507.06261, 2025.
+A. Das, W. Kong, R. Sen, and Y. Zhou. A decoder-only foundation model for time-series forecasting.
+In Proceedings of the 41st International Conference on Machine Learning, pages 10148–10167, 2024.
+N. Gruver, M. Finzi, S. Qiu, and A. G. Wilson. Large language models are zero-shot time series
+forecasters. Advances in Neural Information Processing Systems, 36:19622–19635, 2023.
+S. B. Hoo, S. Müller, D. Salinas, and F. Hutter. From tables to time: Extending tabpfn-v2 to time series
+forecasting. arXiv preprint arXiv:2501.02945, 2025.
+C.-Y. Hsieh, C.-L. Li, C.-k. Yeh, H. Nakhost, Y. Fujii, A. Ratner, R. Krishna, C.-Y. Lee, and T. Pfister. Distilling step-by-step! outperforming larger language models with less training data and
+smaller model sizes. In A. Rogers, J. Boyd-Graber, and N. Okazaki, editors, Findings of the
+Association for Computational Linguistics: ACL 2023, pages 8003–8017, Toronto, Canada, July
+12
+
+Reasoning-Aware Training for Time Series Forecasting
+
+2023. Association for Computational Linguistics. doi: 10.18653/v1/2023.findings-acl.507. URL
+https://aclanthology.org/2023.findings-acl.507/.
+R. J. Hyndman and Y. Khandakar. Automatic time series forecasting: the forecast package for r. Journal
+of statistical software, 27:1–22, 2008.
+Z. Ji, N. Lee, R. Frieske, T. Yu, D. Su, Y. Xu, E. Ishii, Y. J. Bang, A. Madotto, and P. Fung. Survey of
+hallucination in natural language generation. ACM computing surveys, 55(12):1–38, 2023.
+M. Jin, S. Wang, L. Ma, Z. Chu, J. Y. Zhang, X. Shi, P.-Y. Chen, Y. Liang, Y.-F. Li, S. Pan, and Q. Wen.
+Time-LLM: Time series forecasting by reprogramming large language models. In The Twelfth
+International Conference on Learning Representations, 2024. URL https://openreview.net/
+forum?id=Unb5CVPtae.
+B. Lim and S. Zohren. Time-series forecasting with deep learning: a survey. Philosophical transactions
+of the royal society a: mathematical, physical and engineering sciences, 379(2194), 2021.
+C. Liu, T. Aksu, J. Liu, X. Liu, H. Yan, Q. Pham, S. Savarese, D. Sahoo, C. Xiong, and J. Li. Moirai 2.0:
+When less is more for time series forecasting. arXiv preprint arXiv:2511.11698, 2025a.
+Y. Liu, T. Hu, H. Zhang, H. Wu, S. Wang, L. Ma, and M. Long. itransformer: Inverted transformers
+are effective for time series forecasting. In The Twelfth International Conference on Learning
+Representations, 2024. URL https://openreview.net/forum?id=JePfAI8fah.
+Y. Liu, G. Qin, Z. Shi, Z. Chen, C. Yang, X. Huang, J. Wang, and M. Long. Sundial: A family of highly
+capable time series foundation models. In International Conference on Machine Learning, pages
+39295–39317. PMLR, 2025b.
+Y. Liu, X. Su, S. Wang, H. Zhang, H. Liu, Y. Wang, Z. Ye, Y. Xiang, J. Wang, and M. Long. Timer-s1:
+A billion-scale time series foundation model with serial scaling. arXiv preprint arXiv:2603.04791,
+2026.
+I. Loshchilov and F. Hutter. Decoupled weight decay regularization. In International Conference on
+Learning Representations, 2019. URL https://openreview.net/forum?id=Bkg6RiCqY7.
+S. M. Lundberg and S.-I. Lee. A unified approach to interpreting model predictions. Advances in neural
+information processing systems, 30, 2017.
+Y. Nie, N. H. Nguyen, P. Sinthong, and J. Kalagnanam. A time series is worth 64 words: Long-term
+forecasting with transformers. In The Eleventh International Conference on Learning Representations,
+2023. URL https://openreview.net/forum?id=Jbdc0vTOcol.
+K. Rasul, A. Ashok, A. R. Williams, A. Khorasani, G. Adamopoulos, R. Bhagwatkar, M. Biloš, H. Ghonia,
+N. Hassen, A. Schneider, S. Garg, A. Drouin, N. Chapados, Y. Nevmyvaka, and I. Rish. Lag-llama:
+Towards foundation models for time series forecasting. In R0-FoMo:Robustness of Few-shot and
+Zero-shot Learning in Large Foundation Models, 2023. URL https://openreview.net/forum?
+id=jYluzCLFDM.
+M. T. Ribeiro, S. Singh, and C. Guestrin. " why should i trust you?" explaining the predictions of any
+classifier. In Proceedings of the 22nd ACM SIGKDD international conference on knowledge discovery
+and data mining, pages 1135–1144, 2016.
+T. Rojat, R. Puget, D. Filliat, J. Del Ser, R. Gelin, and N. Díaz-Rodríguez. Explainable artificial
+intelligence (xai) on timeseries data: A survey. arXiv preprint arXiv:2104.00950, 2021.
+13
+
+Reasoning-Aware Training for Time Series Forecasting
+
+R. Rombach, A. Blattmann, D. Lorenz, P. Esser, and B. Ommer. High-resolution image synthesis with
+latent diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern
+recognition, pages 10684–10695, 2022.
+C. Rudin. Stop explaining black box machine learning models for high stakes decisions and use
+interpretable models instead. Nature machine intelligence, 1(5):206–215, 2019.
+R. H. Shumway and D. S. Stoffer. Arima models. In Time series analysis and its applications: with R
+examples, pages 75–163. Springer, 2017.
+E. Spiliotis, V. Assimakopoulos, and S. Makridakis. Generalizing the theta method for automatic
+forecasting. European Journal of Operational Research, 284(2):550–558, 2020.
+Synthefy Team.
+Introducing synthefy migas 1.0: State-of-the-art forecasting on your
+unique data, in minutes, November 2025.
+URL https://www.synthefy.com/blog/
+introducing-synthefy-migas. Accessed: 2026-05-04.
+M. Tan, M. A. Merrill, V. Gupta, T. Althoff, and T. Hartvigsen. Are language models actually useful for
+time series forecasting? In The Thirty-eighth Annual Conference on Neural Information Processing
+Systems, 2024. URL https://openreview.net/forum?id=DV15UbHCY1.
+H. Tang, C. Zhang, M. Jin, Q. Yu, Z. Wang, X. Jin, Y. Zhang, and M. Du. Time series forecasting with
+llms: Understanding and enhancing model capabilities. ACM SIGKDD Explorations Newsletter, 26
+(2):109–118, 2025.
+X. Tao, S. Zhang, M. Cheng, D. Wang, T. Pan, B. Pan, C. Zhang, and S. Wang. From values to tokens:
+An llm-driven framework for context-aware time series forecasting via symbolic discretization.
+arXiv preprint arXiv:2508.09191, 2025.
+G. Team, R. Anil, S. Borgeaud, J.-B. Alayrac, J. Yu, R. Soricut, J. Schalkwyk, A. M. Dai, A. Hauth, K. Millican, et al. Gemini: a family of highly capable multimodal models. arXiv preprint arXiv:2312.11805,
+2023.
+Y. Tian, Y. Han, X. Chen, W. Wang, and N. V. Chawla. Beyond answers: Transferring reasoning
+capabilities to smaller llms using multi-teacher knowledge distillation. In Proceedings of the eighteenth
+acm international conference on web search and data mining, pages 251–260, 2025.
+J. Wei, X. Wang, D. Schuurmans, M. Bosma, F. Xia, E. Chi, Q. V. Le, D. Zhou, et al. Chain-of-thought
+prompting elicits reasoning in large language models. Advances in neural information processing
+systems, 35:24824–24837, 2022.
+G. Woo, C. Liu, A. Kumar, C. Xiong, S. Savarese, and D. Sahoo. Unified training of universal time series
+forecasting transformers. In International Conference on Machine Learning, pages 53140–53164.
+PMLR, 2024.
+H. Xue and F. D. Salim. Promptcast: A new prompt-based learning paradigm for time series forecasting.
+IEEE Transactions on Knowledge and Data Engineering, 36(11):6851–6864, 2023.
+C. Ye, Z. Hu, Y. Deng, Z. Huang, M. D. Ma, Y. Zhu, and W. Wang. Mirai: Evaluating llm agents for
+event forecasting. arXiv preprint arXiv:2407.01231, 2024.
+L. Zhang, A. Rao, and M. Agrawala. Adding conditional control to text-to-image diffusion models. In
+Proceedings of the IEEE/CVF international conference on computer vision, pages 3836–3847, 2023.
+
+14
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Table of Contents for Appendix
+A Theoretical Grounding and Proofs. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+A.1 Assumptions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+A.2 Mechanism of Cross-Modal Alignment . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+A.3 Proof of Variance Reduction . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+A.4 The Bias-Variance Guarantee via Joint Optimization . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+B Baseline Comparison . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18
+C Limitations and Broader Impacts . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18
+D Implementation Details . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18
+E Forecasting Case Studies . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+F Reasoning Case Studies . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+G Prompts for the LLMs . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26
+H Forecasting Performance Evaluation on TFRBench . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+I
+
+Reasoning Performance Evaluation on TFRBench . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 33
+
+15
+
+Reasoning-Aware Training for Time Series Forecasting
+
+A. Theoretical Grounding and Proofs
+This section provides the complete assumptions, mechanism details, and proofs for the STRIDE
+framework.
+A.1. Assumptions
+Multi-Modality of Unconditional Forecasts The future distribution given only past numerical data 𝑋
+is a mixture of 𝐾 distinct plausible trajectories (modes):
+𝑃 (𝑌 | 𝑋 ) =
+
+𝐾
+∑︁
+
+𝜋 𝑖 𝑃 𝑖 (𝑌 | 𝑋 )
+
+𝑖=1
+
+where each 𝑃𝑖 represents a trajectory family and 𝜋𝑖 are the probabilities of each scenario occurring
+based on history alone.
+Reasoning as a Mode Selector via Distillation A Teacher LLM generates a perfect oracle reasoning
+representation 𝑅𝑟𝑒 𝑓 isolating the true mode 𝑘. The Student LLM generates a continuous hidden state
+sequence 𝐻 . We assume that minimizing the Cross-Entropy loss (L𝐶𝐸 → 0) aligns the Student’s
+pooled representation ℎ𝑅 with the target oracle distribution:
+given that
+
+𝑃 (𝑌 | 𝑋, ℎ𝑅 ) ≈ 𝑃 𝑘 (𝑌 | 𝑋 )
+
+L𝐶𝐸 → 0
+
+A.2. Mechanism of Cross-Modal Alignment
+Let 𝐻 ∈ ℝ𝐿× 𝑑𝑙𝑙𝑚 denote the matrix of last hidden states from the Student LLM. We derive a fixed-size
+global reasoning embedding via mean-pooling:
+1 ∑︁
+𝐿
+
+ℎ𝑅 =
+
+𝐿
+
+𝐻𝑖
+
+𝑖=1
+
+To align the semantic language space with the continuous time series space, we apply a learned linear
+projection matrix 𝑊𝑝𝑟𝑜 𝑗 ∈ ℝ𝑑𝑙𝑙𝑚 × 𝑑𝑡𝑠 :
+𝑒𝑅 = ℎ𝑅 𝑊 𝑝𝑟𝑜 𝑗
+This continuous reasoning prior 𝑒𝑅 is then fused with the native time series embeddings 𝐸𝑇𝑆 :
+𝐸 𝑓 𝑢𝑠𝑒𝑑 = 𝑒𝑅 ⊕ 𝐸𝑇𝑆
+
+The final forecast distribution is evaluated as 𝑃 (𝑌 | 𝐸 𝑓 𝑢𝑠𝑒𝑑 ).
+A.3. Proof of Variance Reduction
+Assume each mode 𝑃𝑖 (𝑌 | 𝑋 ) is a Gaussian distribution with mean 𝜇 𝑖 and variance 𝜎2𝑖 .
+Step 1: Variance of the Unconditional Distribution The overall mean is 𝜇¯ =
+of total variance for mixtures:
+𝑉 𝑎𝑟 (𝑌 | 𝑋 ) =
+
+𝐾
+∑︁
+𝑖=1
+
+2
+
+𝜋𝑖 𝜎𝑖 +
+
+𝐾
+∑︁
+
+𝑖=1 𝜋𝑖 𝜇 𝑖 . By the law
+
+Í𝐾
+
+𝜋𝑖 ( 𝜇 𝑖 − 𝜇
+¯) 2
+
+𝑖=1
+
+16
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Step 2: Variance of the Conditional Distribution Assuming successful distillation, the conditional
+distribution collapses to 𝑃𝑘 (𝑌 | 𝑋 ) = N ( 𝜇 𝑘 , 𝜎2𝑘 ). The variance of the forecast with reasoning is:
+𝑉 𝑎𝑟 (𝑌 | 𝐸 𝑓 𝑢𝑠𝑒𝑑 ) = 𝜎2𝑘
+
+Step 3: Comparison Assuming all modes have a similar internal variance 𝜎2 :
+𝑉 𝑎𝑟 (𝑌 | 𝑋 ) = 𝜎2 +
+
+𝐾
+∑︁
+
+𝜋𝑖 ( 𝜇 𝑖 − 𝜇
+¯) 2
+
+𝑖=1
+
+𝑉 𝑎𝑟 (𝑌 | 𝐸 𝑓 𝑢𝑠𝑒𝑑 ) = 𝜎2
+
+Subtracting the two gives:
+𝑉 𝑎𝑟 (𝑌 | 𝑋 ) − 𝑉 𝑎𝑟 (𝑌 | 𝐸 𝑓 𝑢𝑠𝑒𝑑 ) =
+
+𝐾
+∑︁
+
+𝜋𝑖 ( 𝜇 𝑖 − 𝜇
+¯) 2
+
+𝑖=1
+
+Thus:
+𝑉 𝑎𝑟 (𝑌 | 𝐸 𝑓 𝑢𝑠𝑒𝑑 ) ≤ 𝑉 𝑎𝑟 (𝑌 | 𝑋 )
+
+A.4. The Bias-Variance Guarantee via Joint Optimization
+STRIDE resolves the Bias-Variance tradeoff through its joint optimization framework:
+L𝑡𝑜𝑡𝑎𝑙 = 𝛼L𝐶𝐸 + 𝛽 L𝑄𝑢𝑎𝑛𝑡𝑖𝑙𝑒
+Minimizing L𝐶𝐸 guarantees variance reduction by ensuring the reasoning embedding ℎ𝑅 matches
+the Teacher’s logic, which ideally isolates the true future mode. However, if the Student LLM generates
+a misspecified reasoning trace, it may isolate an incorrect mode 𝑗 ( 𝑗 ≠ 𝑘). We can formalize the impact
+of this mode misspecification as follows.
+Discussion on Bias Mitigation. Let the true future trajectory belong to mode 𝑘 with mean 𝜇 𝑘
+and variance 𝜎2𝑘 . If the misspecified prior 𝑒𝑅, 𝑗 strictly isolates an incorrect mode 𝑗, the predictive
+distribution collapses to 𝑃 𝑗 (𝑌 | 𝑋 ) with mean 𝜇 𝑗 and variance 𝜎2𝑗 . While the conditional variance remains
+low (𝑉 𝑎𝑟 (𝑌 | 𝐸 𝑓 𝑢𝑠𝑒𝑑 ) = 𝜎2𝑗 ), the prediction incurs a severe structural bias:
+𝐵𝑖𝑎𝑠 (𝑌ˆ ) = 𝔼[𝑌 | 𝑒𝑅, 𝑗 ] − 𝔼[𝑌 | 𝑒𝑅,𝑘 ] = 𝜇 𝑗 − 𝜇 𝑘
+
+Evaluated through the lens of expected squared error, this mode misspecification yields:
+𝔼[(𝑌 − 𝑌ˆ ) 2 | 𝑒𝑅, 𝑗 ] = ( 𝜇 𝑗 − 𝜇 𝑘 ) 2 + 𝜎2𝑗 +
+| {z } |{z}
+Bias2
+
+Variance
+
+𝜎2𝑘
+
+|{z}
+
+Irreducible Error
+
+If the misspecified mode 𝑗 diverges significantly from the true mode 𝑘, the squared bias term
+( 𝜇 𝑗 − 𝜇 𝑘 ) 2 dominates the error landscape. In our framework, minimizing L𝑄𝑢𝑎𝑛𝑡𝑖𝑙𝑒 heavily penalizes
+this distributional distance. This inflated error produces large corrective gradients that propagate
+backward from the numerical loss, through the latent fusion 𝐸 𝑓 𝑢𝑠𝑒𝑑 and projection matrix 𝑊𝑝𝑟𝑜 𝑗 ,
+and directly into the Student LLM. Therefore, while Theorem 1 bounds the variance under ideal
+conditions, the joint optimization explicitly bounds the bias by penalizing misspecified priors that
+steer the prediction toward incorrect trajectories.
+17
+
+Reasoning-Aware Training for Time Series Forecasting
+
+B. Baseline Comparison
+Statistical Methods. We include traditional baselines such as ARIMA (Box et al., 2015), Seasonal
+Naive (Aksu et al., 2024), AutoARIMA (Hyndman and Khandakar, 2008), AutoTheta (Spiliotis et al.,
+2020), and AutoETS following (Liu et al., 2026).
+Time Series Foundation Models (TSFMs). We benchmark against leading numerical foundation
+models including TimesFM-2.5 (Das et al., 2024), Chronos-2.0 (Ansari et al., 2025), Timer-S1 (Liu
+et al., 2026), Migas-1.0 (Synthefy Team, 2025), TiRex (Auer et al., 2026), Moirai2 (Liu et al., 2025a),
+Toto-1.0 (Cohen et al., 2024), TabPFN-TS (Hoo et al., 2025), and Sundial-Base (Liu et al., 2025b).
+General-Purpose LLMs. To demonstrate the modality gap inherent in zero-shot prompting, we
+evaluate against several models from the Gemini (Comanici et al., 2025; Team et al., 2023) and
+Claude families: Gemini-2.5-Flash, Gemini-2.5-Pro, Gemini-3.1-Pro, Claude-Sonnet-4, and ClaudeSonnet-4.5 following (Ahamed et al., 2026). We used Vertex AI for these models 1 .
+
+C. Limitations and Broader Impacts
+While our approach effectively bridges the modality gap between semantic reasoning and numerical
+forecasting, its training pipeline is inherently bounded by the quality and factual accuracy of the
+Teacher (TFRBench (Ahamed et al., 2026)) used to generate the reference reasoning. Furthermore,
+jointly optimizing a Small-LLM alongside a target Time Series Foundation Model (TSFM) introduces
+additional computational overhead and memory requirements compared to deploying a standalone
+numerical encoder. In terms of broader impacts, equipping black-box models with human-interpretable
+strategic planning promotes responsible deployment in high-stakes fields like healthcare, finance,
+and climate modeling, where algorithmic transparency is critical. Nevertheless, practitioners must
+remain vigilant, as highly articulate AI-generated narratives could inadvertently foster automation
+bias or mask underlying data flaws if deployed without proper human oversight.
+
+D. Implementation Details
+For our knowledge distillation pipeline, primarily, we utilize Gemini-3.1-Pro as the Teacher LLM to
+generate the high-quality reference reasoning via TFRBench (Ahamed et al., 2026). For baseline
+reasoning provider model also, we used Gemini-3.1-pro. The lightweight student model (Small-LLM) is
+primarily parameterized by Gemma-3-4B-it. To maintain training stability and preserve fundamental
+linguistic capabilities, we apply Low-Rank Adaptation (LoRA) to the attention mechanisms of the
+Small-LLM during the joint optimization phase. Detailed prompts for these LLMs are provided in
+App. G. The entire pipeline is trained end-to-end using a combination of textual cross-entropy loss
+and numerical quantile loss, while providing equal weights (𝛼, 𝛽 = 1) to both terms in Eq. 1. For
+optimization we used AdamW optimizer (Loshchilov and Hutter, 2019). To train our framework, we
+utilized a distributed computing environment configured with either 16 NVIDIA A100 (40GB) for
+Chronos-2.0 or 8 NVIDIA H100 (80GB) GPUs for Timer-S1.
+Besides, Gemini-3.1-pro and Gemma-3-4B-it, we also demonstrate the effectiveness of STRIDE
+with Claude-Sonnet-4.5 and Qwen3-4B-Instruct in Subsection 5. While we adopt Chronos-2.0 as
+TSFM backbone, we demonstrate generalizability of our framework with SOTA Timer-S1.
+1 https://console.cloud.google.com/agent-platform/model-garden
+
+18
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Historic Input
+
+Ground Truth
+
+Chronos-2
+
+Ours
+
+4.4
+Close
+
+4.2
+4.0
+3.8
+3.6
+4.6
+
+High
+
+4.4
+4.2
+4.0
+3.8
+3.6
+4.2
+Low
+
+4.0
+3.8
+3.6
+
+4.4
+4.2
+4.0
+3.8
+3.6
+3.4
+
+-20
+08
+20
+
+-08
+
+-18
+08
+20
+
+-08
+
+-14
+08
+20
+
+-08
+
+-12
+08
+20
+
+-08
+
+-08
+08
+20
+
+-08
+
+-06
+08
+20
+
+-08
+
+-04
+08
+20
+
+-08
+
+-31
+08
+20
+
+-07
+
+08
+20
+
+-07
+
+08
+20
+
+-07
+
+08
+20
+
+-07
+
+-29
+
+1e8
+
+-25
+
+6
+5
+4
+3
+2
+1
+
+-23
+
+Volume
+
+Open
+
+3.4
+
+Figure 4 | Forecasting prediction for Amazon dataset.
+
+19
+
+Reasoning-Aware Training for Time Series Forecasting
+
+E. Forecasting Case Studies
+In this section, we demonstrate several case studies, where we compare our framework with original
+Chronos-2 method.
+Historic Input
+
+Value
+
+0.15
+
+Ground Truth
+
+Chronos-2
+
+Ours
+
+0.10
+0.05
+
+-11
+-07
+15
+20
+
+-11
+20
+
+15
+
+-07
+
+-10
+20
+
+15
+
+-07
+
+-09
+20
+
+15
+
+-07
+
+-08
+20
+
+15
+
+-07
+
+-07
+20
+
+15
+
+-07
+
+-07
+20
+
+15
+
+-07
+
+-06
+20
+
+15
+
+-07
+
+-05
+20
+
+15
+
+-07
+
+-04
+-07
+15
+20
+
+20
+
+15
+
+-07
+
+-04
+
+0.00
+
+Figure 5 | Forecasting prediction for Traffic dataset.
+Historic Input
+
+Ground Truth
+
+Chronos-2
+
+Ours
+
+Value
+
+20000
+10000
+
+4-2
+0
+17
+-0
+20
+
+4-2
+0
+20
+
+17
+-0
+
+4-1
+9
+20
+
+17
+-0
+
+4-1
+8
+20
+
+17
+-0
+
+4-1
+7
+20
+
+17
+-0
+
+4-1
+6
+20
+
+17
+-0
+
+4-1
+6
+20
+
+17
+-0
+
+4-1
+5
+20
+
+17
+-0
+
+4-1
+4
+20
+
+17
+-0
+
+4-1
+3
+17
+-0
+20
+
+20
+
+17
+-0
+
+4-1
+3
+
+0
+
+Figure 6 | Forecasting prediction for Nyc Taxi dataset.
+
+F. Reasoning Case Studies
+NYC Taxi
+Ground Truth
+
+Gemini-3.1-pro
+
+Chronos-2
+
+Ours
+
+0
+20
+13
+
+-05
+
+-20
+
+00
+:0
+
+0
+20
+13
+
+-05
+
+-19
+
+00
+:0
+
+0
+20
+13
+
+-05
+
+-18
+
+00
+:0
+
+0
+20
+13
+
+-05
+
+-17
+
+00
+:0
+
+0
+20
+13
+
+-05
+
+-16
+
+00
+:0
+
+0
+20
+13
+
+-05
+
+-15
+
+00
+:0
+
+0
+00
+:0
+20
+13
+
+-05
+
+-14
+
+00
+:0
+-13
+-05
+20
+13
+
+20
+13
+
+-05
+
+-12
+
+00
+:0
+
+0
+
+30000
+20000
+10000
+
+0
+
+Value
+
+Historic Input
+
+Baseline Reasoning (Gemini-3.1-pro)
+The time series exhibits a strong 24-hour seasonality, typical of hourly taxi trip counts, with
+deep troughs in the early morning (03:00-04:00) and peaks in the evening (18:00-19:00). The
+trend component shows a steady increase over the historical period, rising from approximately
+18,000 to over 21,000. To forecast the next 96 steps (4 days), we project the trend to continue
+its gradual upward trajectory, starting at a baseline of 21,500 and increasing by 2 units per
+hour. We then superimpose the extracted 24-hour seasonal profile onto this projected trend.
+Residuals are assumed to be zero for the forecast horizon. This additive combination of a
+linearly increasing trend and a fixed daily seasonal pattern yields the final predicted values,
+maintaining the expected order of magnitude and daily structural variations.
+
+20
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Our Reasoning
+• Cross-Channel Analysis: As a single-channel dataset, NYC taxi trip volume is intrinsically driven by the city’s 24-hour mobility cycle, commuter schedules, and nightlife.
+The data exhibits a strong dependency on the day of the week, with distinct behavioral
+shifts between weekdays and weekends dictating the flow of urban transit.
+• Trend Component Plan: The overarching baseline hovers around a mean of approximately 20,000 trips per hour, but this is heavily modulated by the day of the week.
+Weekdays sustain higher overall daytime activity, while the weekend trend shifts the
+bulk of the volume toward the afternoon and late evening, reflecting a transition from
+business-driven to leisure-driven demand.
+• Seasonality Component Plan: The seasonal structure is defined by a robust 24-hour
+cycle that morphs based on the day. On weekdays (first 48 hours), the pattern is
+distinctly bimodal: a sharp morning commuter peak around 8:00 AM reaching 26,00028,000 trips, a midday plateau near 24,000 trips, and a dominant evening rush peaking
+between 7:00 PM and 8:00 PM at 33,000-34,000 trips. On weekends (latter 48 hours),
+the morning commute peak vanishes. Instead, demand builds steadily throughout the
+afternoon. Saturday maintains a strong evening peak of around 31,000 trips, while
+Sunday’s peak is softer and earlier. Across all days, an early morning lull occurs between
+3:00 AM and 5:00 AM.
+• Residuals & Event Plan: Specific structural anomalies are embedded in the daily flow.
+Weekdays feature a sharp, temporary dip around 4:00 PM (dropping to roughly 18,00019,000 trips), perfectly aligning with the traditional NYC taxi driver shift change. The
+transition into the weekend introduces a "nightlife buffer"; late-night hours on Friday and
+Saturday (midnight to 2:00 AM) sustain unusually high volumes of 21,000-29,000 trips.
+The model must anticipate these localized structural deviations rather than smoothing
+them out.
+Evaluation Scores
+Overall Scores: Ours: 4.0
+
+|
+
+Gemini-3.1-pro: 2.75
+
+Metrics Breakdown (Gemini-3.1-pro):
+• Domain Relevance (3/5): Uses basic terminology but lacks true domain expert depth,
+failing to distinguish weekday vs. weekend patterns.
+• Forecasting Correctness (2/5): Identifies basic intra-day seasonality but misses weekly
+seasonality and incorrectly models a continuous linear upward trend.
+• Event Relevance (1/5): Completely ignores all external events, explicitly stating
+residuals are assumed to be zero.
+• Logic Consistency (5/5): Perfectly aligns with the candidate’s stated reasoning, but
+the methodology itself is flawed.
+Metrics Breakdown (Ours):
+• Domain Relevance (5/5): Demonstrates expert-level domain knowledge, using precise
+terminology such as ’24-hour mobility cycle,’ ’bimodal,’ ’taxi driver shift change,’ and
+’nightlife buffer’.
+
+21
+
+Reasoning-Aware Training for Time Series Forecasting
+
+• Forecasting Correctness (4/5): Correctly identifies the overarching trend and the
+complex daily/weekly seasonality. Misses specific magnitude spikes caused by localized
+external events.
+• Event Relevance (2/5): Misses the specific external events (sports games, festivals)
+highlighted in the Ground Truth, despite effectively capturing recurring structural
+events.
+• Logic Consistency (5/5): The numerical forecast is a perfect translation of the narrative.
+Specific claims are precisely reflected in the generated numbers.
+Traffic
+
+Value
+
+Historic Input
+
+Ground Truth
+
+Gemini-3.1-pro
+
+Chronos-2
+
+Ours
+
+0.1
+
+0
+
+0
+
+00
+:0
+-10
+20
+15
+-03
+
+00
+:0
+-09
+20
+15
+-03
+
+0
+
+0
+
+00
+:0
+-08
+20
+15
+-03
+
+00
+:0
+-07
+20
+15
+-03
+
+0
+
+0
+
+00
+:0
+-06
+20
+15
+-03
+
+00
+:0
+-05
+20
+15
+-03
+
+0
+
+0
+
+00
+:0
+-04
+20
+15
+-03
+
+00
+:0
+-03
+20
+15
+-03
+
+20
+15
+-03
+
+-02
+
+00
+:0
+
+0
+
+0.0
+
+Baseline Reasoning (Gemini-3.1-pro)
+The time series exhibits a strong and consistent daily seasonality (24-hour period) with a
+relatively stable trend. By analyzing the pre-computed decomposition features, we observe
+that the trend component stabilizes around 0.0348 towards the end of the historical data. The
+seasonal component repeats perfectly every 24 hours, capturing the daily peaks (around hours
+07:00 and 08:00) and troughs (around hours 00:00 to 02:00). To forecast the next 96 steps
+(4 days), we project the constant trend of 0.0348 forward and add it to the corresponding
+hour’s seasonal component. This approach generates a repeating 24-hour pattern that closely
+matches the magnitude and shape of the historical data, ensuring all predicted values remain
+within the expected 0.00 to 0.18 range.
+Our Reasoning
+• Cross-Channel Analysis: As this is a single-channel dataset, the analysis focuses exclusively on the internal temporal dynamics of the traffic volume. The data is inherently
+cyclical, driven by human mobility patterns, and exhibits strong daily and weekly
+periodicities without reliance on external covariates.
+• Trend Component Plan: The underlying baseline trend remains relatively flat and
+stable throughout the forecast horizon, hovering near a low baseline of approximately
+0.002 to 0.01 units during off-peak nighttime hours. Rather than a continuous upward
+or downward drift, the trend acts as a stationary foundation that dynamically scales to
+accommodate the varying magnitudes of daily traffic surges.
+• Seasonality Component Plan: The traffic volume is dominated by a strict 24-hour
+seasonal cycle, featuring pronounced peaks during specific active hours (roughly the
+7th to 9th hour of the daily cycle). Crucially, this daily seasonality is modulated by a
+broader weekly pattern. On high-activity days (e.g., typical weekdays), the seasonal
+amplitude surges to roughly 0.14 to 0.15 units. On low-activity days (e.g., weekends),
+this amplitude is significantly dampened, reaching only 0.025 to 0.04 units. The
+
+22
+
+Reasoning-Aware Training for Time Series Forecasting
+
+model must accurately capture both the timing of the daily peaks and these day-to-day
+amplitude shifts.
+• Residuals & Predicted Event Plan: The residual component should remain tightly
+constrained, representing minor, random fluctuations in traffic flow with deviations of
+roughly 0.001 to 0.005 units. The most notable "event" in this sequence is the structural
+shift during the middle 48 hours of the forecast, where peak traffic volume drops
+drastically by over 70% (from ∼0.14 down to ∼0.03 units). This reflects a predictable
+weekend or holiday effect. The model must anticipate this temporary suppression of
+traffic and subsequently predict a full recovery to the baseline high-volume pattern
+(returning to ∼0.14 units) by the final day of the forecast window.
+Evaluation Scores
+Overall Scores: Ours: 4.75
+
+|
+
+Gemini-3.1-pro: 3.0
+
+Metrics Breakdown (Gemini-3.1-pro):
+• Domain Relevance (2/5): Uses generic time series terminology (e.g., ’trend’, ’seasonal
+component’, ’24-hour period’) but fails to incorporate any domain-specific language
+related to traffic, such as ’commute hours’, ’weekdays vs. weekends’, or ’congestion’.
+• Forecasting Correctness (2/5): Correctly identifies the daily seasonality but completely
+misses the crucial weekly seasonality (the difference between weekdays and weekends).
+It erroneously predicts sharp morning commute peaks for Saturday and Sunday.
+• Event Relevance (3/5): No external events were mentioned by the candidate. While it
+missed the opportunity to discuss the lack of events or historical weather impacts, it
+did not hallucinate any false events, making it acceptable but lacking depth.
+• Logic Consistency (5/5): The numerical forecast perfectly aligns with the candidate’s
+stated logic. The reasoning explicitly states it will generate a repeating 24-hour pattern,
+and the predicted values reflect exactly the same 24-hour cycle for all four days.
+Metrics Breakdown (Ours):
+• Domain Relevance (5/5): Demonstrates expert domain knowledge, correctly identifying the dataset as traffic volume/occupancy and using precise terminology such as
+’commuter traffic patterns,’ ’intra-day and intra-week cyclicality,’ and ’morning/evening
+commute peaks.’
+• Forecasting Correctness (4/5): Correctly identifies the overall trend and the stark
+contrast between weekday and weekend seasonality. However, it slightly misses the
+exact shape of the weekend traffic, predicting a suppressed morning peak rather than
+the broad afternoon plateau described in the Ground Truth.
+• Event Relevance (5/5): Does not hallucinate any external events and correctly identifies
+the transition to the weekend as the primary structural shift impacting the forecast
+window, which aligns perfectly with the Ground Truth’s lack of external events for those
+days.
+• Logic Consistency (5/5): The numerical forecast is a precise translation of the reasoning.
+The text explicitly predicts weekday peaks of approx. 0.147 and weekend peaks of
+approx. 0.038 and 0.027, which are exactly reflected in the generated data points.
+
+23
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Amazon Pricing
+
+Close
+
+Historic Input
+
+Ground Truth
+
+Gemini-3.1-pro
+
+Chronos-2
+
+Ours
+
+97.5
+95.0
+92.5
+90.0
+87.5
+85.0
+97.5
+
+High
+
+95.0
+92.5
+90.0
+87.5
+
+Low
+
+95
+90
+85
+
+Open
+
+95
+90
+85
+1e8
+
+Volume
+
+1.5
+1.0
+
+:00
+20
+
+19
+
+-06
+
+-25
+
+00
+
+:00
+20
+
+19
+
+-06
+
+-21
+
+00
+
+:00
+20
+
+19
+
+-06
+
+-17
+
+00
+
+:00
+20
+
+19
+
+-06
+
+-13
+
+00
+
+:00
+20
+
+19
+
+-06
+
+-09
+
+00
+
+:00
+20
+
+19
+
+-06
+
+-05
+
+00
+
+:00
+00
+-01
+-06
+19
+20
+
+20
+
+19
+
+-05
+
+-29
+
+00
+
+:00
+
+0.5
+
+Baseline Reasoning (Gemini-3.1-pro)
+To forecast the next 7 steps for the 5 channels, we analyze the provided decomposition
+features. First, the Seasonality Component exhibits a strict 7-step repeating pattern. The
+next 7 steps will exactly mirror the seasonal values starting from the beginning of the cycle
+(e.g., the values from 2019-05-29 to 2019-06-06). Second, we evaluate the Trend Component.
+The price channels (Close, High, Low, Open) show a steady upward trajectory. By comparing
+the last few actual values to their seasonal adjustments, we estimate a conservative trend
+increment of approximately +0.30 per day for the price channels, starting from a base trend
+of roughly 95.00 for Close, 95.50 for High, 94.50 for Low, and 94.80 for Open. For Volume,
+the trend has been decreasing but appears to stabilize around 55,000,000 in the most recent
+actuals, so we project a flat baseline trend of 55,000,000. Finally, we synthesize the forecast
+by adding the projected linear trend to the exact repeating seasonal components for each
+respective step and channel.
+
+24
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Our Reasoning
+• Cross-Channel Analysis: The dataset comprises highly collinear daily price metrics
+(Open, High, Low, Close) and trading Volume for Amazon stock. Volume serves as a key
+indicator of market participation and momentum. The forecast indicates a tight daily
+trading range (spreads of roughly 0.5 to 1.0 points between High and Low) coupled
+with below-average volume (57M-62M shares compared to the historical mean of 85M).
+This dynamic suggests a low-volatility consolidation phase where the stock establishes
+a new, slightly higher baseline without aggressive institutional buying or panic selling
+pressure.
+• Trend Component Plan: The price channels will exhibit a mild bullish drift, breaking
+just above the historical maximums (historically 94.78) to establish a new support floor
+around 95.0. Open and Close prices will stabilize tightly in the 95.0 to 95.5 range, while
+the High tests near-term resistance at 96.0. The Low will steadily track between 94.5
+and 95.5. Concurrently, Volume will demonstrate a gradual upward slope, climbing
+from approximately 57.4M to 62.4M shares over the forecast horizon, reflecting a slow,
+steady accumulation of market confidence at these newly established price levels.
+• Seasonality Component Plan: While daily equity data is primarily driven by broader
+macroeconomic trends rather than strict daily seasonality, standard intra-week trading
+patterns apply. The forecast captures a typical trading week’s rhythm, with prices remaining relatively flat and stable day-over-day. Volume will follow a standard structural
+trajectory, starting lower early in the period and gradually building momentum toward
+the end of the 7-day horizon, mimicking typical late-week portfolio adjustments and
+institutional positioning.
+• Residuals & Event Plan: Residuals will capture standard intraday market noise, bid-ask
+spread fluctuations, and minor algorithmic trading activity. The forecast assumes a quiet
+macroeconomic environment with no major catalyst events (such as earnings reports,
+product launches, or Federal Reserve announcements), which is explicitly reflected in
+the absence of volume spikes (remaining well below the historical 181M maximum).
+Minor deviations, such as the slight dip in the Low price to 94.5 on the third day,
+represent routine localized profit-taking or minor intraday sell-offs that are quickly
+absorbed by the prevailing baseline trend.
+Evaluation Scores
+Overall Scores: Ours: 4.0
+
+|
+
+Gemini-3.1-pro: 1.75
+
+Metrics Breakdown (Gemini-3.1-pro):
+• Domain Relevance (2/5): The candidate uses generic time-series terminology (e.g.,
+‘Seasonality Component’, ‘Trend Component’, ‘linear trend’) but completely lacks
+domain-specific financial language such as ‘market rally’, ‘volatility’, or ’liquidity’ that
+would be appropriate for an equity dataset.
+• Forecasting Correctness (2/5): The candidate incorrectly assumes a ’strict 7-step
+repeating pattern’ for seasonality, ignoring the standard 5-day trading week for equities.
+It also completely misses the event-driven rally dynamics described in the Ground Truth,
+resulting in highly inaccurate predictions.
+• Event Relevance (2/5): The candidate completely ignores the critical external events
+(the FOMC meeting and the San Francisco e-cigarette ban) that are the primary drivers
+
+25
+
+Reasoning-Aware Training for Time Series Forecasting
+
+of the market movement in the Ground Truth, relying instead on a flawed mechanical
+decomposition.
+• Logic Consistency (1/5): There is a direct contradiction between the reasoning and
+the numbers. The candidate claims to mirror the seasonal values from 2019-05-29 to
+2019-06-06 (a period where the actual Close price dropped sharply from 90 to 84) and
+add a small +0.30 daily trend. However, the predicted numerical values spike upwards
+to nearly 98, which mathematically contradicts the stated logic.
+Metrics Breakdown (Ours):
+• Domain Relevance (5/5): The candidate demonstrates expert-level domain knowledge,
+using precise financial terminology such as ‘bullish breakout’, ‘support floor’, ’algorithmic
+selling’, ’liquidity vacuums’, and ’options expiration activity’ to explain the market
+dynamics.
+• Forecasting Correctness (4/5): The candidate captures the general price level (around
+95-96) but completely misses the actual trend and volatility. It predicts a flat, lowvolatility environment with a smooth volume curve, failing to capture the significant
+price peak on day 3, the sharp drop on day 6, and the erratic, high-volume surges
+present in the Ground Truth.
+• Event Relevance (2/5): The candidate fails to identify the key macroeconomic event
+(the FOMC meeting) driving the market rally. Instead, it relies on generic, hypothetical
+events like ’minor positive catalyst’, ’analyst upgrade’, or ’options expiration’ to justify
+its predicted movements, which are not grounded in the specific context of the Ground
+Truth.
+• Logic Consistency (5/5): The numerical forecast perfectly aligns with the candidate’s
+narrative. Every specific claim made in the text, such as the Close stepping up to 95.5,
+the High dipping to 95.5 mid-period, the Low dipping to 94.5 on day 3, and Volume
+dipping to 57.9M before rising to 62M, is exactly reflected in the generated numbers.
+
+G. Prompts for the LLMs
+In this section, we provide the prompts for the LLMs we used for our framework for reproducibility.
+For training data generation, we utilized the prompts from TFRBench Ahamed et al. (2026).
+Prompt: TFRBench Search Agent for Training Reasoning Generation (Event Retrieval)
+You are a specialized Search Agent. Your sole mission is to find relevant, time-specific external
+events that could impact a time-series forecast. Your task is to find events in BOTH the recent
+past and the future window.
+Core Search Parameters
+• Dataset Name: {dataset_name}
+• Recent Past Window: {past_start} to {past_end}
+• Future Window: {future_start} to {future_end}
+• Location Hint: {location_hint}
+Search Strategy
+1. Time-Bound: Focus only on events within the specified windows.
+
+26
+
+Reasoning-Aware Training for Time Series Forecasting
+
+2. Impactful Topics: Search for objective, external factors like public holidays, major
+weather events (heatwaves, storms), sporting events, conferences, or economic announcements.
+3. No Impact Analysis: Do NOT analyze the ‘potential impact’. Just state the event and its
+date.
+4. Prioritize: Return only the top {search_events} most significant, time-specific events. Do
+not return a long, unprioritized list.
+IMPORTANT: Your entire response must be a single, concise, numbered list of events.
+• Do NOT add any preamble (e.g., ‘Here are the events:’).
+• Format: 1. [Event Name] ([Date or Date Range])
+• If no events are found, return the single word: None
+Provide your findings directly.
+Prompt: TFRBench Reference Reasoning Generation
+You are a Master Forecaster. Your task is to generate a concrete, step-by-step reasoning plan for
+a downstream forecasting AI. You must analyze the historical data and the provided external
+events to create a strategic guide for predicting the future.
+Guidelines
+1. Direct Strategy: Do not list assumptions. Go straight to the analysis.
+2. Cross-Channel Analysis: Explain how channels influence each other (e.g., ‘A rise in
+Channel A will likely drive a delayed rise in Channel B’).
+3. Qualitative & Flexible:
+• Do NOT provide exact equations (e.g., ‘add 0.2317’ is forbidden).
+• Describe behavior (e.g., ‘The trend should continue its recent upward path, but at a
+decelerating rate’).
+• CRITICAL: You MUST include flexible numeric ranges/directions to make the reasoning concrete (e.g., “expect an upward shift of roughly 10-15 units,” “volatility
+will likely double”).
+4. Event Integration: You MUST integrate the provided ‘External Events’.
+5. No Calculations: Do not generate a mock forecast table.
+— Full Data Context —
+{full_data_context_string}
+— Validated External Events —
+{external_events}
+IMPORTANT: Your entire response must start immediately with Final Reasoning:
+• Do NOT add any preamble.
+• Follow this exact format:
+Final Reasoning:
+[Channel 1 Name]:
+• Cross-Channel Analysis: [Your analysis of dependencies.]
+• Trend Component Plan: [Qualitative plan for the trend, including flexible numeric
+guidance.]
+
+27
+
+Reasoning-Aware Training for Time Series Forecasting
+
+• Seasonality Component Plan: [Qualitative plan for seasonality.]
+• Residuals & Event Plan: [Qualitative plan for residuals and specific event impacts.]
+[Channel 2 Name]:
+... (Repeat for all channels)
+Prompt: Baseline Reasoning Provider (Large LLM)
+You are a Master Forecaster. Your task is to generate a concrete, step-by-step reasoning plan for
+a downstream forecasting AI. You must analyze the historical data context to create a strategic
+guide for predicting the future.
+Guidelines
+1. Direct Strategy: Do not list assumptions. Go straight to the analysis.
+2. Cross-Channel Analysis: Explain how channels influence each other (e.g., ‘A rise in
+Channel A will likely drive a delayed rise in Channel B’).
+3. Qualitative & Flexible:
+• Do NOT provide exact equations (e.g., ‘add 0.2317’ is forbidden).
+• Describe behavior (e.g., ‘The trend should continue its recent upward path, but at a
+decelerating rate’).
+• CRITICAL: You MUST include flexible numeric ranges/directions to make the reasoning concrete (e.g., “expect an upward shift of roughly 10-15 units,” “volatility
+will likely double”).
+4. Event Prediction: Since no external search is provided, you must infer and predict likely
+cyclical, seasonal, or external events purely based on the historical patterns. Describe
+their expected directional impact.
+5. No Calculations: Do not generate a mock forecast table.
+— Full Historical Data Context —
+{context_str}
+IMPORTANT: Your entire response must start immediately with Final Reasoning:
+• Do NOT add any preamble.
+• Follow this exact format:
+Final Reasoning:
+[Channel 1 Name]:
+• Cross-Channel Analysis: [Your analysis of dependencies.]
+• Trend Component Plan: [Qualitative plan for the trend, including flexible numeric
+guidance.]
+• Seasonality Component Plan: [Qualitative plan for seasonality.]
+• Residuals & Predicted Event Plan: [Qualitative plan for residuals and inferred event
+impacts.]
+[Channel 2 Name]:
+... (Repeat for all channels)
+
+28
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Prompt: Reasoning Generation (Small-LLM)
+You are a Master Forecaster. Your task is to generate a concrete, step-by-step reasoning plan for
+a downstream forecasting AI. You must analyze the historical data context to create a strategic
+guide for predicting the future.
+Guidelines
+1. Direct Strategy: Do not list assumptions. Go straight to the analysis.
+2. Cross-Channel Analysis: Explain how channels influence each other.
+3. Qualitative & Flexible: You MUST include flexible numeric ranges/directions (e.g.,
+“expect an upward shift of roughly 10-15 units”). Do NOT provide exact equations.
+4. Event Prediction: Infer likely cyclical, seasonal, or external events based purely on
+historical patterns.
+5. Purely Analytical: Do NOT invent physical causes, real-world events, or dates (e.g., do
+not guess it is “cloud cover” or “equipment failure”). Your insight and planning must be
+derived strictly from the statistical properties of the numeric arrays provided.
+6. No Code or Calculations: Do not generate a mock forecast table. Do NOT write Python
+scripts or markdown code blocks.
+7. Strict Formatting: You must format your response exactly like this for every channel:
+[Channel X Name]:
+• Cross-Channel Analysis: [Your analysis]
+• Trend Component Plan: [Your qualitative plan]
+• Seasonality Component Plan: [Your qualitative plan]
+• Residuals & Predicted Event Plan: [Your qualitative plan]
+— Full Historical Data Context —
+{context_str}
+— Baseline Strategy —
+{baseline_reasoning}
+[Task]
+Refine the baseline strategy into the comprehensive reasoning plan based on the guidelines
+above. Encode the representations purely as plain text.
+Prompt: Baseline Reasoning Generation (Ahamed et al., 2026)
+Your task is to do time series forecasting WITH reasoning.
+Given the input Data with context:
+{context_str}
+Forecast the next {pred_len} steps for the {num_channels} channels.
+Strict Operational Protocols:
+1. Forecast a plausible continuation based on the signal structure.
+2. Scale Check: Read the ‘Data Scale Reference’ above. Your forecast must match this order of
+magnitude.
+3. You are permitted to use the provided features, and you must reason over them.
+4. Your output must be strictly limited to the final predicted values.
+5. You must output step-by-step thinking, which is your reasoning. Your reasoning must be
+about pre-analysis. That is it should capture why certain forecast should be made rather than
+post explanation of the forecast.
+
+29
+
+Reasoning-Aware Training for Time Series Forecasting
+
+6. Your reasoning is like a directive to an LLM, which will be used to improve the forecasting
+performance of a downstream LLM. Hence, it must be detailed and specific.
+7. Utilize your reasoning first, then derive the forecast.
+8. Provide the result ONLY as a JSON object containing the reasoning and numerical forecast
+array. Do not include any additional text.
+9. YOUR REASONING IS NOT ABOUT THE POST ANALYSIS RATHER IT IS A FUTURE DIRECTION FOR THE DOWNSTREAM LLM TO FOLLOW.
+Your entire response should consist of nothing but the JSON object.
+Required Output Specification:
+Your response must be a valid JSON object with exactly two keys:
+- “reasoning”: A detailed text string documenting your reasoning.
+- “forecast”: The 2D numerical array of shape ({pred_len}, {num_channels}) representing the
+final prediction.
+Prompt: Reasoning Evaluator (LLM-as-a-Judge)
+You are an expert Time Series Forecasting Evaluator participating in the TRFBench Human Eval
+process. Your goal is to audit a Candidate Model’s prediction by comparing its reasoning and
+numerical outputs against a Ground Truth analysis.
+1. Input Data
+Context: {context_str}
+Ground Truth (The Ideal Analysis):
+Reasoning: {ground_truth_reasoning}
+Actual Future Values: {gt_vals_str}
+Candidate Prediction (To Evaluate):
+Generated Reasoning: {candidate_reasoning}
+Predicted Values: {cand_vals_str}
+2. Task Annotation Instructions
+You must rate the Candidate Prediction on the following four metrics. Use the specific rubrics
+below to assign a score (1-5) for each.
+Metric 1: Domain Relevance (1-5) Does the reasoning incorporate domain-specific terminology
+and logic appropriate for the dataset context?
+• 1 (Irrelevant/Wrong): Wrong domain terminology. Logic makes no sense.
+• 2 (Generic): Vague language without domain terms.
+• 3 (Acceptable): Basic terms used correctly but lacks depth.
+• 4 (Good): Specific terminology and standard forecasting logic used correctly.
+• 5 (Expert): Deep domain expertise, precise jargon, matches Ground Truth logic.
+Metric 2: Forecasting Correctness (1-5) Does the reasoning correctly identify fundamental
+time-series dynamics (global trend, seasonality)?
+• 1 (Incorrect): Completely misses trend or seasonality.
+• 2 (Weak): Identifies trend but ignores obvious seasonality.
+• 3 (Average): Captures main trend/seasonality but misses magnitude/shape.
+• 4 (Strong): Correctly identifies trend, seasonality, and general shape.
+• 5 (Exact): Perfectly captures trend, seasonality, and inflection points.
+Metric 3: Event Relevance (1-5) Are external events factually grounded and causally relevant?
+
+30
+
+Reasoning-Aware Training for Time Series Forecasting
+
+• 1 (Hallucination): Mentions non-existent or false events.
+• 2 (Irrelevant): Real events but no logical connection.
+• 3 (Correlated): Identifies event but explanation is vague.
+• 4 (Causal): Clearly links event to specific data movement.
+• 5 (Aligned): Detailed, accurate causal explanation of impact.
+Metric 4: Logic-to-Number Consistency (1-5) Does the narrative explanation logically support
+the generated numerical forecast?
+• 1 (Contradiction): Text and numbers are opposites.
+• 2 (Disconnected): Text describes shapes not seen in numbers.
+• 3 (Weak Consistency): Direction matches but magnitude is off.
+• 4 (Consistent): Numbers generally follow the narrative.
+• 5 (Alignment): Numerical forecast is a precise translation of the reasoning.
+3. Output Format
+Provide your assessment as a single valid JSON object. Do not include any text before or after
+the JSON.
+{
+“metric_1_domain_relevance”: { “score”: <int 1-5>, “reasoning”: “...” },
+“metric_2_forecasting_correctness”: { “score”: <int 1-5>, “reasoning”: “...” },
+“metric_3_event_relevance”: { “score”: <int 1-5>, “reasoning”: “...” },
+“metric_4_logic_consistency”: { “score”: <int 1-5>, “reasoning”: “...” },
+“final_critique”: “<Summary of strengths/weaknesses>”
+}
+
+31
+
+Reasoning-Aware Training for Time Series Forecasting
+
+H. Forecasting Performance Evaluation on TFRBench
+Tables 4 and 5 present the numerical evaluation on TFRBench across in-domain and out-of-domain
+settings. Overall, our reasoning-aware framework establishes state-of-the-art accuracy, achieving
+the lowest average MASE of 0.615 (in-domain) and 0.724 (out-of-domain). By injecting semantic
+reasoning as a structural prior, our model systematically reduces error margins compared to unguided
+foundation models like Chronos-2.0 and TimesFM-2.5. It particularly excels on datasets like Traffic
+and NYC Taxi, while entirely bypassing the mathematical degradation inherent in zero-shot LLM
+forecasters. However, we observe a distinct boundary condition in highly stochastic, event-driven
+domains like the Amazon and Apple datasets, where our framework marginally underperforms. This
+localized degradation is a direct artifact of our closed-loop inference architecture. Because during
+inference, the student LLM generates its reasoning prior based strictly on historical numerical context,
+lacking access to real-time external covariates like macroeconomic news, it defaults to predicting
+conservative, low-volatility continuations. Consequently, projecting this over-smoothed reasoning
+prior into the TSFM inadvertently dampens the numerical encoder’s responsiveness to sudden market
+shocks. This reveals a necessity for dynamic external knowledge in financial forecasting.
+Table 4 | Numerical performance on TFRBench (In-Domain datasets). We report Mean Absolute
+Error (MAE) and Mean Absolute Scaled Error (MASE) in the format 𝑚𝑒𝑎𝑛𝑠𝑡𝑑 (lower is better). To
+avoid cross-dataset scaling issues, we only present the average for MASE. Bold indicates the best
+performance, and underline indicates the second best.
+Solar Daily
+
+Models
+
+Electricity
+
+Car Parts
+
+Hierarchical Sales
+
+Bitbrains Fast Storage
+
+Average
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MASE
+
+ARIMA
+TimesFM-2.5
+Chronos-2.0
+
+1.4440.000
+1.4750.000
+1.4090.000
+
+0.6990.000
+0.7350.000
+0.6850.000
+
+5.5640.000
+4.7580.000
+4.1620.000
+
+1.5360.000
+1.3800.000
+1.2710.000
+
+0.5690.000
+0.3280.000
+0.2940.000
+
+0.8730.000
+0.4480.000
+0.4130.000
+
+2.2390.000
+2.1420.000
+2.1270.000
+
+0.7890.000
+0.7530.000
+0.7500.000
+
+3.57 × 104 0.000
+2.62 × 104 0.000
+2.69 × 104 0.000
+
+0.7990.000
+3.4010.000
+0.7080.000
+
+0.9390.000
+1.3430.000
+0.7650.000
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Ours (+Chronos-2.0)
+
+2.1660.432
+2.5980.288
+2.4810.475
+1.7800.209
+1.6030.011
+0.8840.051
+
+1.0370.151
+1.2170.123
+1.1690.242
+0.8690.078
+0.7790.010
+0.4480.019
+
+6.2710.315
+7.6042.577
+8.7740.477
+6.3160.511
+3.9440.076
+2.9220.192
+
+1.7850.115
+2.2440.862
+2.6470.014
+1.7140.202
+1.1840.115
+0.8280.015
+
+0.4600.081
+0.4320.119
+0.4750.111
+0.4130.021
+0.4760.020
+0.2800.002
+
+0.6620.105
+0.6300.192
+0.7030.187
+0.5950.022
+0.6710.052
+0.4040.003
+
+2.6750.026
+2.7750.068
+3.4170.899
+2.7100.289
+2.3410.033
+2.0810.075
+
+0.9040.035
+0.9380.029
+1.1250.293
+0.8980.107
+0.8010.022
+0.7190.008
+
+4.62 × 104 636.396
+4.99 × 104 5.80×103
+1.11 × 105 8.44×104
+8.34 × 104 6.02×104
+4.16 × 104 353.553
+2.47 × 104 1.09×103
+
+1.1100.096
+1.2660.097
+3.0262.331
+3.2443.262
+0.8330.004
+0.6760.006
+
+1.1000.101
+1.2590.261
+1.7340.613
+1.4640.734
+0.8540.040
+0.6150.010
+
+Table 5 | Numerical performance on TFRBench (Out-of-Domain datasets). We report Mean Absolute
+Error (MAE) and Mean Absolute Scaled Error (MASE) in the format 𝑚𝑒𝑎𝑛𝑠𝑡𝑑 (lower is better). To
+avoid cross-dataset scaling issues, we only present the average for MASE. Bold indicates the best
+performance, and underline indicates the second best.
+Models
+
+Web Traffic
+
+Traffic
+
+Nyc Taxi
+
+Amazon
+
+Apple
+
+Average
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MAE
+
+MASE
+
+MASE
+
+ARIMA
+TimesFM-2.5
+Chronos-2.0
+
+15.4000.000
+12.0000.000
+11.9000.000
+
+0.7880.000
+0.6760.000
+0.6790.000
+
+0.0390.000
+0.0140.000
+0.0110.000
+
+2.6280.000
+0.8470.000
+0.6640.000
+
+8.65 × 103 0.000
+2.70 × 103 0.000
+1.96 × 103 0.000
+
+3.4290.000
+1.0510.000
+0.7900.000
+
+9.11 × 106 0.000
+6.56 × 106 0.000
+7.24 × 106 0.000
+
+0.9950.000
+0.7470.000
+0.8210.000
+
+2.28 × 107 0.000
+1.86 × 107 0.000
+1.95 × 107 0.000
+
+1.1000.000
+0.8790.000
+0.9360.000
+
+1.7880.000
+0.8400.000
+0.7780.000
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Ours (+Chronos-2.0)
+
+23.3000.000
+28.2001.000
+19.9000.400
+18.0000.800
+13.6000.000
+12.0760.175
+
+1.1200.000
+1.5380.046
+1.2110.040
+0.8650.003
+1.4720.000
+0.6640.001
+
+0.0270.000
+0.0300.001
+0.0240.004
+0.0240.000
+0.0150.000
+0.0110.000
+
+1.6470.000
+1.8850.025
+1.4500.168
+1.4580.001
+1.1020.000
+0.6340.002
+
+5.75 × 103 0.000
+7.10 × 103 110.000
+5.31 × 103 120.000
+4.63 × 103 40.000
+1.73 × 103 0.000
+1.39 × 103 74.878
+
+2.2890.000
+2.8150.033
+2.0850.055
+1.8370.015
+0.8890.000
+0.5550.027
+
+1.37 × 107 0.000
+1.49 × 107 3.00×105
+1.34 × 107 2.00×105
+7.97 × 106 1.20×105
+1.03 × 107 0.000
+6.56 × 106 1.98×104
+
+1.3330.001
+1.4640.015
+1.5110.050
+0.8700.011
+1.7760.000
+0.7910.003
+
+3.37 × 107 0.000
+3.57 × 107 6.00×105
+3.54 × 107 9.00×105
+2.16 × 107 2.00×105
+2.70 × 107 0.000
+1.99 × 107 3.62×105
+
+1.4820.000
+1.5890.036
+1.6510.031
+0.9890.011
+1.8020.000
+0.9730.020
+
+1.5740.000
+1.8580.031
+1.5820.069
+1.2040.008
+1.4080.000
+0.7240.011
+
+32
+
+Reasoning-Aware Training for Time Series Forecasting
+
+I. Reasoning Performance Evaluation on TFRBench
+Table 6 | LLM-as-a-Judge Results (In-Domain). We report the reasoning quality scores comparing
+against the baseline models. Scores are measured on a scale of 1 to 5, where higher values indicate
+better performance. The metrics cover four dimensions: Domain Relevance (Dom.), Forecasting
+Correctness (Fcst.), Event Relevance (Evt.), and Logic-to-Number Consistency (Logic).
+Dataset
+
+Metrics
+
+Models
+Dom.
+
+Fcst.
+
+Evt.
+
+Logic
+
+Solar Daily
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Gemma-3-4B-it
+Ours (+Chronos-2.0)
+
+2.472
+3.026
+4.503
+4.922
+3.736
+2.731
+4.896
+
+2.399
+2.316
+2.570
+3.062
+2.995
+2.642
+3.093
+
+1.933
+2.036
+2.503
+2.891
+2.109
+2.047
+2.062
+
+4.435
+4.528
+2.870
+3.363
+4.974
+1.119
+4.839
+
+Electricity
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Gemma-3-4B-it
+Ours (+Chronos-2.0)
+
+2.856
+2.331
+3.765
+3.810
+3.091
+2.612
+4.416
+
+2.229
+2.739
+1.955
+2.054
+3.006
+2.459
+3.671
+
+1.136
+1.725
+1.439
+2.093
+2.156
+2.008
+2.193
+
+4.643
+4.569
+2.977
+3.167
+4.972
+1.278
+4.881
+
+Car Parts
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Gemma-3-4B-it
+Ours (+Chronos-2.0)
+
+2.244
+3.123
+3.760
+4.120
+3.506
+2.380
+4.783
+
+2.383
+2.658
+2.605
+2.675
+2.341
+1.958
+3.503
+
+1.764
+1.863
+1.996
+2.022
+1.808
+1.874
+2.374
+
+4.845
+4.181
+3.053
+3.384
+4.949
+1.283
+4.993
+
+Hierarchical Sales
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Gemma-3-4B-it
+Ours (+Chronos-2.0)
+
+2.666
+2.619
+3.091
+3.757
+2.887
+2.309
+4.127
+
+2.151
+2.974
+1.974
+2.613
+2.916
+2.419
+2.991
+
+1.035
+1.622
+1.153
+2.046
+1.977
+1.869
+2.059
+
+4.753
+4.725
+3.318
+3.651
+4.636
+1.041
+4.950
+
+Bitbrains Fast Storage
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Gemma-3-4B-it
+Ours (+Chronos-2.0)
+
+3.174
+3.807
+3.942
+4.714
+3.555
+2.233
+4.897
+
+2.606
+2.565
+2.240
+2.780
+3.112
+2.028
+3.221
+
+2.699
+2.944
+3.122
+3.428
+2.926
+2.307
+2.959
+
+3.152
+3.845
+1.988
+2.507
+4.985
+1.322
+4.913
+
+33
+
+Reasoning-Aware Training for Time Series Forecasting
+
+Table 7 | LLM-as-a-Judge Results (Out-of-Domain). We report the reasoning quality scores comparing
+against the baseline models. Scores are measured on a scale of 1 to 5, where higher values indicate
+better performance. The metrics cover four dimensions: Domain Relevance (Dom.), Forecasting
+Correctness (Fcst.), Event Relevance (Evt.), and Logic-to-Number Consistency (Logic).
+Dataset
+
+Metrics
+
+Models
+Dom.
+
+Fcst.
+
+Evt.
+
+Logic
+
+Web Traffic
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Gemma-3-4B-it
+Ours (+Chronos-2.0)
+
+3.158
+3.585
+3.749
+3.928
+3.100
+2.196
+4.045
+
+2.904
+2.831
+2.104
+2.325
+3.180
+2.501
+3.016
+
+1.961
+2.039
+2.080
+2.120
+2.100
+1.911
+2.085
+
+4.403
+4.693
+3.100
+3.727
+4.990
+1.044
+4.969
+
+Traffic
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Gemma-3-4B-it
+Ours (+Chronos-2.0)
+
+2.708
+2.762
+3.535
+4.294
+3.690
+2.882
+4.726
+
+1.365
+1.946
+2.010
+2.254
+2.740
+2.307
+3.394
+
+1.437
+1.896
+1.468
+2.488
+2.350
+2.192
+2.619
+
+4.416
+4.584
+2.946
+3.586
+5.000
+1.670
+4.964
+
+Nyc Taxi
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Gemma-3-4B-it
+Ours (+Chronos-2.0)
+
+2.808
+2.814
+3.576
+4.532
+4.040
+2.762
+4.811
+
+1.248
+1.922
+2.078
+2.297
+3.380
+2.018
+3.465
+
+1.176
+1.703
+1.327
+2.363
+2.280
+2.005
+2.215
+
+4.327
+4.360
+2.868
+2.767
+4.910
+1.141
+4.870
+
+Amazon
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Gemma-3-4B-it
+Ours (+Chronos-2.0)
+
+2.082
+2.262
+2.686
+3.588
+2.730
+1.948
+4.494
+
+1.473
+1.488
+1.680
+2.012
+1.640
+1.290
+1.790
+
+1.625
+1.637
+1.677
+1.893
+1.670
+1.899
+1.906
+
+3.624
+3.213
+2.811
+3.970
+3.840
+1.146
+4.954
+
+Apple
+
+Gemini-2.5-Flash
+Gemini-2.5-Pro
+Claude-Sonnet-4
+Claude-Sonnet-4.5
+Gemini-3.1-Pro
+Gemma-3-4B-it
+Ours (+Chronos-2.0)
+
+2.069
+2.217
+2.525
+3.617
+2.670
+1.925
+4.542
+
+1.523
+1.557
+1.680
+2.075
+1.640
+1.354
+1.621
+
+1.613
+1.695
+1.601
+1.917
+1.640
+1.898
+1.947
+
+3.513
+3.380
+2.608
+3.786
+3.850
+1.194
+4.914
+
+34
+
+

@@ -1,0 +1,2727 @@
+PREPRINT
+
+1
+
+Graphs Meet AI Agents: Taxonomy, Progress, and
+Future Opportunities
+
+arXiv:2506.18019v3 [cs.AI] 4 Jul 2025
+
+Yuanchen Bei, Weizhi Zhang, Siwen Wang, Weizhi Chen, Sheng Zhou, Hao Chen, Yong Li, Jiajun Bu,
+Shirui Pan, Senior Member, IEEE, Yizhou Yu, Fellow, IEEE, Irwin King, Fellow, IEEE,
+Fakhri Karray, Fellow, IEEE, Philip S. Yu, Fellow, IEEE
+
+Abstract—AI agents have experienced a paradigm shift, from
+early dominance by reinforcement learning (RL) to the rise of
+agents powered by large language models (LLMs), and now
+further advancing towards a synergistic fusion of RL and
+LLM capabilities. This progression has endowed AI agents
+with increasingly strong abilities. Despite these advances, to
+accomplish complex real-world tasks, agents are required to plan
+and execute effectively, maintain reliable memory, and coordinate
+smoothly with other agents. Achieving these capabilities involves
+contending with ever-present intricate information, operations,
+and interactions. In light of this challenge, data structurization can
+play a promising role by transforming intricate and disorganized
+data into well-structured forms that agents can more effectively
+understand and process. In this context, graphs, with their natural
+advantage in organizing, managing, and harnessing intricate data
+relationships, present a powerful data paradigm for structurization
+to support the capabilities demanded by advanced AI agents.
+To this end, this survey presents a first systematic review of
+how graphs can empower AI agents. Specifically, we explore the
+integration of graph techniques with core agent functionalities,
+highlight notable applications, and identify prospective avenues
+for future research. By comprehensively surveying this burgeoning
+intersection, we hope to inspire the development of next-generation
+AI agents equipped to tackle increasingly sophisticated challenges
+with graphs. Related resources are collected and continuously
+updated for the community in the Github link.
+Index Terms—Graphs, Graph Learning, Agents, Large Language Models, Reinforcement Learning, Survey.
+
+I. I NTRODUCTION
+In the rapidly evolving landscape of artificial intelligence,
+AI agents have received remarkable attention due to their
+potential to automate task processing. These agents have
+undergone a transformative journey, progressing from early
+reinforcement learning (RL)-based agents [1], [2] to large
+language model (LLM)-powered agents [3], [4], and more
+recently to architectures that tightly couple LLMs as the
+Yuanchen Bei, Weizhi Chen, Sheng Zhou, and Jiajun Bu are with
+Zhejiang University, Hangzhou, China. E-mail: yuanchenbei@zju.edu.cn;
+chenweizhi@zju.edu.cn; zhousheng zju@zju.edu.cn; bjj@zju.edu.cn.
+Weizhi Zhang and Philip S. Yu are with University of Illinois Chicago,
+Chicago, USA. E-mail: wzhan42@uic.edu; psyu@uic.edu.
+Siwen Wang and Fakhri Karray are with Mohamed Bin Zayed University of
+Artificial Intelligence, Abu Dhabi, UAE. E-mail: wangsiwendut@gmail.com;
+Fakhri.Karray@mbzuai.ac.ae.
+Hao Chen is with City University of Macau, Macao SAR, China. E-mail:
+sundaychenhao@gmail.com. Yong Li is with Ant Group, Hangzhou, China. Email: liyong.liy@antgroup.com. Shirui Pan is with Griffith University, Brisbane,
+Australia. E-mail: s.pan@griffith.edu.au. Yizhou Yu is with The University
+of Hong Kong, Hong Kong SAR, China. E-mail: yizhouy@acm.org. Irwin
+King is with The Chinese University of Hong Kong, Hong Kong SAR, China.
+E-mail: king@cse.cuhk.edu.hk.
+
+foundational knowledge backbone with RL as task-specific
+learning paradigms [5]. This progression marks a substantial
+leap in agent capabilities, enabling them to understand complex
+tasks by leveraging the extensive foundational world knowledge
+inherent in LLMs and learning to accurately process tasks with
+RL optimization.
+AI agents performing complex real-world tasks are often
+required to possess diverse capabilities [6], [7]. Effective task
+navigation requires multiple agent functionalities, such as
+sophisticated planning, precise execution involving external
+tools, maintenance of reliable memory systems, and facilitating
+effective coordination with other agents [8], [9]. However, a
+central challenge is that, due to the complexity of the tasks,
+agents are often confronted with intricate and disorganized information, operators, and interactions in these functionalities.
+It is essential to find an effective way to organize and manage
+such encountered data in agent functionalities so that agents
+can better comprehend and efficiently process the information
+presented to them, ultimately enhancing their effectiveness in
+handling complex tasks. For example, agents need to parse
+unstructured task descriptions and reorganize them into an
+actionable schedule of subtasks during planning. The myriad
+of external tools available should be arranged to preserve both
+efficiency and accuracy for use during agent execution. In
+addition, the vast contents of the memory should be organized
+so that useful information is retained and readily retrievable
+for agents. Moreover, in a multi-agent setting, a coordination
+topology should be determined that enables agents to transmit
+meaningful messages to one another effectively. With unstructured data, traditional agents only implicitly recognize latent
+correlations among information, operators, or other agents
+during the learning process. Based on beneficial relationships
+inherent in the data, structurization with explicit graphbased modeling emerges as a promising way to address these
+challenges, transforming raw and complex inputs into concise
+and well-organized forms that are more amenable to agent
+comprehension and processing. Such organized information
+is helpful for AI agents to explore complex tasks and make
+well-informed decisions.
+Graphs have demonstrated extensive applicability in diverse
+domains [10]–[12] and have proved to be a powerful paradigm
+for managing data and organizing information with valuable
+relationships. Based on built graphs, graph learning then
+demonstrates success in using structured information [13], [14].
+Specifically, forming a graph by representing and modeling
+entities as nodes and their explicit or implicit interconnections
+
+PREPRINT
+
+2
+
+(2) AI Agent Methodology
+
+(1) Graph Methodology
+Graph
+
+Graph Learning
+
+Data Organization
+
+Knowledge Extraction
+
+Please help
+me […].
+User
+Task Input
+
+AI Agents
+Foundation Model
+
+Learning Paradigm
+
+LLMs…
+
+RL…
+
+…
+Processing
+
+Complete
+
+(4) Graphs for AI Agents
+Agent Execution
+
+Agent Planning
+Task Reasoning
+
+Task Decomposition
+
+Decision Searching
+
+Environment
+Interaction
+
+Tool Usage
+
+…
+
+…
+
+Synthesis
+
+Multi-Agent Coordination
+
+Agent Memory
+
+Graph Understanding
+Node Classification
+…
+
+…
+
+…
+
+(3) AI Agents for Graphs
+Graph Annotation and Synthesis
+Annotation
+
+Planning, Execution, Memory,
+Multi-Agent Coordination…
+
+Memory Organization
+
+Memory Retrieval
+
+Memory Maintenance
+
+Message Passing
+
+Topology Optimization
+
+Link Prediction
+
+(5) Applications
+
+(6) Challenges and Opportunities
+
+Scientific Computing
+
+Embodied AI
+
+Benchmarking Evaluation
+
+Graph Foundation Models
+for Agents
+
+Agentic Information
+Retrieval
+
+Industrial and
+Automation Systems
+
+Privacy and Security
+
+Multimodal Agents
+
+Game AI
+
+Human Society
+
+Model Context Protocol
+
+Open Agent Network
+
+Fig. 1: An overall illustration of graphs meet AI agents. (1) Graph Methodology: graph data organization and knowledge
+extraction with graphs. (2) AI Agent Methodology: LLM-based foundation models and RL-based learning paradigms, forming
+core AI Agent pipelines. (3) AI Agents for Graphs: the powerful capabilities of agents in graph modeling and learning, such as
+graph annotation, synthesis, and understanding. (4) Graphs for AI Agents: the role and potential of graphs and graph learning
+in empowering the core functionalities of agents, including agent planning, execution, memory, and multi-agent coordination.
+(5) Representative Applications. (6) Challenges and Future Opportunities.
+
+as edges provides an effective way for data organization. illustrated in Figure 1, our discussion is structured around
+A suitable graph is central to data organization for agents. core agentic functionalities empowered with graphs. We
+The flexibility of graph construction allows for customized primarily focus on the potential of graph learning to bolster
+structures based on specific environments, tasks, operators, agent planning, agent execution, agent memory, and multiand applications [15]–[17], or the usage of existing external agent coordination. Furthermore, this survey also explores
+knowledge graphs [18], [19]. This versatility enables graphs the reciprocal relationship, detailing how AI agents can, in
+to be widely integrated into various types of agents and their turn, empower and refine graph learning processes. Finally,
+diverse functions. Under the foundation of well-formed graphs, based on the reviews, we outline promising applications and
+graph learning techniques can further provide a powerful identify key future research opportunities within this dynamic
+framework with knowledge extraction on graphs for capturing interdisciplinary field. By reviewing comprehensive insights in
+elaborate relationships and meaningful information for agents. this evolving field, we aim to catalyze new advancements in
+This makes the graph technique an ideal methodology for AI agents capable of leveraging structured knowledge to tackle
+augmenting the capabilities of AI agents in complex scenarios. increasingly sophisticated challenges.
+Consequently, the novel intersection of graphs and AI agents
+Within the contexts in this article, existing surveys have
+holds a significant promise for enhancing agent capacity to
+primarily explored its utility in reinforcement learning [20],
+process and utilize structured information, thereby fostering
+[21]. More recently, amidst the significant advancements in
+more effective agent functionalities, such as planning, execution,
+LLMs, graph learning has also been recognized as an effective
+memory, and multi-agent coordination.
+technique to improve LLM capabilities. Several reviews have
+Taxonomy. This survey systematically investigates the role covered this area [22], [23]. However, despite these contribuof graphs in the organization of information, operators, tions, a systematic review specifically elucidating how graphs
+and multi-models for AI agents, covering the spectrum from can benefit various functionalities of an AI agent is notably
+RL-based to LLM-based agent paradigms. Recognizing the absent. To the best of our knowledge, this survey presents
+increasing fusion of RL techniques with LLM foundation the first systematic exploration dedicated to the intersection
+models, our analysis does not explicitly differentiate the role of graph techniques and the multifaceted operations of AI
+of graph learning between these agent architectures. Instead, as agents. Based on this comprehensive review, our aim is to
+
+PREPRINT
+
+3
+
+provide helpful insights that can inspire the development of consequences, and using scalar rewards or penalties to refine its
+next-generation AI agents. The main contributions in the paper behavior flexibly with or without human labels. The paradigm
+are listed as follows:
+focuses on sequential decision making, that is, optimizing a
+chain of actions for long-term return [28], [29].
+• In this paper, we provide the first comprehensive review
+Why RL is a suitable learning paradigm for AI
+of the powerful and promising intersection between graph
+agents? Firstly, reinforcement learning is inherently built on an
+techniques and AI agents1 .
+”interaction-feedback” loop, reflecting an agent’s continuous
+• We introduce a novel taxonomy that provides a structured
+perspective on the role graphs play across different ”perceive-act” cycle. In this way, it can learn from experiences
+agentic functionalities: planning, execution, memory, and without relying heavily on labeled datasets. Secondly, RL pairs
+coordination with other agents. We also discuss how naturally with fast simulators, allowing agents to accumulate
+vast experience through self-play or exploration before deployagents, in turn, can advance graph learning.
+ment. Furthermore, RL encodes task objectives directly through
+• Based on the survey, we further discuss meaningful
+applications, key challenges, and future opportunities of reward design, letting the agent focus solely on maximizing
+return. These enable RL agents to flexibly design customized
+graph-empowered AI agents.
+The following sections are organized as follows. We give learning strategies according to the characteristics of specific
+key preliminaries related to this survey in Section II. Then, tasks and environments.
+a detailed related work survey based on our taxonomy is
+introduced in Section III to Section VII. In addition, promising C. Large Language Models
+applications and future opportunities for the intersection of
+In recent years, based on extensive world knowledge during
+graph techniques and AI agents are discussed in Section VIII large-scale pretraining, large language models (LLMs) have
+and Section IX. Finally, the key summary of this paper is demonstrated great knowledge expression ability in natural
+presented in Section X.
+language understanding and generation tasks [30]. Although RL
+can flexibly shape agents for different scenarios through rewardII. P RELIMINARIES
+based learning, RL agents need to be trained individually for
+each specific task. LLM can serve as an agent’s foundation
+A. AI Agents
+An AI agent is an intelligent model capable of perceiving model for various tasks without costly re-training, supported
+its environment and making autonomous decisions to achieve by the pre-trained foundational knowledge.
+Why LLMs are suitable foundation models for AI agents?
+specific goals [24]. In traditional AI agents, a learnable model
+Firstly,
+the outstanding natural language understanding ability
+is mainly optimized by reinforcement learning. Through a
+of
+LLMs
+allows them to accurately interpret user instructions
+carefully designed reward function, it is guided to make suitable
+and
+needs,
+forming the basis for effective agent-user interaction.
+decisions for a specific task as it interacts with the environment
+Secondly,
+their
+powerful language generation enables them
+via a potential action set. Hence, we can also refer to this type
+to
+create
+action
+strategies, call external tools/functions, and
+of AI agent as an RL agent.
+manage
+historical
+memory tailored to different task scenarios
+In recent years, with the significant advancements in genwith
+textual
+descriptions
+and operations [9], [31]. Furthermore,
+erative AI centered on large language models, there has been
+LLMs
+can
+continuously
+learn and update their knowledge
+a growing focus on agents based on LLMs. We can refer to
+through
+retrieval-augmented
+generation or post-training [32],
+this newly emerging paradigm of agents as the LLM agent. In
+[33],
+adapting
+to
+diverse
+and
+changing
+tasks. This adaptability
+addition to the ability to perceive the environment, understand
+and
+capacity
+for
+evolution
+equip
+them
+to
+better serve users in
+tasks, and plan solutions for tasks, such as the previous RL
+various
+applications.
+agents, LLM agents also have memory mechanisms and tool
+usage abilities. They can store and manage memories and
+D. Graphs and Graph Learning
+invoke external tools/functions to perform tasks.
+Note that since reinforcement learning has already shown
+In the real world, explicit or implicit structural relationships
+its powerful ability to enhance the large language model [25]– are often available within the data. Graph techniques aim to
+[27], they are gradually merging into an inseparable whole. build an effective graph model to organize the data with nodes
+Therefore, in this survey, we will review the functionality of (representing entities) and edges (representing relationships),
+graph learning in AI agents from the early days of AI agents thereby modeling or learning complex structured knowledge
+onward, without explicitly distinguishing between these two with an organized graph. They are widely used in fields such as
+types of technical backbones.
+social network analysis, bioinformatics, and recommendation
+systems [141]–[143]. The graph learning process can generally
+be divided into two key parts: data organization and knowledge
+B. Reinforcement Learning
+Reinforcement Learning (RL) sits at the intersection of extraction. The two parts can also answer why graphs can
+machine learning, control theory, and cognitive science. Unlike play a powerful role in AI agents?
+Data Organization (Graph). A good graph structure is
+supervised learning, which relies mainly on labeled large
+crucial
+for extracting effective information. Organizing data
+datasets, RL lets an agent learn by acting, observing the
+into a suitable graph is the foundation and an important part
+1 Related resources are collected in the Github link.
+of information and operator structurization. Traditional AI
+
+PREPRINT
+
+4
+
+Knowledge Graph-Auxiliary
+Reasoning
+
+QA-GNN [18], ToG [34], KG-CoT [19], RoG [35], MindMap [36] , PoG [37]
+
+Structure-Organized
+Reasoning
+
+ToT [38], RATT [39], GoT [40], Graph of Thoughts [41], RwG [42]
+
+Task Reasoning
+
+Graphs for Agent
+Planning (Sec. III)
+
+Task Decomposition
+
+AgentKit [43], VillagerAgent [44], DynTaskMAS [45], Plan-over-Graph [46], DAG-Plan [47], LGC-MARL [48],
+FGRL [49], GNN4TaskPlan [50]
+
+Task Decision Searching
+
+MCTS [51], M-MCTS [52], MENS-DT-RL [53], PromptAgent [54], LATS [55], MCGS [56], GBOP [57], CMCGS [58]
+
+Tool Usage
+
+GRAPH-COT [59], GPTSwarm [16], ToolNet [17], Tool Fusion [60], ControlLLM [61]
+
+Graphs for Agent
+Execution (Sec. IV)
+
+Heuristic-Based
+Relationship
+
+Rollout [62], GRLOS [63], Graph-MARL [64], LGD-AB [65], MoMa-LLM [66],
+PlanAgent [67], SG-RwR [68], Xplore-Agent [69]
+
+Learning-Based
+Relationship
+
+MAGNet [70], TransfQMix [15], CAM [71], GAR-CoNav [72], STGNN [73]
+
+Graphs meet AI Agents
+
+Environment Interaction
+
+Graphs for Agent
+Memory (Sec. V)
+
+Memory Organization
+
+AriGraph [74], IKG [75], Graphusion [76], MemGraph [77], Mind Map [78], StructuralMemory [79], DAMCS [80],
+GraphRAG [81], KG-Retriever [82]
+
+Memory Retrieval
+
+G-Retriever [83], GFM-RAG [84], SubgraphRAG [85], LightRAG [86], GRAG [87], PathRAG [88]
+
+Memory Maintenance
+
+A-MEM [89], AriGraph [74], DAMCS [80], Zep [90], HippoRAG [91], LightRAG [86], KG-Agent [92], InstructRAG [93]
+
+Coordination Message
+Passing
+Graphs for Multi-Agent
+Coordination (Sec. VI)
+
+Agents for Graph
+Learning (Sec. VII)
+
+Task-Specific
+Relationship
+
+FLOW-GNN [94], LGC-MARL [48], DynTaskMAS [45], MAGNNET [95],
+RandStructure2Vec [96], MACNET [97]
+
+Environment-Specific
+Relationship
+
+GRL [98], MAGNNETO [99], ExpoComm [100], GraphComm [101], MAGI [102],
+HEAT [103], COMAT [104]
+
+Coordination Topology
+Optimization
+
+DICG [105], DiscoGraph [106], CoPU [107], DMCG [108], G2ANet [109], MAGIC [110], MAGE-X [111],
+CommFormer [112], AgentPrune [113], AGP [114], G-Designer [115], GNN-VAE [116], DyLAN [117],
+HGRL [118], GPTSwarm [16]
+
+Graph Annotation and
+Synthesis
+
+GPA [119], BIGENE [120], LLM4GraphGen [121], GAG [122], IGDA [123], Plan-over-Graph [46], GraphMaster [124]
+
+Graph Understanding
+
+Policy-GNN [125], SUGAR [126], MAG-GNN [127], AgentNet [128], GAgN [129], GL-Agent [130],
+GraphGPT [131], GA [132], OFA [133], ZeroG [134], LLaGA [135], GraphInstruct [136], GraphWiz [137],
+GraphAgent-Reasoner [138], GraphAgent [139], GraphTeam [140]
+
+Fig. 2: A taxonomy overview of this survey with representative methods on graph-empowered functionalities of AI agents and
+agent-facilitated graph learning.
+
+agents mainly deal with unstructured data and need extensive
+environmental trials to gain task-relevant knowledge from
+complex task data. However, much of the information and
+operators that an agent encounters can be better organized via
+graphs. For instance, task planning can be facilitated using
+sub-task dependency graphs, memory can be organized through
+graphs, and communication patterns among multiple agents
+can also be represented as graph topologies.
+Knowledge Extraction (Graph Learning). Once wellorganized graphs are obtained, graph models, such as graph
+neural networks (GNNs), can extract task-required knowledge
+by leveraging and aggregating the information at each node and
+its neighborhood in the graph. Compared to learning directly
+from unstructured data, defined nodes can share information
+with their neighbors when learning from structured knowledge,
+enabling them to make decisions not solely based on their
+local information. In this way, it can more flexibly support an
+agent’s complex operators, such as task dependency modeling,
+efficient decision search, effective memory management and
+retrieval, and multi-agent communication optimization.
+E. Taxonomy Overview
+In this paper, we present a novel taxonomy on how graph
+techniques and AI agents can enhance each other, as shown
+in Figure 2. Specifically, in Sections III-VI, we introduce
+how graph learning can support core functionalities of agents,
+
+including planning (Section III), execution (Section IV), memory (Section V), and multi-agent coordination (Section VI).
+In this way, dividing the synergy points of graphs for agent
+functionalities not only matches the natural modularization in
+agent system design but also highlights the unique opportunities
+for graph-centric techniques in each functionality. In addition,
+in Section VII, we also discuss how the agent paradigm can,
+in return, be used to strengthen the graph learning process.
+By explicitly considering the reverse direction, how agentbased paradigms can benefit graph learning, we emphasize
+bidirectional innovation and encourage a holistic view where
+graphs and agents co-evolve and deeply integrate, inspiring
+new methodologies that go beyond unidirectional adoption.
+Based on this well-organized taxonomy, we can then discuss
+applications and future opportunities in Sections VIII and IX.
+III. G RAPHS FOR AGENT P LANNING
+Planning is one of the foundational and crucial capabilities
+for an AI Agent. To achieve a specific goal or task, planning
+refers to the process in which an AI agent understands the
+task and devises a series of rational and ordered action plans
+after taking into account various available factors [8]. For
+instance, in a game-playing scenario, the AI Agent needs to
+plan how to select appropriate equipment and determine the
+optimal route, etc., to complete the mission of passing through
+the challenges. As illustrated in Figure 3, graphs can play a
+
+PREPRINT
+
+5
+
+Analyze Google’s development trends in
+LLMs by reviewing the related top
+conference papers it published and
+their main research directions over the
+past three years.
+
+Develop a web-based online note-taking
+application that allows users to register
+and log in, create, edit, delete, and view
+their notes, and support multi-device
+synchronization.
+
+Please design a path for the agent
+that minimizes obstacles and total
+travel distance, ensuring optimal
+completion of the task.
+
+Agent
+
+Agent
+Decomposing into
+Subtasks
+
+Output
+External
+Knowledge Graph
+
+Agent
+
+Requirements Analysis
+
+There are 10 balls in a box: red, blue,
+and yellow. There are 2 more red balls
+than blue balls, and one fewer yellow
+ball than red balls. How many balls of
+each color are there?
+
+Input
+
+Input
+
+Thoughts
+
+System Design
+Database Design
+
+Action Planning
+Selection
+
+Frontend Initialization
+Backend Initialization
+User Authentication
+
+Frontend Notes
+Management UI
+
+API Design
+
+Expansion
+
+Backpropagation
+
+Notes Function
+Development
+
+Agent
+
+……
+Output
+
+Task Reasoning
+
+Thought Graph
+
+Task Dependency
+Graph
+
+Deployment & Testing
+
+Task Decomposition
+
+Simulation
+
+State Space Graph
+
+Task Decision Searching
+
+Fig. 3: An illustration of graphs for agent planning.
+
+role in various aspects of agent planning, mainly including
+effectively organizing the task reasoning form, arranging the
+task decomposition procedure, and constructing an efficient
+task decision searching process.
+A. Task Reasoning
+From Chain-of-Thought (CoT) [144] to Deepseek-R1 [27],
+many studies have improved prompts and thinking to boost the
+task reasoning of LLM-based agents. These approaches use
+the agents’ intermediate thinking for deep task reasoning. To
+better enhance this thinking and help agents extract key task
+knowledge effectively with graphs, many works have explored
+the knowledge graph auxiliary and graph-based organization
+for the task reasoning process.
+1) Knowledge Graph-Auxiliary Reasoning: Knowledge
+graph-assisted reasoning primarily enhances the agent’s reasoning for tasks by leveraging additional information on an
+auxiliary knowledge graph. Formally, a knowledge graph (KG)
+is a structured representation of knowledge. The nodes in a
+KG denote entities or concepts that the model can recognize
+or generate, while the edges signify the relationships between
+these entities or concepts [145]. The agent can extract multi-hop
+subgraph information from the auxiliary knowledge graph (KG)
+based on the entities and the relationships between entities
+involved in the task. This enables the agent to gain a deeper
+understanding of the entities and develop a more comprehensive
+grasp of the target task.
+In the early period, a representative work QA-GNN [18]
+improves question-answering systems by combining language
+models and auxiliary KGs by using a relevance scoring
+mechanism to evaluate the importance of the KG node for the
+target tasks. Through GNNs that enable mutual representation
+
+updates, the model can handle complex structured reasoning
+tasks. Subsequently, recent work has begun to utilize insights
+related to QA-GNN, given the significant success of using
+prompts to activate the capabilities of LLMs. For example,
+ToG [34] and KG-CoT [19] have begun to enhance the task
+reasoning process of the LLM agent with KG-based retrievalaugmented generation (RAG). These studies focus on extracting
+key entities from prompts and employing graph retrieval
+techniques to identify related multi-hop subgraphs or paths
+of corresponding entities within auxiliary KGs. This process
+uncovers higher-order relationships and knowledge of the target
+task. Subsequently, various methods have begun to explore
+enhancement mechanisms for the deeper integration between
+auxiliary KGs and LLM agents. For example, RoG [35]
+introduces a novel planning-retrieval-reasoning framework,
+focusing on generating relation paths from KGs as plans to
+optimize the reasoning process of LLM agents. MindMap [36]
+builds a mind map that more deeply connects external KG
+knowledge with the LLM’s implicit knowledge for reasoning.
+In addition, PoG [37] includes dynamic multistage path
+exploration and efficient path pruning to extract multi-hop
+reasoning paths and information from KGs.
+2) Structure-Organized Reasoning: Compared with directly
+generating responses, the intermediate thinking and reasoning
+processes of LLM agents can generate a wealth of additional
+helpful information. Structure-enhanced reasoning can help
+LLM agents understand key task-related knowledge more
+efficiently by structuring these processes with trees or more
+complex graph forms [146].
+Initially, works explored using the tree structure, a special
+type of graph, to structurally enhance the CoT reasoning
+process. Representatively, ToT [38] constructs a tree-structured
+representation of coherent thoughts, enabling agents to explore
+
+PREPRINT
+
+6
+
+multiple reasoning paths simultaneously and make global plan. Furthermore, DAG-Plan [47] and LGC-MARL [48]
+decision-making through self-evaluation of the current state. conduct reinforcement learning by designing specific reward
+RATT [39] further adjusts and optimizes the structure of the functions on the TDG to complete the path planning. Moreover,
+thought tree by planning and looking ahead at each point in FGRL [49] and GNN4TaskPlan [50] optimize a suitable subthe thought branch to explore and evaluate multiple potential task execution path in the task graph using GNNs, with the
+reasoning steps, combining the fact-checking ability of retrieval- information aggregation between subtask nodes.
+augmented generation (RAG). To consider more complex
+relationships in the reasoning process, GoT [40] and Graph of C. Task Decision Searching
+Thoughts [41] represent information units of the LLM agent’s
+Task decision searching is an important process in the
+thought as nodes and dependencies between them as edges to planning stage of AI agents, involving the making of sequenadvance the agent’s reasoning capabilities, which provides more tial decisions in complex environments to achieve specific
+complex relationships than a pure tree structure. Furthermore, goals [148]. Search algorithms involve state transitions within
+compared to GoT and Graph-of-Thought, which improve the decision space, which naturally form a graph structure with
+reasoning by organizing LLM-generated intermediate results transitions between states. These states and their transitions
+into graph structures, RwG [42] extracts information from the form a state space graph (SSG). Formally, each node in the
+context to build graphs. Then it continuously improves and SSG represents a state, with the node’s properties being the
+optimizes these graphs through multiple rounds of verification, state’s information, such as its textual description or parameters.
+better aligning them with specific tasks.
+The transitions between states serve as the edges between nodes.
+Note that the edge relationships in the SSG are typically
+optimized by the search algorithm itself, rather than being
+B. Task Decomposition
+predefined. It involves an agent’s process of exploring different
+In AI agents, task planning requires decomposing user states and actions to dynamically generate and update the
+requests (in natural language for LLM agents) into specific SSG within an environment, based on the current state and
+sub-tasks. A complex task usually consists of several subtasks environment, to identify a sequence of actions that maximizes
+that are easier to handle [8], [147]. Proper task decomposition long-term rewards.
+is important because reasonable sub-task decomposition can
+Typically, Monte Carlo Tree Search (MCTS) is a heuristic
+improve the accuracy and efficiency of the agent in performing search algorithm for decision-making [51]. It represents the
+tasks. These sub-tasks often have dependencies, such as one state space of the complex problem in a hierarchical tree
+task’s output serving as another’s input. These sub-tasks and structure. Each node represents a state and each edge represents
+their dependencies form a task dependency graph (TDG). an action. This tree structure enables the algorithm to explore
+TDG is the primary organized graph structure used in the task and manage possible states and actions in an orderly manner,
+decomposition process. Formally, the nodes of a TDG are which enhances the search efficiency and avoids blind searching
+usually the several sub-tasks decomposed from a task. The in the vast state space. Many approaches have used MCTS to
+features of the nodes can be described in natural language improve the task-handling capability of agents. For example,
+or key feature vectors of subtask nodes. The edges between PromptAgent [54] uses MCTS for automatic prompt optimizasub-task nodes are strictly established based on dependencies tion. LATS [55] provides a foundation for the unified planning
+such as task execution order. To ensure that no dead loops and understanding of LLM agents using MCTS. Some recent
+occur during task execution, a TDG is typically a directed works have also explored the enhancement of agents’ search
+acyclic graph (DAG).
+abilities in tree-structured SSGs. For instance, M-MCTS [52]
+There are two main ways to construct TDG. One is for enhances the MCTS SSGs by incorporating a memory mechatasks with implicit subtask dependencies, leveraging LLMs’ nism to boost online search performance for models. MENS-DTreasoning like CoT to split subtasks and mine dependencies, RL [53] uses evolutionary algorithms to search tree structures,
+such as DAG-Plan [47], LGC-MARL [48], and VillagerA- thus improving the interpretability of decision trees. Some
+gent [44]. Note that the previous structure-organized reasoning methods have found that tree-structured SSGs still suffer from
+methods can also be directly applied here for implicit subtask computational inefficiency and information sharing issues. They
+dependency modeling by prompting LLMs to perform task cannot share evaluation info across branches, causing a waste
+decomposition during reasoning. The other is to directly build of computation and memory. To solve this, these methods
+a graph using prior explicit subtask relationships and rules, expand the search structure from a tree to a directed acyclic
+such as DynTaskMAS [45] and Plan-over-Graph [46].
+graph, such as MCGS [56] and GBOP [57], enabling the
+Based on the determined TDG, the aim of agent planning sharing of information between branches and merging of nodes
+is to identify connected, acyclic paths or subgraphs in the with the same state representation for a more efficient search.
+TDG and sequentially invoke appropriate subtasks to complete Furthermore, CMCGS [58] enhances the SSG to extend MCGS
+the task. Existing methods adopt mainly three main types from a search in discrete state spaces to an efficient search in
+of techniques, including LLMs, RL, and GNNs, to plan continuous spaces.
+optimal execution paths or subgraphs in TDG. Representatively,
+IV. G RAPHS FOR AGENT E XECUTION
+based on the reasoning ability of LLMs, AgentKit [43],
+VillagerAgent [44], and Plan-over-Graph [46] describes the
+After the planning of an agent, the execution phase is where
+TDG textually for the LLM agent to generate the execution the formulated plan is put into action. At this stage, two main
+
+PREPRINT
+
+modules can play an important role. (1) Tool usage: the agent
+needs to call upon appropriate external tools in combination
+with its own knowledge in order to complete the specified
+actions. (2) Environment interaction: the agent should interact
+with the neighboring environment to perceive the information
+it faces and conduct actions based on current circumstances.
+Graphs can help arrange the scheduling of these numerous
+tools and model the rich relationships between agents and the
+environments in which they reside. The examples for these
+processes are provided in Figure 4.
+A. Tool Usage
+Agent tool usage refers to the process in which an agent
+invokes predefined tools, which can be APIs, software libraries,
+or various function calls, to perform specific actions. For
+example, GRAPH-COT [59] strengthens the graph reasoning
+abilities of LLM agents by interactive tool calls with external
+graph-related knowledge during the reasoning process. With
+the recent development of the Model Context Protocol (MCP),
+which is an open, unified, structured, and secure standard
+introduced by Anthropic2 in 2024, the complex structured
+invocation of external data by agents has begun to attract
+widespread attention. When an agent has a multitude of
+tools, there are often intricate dependencies and invocation
+relationships among them.
+In addition to helping agents reason graph-like data, graph
+organization and learning can also be used to construct a
+tool graph to clearly display the interconnections between
+these tools, enabling the agent to efficiently use and manage a
+vast number of tools. To achieve this target, GPTSwarm [16]
+presents a flexible pipeline for graph-based tool usage, where
+an agent is abstracted as a DAG. In this framework, each
+node stands for a certain function, and the edges show the
+information flow between the nodes. ToolNet [17] and Tool
+Fusion [60] leverage the sparsity of tool usage patterns to
+organize tools into a directed graph, which means that when
+a particular tool is invoked, the subsequent tool to be called
+is usually restricted to a very limited set of options. This
+enables agents to handle a large number of tools without
+a significant increase in token consumption. In addition,
+ControlLLM [61] constructs a tool graph containing resource
+nodes and tool nodes and employs parallel graph search
+algorithms to find suitable tool paths efficiently, avoiding the
+hallucination problem in tool usage.
+
+7
+
+Please perform a “technical health
+check” on the main branch of a
+GitHub repository:
+run a static vulnerability scan,
+measure code complexity, and
+generate a comprehensive PDF
+report with remediation priorities.
+
+Task
+
+RepoFetcher
+fetch_repo(repo_url: str,
+branch: str = "main") → RepoDir
+VulnScanner
+scan_vuln(repo:
+RepoDir) → List[Vuln]
+
+Calling Tools
+
+Tool Graph
+
+ComplexityMeter
+measure_complexity(repo:
+RepoDir) → Dict[str, Score]
+
+ReportGenerator
+build_report(vulns: List[Vuln],
+complexity: Dict[str, Score])
+→ PDF
+
+Tool Usage
+Environment Perception
+
+Waiting
+
+…
+
+Agent
+
+Make Way
+
+Keep Safe Distance
+
+Avoid Obstacles
+
+Environment-Interaction
+Graph
+
+Environment Interaction
+
+Fig. 4: An illustration of graphs for agent execution.
+
+modeling these relationships can be divided into two categories:
+heuristic-based methods, which rely on predefined rules or
+prior knowledge, and learning-based methods, which learn
+relationships through data-driven optimization.
+1) Heuristic-Based Relationship: Heuristic-based relationships are manually defined based on prior knowledge of the
+environment and are widely adopted in agent systems.
+RL-based agents need to interact with the environment
+extensively to optimize policies through specially-designed
+RL algorithms. Modeling the relationships among agents and
+environmental entities is therefore crucial for the effectiveness
+of these algorithms. Examples include self-driving agents like
+Rollout [62] in urban environments, embodied agents such
+as GRLOS [63] in warehouse-scheduling settings, routing
+agents like Graph-MARL [64] in communication network
+environments, and auto-bidding agents such as LGD-AB [65] in
+online advertising scenarios. Once these graphs are designed for
+specific environments, the corresponding relational structures
+can serve as structural priors to assist RL-based agents in
+interacting with the environment and achieving higher rewards.
+More recently, the advent of LLMs with strong reasoning
+and planning capabilities has led to growing interest in
+their integration into agent systems. However, LLM-based
+agents often struggle to ground their abilities in situated
+environments due to the lack of environmental representations
+that LLMs can effectively process [150]. Scene graphs [149]
+provide structured representations of the environment that
+complement the reasoning abilities of LLMs, thus enhancB. Environment Interaction
+ing the environmental understanding and interaction abilities
+As the environment serves as the foundation for an agent to
+of LLM-based agents. This synergy has been explored in
+perform tasks and optimize its behavior, the ability to perceive
+various settings, including embodied agents such as MoMaand interact with it is a key capability of the agent. Graphs serve
+LLM [66] in indoor environments, self-driving agents such as
+as a general-purpose data structure for modeling relationships
+PlanAgent [67] in outdoor environments, and LLM agents like
+among agents and environmental entities, such as connectivity,
+SG-RwR [68] in simulation environments. Similarly, Xplorespatial proximity, and interaction dependencies. A scene graph,
+Agent [69] constructs a GUI Transition Graph to model the
+a specialized type of graph, represents visual scenes by encodrelationships between GUI screens, guiding LLMs through
+ing objects as nodes and their spatial or semantic relationships
+multiple downstream tasks.
+(e.g., ”on top of,” ”holding”) as edges [149]. Approaches to
+2) Learning-Based Relationship: Since heuristic-based re2 https://github.com/modelcontextprotocol
+lationships rely heavily on manually designed ones and often
+
+PREPRINT
+
+8
+
+Energy conservation underlies classical
+mechanics: in an isolated system, total energy
+merely toggles between potential, kinetic, and
+other forms; a swinging pendulum illustrates this.
+Atomic experiments shattered fixed-orbit
+models, giving rise to quantum mechanics. Waveparticle duality preserves energy bookkeeping
+probabilistically, explaining atomic spectra and
+enabling semiconductor technology.
+Extreme energy or gravity stresses quantum
+rules once more, demanding relativity and
+yielding quantum field theory. Electroweak and
+strong forces now fit this scheme, while string
+and loop quantum gravity aim to complete energyconserving unification for all four interactions.
+
+Extreme energy or
+gravity stresses
+quantum rules
+once more, ….
+
+Atomic experiments
+shattered fixed-orbit
+models, giving rise to
+quantum mechanics. …
+
+Extreme energy or
+gravity stresses
+quantum rules
+once more, ….
+
+New Query
+
+……
+
+Historical Memory
+
+Memory Graph
+
+Memory Organization
+
+Energy conservation
+underlies classical
+mechanics: in an
+isolated system, …
+
+Energy conservation
+underlies classical
+mechanics: in an
+isolated system, …
+
+Energy conservation
+underlies classical
+mechanics: in an
+isolated system, …
+
+Atomic experiments
+shattered fixed-orbit
+models, giving rise to
+quantum mechanics. …
+
+How does wave-particle
+duality preserve energy
+conservation within a
+probabilistic framework?
+
+Memory Retrieval
+
+Extreme energy or
+gravity stresses
+quantum rules
+once more, ….
+
+Atomic experiments
+shattered fixed-orbit
+models, giving rise to
+quantum mechanics. …
+
+Testing four-force
+unification hinges on
+detecting quantumgravity signatures. …
+
+New Memory Node
+
+Memory Maintenance
+
+Fig. 5: An illustration of graphs for agent memory.
+
+struggle to generalize across environments, some works have inspired by modern cognitive models of memory that emphasize
+started to suggest learning-based relationships.
+relational and contextual reasoning capabilities in humans [156],
+These methods involve initializing relationships and then [157]. Recent LLM-based agents have explored a spectrum
+learning the relationships with learnable parameters or specific of memory representations, from unstructured text chunks to
+models, which is more flexible in different environments. After structured knowledge graphs. In particular, knowledge graphs
+determining the node content and initial node relationships, (composed of semantic triples) and other structured forms
+these methods dynamically learn the relationship weights (e.g., atomic facts and summarized notes) are increasingly
+or embeddings between nodes using learnable parameters used to organize an agent’s long-term memory. For example,
+or attention-based models like Transformer [151] or Graph the AriGraph [74] system represents an agent’s memory as
+Attention Networks (GAT) [152]. This helps capture the a structured knowledge graph of triples that encodes both
+relationship between the agent and environment nodes. For semantic facts and episodic events from the agent’s experience.
+example, MAGNet [70] and TransfQMix [15] initialize graphs Such graph-based memory organization enables the agent to
+based on entities in the environment that the agents depend on recall not just isolated data points but the structured connections
+or observe, then use self-attention mechanisms to dynamically between them (e.g. cause–effect relations, temporal or relational
+adjust edge weights and determine neighborhood importance. links), which is essential for different scenarios like IKG [75]
+CAM [71] first constructs edge features based on the obstacle- for industrial multimodal data, Graphusion [76] for education,
+rich environment and then uses a multi-layer perceptron to MemGraph [77] for patent analysis, and Mind Map [78] for web
+further learn the constructed edges. GAR-CoNav [72] identifies search. Moreover, StructuralMemory [79] evaluates four types
+node entities in the global environment and uses GAT to learn of memory structures: chunks, knowledge triples, atomic facts,
+the association strength between nodes. STGNN [73] models and summaries, in multiple scenarios. The study found that
+the environment as a grid-based graph and incorporates learn- different memory structures offer distinct advantages tailored
+able weights into Graph Convolutional Networks (GCN) [153] to specific tasks.
+to capture spatial and temporal dependencies within the data.
+Integrating richer information, some works begin to introduce
+hierarchical
+or hybrid graphs with multilevel or multigranV. G RAPHS FOR AGENT M EMORY
+ularity information to improve organization. For instance, a
+Memory is a crucial capability that allows agents to store decentralized multi-agent framework, DAMCS [80], uses a
+and recall past experiences or related knowledge [154], [155]. hierarchical knowledge graph as memory, where multi-modal
+It allows agents to accumulate experience, thus facilitating experiences are organized at different levels of abstraction.
+more informed and appropriate actions. When applied to agent This hierarchy allows agents to record low-level details and
+memory, a graph-based memory organization can effectively high-level summaries and to share only the relevant portions
+uncover latent associations among the various information with teammates, enhancing cooperative behavior. Similarly,
+encountered by the agent. Based on a graph-based memory GraphRAG [81] constructs a hybrid knowledge graph that
+organization, equipped with effective memory retrieval and encodes both entity- and community-level nodes. This layered
+maintenance, the agent’s ability is enhanced to recognize design enables the retrieval of tightly connected local facts
+patterns and connections that might not be immediately while preserving broader semantic clusters, facilitating contextapparent, thereby enriching its knowledge base and improving aware responses to questions requiring both fine-grained and
+its execution in dynamic environments over an extended period. holistic understanding. KG-Retriever [82] further advances this
+A toy example of graph-empowered memory is demonstrated direction by indexing knowledge into a hierarchical graph
+in Figure 5.
+composed of entity-level and document-level nodes. This
+structure facilitates follow-up retrieval at different semantic
+A. Memory Organization
+resolutions, enabling the agent to reason over specific entities
+Agents equipped with graph-structured memory can store or to aggregate information from entire documents depending
+knowledge and experiences as interconnected representations, on the complexity of the query.
+
+PREPRINT
+
+9
+
+for the agent’s journey tracking. Higher-level long-term goal
+Based on the structured memory, it is critical for LLM agents nodes are generated to provide an overview of the long-term
+to accurately and efficiently retrieve useful information from progress. Zep [90] is supported by Graphiti, a temporal-aware
+it as reliable guidance. Although traditional similarity-based hierarchical knowledge graph engine. It dynamically integrates
+retrievers can be directly applied to graph-based memory [158], unstructured conversational data, maintaining historical relato fully leverage the characteristics of graph information, recent tionships. Memory management is achieved via a multi-layer
+works, mainly including graph-based retrieval-augmented gener- knowledge graph with plot, semantic entity, and community
+ation (graph-based RAG), have paid attention to the retrievers subgraphs. For graph updating strategies, some works like
+specifically designed for graph-based knowledge bases and HippoRAG [91] and LightRAG [86] include dynamically incremental graph updating. KG-Agent [92] introduces LLMs for
+memories [159], [160].
+Among the process of the retrieval, some works focus updating the knowledge graph. Furthermore, InstructRAG [93]
+on the accuracy aspect of retrieved knowledge subgraphs, adopts an RL agent with designed actions to maintain and
+which are the key factors that directly influence the decision update graphs.
+made by agents. Representatively, G-Retriever [83] and GFMVI. G RAPHS FOR M ULTI -AGENT C OORDINATION
+RAG [84] integrate the semantic similarity and the graph
+metrics for customized retriever design to rank and search
+A multi-agent system (MAS) is a complex system that intethe informative subgraphs, while SubgraphRAG [85] provides grates multiple AI agents for mutual integration, collaboration,
+a lightweight perceptron with the triple-scoring mechanism and competition. Its goal is to accomplish complex tasks that are
+for flexible subgraph retrieval based on the query relevance. difficult for a single agent to complete through the interaction
+Furthermore, LightRAG [86] proposes a dual retriever system, between various agents [162], [163]. In these systems, each
+including a local retriever for entity-level questions and a global agent has its own specialized advantages, such as domainretriever for complex queries requiring subgraph reasoning.
+specific knowledge, reasoning ability, and the overall effect
+In addition to the accuracy, as the retrieval of memories of coordination depends on the information exchange and
+demands extra processing time that affects the efficiency of decision consensus between the agents. The core focus of
+agents, some studies also conduct the efficiency-oriented coordinating multiple agents is relational modeling. Graph
+optimization for the retrieval with balancing effectiveness. For organization and learning can take advantage of its inherent
+example, GRAG [87] proposes a novel divide-and-conquer ability to process relational data to excel in such modeling. To
+strategy to retrieve the optimal subgraph in linear time, along make the review consistent, we define the graph organization
+with two complementary views to help LLMs understand the of multi-agent coordination as the agent coordination graph
+graph context. In addition, PathRAG [88] removes semantically (ACG). Formally, in the ACG, the core nodes are agents. Node
+overlapping paths with flow-based pruning, reducing the features represent the information of each agent. Edges are
+retrieval latency while maintaining the recall score.
+communication paths between agent nodes that are formed
+to pass messages between agents. For an MAS, graphs have
+mainly two roles. First, based on the predefined ACG (taskC. Memory Maintenance
+specific and environment-specific relationships), learn what
+Compared with graph-based RAG, beyond organizing and
+information agents should communicate to maximize the
+retrieving structured knowledge, a pivotal and challenging
+MAS’s performance. Second, optimize the ACG topology to
+aspect of graph-based agent memory is its dynamic evolution,
+improve communication effectiveness among multiple agents.
+the capacity to continuously update and refine memory repreThe process is demonstrated in Figure 6.
+sentations and graph topologies in response to new experiences
+and interactions.
+Therefore, dynamic graph-based memory architectures have A. Coordination Message Passing
+emerged in some studies as effective solutions for maintaining
+Heuristic relationships embedded in the tasks agents perform
+and evolving long-term memory in LLM agents [161]. For and in the environments with which they interact can be
+example, A-MEM [89] creates interconnected knowledge leveraged to construct the interaction topology of a multinetworks through dynamic indexing and linking, allowing agent system. Building on this prior relational knowledge,
+continuous refinement of contextual representations as new recent work has begun to explore how to transmit and optimize
+memory is integrated. AriGraph [74] consists of episodic and messages among agents more effectively.
+semantic memories. Episodic memory records observations
+1) Task-Specific Relationship: The task-specific relationship
+received by the agent at specific steps and their temporal consists mainly of two aspects: explicit task dependencies and
+relationships. The agent continuously detects and removes task allocation to agents through implicit relationships.
+outdated knowledge, expands semantic memory, and updates
+Task Dependency-Based Relationship. In this type of
+episodic memory to maintain the dynamic graph.
+relationship, the TDG for subtask dependency modeling is
+To better capture and store the long-term relationship of ele- used as the ACG. Within the agentic task execution workflow,
+ments, some works have further constructed memories through multiple agents, respectively, take charge of a subtask. These
+hierarchical dynamic graphs. Representatively, DAMCS [80] agents will conduct message passing for efficient task execution
+proposes a goal-oriented hierarchical knowledge graph for long- based on the TDG’s dependency relationship. For instance,
+term memory, with lower-level experience nodes and goal nodes based on the TDG, FLOW-GNN [94] and LGC-MARL [48]
+B. Memory Retrieval
+
+PREPRINT
+
+10
+
+Env.
+Relation 1
+
+Subtask 2
+Subtask 4
+
+Subtask 1
+
+Subtask 5
+
+Subtask 3
+
+Env.
+Relation 3
+
+Agent 1
+Env.
+Relation 2
+
+Env.
+Relation 4
+
+Agent 2
+
+Agent 4
+
+Env. Relation 5
+Agent 3
+
+Agent 5
+
+B. Coordination Topology Optimization
+
+Environment-Specific
+Relationship
+
+Task-Specific Relationship
+
+Coordination Message Passing
+Input
+
+Optimized Topology
+
+Optimizer
+Unknown Multi-Agent Relationship
+
+focuses on urban driving scenarios, and COMAT [104] targets
+cooperation in heterogeneous multi-robot systems.
+
+Effective Multi-Agent Relationship
+
+Coordination Topology Optimization
+
+Fig. 6: An illustration of graphs for multi-agent coordination.
+
+adopt GNNs and Graph-based multi-agent RL, respectively,
+to optimize the task workflow. DynTaskMAS [45] proposes a
+framework for dynamically managing multi-agent collaboration
+under TDG. Moreover, MACNET [97] uses the critic-actor
+task DAG for agent collaboration.
+Task Allocation-Based Relationship. For multiple agents
+that need to collaborate to complete a complex task in an
+environment without explicit inter-subtask dependencies, some
+methods initiate the graph construction of a task allocationbased relationship for effective information extraction and exchange, such as RandStructure2Vec [96] and MAGNNET [95].
+Specifically, these methods introduce task-representing nodes in
+the ACG. In this way, by connecting agent nodes with relevant
+task nodes and leveraging multi-layer graph message passing
+with GNNs, they capture higher-order agent-agent, agent-task,
+and task-task associations, thereby enhancing multi-agent task
+processing abilities.
+2) Environment-Specific Relationship: The environmentspecific relationships in multi-agent coordination focus on
+modeling the relationships among multiple agents and message
+passing under a particular agent environment. In this kind of
+relationship, each node in the ACG represents an agent, and
+the graph construction is based on the characteristics of the
+specified environment.
+Similarly to the heuristic-based relationships discussed
+in Section IV, some approaches rely on predefined rules
+to represent the relationships among agents. For example,
+GRL [98] models vehicles as graph nodes and their interactions
+as edges for decision-making in interactive traffic scenarios.
+In MAGNNETO [99], agents exchange information with
+neighboring agents according to the underlying graph structure
+in computer networks. ExpoComm [100] uses the exponential
+topology for efficient information dissemination among agents
+in large-scale multi-agent systems. In contrast, similar to
+the learning-based relationships discussed earlier, several
+methods dynamically learn the weights of the relationship
+among agents after initialization in specific environments. For
+instance, GraphComm [101] and MAGI [102] explore multiagent communication in game-playing scenarios, HEAT [103]
+
+Due to the diverse task settings in the real world, there is
+always a lack of available prior relationships for designing
+the multi-agent coordination graph structure. Therefore, it is
+necessary to learn and optimize a communication topology
+for a given multi-agent scenario [115], [117]. Many existing
+works have explored this issue and can be categorized into
+three main classes for topology optimization, including edge
+importance measurement, graph autoencoder optimization, and
+reinforcement learning.
+Edge Importance Measurement. In an overall pipeline,
+these methods first initialize a fully connected or rule-based
+topology between multiple agents. Then, on the one hand,
+many works select helpful edges via attention mechanisms, importance scores, or learnable parameterized edge weights, like
+DICG [105], DiscoGraph [106], CoPU [107], and DMCG [108].
+Building on this line, as parameterized connected graphs
+are computationally inefficient due to the high topology
+density, some methods convert them back to discrete graphs
+by threshold binarization (edges exist if weights exceed a
+threshold, otherwise not) or differentiable Gumbel-Softmax
+discretization [164], such as G2ANet [109], MAGIC [110],
+MAGE-X [111], and CommFormer [112]. On the other
+hand, some works directly utilize trainable graph masking
+for redundant and unnecessary communication node or edge
+pruning. For example, AgentPrune [113] identifies key multiagent connections through low-rank-principled graph masking,
+and AGP [114] dynamically determines which agent nodes
+participate in specific tasks through a node masking head.
+Graph Auto-Encoder Optimization. Graph auto-encoders
+(GAEs) encode node representations via an encoder layer
+and optimize specific tasks via a decoder layer. Many graph
+learning works use the GAE architecture for self-supervised
+link prediction between nodes [165], [166]. The core idea is
+to learn node representations with the encoder and to predict
+the links with a decoder. Based on this insight, GAE can be
+used for agent communication topology learning by predicting
+the high-confidence edges that exist between agents. Related
+works like G-Designer [115] and GNN-VAE [116], through
+graph variational autoencoders [167], robustly predict whether
+edges exist between agent nodes to determine the optimal
+multi-agent coordination topology. AGP [114] employs GAE
+for soft-pruning on sampled communication topologies and
+supplying supervision signals for the subsequent optimization
+within the framework.
+Reinforcement Learning. RL-based approaches that optimize multi-agent ACG topologies focus primarily on crafting
+an appropriate reward function that decides whether an edge
+between two agent nodes should exist or not. For example,
+HGRL [118] uses the link agent to learn which edges to add
+or remove for a node to maximize long-term RL rewards.
+GPTSwarm [16] parameterizes edge probabilities as a continuous and optimizable distribution, updating it based on task
+outcomes such as task response accuracy. The main challenge
+
+PREPRINT
+
+11
+
+Unlabeled Nodes
+
+Labeled Nodes
+
+Agent
+
+Labeled Graph
+
+2-dimensional features for each node:
+Node 1 features (-0.47, 1.26)
+Node 2 features (0.88, -0.13)
+Node 3 features (-1.02, 0.55)
+Node 4 features (0.31, -0.79)
+
+[0.31, -0.79]
+
+Graph Descriptions
+
+Graph Annotation
+
+[-1.02, 0.55]
+
+[-0.47, 1.26]
+
+The edges are:
+(1, 2), (2, 3), (3, 1), (3, 4)
+
+Unlabeled Graph
+
+[0.88, -0.13]
+
+This is an undirected graph with 4
+nodes and an average node degree of 2.
+
+Generated Graph
+
+Graph Synthesis
+
+Reward
+
+Predicted
+Label
+
+RL Agent
+Downstream
+Tasks
+
+LLM Agent
+
+Node Classification
+
+……
+
+Graph Data
+
+…
+LLM Multi-Agent
+
+Graph Understanding
+
+Predicted
+Edge
+
+Link Prediction
+
+Fig. 7: An illustration of agents for graph learning.
+
+of these RL methods lies in balancing modeling effectiveness,
+overhead, and efficiency.
+
+graphs attributed to text. It uses agents to automatically simulate
+human-item interactions to produce graphs that mirror realworld networks. IGDA [123] is an iterative graph generation
+agent that predicts the initial graph by prompting the LLM to
+reason about the causal relationships and then updates the graph
+iteratively. In each round, edges with the highest uncertainty are
+prioritized for experimentation. After the experiment, the graph
+was updated based on the feedback. Plan-over-Graph [46] first
+synthesizes an initial graph with defined rules. Then, an LLM
+agent is prompted to convert the graph into a description, with
+self-correction to ensure consistency between the generated
+graph and the original graph. GraphMaster [124] further
+proposes a multi-agent framework for graph data synthesis,
+which comprises four specialized LLM agents: the manager,
+perception, enhancement, and evaluation agents, that collaborate
+to optimize the synthesis process.
+B. Graph Understanding
+
+Traditional graph learning mainly aims to learn suitable
+representations and model parameters for graph understanding
+As shown in the previous sections, graph learning has and graph modeling tasks, including node classification, link
+contributed significantly to the capabilities of AI agents at prediction, and graph classification.
+RL Agents. Traditional graph modeling methods, such as
+various stages. However, the relationship between graphs and
+GCN
+[153] and GAT [152], are based on fixed design logic.
+agents is not just unidirectional. Similarly, the paradigm of
+However,
+real-world graph structures are diverse, and fixed
+AI agents can also empower graph learning and graph-related
+modeling
+logic cannot fully utilize the potential of graph
+tasks, opening up new avenues for automatic and effective graph
+learning.
+Therefore,
+methods like RL agents have started to
+processing. As illustrated in Figure 7, this synergy manifests
+design
+adaptive
+aggregation
+mechanisms for graph learning. For
+itself primarily in two main aspects: (1) Graph annotation and
+example,
+Policy-GNN
+[125]
+uses RL to adaptively determine
+synthesis, as well as (2) Graph understanding tasks.
+the number of aggregations for each node, addressing the issue
+that different nodes require varying aggregation iterations to
+A. Graph Annotation and Synthesis
+adequately capture structural information. SUGAR [126] and
+Graph annotation and synthesis are crucial in graph learning MAG-GNN [127] employ RL to design adaptive subgraph-level
+due to the high cost of labeling and synthesizing high-quality aggregation operators to enhance graph modeling capabilities.
+graph data for graph model training in many real-world To further leverage the power of multi-agent in RL, Agentapplications [168], [169].
+Net [128] trains neural agents to walk through the graph and
+Graph Annotation. As graph annotation can be regarded as collectively decide on the output without applying traditional
+a decision-making process for label prediction and correction message passing. GAgN [129] treats each node as an agent and
+target, RL agents can be optimized for annotation through trial. proposes a decentralized graph structure agent network learning
+Representatively, GPA [119] formulates the active learning to infer global perception, enabling resistance to attacks on
+problem on graphs as a Markov decision process and uses graph operators.
+RL to learn the optimal query strategy. GPA [119] can be
+LLM Agents. With the powerful knowledge of LLMs, many
+jointly trained on several source graphs with full labels to learn works are exploring how to design and tune LLM agents to
+a transferable active learning policy, which can be directly fully leverage the capabilities of LLMs in graph-modeling
+generalized to unlabeled graphs. BIGENE [120] models graph tasks. The core of these works is to post-train LLMs on graph
+active learning as a multi-agent RL problem for node annotation. data. Thus, LLM agents can automatically understand graph
+At each time step, each agent in BIGENE chooses an unlabeled data through text-described graph information and carry out
+node, forming a joint action. All agents share the same reward downstream tasks like node classification. GL-Agent [130]
+function and aim to collaborate to maximize the improvement and GraphGPT [131] initially propose LLM frameworks for
+of the classification model.
+agentic graph learning on various graphs. GA [132] uses LLM
+Graph Synthesis. With the abundant pre-trained knowledge as the foundation model of an agent, and employs a memory
+of LLMs, many works have adopted the LLM agent paradigm to mechanism to store nodes or edges embeddings for retrieval
+generate specific graphs for training or simulation. For instance, augmentation. Additionally, OFA [133] and ZeroG [134] use the
+LLM4GraphGen [121] proposes a flexible pipeline where graph LLM agent to map nodes from different graphs into a unified
+generation tasks are formulated as textual prompts, and LLM semantic space to ensure the generalization ability across
+agents are required to output graphs in a specific format. datasets and graph understanding tasks. LLaGA [135] further
+GAG [122] adopts LLM agents to generate dynamic social transforms graph inputs into a token space comprehensible
+VII. AGENTS FOR G RAPH L EARNING
+
+PREPRINT
+
+12
+
+to LLMs. This transformation allows the use of the inherent can be roughly divided into two categories. First, scene graphs
+reasoning abilities of LLMs for graph-related tasks without provide structured high-level representations of environments,
+modifying the LLM parameters. GraphInstruct [136] constructs enhancing the scene understanding capabilities of embodied
+diverse graph generation processes and descriptions, and agents. For instance, Ravichandran et al. [177] embed scene
+proposes a step-by-step masking training strategy for LLM graphs into a latent feature space using GNNs, enabling agents
+supervised fine-tuning. Besides tuning to make models generate to learn effective navigation policies via reinforcement learning.
+reasoning paths based on graph structure and text prompts, SayPlan [178] leverages a scene graph to guide LLMs in
+GraphWiz [137] further improves reasoning ability by using semantic search and refines the initial plan based on feedback
+DPO [170] to compare reasoning paths.
+from a graph simulator. SG-Nav [179] incrementally constructs
+LLM Multi-Agents. Graph modeling can be seen as a a scene graph during environment exploration, providing LLMs
+complex task that involves multiple sub-modeling tasks, such with scene context to reason about the locations of the goals and
+as graph data processing, graph architecture selection, and to select the exploration frontiers. Second, knowledge graphs
+graph task execution, which is difficult for a single agent to have been employed in embodied AI to support more informed
+handle all. Therefore, recently, many works have introduced decision-making. For instance, [180] represents task-relevant
+multiple LLMs to construct a multi-agent system, with each knowledge, while [181] encodes safety protocols and physical
+agent focusing on a specific sub-modeling task. For instance, constraints based on knowledge graphs. Scene-MMKG [182]
+GraphAgent-Reasoner [138] proposes the first multi-agent combines prompt-based schema extraction with knowledge
+graph reasoning framework based on LLM without fine-tuning. from multiple sources to construct a scene-specific knowledge
+The main LLM extracts the node and edge information from graph. By incorporating structured knowledge representations,
+the text description and builds an agent for each node. These these approaches enhance the abilities of embodied agents in
+agents communicate with neighborhoods and update their states planning, manipulation, and navigation.
+based on LLM’s instructions. GraphAgent [139] defines graph
+generation agents, task planning agents, and task execution C. Game AI
+agents. These agents work together to integrate language models
+Graph structures are gaining increasing attention as an
+and graph models, aiming to discover complex relational
+effective tool for representation and modeling in game AI.
+information and data semantic dependencies. Inspired by human
+An important reason is that games involve strategic interacproblem solving processes, GraphTeam [140] further designs
+tions between players, as well as between player-controlled
+a multi-agent framework with three functional groups: inputcharacters and the game environment [183]. For example, in
+output regularization, external knowledge retrieval, and graphthe analysis of two-player games, response graph models not
+based problem solving.
+only capture non-trivial properties of games but also reveal
+profound connections between different types of games [184].
+VIII. A PPLICATIONS
+In multi-agent gaming systems, game abstraction mechanisms
+A. Scientific Computing
+can simplify the policy learning process and enhance the
+Graph learning combined with agent systems has shown
+asymptotic performance of algorithms [109]. Specifically, in
+significant potential in the field of scientific computing, parmulti-agent sports games, graph-based generative models show
+ticularly in areas such as automated scientific discovery and
+superior performance in predicting multi-agent trajectories
+bioinformatics analysis [171], [172].
+and in distribution similarity metrics [185]. Recently, with
+Deep integration can be divided into two main aspects. First,
+the widespread application of LLMs, text-based games have
+using graphs to connect scientific knowledge and enhance
+become more and more famous [186], [187]. Representatively,
+agents’ scientific understanding. Second, applying graph learnGATA [188] adopts dynamic belief graphs to better understand
+ing to model inherent structured data in some disciplines,
+the state of the game and make decisions in text-based games,
+such as molecular and protein structures, and then align
+achieving performance improvements over traditional textwith agents. For example, on the one hand, SciAgents [173]
+based models.
+enables automatic discovery of interdisciplinary knowledge
+and hypothesis generation by integrating large-scale ontology
+knowledge graphs and LLM multi-agent systems. Thought D. Agentic Information Retrieval
+Graph [174] combines the LLM agent’s structured Tree-ofFuture research in agentic information retrieval can be
+Thought understanding process with a genetic knowledge significantly advanced by integrating graph learning to support
+base, achieving successes in gene set analysis. On the other structured retrieval planning and adaptive reasoning. Reprehand, LLaMo [175] proposes multi-level graph projectors sentative approaches such as Think-on-Graph [34], [189] and
+and structure instruction tuning of LLM agents, targeting Graph Chain-of-Thought [59], where an LLM operates as an
+the challenge of converting between molecular structures and agent that interactively explores a knowledge graph (KG) to
+language modalities.
+retrieve relevant information and perform reasoning. This is
+implemented via an iterative prompt loop where the LLM
+B. Embodied AI
+generates the next query or “move” on the graph, and the
+In embodied AI, agents must perceive their surrounding retrieved node facts are fed back into the prompt. In parallel,
+environments and execute appropriate actions [176]. Graph- RL-based optimization is being explored in agentic retrieval
+based representations are powerful tools in this domain and and reasoning. Recent methods [190]–[192] train LLM agents
+
+PREPRINT
+
+with reward signals that encourage effective search queries and
+iterative evidence gathering, showing that models can learn
+when to invoke external knowledge and even retry searches
+after failures. A promising future direction is to unify graphbased agentic planning and RL-driven learning into one loop.
+For example, an autonomous retrieval agent that leverages
+knowledge graph relationships for decision making while
+continuously learning to refine its search and reasoning policy,
+thereby achieving more robust, interpretable, and efficient
+information retrieval in complex tasks.
+
+13
+
+LLM-based agents. Graph-related agent benchmarks have also
+begun to gain attention in recent years. For the challenge
+aspects, existing benchmarks still differ in task definitions
+or evaluation data, making unified evaluation challenging.
+Furthermore, as LLM foundation models and RL technologies
+integrate deeply, future benchmarks could incorporate both and
+include graph-based models as a part. Also, for emerging
+complex scenarios in which graph learning shows great
+potential, like multi-agent reasoning, memory, and collaboration
+in large-scale dynamic environments, there is currently a lack
+of graph-centric agent benchmarks.
+
+E. Industrial and Automation Systems
+In the era of Industry 4.0 and the Internet of Things (IoT),
+the focus is on achieving efficient and automated production
+through intelligent technologies [193]. Currently, agent systems
+have begun to be applied in warehousing management, manufacturing scheduling, and other fields, providing key technical
+support for Industry 4.0 [194], [195]. In these industrial
+systems, the key capabilities that an agent should possess
+are scalability, dynamic evolvability, and robustness. When
+it comes to scalability, in industrial systems, an agent often
+involves a large search space and a large number of tool
+invocations. There is also a great deal of relation between
+agents. Graph organization and learning can obtain a sparse
+association graph to reduce non-informative interactions and
+achieve efficient performance [17], [96], [112]. Graph-based
+models can also be flexible in dynamic environments with
+dynamic graph evolution [108], [196]. Also, the robustness of
+the agent system can be enhanced by learning the inherent
+patterns and structures in the graph data to filter out abnormal
+or noisy information in the system [197], [198].
+F. Human Society
+
+B. Graph Foundation Models for Agents
+In traditional graph modeling tasks, representative methods
+like GCN [153] and GAT [152] adopt message passing for
+knowledge extraction, providing solid foundations for graph
+modeling. Based on such a foundation, many further works
+and applications are proposed to accelerate the development of
+the field. For example, some methods have begun to explore
+unified and effective graph foundation models (GFMs) for
+handling multiple graph domains simultaneously [221], [222].
+For AI agents, there are various graph-based methods for
+different tasks. However, there is a lack of foundational graph
+operators for widespread use. Therefore, developing effective
+GFMs in agent-based functions is a promising direction.
+Furthermore, given that agent scenarios often need to handle
+complex tasks, GFMs for agents can be designed from the
+perspectives of Effectiveness, Explainability, and Scalability
+(EES). Specifically, while serving effectiveness, GFMs can
+improve the interpretability of agent decisions by using logical
+relationships between nodes based on graph advantage [223],
+[224] and improve system scalability by organizing information
+and operators in a structured way [17].
+
+LLM-based agents have held significant potential in anC. Privacy and Security
+alyzing and simulating human social behaviors in recent
+For AI agents, graph organization and learning primarily
+years. Research has shown that agents driven by LLM can
+establish
+connections among entities, such as agent nodes
+effectively model information dissemination, emotional and
+and
+external
+tools, to enable efficient message sharing and
+attitudinal changes, and complex network formation within
+transmission,
+which may bring security issues. (1) Data
+social networks [199]. An important reason is that LLM agents
+Privacy:
+A
+future
+direction lies in enabling message sharing
+can simulate key dynamics in real-world social networks [200].
+and
+transmission
+between
+nodes involving private information
+These include preferential attachment, triadic closure, howhile
+ensuring
+privacy
+[225]–[227],
+such as communication
+mophily, and community structure. In addition, LLM agents can
+between
+private-domain
+agents
+[228],
+[229]. For example, in
+adjust their behavioral strategies according to the characteristics
+a
+healthcare
+setting,
+patient
+data
+is
+highly
+sensitive. If the
+of the network. Based on this foundational ability, many
+agent’s
+operators
+or
+the
+interaction
+of
+multiple
+agents involves
+works have adopted LLM agents for social network and user
+information
+passing,
+it
+is
+crucial
+to
+ensure
+that
+patient
+privacy is
+behavior simulation [122], [201]–[203]. Further, some works
+protected.
+(2)
+Attack
+Defense:
+Multi-agent
+communication
+and
+have adopted LLM agents for human society analysis. For
+agent-environment
+interaction,
+which
+naturally
+form
+a
+graph
+example, [204] performs personality analysis in online social
+networks with LLM agents. [205] employs LLM agents to topology, are susceptible to adversarial attacks [229]–[231].
+Attackers can send indistinguishable adversarial messages to
+analyze the mechanisms of social rumors spreading.
+severely disrupt the agent system’s performance and privacy
+data leakage [229], [232]. Some works have explored the impact
+IX. C HALLENGES AND F UTURE O PPORTUNITIES
+of multi-agent topology on system security [233], [234]. Highly
+A. Benchmarking Evaluation
+connected topologies may make the system more susceptible
+As illustrated in Table I, there are currently numerous to attacks, as malicious information can spread quickly among
+representative benchmarks and open-source toolkits that have agents. Future research should focus on designing more secure
+been proposed for evaluations in different agent tasks, especially multi-agent coordination and agent-environment interaction
+
+PREPRINT
+
+14
+
+Agent Type
+
+Evaluation Task (s)
+
+Link
+
+General
+
+EPyMARL [206]
+BenchMARL [207]
+Memory Gym [208]
+API-Bank [209]
+PlanBench [210]
+AgentBench [211]
+ToolBench [212]
+GTA [213]
+TravelPlanner [214]
+τ -bench [215]
+TOOLSANDBOX [216]
+REALM-Bench [217]
+
+RL Agent
+RL Agent
+RL Agent
+LLM Agent
+LLM Agent
+LLM Agent
+LLM Agent
+LLM Agent
+LLM Agent
+LLM Agent
+LLM Agent
+LLM Agent
+
+Multi-Agent Coordination
+Multi-Agent Coordination
+Agent Memory
+Tool Usage
+Task Reasoning, Task Decomposition
+General
+Tool Usage
+Tool Usage
+Task Reasoning, Task Decomposition, Tool Usage
+Tool Usage, Agent-Environment Interaction
+Tool Usage, Agent-Environment Interaction
+Task Reasoning, Task Decomposition, Multi-Agent Coordination
+
+Github
+Github
+Github
+Github
+Github
+Github
+Github
+Github
+Github
+Github
+Github
+Github
+
+Graph-Related
+
+TABLE I: A collection of representative benchmarks and open-source toolkits.
+Benchmarks and Toolkits
+
+LangGraph
+GLBench [218]
+ProGraph [219]
+GraphArena [220]
+GPTSwarm [16]
+MACNET [97]
+ToolLinkOS [60]
+FLORA-Bench [94]
+
+LLM Agent
+LLM Agent
+LLM Agent
+LLM Agent
+LLM Agent
+LLM Agent
+LLM Agent
+LLM Agent
+
+Tool Usage, Multi-Agent Coordination
+Graph Modeling
+Graph Modeling
+Graph Modeling
+Task Reasoning, Tool Usage, Multi-Agent Coordination
+Multi-Agent Coordination
+Tool Usage
+Task Reasoning, Task Decomposition
+
+Github
+Github
+Github
+Github
+Github
+Github
+Github
+Github
+
+strategies. It is necessary to develop topologies and mechanisms
+that can defend against adversarial attacks while maintaining
+communication effectiveness.
+D. Multimodal Agents
+The agent paradigm using LLMs as foundation models has
+achieved remarkable performance in executing tasks in the
+language space. Research on agents and LLMs is still constantly
+evolving. For example, there have been some breakthroughs
+in large vision language models [235] or multimodal large
+language models [236] recently. They can also serve as the
+foundation model for next-generation AI agents. Multimodal
+agents will surpass current systems centered on language or
+single modalities, evolving into unified entities capable of
+understanding and integrating information streams such as text,
+vision, and speech [237], [238]. Such agents should make
+decisions and learn autonomously from heterogeneous data
+sources. In this evolution, graph learning can play a vital role
+as multimodal data are inherently interlinked with complex
+and dynamic relationships. Graph techniques can abstract
+and connect different modalities, seamlessly integrating and
+aligning modality entities from the external world, perceived
+objects, and environmental states [11], [239], [240].
+E. Model Context Protocol
+MCP is an open standard to provide a unified, structured, and
+secure way for LLM agents to exchange data with the outside
+world. The MCP protocol defines how context information
+is exchanged between agents and external data, providing a
+standardized means for seamless integration between agent
+applications and external data sources, tools, and services [241],
+[242]. Since structured interaction between agents and external
+data is a key insight of MCP, graph learning can enhance MCP
+from two promising perspectives. (1) Efficient Data Integration: Various data types and sources can be integrated into a
+
+unified KG. Graph learning can uncover hidden relationships
+and patterns, improving KG construction. This enriches the
+knowledge base accessible via the MCP protocol, providing
+AI models with more comprehensive and accurate context for
+better problem-solving. (2) Personalized Recommendations:
+By modeling agent behavior and preferences, graph learning
+can provide personalized tool and data source recommendations.
+The MCP protocol can be extended by using this to quickly
+locate and call the most suitable tools and data for different
+agents, enhancing their experience and productivity.
+F. Open Agent Network
+A single agent can hardly optimize security, latency, domain
+expertise, and tool usage all at once. In the rapid development
+of agents empowered with LLM, agents are shifting from single,
+monolithic, general-purpose chatbots to ecosystems and swarms
+of specialized agents [9], [243]. An Open Agent Network
+(OAN) would be a promising, public, and decentralized
+network where agents are registered and orchestrated [244].
+It could be a unified, heterogeneous, and large-scale graph,
+including potential network participants like agents, tools,
+tasks (applications), humans, and policies (regulators) in the
+future. In the prospects for OAN, the network infrastructure
+offers discovery, routing, invocation, settlement, and reputation
+services. Any compliant third party can publish or invoke
+agents, yielding a composable agent graph. Within the OAN,
+graphs can weave together several complementary capabilities.
+(1) OAN Effectiveness: Graph learning can predict the optimal
+call path by incorporating latency and cost, continuously update
+the OAN graph online, and inductively generate representations
+for newly added nodes. (2) OAN Risk Control: Graph
+representations enable trust and risk analysis by applying
+tasks like node classification and link prediction to gauge
+the reputation of newly registered agents and highlight fragile
+dependency chains, while temporal patterns extracted from
+edge logs can be adopted to detect potential anomalies.
+
+PREPRINT
+
+15
+
+X. C ONCLUSION
+In this paper, we provide a comprehensive and systematic
+review of the intersection of graph techniques and AI agents,
+with graph-empowered agent functionalities, including planning,
+execution, memory, and multi-agent coordination. In addition,
+we also investigate how AI agent paradigms can enhance graph
+learning, such as graph annotation, synthesis, and understanding.
+Based on the detailed review, we then summarize meaningful
+applications, open questions, and future opportunities for this
+rapidly developing intersection field, offering new potential
+approaches for next-generation agents facing increasingly
+complex and messy task information. Related resources are
+organized and updated in Github link for the research and
+industrial communities.
+R EFERENCES
+[1] T. T. Nguyen, N. D. Nguyen, and S. Nahavandi, “Deep reinforcement
+learning for multiagent systems: A review of challenges, solutions,
+and applications,” IEEE transactions on cybernetics, vol. 50, no. 9, pp.
+3826–3839, 2020.
+[2] C. Florensa, D. Held, X. Geng, and P. Abbeel, “Automatic goal generation for reinforcement learning agents,” in International conference on
+machine learning. PMLR, 2018, pp. 1515–1528.
+[3] L. Wang, C. Ma, X. Feng, Z. Zhang, H. Yang, J. Zhang, Z. Chen,
+J. Tang, X. Chen, Y. Lin et al., “A survey on large language model
+based autonomous agents,” Frontiers of Computer Science, vol. 18,
+no. 6, p. 186345, 2024.
+[4] A. Zhao, D. Huang, Q. Xu, M. Lin, Y.-J. Liu, and G. Huang, “Expel:
+Llm agents are experiential learners,” in Proceedings of the AAAI
+Conference on Artificial Intelligence, vol. 38, no. 17, 2024, pp. 19 632–
+19 642.
+[5] F. Peiyuan, Y. He, G. Huang, Y. Lin, H. Zhang, Y. Zhang, and H. Li,
+“Agile: A novel reinforcement learning framework of llm agents,” in
+Advances in Neural Information Processing Systems, vol. 37, 2024, pp.
+5244–5284.
+[6] T. Masterman, S. Besen, M. Sawtell, and A. Chao, “The landscape
+of emerging ai agent architectures for reasoning, planning, and tool
+calling: A survey,” arXiv preprint arXiv:2404.11584, 2024.
+[7] N. Krishnan, “Ai agents: Evolution, architecture, and real-world
+applications,” arXiv preprint arXiv:2503.12687, 2025.
+[8] X. Huang, W. Liu, X. Chen, X. Wang, H. Wang, D. Lian, Y. Wang,
+R. Tang, and E. Chen, “Understanding the planning of llm agents: A
+survey,” arXiv preprint arXiv:2402.02716, 2024.
+[9] T. Guo, X. Chen, Y. Wang, R. Chang, S. Pei, N. V. Chawla,
+O. Wiest, and X. Zhang, “Large language model based multi-agents: a
+survey of progress and challenges,” in Proceedings of the Thirty-Third
+International Joint Conference on Artificial Intelligence, 2024, pp. 8048–
+8057.
+[10] Q. Guo, F. Zhuang, C. Qin, H. Zhu, X. Xie, H. Xiong, and Q. He,
+“A survey on knowledge graph-based recommender systems,” IEEE
+Transactions on Knowledge and Data Engineering, vol. 34, no. 8, pp.
+3549–3568, 2020.
+[11] Y. Ektefaie, G. Dasoulas, A. Noori, M. Farhat, and M. Zitnik,
+“Multimodal learning with graphs,” Nature Machine Intelligence, vol. 5,
+no. 4, pp. 340–350, 2023.
+[12] C. Chen, Y. Wu, Q. Dai, H.-Y. Zhou, M. Xu, S. Yang, X. Han, and
+Y. Yu, “A survey on graph neural networks and graph transformers in
+computer vision: A task-oriented perspective,” IEEE Transactions on
+Pattern Analysis and Machine Intelligence, 2024.
+[13] Z. Wu, S. Pan, F. Chen, G. Long, C. Zhang, and P. S. Yu, “A
+comprehensive survey on graph neural networks,” IEEE transactions on
+neural networks and learning systems, vol. 32, no. 1, pp. 4–24, 2020.
+[14] L. Wu, Y. Chen, K. Shen, X. Guo, H. Gao, S. Li, J. Pei, B. Long et al.,
+“Graph neural networks for natural language processing: A survey,”
+Foundations and Trends® in Machine Learning, vol. 16, no. 2, pp.
+119–328, 2023.
+[15] M. Gallici, M. Martin, and I. Masmitja, “Transfqmix: Transformers for
+leveraging the graph structure of multi-agent reinforcement learning
+problems,” in Proceedings of the 2023 International Conference on
+Autonomous Agents and Multiagent Systems, 2023, pp. 1679–1687.
+
+[16] M. Zhuge, W. Wang, L. Kirsch, F. Faccio, D. Khizbullin, and
+J. Schmidhuber, “Gptswarm: Language agents as optimizable graphs,”
+in Forty-first International Conference on Machine Learning, 2024.
+[17] X. Liu, Z. Peng, X. Yi, X. Xie, L. Xiang, Y. Liu, and D. Xu, “Toolnet:
+Connecting large language models with massive tools via tool graph,”
+arXiv preprint arXiv:2403.00839, 2024.
+[18] M. Yasunaga, H. Ren, A. Bosselut, P. Liang, and J. Leskovec, “Qa-gnn:
+Reasoning with language models and knowledge graphs for question
+answering,” in Proceedings of the 2021 Conference of the North
+American Chapter of the Association for Computational Linguistics:
+Human Language Technologies, 2021, pp. 535–546.
+[19] R. Zhao, F. Zhao, L. Wang, X. Wang, and G. Xu, “Kg-cot: Chain-ofthought prompting of large language models over knowledge graphs
+for knowledge-aware question answering,” in Proceedings of the
+Thirty-Third International Joint Conference on Artificial Intelligence
+(IJCAI-24). International Joint Conferences on Artificial Intelligence,
+2024, pp. 6642–6650.
+[20] S. Munikoti, D. Agarwal, L. Das, M. Halappanavar, and B. Natarajan,
+“Challenges and opportunities in deep reinforcement learning with
+graph neural networks: A comprehensive review of algorithms and
+applications,” IEEE transactions on neural networks and learning
+systems, 2023.
+[21] Z. Liu, J. Zhang, E. Shi, Z. Liu, D. Niyato, B. Ai, and X. S. Shen, “Graph
+neural network meets multi-agent reinforcement learning: Fundamentals,
+applications, and future directions,” IEEE Wireless Communications,
+2024.
+[22] Y. Li, Z. Li, P. Wang, J. Li, X. Sun, H. Cheng, and J. X. Yu, “A survey
+of graph meets large language model: progress and future directions,”
+in Proceedings of the Thirty-Third International Joint Conference on
+Artificial Intelligence, 2024, pp. 8123–8131.
+[23] B. Jin, G. Liu, C. Han, M. Jiang, H. Ji, and J. Han, “Large language
+models on graphs: A comprehensive survey,” IEEE Transactions on
+Knowledge and Data Engineering, 2024.
+[24] M. Wooldridge and N. R. Jennings, “Intelligent agents: Theory and
+practice,” The knowledge engineering review, vol. 10, no. 2, pp. 115–
+152, 1995.
+[25] Y. Cao, H. Zhao, Y. Cheng, T. Shu, Y. Chen, G. Liu, G. Liang,
+J. Zhao, J. Yan, and Y. Li, “Survey on large language model-enhanced
+reinforcement learning: Concept, taxonomy, and methods,” IEEE
+Transactions on Neural Networks and Learning Systems, 2024.
+[26] S. Wang, S. Zhang, J. Zhang, R. Hu, X. Li, T. Zhang, J. Li, F. Wu,
+G. Wang, and E. Hovy, “Reinforcement learning enhanced llms: A
+survey,” arXiv preprint arXiv:2412.10400, 2024.
+[27] D. Guo, D. Yang, H. Zhang, J. Song, R. Zhang, R. Xu, Q. Zhu, S. Ma,
+P. Wang, X. Bi et al., “Deepseek-r1: Incentivizing reasoning capability
+in llms via reinforcement learning,” arXiv preprint arXiv:2501.12948,
+2025.
+[28] K. Arulkumaran, M. P. Deisenroth, M. Brundage, and A. A. Bharath,
+“Deep reinforcement learning: A brief survey,” IEEE Signal Processing
+Magazine, vol. 34, no. 6, pp. 26–38, 2017.
+[29] T. M. Moerland, J. Broekens, A. Plaat, C. M. Jonker et al., “Modelbased reinforcement learning: A survey,” Foundations and Trends® in
+Machine Learning, vol. 16, no. 1, pp. 1–118, 2023.
+[30] Y. Chang, X. Wang, J. Wang, Y. Wu, L. Yang, K. Zhu, H. Chen, X. Yi,
+C. Wang, Y. Wang et al., “A survey on evaluation of large language
+models,” ACM transactions on intelligent systems and technology,
+vol. 15, no. 3, pp. 1–45, 2024.
+[31] Z. Zhang, X. Bo, C. Ma, R. Li, X. Chen, Q. Dai, J. Zhu, Z. Dong,
+and J.-R. Wen, “A survey on the memory mechanism of large language
+model based agents,” arXiv preprint arXiv:2404.13501, 2024.
+[32] W. Fan, Y. Ding, L. Ning, S. Wang, H. Li, D. Yin, T.-S. Chua, and
+Q. Li, “A survey on rag meeting llms: Towards retrieval-augmented
+large language models,” in Proceedings of the 30th ACM SIGKDD
+Conference on Knowledge Discovery and Data Mining, 2024, pp. 6491–
+6501.
+[33] K. Kumar, T. Ashraf, O. Thawakar, R. M. Anwer, H. Cholakkal, M. Shah,
+M.-H. Yang, P. H. Torr, F. S. Khan, and S. Khan, “Llm post-training:
+A deep dive into reasoning large language models,” arXiv preprint
+arXiv:2502.21321, 2025.
+[34] J. Sun, C. Xu, L. Tang, S. Wang, C. Lin, Y. Gong, L. Ni, H.-Y. Shum,
+and J. Guo, “Think-on-graph: Deep and responsible reasoning of large
+language model on knowledge graph,” in The Twelfth International
+Conference on Learning Representations, 2024.
+[35] L. Luo, Y.-F. Li, G. Haffari, and S. Pan, “Reasoning on graphs: Faithful
+and interpretable large language model reasoning,” in The Twelfth
+International Conference on Learning Representations, 2024.
+
+PREPRINT
+
+[36] Y. Wen, Z. Wang, and J. Sun, “Mindmap: Knowledge graph prompting
+sparks graph of thoughts in large language models,” in Proceedings
+of the 62nd Annual Meeting of the Association for Computational
+Linguistics (Volume 1: Long Papers), 2024, pp. 10 370–10 388.
+[37] X. Tan, X. Wang, Q. Liu, X. Xu, X. Yuan, and W. Zhang, “Paths-overgraph: Knowledge graph empowered large language model reasoning,”
+in Proceedings of the ACM on Web Conference 2025, 2025, pp. 3505–
+3522.
+[38] S. Yao, D. Yu, J. Zhao, I. Shafran, T. Griffiths, Y. Cao, and
+K. Narasimhan, “Tree of thoughts: Deliberate problem solving with large
+language models,” in Thirty-seventh Conference on Neural Information
+Processing Systems, vol. 36, 2023, pp. 11 809–11 822.
+[39] J. Zhang, X. Wang, W. Ren, L. Jiang, D. Wang, and K. Liu, “Ratt: A
+thought structure for coherent and correct llm reasoning,” in Proceedings
+of the AAAI Conference on Artificial Intelligence, vol. 39, no. 25, 2025,
+pp. 26 733–26 741.
+[40] Y. Yao, Z. Li, and H. Zhao, “Got: Effective graph-of-thought reasoning
+in language models,” in Findings of the Association for Computational
+Linguistics: NAACL 2024, 2024, pp. 2901–2921.
+[41] M. Besta, N. Blach, A. Kubicek, R. Gerstenberger, M. Podstawski,
+L. Gianinazzi, J. Gajda, T. Lehmann, H. Niewiadomski, P. Nyczyk
+et al., “Graph of thoughts: Solving elaborate problems with large
+language models,” in Proceedings of the AAAI Conference on Artificial
+Intelligence, vol. 38, no. 16, 2024, pp. 17 682–17 690.
+[42] H. Han, Y. Xie, H. Liu, X. Tang, S. Nag, W. Headden, Y. Li, C. Luo, S. Ji,
+Q. He et al., “Reasoning with graphs: Structuring implicit knowledge
+to enhance llms reasoning,” arXiv preprint arXiv:2501.07845, 2025.
+[43] Y. Wu, Y. Fan, S. Y. Min, S. Prabhumoye, S. M. McAleer, R. Salakhutdinov, Y. Bisk, Y. Li, and T. Mitchell, “Agentkit: Structured LLM
+reasoning with dynamic graphs,” in First Conference on Language
+Modeling, 2024.
+[44] Y. Dong, X. Zhu, Z. Pan, L. Zhu, and Y. Yang, “Villageragent: A graphbased multi-agent framework for coordinating complex task dependencies in minecraft,” in Findings of the Association for Computational
+Linguistics ACL 2024, 2024, pp. 16 290–16 314.
+[45] J. Yu, Y. Ding, and H. Sato, “Dyntaskmas: A dynamic task graphdriven framework for asynchronous and parallel llm-based multi-agent
+systems,” arXiv preprint arXiv:2503.07675, 2025.
+[46] S. Zhang, X. Ma, Z. Cao, Z. Zhang, and H. Zhao, “Plan-overgraph: Towards parallelable llm agent schedule,” arXiv preprint
+arXiv:2502.14563, 2025.
+[47] Z. Gao, Y. Mu, J. Qu, M. Hu, L. Guo, P. Luo, and Y. Lu, “Dag-plan:
+Generating directed acyclic dependency graphs for dual-arm cooperative
+planning,” arXiv preprint arXiv:2406.09953, 2024.
+[48] Z. Jia, J. Li, X. Qu, and J. Wang, “Enhancing multi-agent systems via
+reinforcement learning with llm-based planner and graph-based policy,”
+in 2025 IEEE International Conference on Robotics and Automation
+(ICRA). IEEE, 2025.
+[49] T. Marzi, A. S. Khehra, A. Cini, and C. Alippi, “Feudal graph
+reinforcement learning,” Transactions on Machine Learning Research,
+2024.
+[50] X. Wu, Y. Shen, C. Shan, K. Song, S. Wang, B. Zhang, J. Feng,
+H. Cheng, W. Chen, Y. Xiong et al., “Can graph learning improve
+planning in llm-based agents?” in The Thirty-eighth Annual Conference
+on Neural Information Processing Systems, 2024.
+[51] X. Guo, S. Singh, H. Lee, R. L. Lewis, and X. Wang, “Deep learning for
+real-time atari game play using offline monte-carlo tree search planning,”
+in Advances in Neural Information Processing Systems, vol. 27, 2014.
+[52] C. Xiao, J. Mei, and M. Müller, “Memory-augmented monte carlo
+tree search,” in Proceedings of the AAAI conference on artificial
+intelligence, vol. 32, no. 1, 2018.
+[53] V. G. Costa, J. Pérez-Aracil, S. Salcedo-Sanz, and C. E. Pedreira,
+“Evolving interpretable decision trees for reinforcement learning,”
+Artificial Intelligence, vol. 327, p. 104057, 2024.
+[54] X. Wang, C. Li, Z. Wang, F. Bai, H. Luo, J. Zhang, N. Jojic, E. Xing,
+and Z. Hu, “Promptagent: Strategic planning with language models
+enables expert-level prompt optimization,” in The Twelfth International
+Conference on Learning Representations, 2024.
+[55] A. Zhou, K. Yan, M. Shlapentokh-Rothman, H. Wang, and Y.-X. Wang,
+“Language agent tree search unifies reasoning, acting, and planning in
+language models,” in Forty-first International Conference on Machine
+Learning, 2024.
+[56] J. Czech, P. Korus, and K. Kersting, “Improving alphazero using montecarlo graph search,” in Proceedings of the International Conference on
+Automated Planning and Scheduling, vol. 31, 2021, pp. 103–111.
+
+16
+
+[57] E. Leurent and O.-A. Maillard, “Monte-carlo graph search: the value
+of merging similar states,” in Asian Conference on Machine Learning.
+PMLR, 2020, pp. 577–592.
+[58] K. Kujanpää, A. Babadi, Y. Zhao, J. Kannala, A. Ilin, and J. Pajarinen, “Continuous monte carlo graph search,” in Proceedings of the
+23rd International Conference on Autonomous Agents and Multiagent
+Systems, 2024, pp. 1047–1056.
+[59] B. Jin, C. Xie, J. Zhang, K. K. Roy, Y. Zhang, Z. Li, R. Li, X. Tang,
+S. Wang, Y. Meng et al., “Graph chain-of-thought: Augmenting large
+language models by reasoning on graphs,” in Findings of the Association
+for Computational Linguistics ACL 2024, 2024, pp. 163–184.
+[60] E. Lumer, P. H. Basavaraju, M. Mason, J. A. Burke, and V. K. Subbiah,
+“Graph rag-tool fusion,” arXiv preprint arXiv:2502.07223, 2025.
+[61] Z. Liu, Z. Lai, Z. Gao, E. Cui, Z. Li, X. Zhu, L. Lu, Q. Chen, Y. Qiao,
+J. Dai et al., “Controlllm: Augment language models with tools by
+searching on graphs,” in European Conference on Computer Vision.
+Springer, 2024, pp. 89–105.
+[62] D. Garces, S. Bhattacharya, S. Gil, and D. Bertsekas, “Multiagent
+reinforcement learning for autonomous routing and pickup problem with
+adaptation to variable demand,” in 2023 IEEE International Conference
+on Robotics and Automation (ICRA). IEEE, 2023, pp. 3524–3531.
+[63] S.-N. Johnn, V.-A. Darvariu, J. Handl, and J. Kalcsics, “A graph reinforcement learning framework for neural adaptive large neighbourhood
+search,” Computers & Operations Research, vol. 172, p. 106791, 2024.
+[64] J. Weil, Z. Bao, O. Abboud, and T. Meuser, “Towards generalizability
+of multi-agent reinforcement learning in graphs with recurrent message
+passing,” in Proceedings of the 23rd International Conference on
+Autonomous Agents and Multiagent Systems, 2024, pp. 1919–1927.
+[65] D. Huh and P. Mohapatra, “Multi-agent auto-bidding with latent graph
+diffusion models,” arXiv preprint arXiv:2503.05805, 2025.
+[66] D. Honerkamp, M. Büchner, F. Despinoy, T. Welschehold, and A. Valada,
+“Language-grounded dynamic scene graphs for interactive object search
+with mobile manipulation,” IEEE Robotics and Automation Letters,
+2024.
+[67] Y. Zheng, Z. Xing, Q. Zhang, B. Jin, P. Li, Y. Zheng, Z. Xia,
+K. Zhan, X. Lang, Y. Chen et al., “Planagent: A multi-modal large
+language agent for closed-loop vehicle motion planning,” arXiv preprint
+arXiv:2406.01587, 2024.
+[68] Y. Chen, H. Sawhney, N. Gydé, Y. Jian, J. Saunders, P. Vela, and
+B. Lundell, “A schema-guided reason-while-retrieve framework for
+reasoning on scene graphs with large-language-models (llms),” arXiv
+preprint arXiv:2502.03450, 2025.
+[69] Y. Sun, S. Zhao, T. Yu, H. Wen, S. Va, M. Xu, Y. Li, and C. Zhang,
+“Gui-xplore: Empowering generalizable gui agents with one exploration,” in Proceedings of the Computer Vision and Pattern Recognition
+Conference, 2025, pp. 19 477–19 486.
+[70] A. Malysheva, T. T. Sung, C.-B. Sohn, D. Kudenko, and A. Shpilman,
+“Deep multi-agent reinforcement learning with relevance graphs,” arXiv
+preprint arXiv:1811.12557, 2018.
+[71] C. Yu, H. Yu, and S. Gao, “Learning control admissibility models with
+graph neural networks for multi-agent navigation,” in Conference on
+Robot Learning. PMLR, 2023, pp. 934–945.
+[72] W. Ou, B. Luo, X. Xu, Y. Feng, and Y. Zhao, “Reinforcement learned
+multi–agent cooperative navigation in hybrid environment with relational
+graph learning,” IEEE Transactions on Artificial Intelligence, 2024.
+[73] C. Dik, C. Emmanouilidis, and B. Duqueroie, “Graph network-based
+human movement prediction for socially-aware robot navigation in
+shared workspaces,” Neural Computing and Applications, vol. 36,
+no. 34, pp. 21 743–21 759, 2024.
+[74] P. Anokhin, N. Semenov, A. Sorokin, D. Evseev, M. Burtsev, and
+E. Burnaev, “Arigraph: Learning knowledge graph world models with
+episodic memory for llm agents,” arXiv preprint arXiv:2407.04363,
+2024.
+[75] P. Zheng, L. Xia, C. Li, X. Li, and B. Liu, “Towards self-x cognitive
+manufacturing network: An industrial knowledge graph-based multiagent reinforcement learning approach,” Journal of Manufacturing
+Systems, vol. 61, pp. 16–26, 2021.
+[76] R. Yang, B. Yang, A. Feng, S. Ouyang, M. Blum, T. She, Y. Jiang,
+F. Lecue, J. Lu, and I. Li, “Graphusion: a rag framework for knowledge graph construction with a global perspective,” arXiv preprint
+arXiv:2410.17600, 2024.
+[77] Q. Xiong, Z. Xu, Z. Liu, M. Wang, Z. Chen, Y. Sun, Y. Gu, X. Li, and
+G. Yu, “Enhancing the patent matching capability of large language
+models via memory graph,” in Proceedings of the 48th International
+ACM SIGIR Conference on Research and Development in Information
+Retrieval, 2025.
+
+PREPRINT
+
+[78] J. Wu, J. Zhu, and Y. Liu, “Agentic reasoning: Reasoning llms with
+tools for the deep research,” arXiv preprint arXiv:2502.04644, 2025.
+[79] R. Zeng, J. Fang, S. Liu, and Z. Meng, “On the structural memory of
+llm agents,” arXiv preprint arXiv:2412.15266, 2024.
+[80] H. Yang, J. Chen, M. Siew, T. Lorido-Botran, and C. Joe-Wong,
+“Llm-powered decentralized generative agents with adaptive hierarchical knowledge graph for cooperative planning,” arXiv preprint
+arXiv:2502.05453, 2025.
+[81] D. Edge, H. Trinh, N. Cheng, J. Bradley, A. Chao, A. Mody, S. Truitt,
+D. Metropolitansky, R. O. Ness, and J. Larson, “From local to global:
+A graph rag approach to query-focused summarization,” arXiv preprint
+arXiv:2404.16130, 2024.
+[82] W. Chen, T. Bai, J. Su, J. Luan, W. Liu, and C. Shi, “Kg-retriever:
+Efficient knowledge indexing for retrieval-augmented large language
+models,” arXiv preprint arXiv:2412.05547, 2024.
+[83] X. He, Y. Tian, Y. Sun, N. Chawla, T. Laurent, Y. LeCun, X. Bresson,
+and B. Hooi, “G-retriever: Retrieval-augmented generation for textual
+graph understanding and question answering,” in Advances in Neural
+Information Processing Systems, vol. 37, 2024, pp. 132 876–132 907.
+[84] L. Luo, Z. Zhao, G. Haffari, D. Phung, C. Gong, and S. Pan, “Gfm-rag:
+Graph foundation model for retrieval augmented generation,” arXiv
+preprint arXiv:2502.01113, 2025.
+[85] M. Li, S. Miao, and P. Li, “Simple is effective: The roles of graphs and
+large language models in knowledge-graph-based retrieval-augmented
+generation,” in International Conference on Learning Representations,
+2025.
+[86] Z. Guo, L. Xia, Y. Yu, T. Ao, and C. Huang, “Lightrag: Simple and
+fast retrieval-augmented generation,” arXiv preprint arXiv:2410.05779,
+2024.
+[87] Y. Hu, Z. Lei, Z. Zhang, B. Pan, C. Ling, and L. Zhao, “Grag: Graph
+retrieval-augmented generation,” in Findings of the Association for
+Computational Linguistics: NAACL 2025, 2025.
+[88] B. Chen, Z. Guo, Z. Yang, Y. Chen, J. Chen, Z. Liu, C. Shi, and
+C. Yang, “Pathrag: Pruning graph-based retrieval augmented generation
+with relational paths,” arXiv preprint arXiv:2502.14902, 2025.
+[89] W. Xu, K. Mei, H. Gao, J. Tan, Z. Liang, and Y. Zhang, “A-mem:
+Agentic memory for llm agents,” arXiv preprint arXiv:2502.12110,
+2025.
+[90] P. Rasmussen, P. Paliychuk, T. Beauvais, J. Ryan, and D. Chalef, “Zep:
+A temporal knowledge graph architecture for agent memory,” arXiv
+preprint arXiv:2501.13956, 2025.
+[91] B. Jimenez Gutierrez, Y. Shu, Y. Gu, M. Yasunaga, and Y. Su,
+“Hipporag: Neurobiologically inspired long-term memory for large
+language models,” in Advances in Neural Information Processing
+Systems, vol. 37, 2024, pp. 59 532–59 569.
+[92] J. Jiang, K. Zhou, W. X. Zhao, Y. Song, C. Zhu, H. Zhu, and J.-R.
+Wen, “Kg-agent: An efficient autonomous agent framework for complex
+reasoning over knowledge graph,” arXiv preprint arXiv:2402.11163,
+2024.
+[93] Z. Wang, S. X. Teo, J. J. Chew, and W. Shi, “Instructrag: Leveraging
+retrieval-augmented generation on instruction graphs for llm-based task
+planning,” arXiv preprint arXiv:2504.13032, 2025.
+[94] Y. Zhang, Y. Hou, B. Tang, S. Chen, M. Zhang, X. Dong, and S. Chen,
+“Gnns as predictors of agentic workflow performances,” arXiv preprint
+arXiv:2503.11301, 2025.
+[95] L. Ratnabala, A. Fedoseev, R. Peter, and D. Tsetserukou, “Magnnet:
+Multi-agent graph neural network-based efficient task allocation for
+autonomous vehicles with deep reinforcement learning,” arXiv preprint
+arXiv:2502.02311, 2025.
+[96] H. Kang, T. Kwon, J. Park, and J. R. Morrison, “Learning NP-hard
+multi-agent assignment planning using GNN: Inference on a random
+graph and provable auction-fitted q-learning,” in Advances in Neural
+Information Processing Systems, A. H. Oh, A. Agarwal, D. Belgrave,
+and K. Cho, Eds., 2022.
+[97] C. Qian, Z. Xie, Y. Wang, W. Liu, K. Zhu, H. Xia, Y. Dang, Z. Du,
+W. Chen, C. Yang, Z. Liu, and M. Sun, “Scaling large language
+model-based multi-agent collaboration,” in The Thirteenth International
+Conference on Learning Representations, 2025.
+[98] Q. Liu, Z. Li, X. Li, J. Wu, and S. Yuan, “Graph convolution-based deep
+reinforcement learning for multi-agent decision-making in interactive
+traffic scenarios,” in 2022 IEEE 25th International Conference on
+Intelligent Transportation Systems (ITSC). IEEE, 2022, pp. 4074–
+4081.
+[99] G. Bernárdez, J. Suárez-Varela, A. López, X. Shi, S. Xiao, X. Cheng,
+P. Barlet-Ros, and A. Cabellos-Aparicio, “Magnneto: A graph neural network-based multi-agent system for traffic engineering,” IEEE
+
+17
+
+Transactions on Cognitive Communications and Networking, vol. 9,
+no. 2, pp. 494–506, 2023.
+[100] X. Li, X. Wang, C. Bai, and J. Zhang, “Exponential topology-enabled
+scalable communication in multi-agent reinforcement learning,” in
+The Thirteenth International Conference on Learning Representations,
+2025.
+[101] S. Shen, Y. Fu, H. Su, H. Pan, P. Qiao, Y. Dou, and C. Wang,
+“Graphcomm: A graph neural network based method for multi-agent
+reinforcement learning,” in ICASSP 2021-2021 IEEE International
+Conference on Acoustics, Speech and Signal Processing (ICASSP).
+IEEE, 2021, pp. 3510–3514.
+[102] S. Ding, W. Du, L. Ding, J. Zhang, L. Guo, and B. An, “Robust multiagent communication with graph information bottleneck optimization,”
+IEEE Transactions on Pattern Analysis and Machine Intelligence,
+vol. 46, no. 5, pp. 3096–3107, 2023.
+[103] X. Mo, Z. Huang, Y. Xing, and C. Lv, “Multi-agent trajectory prediction
+with heterogeneous edge-enhanced graph attention network,” IEEE
+Transactions on Intelligent Transportation Systems, vol. 23, no. 7, pp.
+9554–9567, 2022.
+[104] Y. Cai, X. He, H. Guo, W.-Y. Yau, and C. Lv, “Transformer-based
+multi-agent reinforcement learning for generalization of heterogeneous
+multi-robot cooperation,” in 2024 IEEE/RSJ International Conference
+on Intelligent Robots and Systems (IROS). IEEE, 2024, pp. 13 695–
+13 702.
+[105] S. Li, J. K. Gupta, P. Morales, R. Allen, and M. J. Kochenderfer, “Deep
+implicit coordination graphs for multi-agent reinforcement learning,”
+in Proceedings of the 20th International Conference on Autonomous
+Agents and MultiAgent Systems, 2021, pp. 764–772.
+[106] Y. Li, S. Ren, P. Wu, S. Chen, C. Feng, and W. Zhang, “Learning
+distilled collaboration graph for multi-agent perception,” in Advances in
+Neural Information Processing Systems, A. Beygelzimer, Y. Dauphin,
+P. Liang, and J. W. Vaughan, Eds., 2021.
+[107] M. Li, S. Chen, Y. Shen, G. Liu, I. W. Tsang, and Y. Zhang,
+“Online multi-agent forecasting with interpretable collaborative graph
+neural networks,” IEEE Transactions on Neural Networks and Learning
+Systems, vol. 35, no. 4, pp. 4768–4782, 2022.
+[108] N. Gupta, J. Z. Hare, R. Kannan, and V. Prasanna, “Deep meta
+coordination graphs for multi-agent reinforcement learning,” arXiv
+preprint arXiv:2502.04028, 2025.
+[109] Y. Liu, W. Wang, Y. Hu, J. Hao, X. Chen, and Y. Gao, “Multi-agent
+game abstraction via graph attention neural network,” in Proceedings
+of the AAAI conference on artificial intelligence, vol. 34, no. 05, 2020,
+pp. 7211–7218.
+[110] Y. Niu, R. Paleja, and M. Gombolay, “Multi-agent graph-attention
+communication and teaming,” in Proceedings of the 20th International
+Conference on Autonomous Agents and MultiAgent Systems, 2021, pp.
+964–973.
+[111] X. Yang, S. Huang, Y. Sun, Y. Yang, C. Yu, W.-W. Tu, H. Yang, and
+Y. Wang, “Learning graph-enhanced commander-executor for multiagent navigation,” in Proceedings of the 2023 International Conference
+on Autonomous Agents and Multiagent Systems, 2023, pp. 1652–1660.
+[112] S. Hu, L. Shen, Y. Zhang, and D. Tao, “Learning multi-agent communication from graph modeling perspective,” in The Twelfth International
+Conference on Learning Representations, 2024.
+[113] G. Zhang, Y. Yue, Z. Li, S. Yun, G. Wan, K. Wang, D. Cheng, J. X. Yu,
+and T. Chen, “Cut the crap: An economical communication pipeline
+for LLM-based multi-agent systems,” in The Thirteenth International
+Conference on Learning Representations, 2025.
+[114] B. Li, Z. Zhao, D.-H. Lee, and G. Wang, “Adaptive graph pruning for
+multi-agent communication,” arXiv preprint arXiv:2506.02951, 2025.
+[115] G. Zhang, Y. Yue, X. Sun, G. Wan, M. Yu, J. Fang, K. Wang, T. Chen,
+and D. Cheng, “G-designer: Architecting multi-agent communication
+topologies via graph neural networks,” arXiv preprint arXiv:2410.11782,
+2024.
+[116] Y. Meng, N. Majcherczyk, W. Liu, S. Kiesel, C. Fan, and F. Pecora,
+“Reliable and efficient multi-agent coordination via graph neural network
+variational autoencoders,” in 2025 IEEE International Conference on
+Robotics and Automation (ICRA). IEEE, 2025.
+[117] Z. Liu, Y. Zhang, P. Li, Y. Liu, and D. Yang, “A dynamic LLM-powered
+agent network for task-oriented agent collaboration,” in First Conference
+on Language Modeling, 2024.
+[118] Q. Chen and B. Heydari, “Adaptive network intervention for complex
+systems: A hierarchical graph reinforcement learning approach,” Journal
+of Computing and Information Science in Engineering, vol. 25, no. 6,
+2025.
+[119] S. Hu, Z. Xiong, M. Qu, X. Yuan, M.-A. Côté, Z. Liu, and J. Tang,
+“Graph policy network for transferable active learning on graphs,” in
+
+PREPRINT
+
+Advances in neural information processing systems, vol. 33, 2020, pp.
+10 174–10 185.
+[120] Y. Zhang, H. Tong, Y. Xia, Y. Zhu, Y. Chi, and L. Ying, “Batch
+active learning with graph neural networks via multi-agent deep
+reinforcement learning,” in Proceedings of the AAAI conference on
+artificial intelligence, vol. 36, no. 8, 2022, pp. 9118–9126.
+[121] Y. Yao, X. Wang, Z. Zhang, Y. Qin, Z. Zhang, X. Chu, Y. Yang, W. Zhu,
+and H. Mei, “Exploring the potential of large language models in graph
+generation,” arXiv preprint arXiv:2403.14358, 2024.
+[122] J. Ji, R. Lei, J. Bi, Z. Wei, X. Chen, Y. Lin, X. Pan, Y. Li, and B. Ding,
+“Llm-based multi-agent systems are scalable graph generative models,”
+arXiv preprint arXiv:2410.09824, 2024.
+[123] A. Havrilla, D. Alvarez-Melis, and N. Fusi, “Igda: Interactive graph
+discovery through large language model agents,” arXiv preprint
+arXiv:2502.17189, 2025.
+[124] E. Du, X. Li, T. Jin, Z. Zhang, R.-H. Li, and G. Wang, “Graphmaster:
+Automated graph synthesis via llm agents in data-limited environments,”
+arXiv preprint arXiv:2504.00711, 2025.
+[125] K.-H. Lai, D. Zha, K. Zhou, and X. Hu, “Policy-gnn: Aggregation
+optimization for graph neural networks,” in Proceedings of the 26th
+ACM SIGKDD International Conference on Knowledge Discovery &
+Data Mining, 2020, pp. 461–471.
+[126] Q. Sun, J. Li, H. Peng, J. Wu, Y. Ning, P. S. Yu, and L. He, “Sugar:
+Subgraph neural network with reinforcement pooling and self-supervised
+mutual information mechanism,” in Proceedings of the web conference
+2021, 2021, pp. 2081–2091.
+[127] L. Kong, J. Feng, H. Liu, D. Tao, Y. Chen, and M. Zhang, “Mag-gnn:
+Reinforcement learning boosted graph neural network,” in Advances
+in neural information processing systems, vol. 36, 2023, pp. 12 000–
+12 021.
+[128] K. Martinkus, P. A. Papp, B. Schesch, and R. Wattenhofer, “Agent-based
+graph neural networks,” in The Eleventh International Conference on
+Learning Representations, 2023.
+[129] A. Liu, W. Li, T. Li, B. Li, G. Xu, P. Zhou, W. Ma, and H. Huang,
+“Graph agent network: Empowering nodes with inference capabilities
+for adversarial resilience,” in Proceedings of the AAAI Conference on
+Artificial Intelligence, vol. 39, no. 18, 2025, pp. 18 746–18 753.
+[130] L. Wei, H. Zhao, X. Zheng, Z. He, and Q. Yao, “A versatile
+graph learning approach through llm-based agent,” arXiv preprint
+arXiv:2309.04565, 2023.
+[131] J. Tang, Y. Yang, W. Wei, L. Shi, L. Su, S. Cheng, D. Yin, and C. Huang,
+“Graphgpt: Graph instruction tuning for large language models,” in
+Proceedings of the 47th International ACM SIGIR Conference on
+Research and Development in Information Retrieval, 2024, pp. 491–
+500.
+[132] Q. Wang, Z. Gao, and R. Xu, “Graph agent: Explicit reasoning agent
+for graphs,” arXiv preprint arXiv:2310.16421, 2023.
+[133] H. Liu, J. Feng, L. Kong, N. Liang, D. Tao, Y. Chen, and M. Zhang,
+“One for all: Towards training one graph model for all classification tasks,”
+in The Twelfth International Conference on Learning Representations,
+2024.
+[134] Y. Li, P. Wang, Z. Li, J. X. Yu, and J. Li, “Zerog: Investigating crossdataset zero-shot transferability in graphs,” in Proceedings of the 30th
+ACM SIGKDD Conference on Knowledge Discovery and Data Mining,
+2024, pp. 1725–1735.
+[135] R. Chen, T. Zhao, A. K. JAISWAL, N. Shah, and Z. Wang, “LLaGA:
+Large language and graph assistant,” in Forty-first International
+Conference on Machine Learning, 2024.
+[136] Z. Luo, X. Song, H. Huang, J. Lian, C. Zhang, J. Jiang, and X. Xie,
+“Graphinstruct: Empowering large language models with graph understanding and reasoning capability,” arXiv preprint arXiv:2403.04483,
+2024.
+[137] N. Chen, Y. Li, J. Tang, and J. Li, “Graphwiz: An instruction-following
+language model for graph computational problems,” in Proceedings
+of the 30th ACM SIGKDD Conference on Knowledge Discovery and
+Data Mining, 2024, pp. 353–364.
+[138] Y. Hu, R. Lei, X. Huang, Z. Wei, and Y. Liu, “Scalable and
+accurate graph reasoning with llm-based multi-agents,” arXiv preprint
+arXiv:2410.05130, 2024.
+[139] Y. Yang, J. Tang, L. Xia, X. Zou, Y. Liang, and C. Huang, “Graphagent:
+Agentic graph language assistant,” arXiv preprint arXiv:2412.17029,
+2024.
+[140] X. S. Li, Q. Chu, Y. Chen, Y. Liu, Y. Liu, Z. Yu, W. Chen, C. Qian,
+C. Shi, and C. Yang, “Graphteam: Facilitating large language modelbased graph analysis via multi-agent collaboration,” arXiv preprint
+arXiv:2410.18032, 2024.
+
+18
+
+[141] A. Sankar, Y. Liu, J. Yu, and N. Shah, “Graph neural networks for
+friend ranking in large-scale social platforms,” in Proceedings of the
+Web Conference 2021, 2021, pp. 2535–2546.
+[142] H.-C. Yi, Z.-H. You, D.-S. Huang, and C. K. Kwoh, “Graph representation learning in bioinformatics: trends, methods and applications,”
+Briefings in Bioinformatics, vol. 23, no. 1, p. bbab340, 2022.
+[143] H. Chen, Y. Bei, Q. Shen, Y. Xu, S. Zhou, W. Huang, F. Huang, S. Wang,
+and X. Huang, “Macro graph neural networks for online billion-scale
+recommender systems,” in Proceedings of the ACM web conference
+2024, 2024, pp. 3598–3608.
+[144] J. Wei, X. Wang, D. Schuurmans, M. Bosma, F. Xia, E. Chi, Q. V.
+Le, D. Zhou et al., “Chain-of-thought prompting elicits reasoning in
+large language models,” in Advances in neural information processing
+systems, vol. 35, 2022, pp. 24 824–24 837.
+[145] S. Ji, S. Pan, E. Cambria, P. Marttinen, and P. S. Yu, “A survey on
+knowledge graphs: Representation, acquisition, and applications,” IEEE
+transactions on neural networks and learning systems, vol. 33, no. 2,
+pp. 494–514, 2021.
+[146] Q. Chen, L. Qin, J. Liu, D. Peng, J. Guan, P. Wang, M. Hu, Y. Zhou,
+T. Gao, and W. Che, “Towards reasoning era: A survey of long
+chain-of-thought for reasoning large language models,” arXiv preprint
+arXiv:2503.09567, 2025.
+[147] Y. Guan, D. Wang, Z. Chu, S. Wang, F. Ni, R. Song, and C. Zhuang,
+“Intelligent agents with llm-based process automation,” in Proceedings
+of the 30th ACM SIGKDD Conference on Knowledge Discovery and
+Data Mining, 2024, pp. 5018–5027.
+[148] P. Ladosz, L. Weng, M. Kim, and H. Oh, “Exploration in deep
+reinforcement learning: A survey,” Information Fusion, vol. 85, pp.
+1–22, 2022.
+[149] X. Chang, P. Ren, P. Xu, Z. Li, X. Chen, and A. Hauptmann, “A
+comprehensive survey of scene graphs: Generation and application,”
+IEEE Transactions on Pattern Analysis and Machine Intelligence,
+vol. 45, no. 1, pp. 1–26, 2021.
+[150] W. Huang, F. Xia, D. Shah, D. Driess, A. Zeng, Y. Lu, P. Florence,
+I. Mordatch, S. Levine, K. Hausman et al., “Grounded decoding: Guiding
+text generation with grounded models for embodied agents,” Advances
+in Neural Information Processing Systems, vol. 36, pp. 59 636–59 661,
+2023.
+[151] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez,
+L. u. Kaiser, and I. Polosukhin, “Attention is all you need,” in Advances
+in Neural Information Processing Systems, vol. 30, 2017.
+[152] P. Veličković, G. Cucurull, A. Casanova, A. Romero, P. Lio, and
+Y. Bengio, “Graph attention networks,” in International Conference
+on Learning Representations, 2018.
+[153] T. N. Kipf and M. Welling, “Semi-supervised classification with
+graph convolutional networks,” in International Conference on Learning
+Representations, 2017.
+[154] J. Luo, W. Zhang, Y. Yuan, Y. Zhao, J. Yang, Y. Gu, B. Wu,
+B. Chen, Z. Qiao, Q. Long et al., “Large language model agent: A
+survey on methodology, applications and challenges,” arXiv preprint
+arXiv:2503.21460, 2025.
+[155] W. Zhang, X. Zhang, C. Zhang, L. Yang, J. Shang, Z. Wei, H. P.
+Zou, Z. Huang, Z. Wang, Y. Gao et al., “Personaagent: When large
+language model agents meet personalization at test time,” arXiv preprint
+arXiv:2506.06254, 2025.
+[156] D. Kumaran, D. Hassabis, and J. L. McClelland, “What learning systems
+do intelligent agents need? complementary learning systems theory
+updated,” Trends in cognitive sciences, vol. 20, no. 7, pp. 512–534,
+2016.
+[157] T. L. Griffiths, F. Callaway, M. B. Chang, E. Grant, P. M. Krueger, and
+F. Lieder, “Doing more with less: meta-reasoning and meta-learning
+in humans and machines,” Current Opinion in Behavioral Sciences,
+vol. 29, pp. 24–30, 2019.
+[158] S. Robertson, H. Zaragoza et al., “The probabilistic relevance framework:
+Bm25 and beyond,” Foundations and Trends® in Information Retrieval,
+vol. 3, no. 4, pp. 333–389, 2009.
+[159] B. Peng, Y. Zhu, Y. Liu, X. Bo, H. Shi, C. Hong, Y. Zhang, and
+S. Tang, “Graph retrieval-augmented generation: A survey,” arXiv
+preprint arXiv:2408.08921, 2024.
+[160] Q. Zhang, S. Chen, Y. Bei, Z. Yuan, H. Zhou, Z. Hong, J. Dong,
+H. Chen, Y. Chang, and X. Huang, “A survey of graph retrievalaugmented generation for customized large language models,” arXiv
+preprint arXiv:2501.13958, 2025.
+[161] K. Hatalis, D. Christou, J. Myers, S. Jones, K. Lambert, A. Amos-Binks,
+Z. Dannenhauer, and D. Dannenhauer, “Memory matters: The need
+to improve long-term memory in llm-agents,” in Proceedings of the
+AAAI Symposium Series, vol. 2, no. 1, 2023, pp. 277–280.
+
+PREPRINT
+
+[162] A. Amirkhani and A. H. Barshooi, “Consensus in multi-agent systems:
+a review,” Artificial Intelligence Review, vol. 55, no. 5, pp. 3897–3935,
+2022.
+[163] S. Han, Q. Zhang, Y. Yao, W. Jin, Z. Xu, and C. He, “Llm
+multi-agent systems: Challenges and open problems,” arXiv preprint
+arXiv:2402.03578, 2024.
+[164] E. Jang, S. Gu, and B. Poole, “Categorical reparameterization
+with gumbel-softmax,” in International Conference on Learning
+Representations, 2017.
+[165] G. Salha, S. Limnios, R. Hennequin, V.-A. Tran, and M. Vazirgiannis,
+“Gravity-inspired graph autoencoders for directed link prediction,” in
+Proceedings of the 28th ACM international conference on information
+and knowledge management, 2019, pp. 589–598.
+[166] Z. Hou, X. Liu, Y. Cen, Y. Dong, H. Yang, C. Wang, and J. Tang,
+“Graphmae: Self-supervised masked graph autoencoders,” in Proceedings
+of the 28th ACM SIGKDD conference on knowledge discovery and
+data mining, 2022, pp. 594–604.
+[167] T. N. Kipf and M. Welling, “Variational graph auto-encoders,” in NIPS
+Workshop on Bayesian Deep Learning, 2016.
+[168] Y. Zhu, Y. Du, Y. Wang, Y. Xu, J. Zhang, Q. Liu, and S. Wu, “A survey
+on deep graph generation: Methods and applications,” in Learning on
+Graphs Conference. PMLR, 2022, pp. 47–1.
+[169] S. Huang, G. Lee, Z. Bao, and S. Pan, “Cost-effective data labelling for
+graph neural networks,” in Proceedings of the ACM Web Conference
+2024, 2024, pp. 353–364.
+[170] R. Rafailov, A. Sharma, E. Mitchell, C. D. Manning, S. Ermon, and
+C. Finn, “Direct preference optimization: Your language model is
+secretly a reward model,” in Advances in neural information processing
+systems, vol. 36, 2023, pp. 53 728–53 741.
+[171] H. Wang, T. Fu, Y. Du, W. Gao, K. Huang, Z. Liu, P. Chandak, S. Liu,
+P. Van Katwyk, A. Deac et al., “Scientific discovery in the age of
+artificial intelligence,” Nature, vol. 620, no. 7972, pp. 47–60, 2023.
+[172] Y. Zhang, X. Chen, B. Jin, S. Wang, S. Ji, W. Wang, and J. Han,
+“A comprehensive survey of scientific large language models and
+their applications in scientific discovery,” in Proceedings of the 2024
+Conference on Empirical Methods in Natural Language Processing,
+2024, pp. 8783–8817.
+[173] A. Ghafarollahi and M. J. Buehler, “Sciagents: Automating scientific
+discovery through bioinspired multi-agent intelligent graph reasoning,”
+Advanced Materials, p. 2413523, 2024.
+[174] C.-Y. Hsu, K. Cox, J. Xu, Z. Tan, T. Zhai, M. Hu, D. Pratt, T. Chen,
+Z. Hu, and Y. Ding, “Thought graph: Generating thought process for
+biological reasoning,” in Companion Proceedings of the ACM Web
+Conference 2024, 2024, pp. 537–540.
+[175] J. Park, M. Bae, D. Ko, and H. J. Kim, “Llamo: Large language
+model-based molecular graph assistant,” in The Thirty-eighth Annual
+Conference on Neural Information Processing Systems, 2024.
+[176] Y. Liu, W. Chen, Y. Bai, X. Liang, G. Li, W. Gao, and L. Lin, “Aligning
+cyber space with physical world: A comprehensive survey on embodied
+ai,” arXiv preprint arXiv:2407.06886, 2024.
+[177] Z. Ravichandran, L. Peng, N. Hughes, J. D. Griffith, and L. Carlone,
+“Hierarchical representations and explicit memory: Learning effective
+navigation policies on 3d scene graphs using graph neural networks,”
+in 2022 International Conference on Robotics and Automation (ICRA).
+IEEE, 2022, pp. 9272–9279.
+[178] K. Rana, J. Haviland, S. Garg, J. Abou-Chakra, I. Reid, and N. Suenderhauf, “Sayplan: Grounding large language models using 3d scene graphs
+for scalable robot task planning,” in Conference on Robot Learning.
+PMLR, 2023, pp. 23–72.
+[179] H. Yin, X. Xu, Z. Wu, J. Zhou, and J. Lu, “Sg-nav: Online 3d scene
+graph prompting for llm-based zero-shot object navigation,” in Advances
+in Neural Information Processing Systems, vol. 37, 2024, pp. 5285–
+5307.
+[180] F. Yang, W. Chen, H. Lin, S. Wu, X. Li, Z. Li, and Y. Wang, “Taskoriented tool manipulation with robotic dexterous hands: A knowledge
+graph approach from fingers to functionality,” IEEE Transactions on
+Cybernetics, 2024.
+[181] Y. Qi, G. Kyebambo, S. Xie, W. Shen, S. Wang, B. Xie, B. He, Z. Wang,
+and S. Jiang, “Safety control of service robots with llms and embodied
+knowledge graphs,” arXiv preprint arXiv:2405.17846, 2024.
+[182] Y. Song, P. Sun, H. Liu, Z. Li, W. Song, Y. Xiao, and X. Zhou, “Scenedriven multimodal knowledge graph construction for embodied ai,”
+IEEE Transactions on Knowledge and Data Engineering, 2024.
+[183] D. Perez-Liebana, J. Liu, A. Khalifa, R. D. Gaina, J. Togelius, and S. M.
+Lucas, “General video game ai: A multitrack framework for evaluating
+agents, games, and content generation algorithms,” IEEE Transactions
+on Games, vol. 11, no. 3, pp. 195–214, 2019.
+
+19
+
+[184] O. Biggar and I. Shames, “The graph structure of two-player games,”
+Scientific Reports, vol. 13, no. 1, p. 1833, 2023.
+[185] R. A. Yeh, A. G. Schwing, J. Huang, and K. Murphy, “Diverse generation for multi-agent sports games,” in Proceedings of the IEEE/CVF
+Conference on Computer Vision and Pattern Recognition, 2019, pp.
+4610–4619.
+[186] S. Hu, T. Huang, G. Liu, R. R. Kompella, F. Ilhan, S. F. Tekin, Y. Xu,
+Z. Yahn, and L. Liu, “A survey on large language model-based game
+agents,” arXiv preprint arXiv:2404.02039, 2024.
+[187] Z. Shi, M. Fang, and L. Chen, “Monte carlo planning with large language
+model for text-based game agents,” arXiv preprint arXiv:2504.16855,
+2025.
+[188] A. Adhikari, X. Yuan, M.-A. Côté, M. Zelinka, M.-A. Rondeau,
+R. Laroche, P. Poupart, J. Tang, A. Trischler, and W. Hamilton,
+“Learning dynamic belief graphs to generalize on text-based games,”
+in Advances in Neural Information Processing Systems, vol. 33, 2020,
+pp. 3045–3057.
+[189] S. Ma, C. Xu, X. Jiang, M. Li, H. Qu, C. Yang, J. Mao, and J. Guo,
+“Think-on-graph 2.0: Deep and faithful large language model reasoning
+with knowledge-guided retrieval augmented generation,” in The Twelfth
+International Conference on Learning Representations, 2025.
+[190] B. Jin, H. Zeng, Z. Yue, J. Yoon, S. Arik, D. Wang, H. Zamani, and
+J. Han, “Search-r1: Training llms to reason and leverage search engines
+with reinforcement learning,” arXiv preprint arXiv:2503.09516, 2025.
+[191] H. Song, J. Jiang, Y. Min, J. Chen, Z. Chen, W. X. Zhao, L. Fang, and
+J.-R. Wen, “R1-searcher: Incentivizing the search capability in llms via
+reinforcement learning,” arXiv preprint arXiv:2503.05592, 2025.
+[192] M. Chen, T. Li, H. Sun, Y. Zhou, C. Zhu, H. Wang, J. Z. Pan, W. Zhang,
+H. Chen, F. Yang et al., “Learning to reason with search for llms via
+reinforcement learning,” arXiv preprint arXiv:2503.19470, 2025.
+[193] G. Dong, M. Tang, Z. Wang, J. Gao, S. Guo, L. Cai, R. Gutierrez,
+B. Campbel, L. E. Barnes, and M. Boukhechba, “Graph neural networks
+in iot: A survey,” ACM Transactions on Sensor Networks, vol. 19, no. 2,
+pp. 1–50, 2023.
+[194] J. Huang, J. Su, and Q. Chang, “Graph neural network and multi-agent
+reinforcement learning for machine-process-system integrated control to
+optimize production yield,” Journal of Manufacturing Systems, vol. 64,
+pp. 81–93, 2022.
+[195] L. Duan and L. Da Xu, “Data analytics in industry 4.0: A survey,”
+Information Systems Frontiers, vol. 26, no. 6, pp. 2287–2303, 2024.
+[196] J. Shen, Y. Lin, Y. Zhang, W. Zhang, F. Shu, and J. Li, “Content cachingassisted vehicular edge computing using multi-agent graph attention
+reinforcement learning,” IEEE Transactions on Vehicular Technology,
+2024.
+[197] Y. Wu, H.-N. Dai, and H. Tang, “Graph neural networks for anomaly
+detection in industrial internet of things,” IEEE Internet of Things
+Journal, vol. 9, no. 12, pp. 9214–9231, 2021.
+[198] S. Li, W. Hu, D. Cao, J. Hu, Z. Chen, and F. Blaabjerg, “Coordinated
+operation of multiple microgrids with heat–electricity energy based on
+graph surrogate model-enabled robust multiagent deep reinforcement
+learning,” IEEE Transactions on Industrial Informatics, 2024.
+[199] C. Gao, F. Xu, X. Chen, X. Wang, X. He, and Y. Li, “Simulating
+human society with large language model agents: City, social media,
+and economic system,” in Companion Proceedings of the ACM Web
+Conference 2024, 2024, pp. 1290–1293.
+[200] M. Papachristou and Y. Yuan, “Network formation and dynamics among
+multi-llms,” arXiv preprint arXiv:2402.10659, 2024.
+[201] G. Murić, A. Tregubov, J. Blythe, A. Abeliuk, D. Choudhary, K. Lerman,
+and E. Ferrara, “Large-scale agent-based simulations of online social
+networks,” Autonomous Agents and Multi-Agent Systems, vol. 36,
+no. 2, p. 38, 2022.
+[202] C. Gao, X. Lan, Z. Lu, J. Mao, J. Piao, H. Wang, D. Jin, and Y. Li,
+“S3: Social-network simulation system with large language modelempowered agents,” arXiv preprint arXiv:2307.14984, 2023.
+[203] A. Ferraro, A. Galli, V. La Gatta, M. Postiglione, G. M. Orlando,
+D. Russo, G. Riccio, A. Romano, and V. Moscato, “Agent-based
+modelling meets generative ai in social network simulations,” in
+International Conference on Advances in Social Networks Analysis
+and Mining. Springer, 2024, pp. 155–170.
+[204] Z. Shu, X. Sun, and H. Cheng, “When llm meets hypergraph: A
+sociological analysis on personality via online social networks,” in
+Proceedings of the 33rd ACM International Conference on Information
+and Knowledge Management, 2024, pp. 2087–2096.
+[205] T. Hu, D. Liakopoulos, X. Wei, R. Marculescu, and N. J. Yadwadkar,
+“Simulating rumor spreading in social networks using llm agents,” arXiv
+preprint arXiv:2502.01450, 2025.
+
+PREPRINT
+
+[206] G. Papoudakis, F. Christianos, L. Schäfer, and S. V. Albrecht,
+“Benchmarking multi-agent deep reinforcement learning algorithms
+in cooperative tasks,” in Thirty-fifth Conference on Neural Information
+Processing Systems Datasets and Benchmarks Track (Round 1), 2021.
+[207] M. Bettini, A. Prorok, and V. Moens, “Benchmarl: Benchmarking multiagent reinforcement learning,” Journal of Machine Learning Research,
+vol. 25, no. 217, pp. 1–10, 2024.
+[208] M. Pleines, M. Pallasch, F. Zimmer, and M. Preuss, “Memory gym:
+Towards endless tasks to benchmark memory capabilities of agents,”
+Journal of Machine Learning Research, vol. 26, pp. 1–40, 2025.
+[209] M. Li, Y. Zhao, B. Yu, F. Song, H. Li, H. Yu, Z. Li, F. Huang, and Y. Li,
+“Api-bank: A comprehensive benchmark for tool-augmented llms,” in
+Proceedings of the 2023 Conference on Empirical Methods in Natural
+Language Processing, 2023, pp. 3102–3116.
+[210] K. Valmeekam, M. Marquez, A. Olmo, S. Sreedharan, and S. Kambhampati, “Planbench: An extensible benchmark for evaluating large
+language models on planning and reasoning about change,” in Advances
+in Neural Information Processing Systems, vol. 36, 2023, pp. 38 975–
+38 987.
+[211] X. Liu, H. Yu, H. Zhang, Y. Xu, X. Lei, H. Lai, Y. Gu, H. Ding,
+K. Men, K. Yang, S. Zhang, X. Deng, A. Zeng, Z. Du, C. Zhang,
+S. Shen, T. Zhang, Y. Su, H. Sun, M. Huang, Y. Dong, and J. Tang,
+“Agentbench: Evaluating LLMs as agents,” in The Twelfth International
+Conference on Learning Representations, 2024.
+[212] Y. Qin, S. Liang, Y. Ye, K. Zhu, L. Yan, Y. Lu, Y. Lin, X. Cong, X. Tang,
+B. Qian et al., “Toolllm: Facilitating large language models to master
+16000+ real-world apis,” in The Twelfth International Conference on
+Learning Representations, 2024.
+[213] J. Wang, M. Zerun, Y. Li, S. Zhang, C. Chen, K. Chen, and X. Le, “Gta:
+a benchmark for general tool agents,” in The Thirty-eight Conference
+on Neural Information Processing Systems Datasets and Benchmarks
+Track, 2024.
+[214] J. Xie, K. Zhang, J. Chen, T. Zhu, R. Lou, Y. Tian, Y. Xiao, and Y. Su,
+“Travelplanner: A benchmark for real-world planning with language
+agents,” in International Conference on Machine Learning. PMLR,
+2024, pp. 54 590–54 613.
+[215] S. Yao, N. Shinn, P. Razavi, and K. Narasimhan, “τ -bench: A benchmark
+for tool-agent-user interaction in real-world domains,” arXiv preprint
+arXiv:2406.12045, 2024.
+[216] J. Lu, T. Holleis, Y. Zhang, B. Aumayer, F. Nan, F. Bai, S. Ma, S. Ma,
+M. Li, G. Yin et al., “Toolsandbox: A stateful, conversational, interactive
+evaluation benchmark for llm tool use capabilities,” arXiv preprint
+arXiv:2408.04682, 2024.
+[217] L. Geng and E. Y. Chang, “Realm-bench: A real-world planning benchmark for llms and multi-agent systems,” arXiv preprint
+arXiv:2502.18836, 2025.
+[218] Y. Li, P. Wang, X. Zhu, A. Chen, H. Jiang, D. Cai, V. W. Chan,
+and J. Li, “Glbench: A comprehensive benchmark for graph with
+large language models,” in Advances in Neural Information Processing
+Systems, vol. 37, 2024, pp. 42 349–42 368.
+[219] X. Li, W. Chen, Q. Chu, H. Li, Z. Sun, R. Li, C. Qian, Y. Wei,
+C. Shi, Z. Liu et al., “Can large language models analyze graphs like
+professionals? a benchmark, datasets and models,” in Advances in
+Neural Information Processing Systems, vol. 37, 2024, pp. 141 045–
+141 070.
+[220] J. Tang, Q. Zhang, Y. Li, N. Chen, and J. Li, “Grapharena: Evaluating
+and exploring large language models on graph computation,” in
+The Thirteenth International Conference on Learning Representations,
+2025.
+[221] J. Liu, C. Yang, Z. Lu, J. Chen, Y. Li, M. Zhang, T. Bai, Y. Fang, L. Sun,
+P. S. Yu et al., “Graph foundation models: Concepts, opportunities
+and challenges,” IEEE Transactions on Pattern Analysis and Machine
+Intelligence, 2025.
+[222] H. Mao, Z. Chen, W. Tang, J. Zhao, Y. Ma, T. Zhao, N. Shah, M. Galkin,
+and J. Tang, “Position: Graph foundation models are already here,” in
+Forty-first International Conference on Machine Learning, 2024.
+[223] Z. Ying, D. Bourgeois, J. You, M. Zitnik, and J. Leskovec, “Gnnexplainer: Generating explanations for graph neural networks,” in
+Advances in neural information processing systems, vol. 32, 2019.
+[224] H. Yuan, H. Yu, S. Gui, and S. Ji, “Explainability in graph neural
+networks: A taxonomic survey,” IEEE transactions on pattern analysis
+and machine intelligence, vol. 45, no. 5, pp. 5782–5799, 2022.
+[225] S. Maliah, G. Shani, and R. Stern, “Collaborative privacy preserving
+multi-agent planning: Planners and heuristics,” Autonomous agents and
+multi-agent systems, vol. 31, pp. 493–530, 2017.
+
+20
+
+[226] F. He, T. Zhu, D. Ye, B. Liu, W. Zhou, and P. S. Yu, “The emerged
+security and privacy of llm agent: A survey with case studies,” arXiv
+preprint arXiv:2407.19354, 2024.
+[227] Y. Li, M. Purcell, T. Rakotoarivelo, D. Smith, T. Ranbaduge, and K. S.
+Ng, “Private graph data release: A survey,” ACM Computing Surveys,
+vol. 55, no. 11, pp. 1–39, 2023.
+[228] D. Calvaresi, M. Schumacher, and J.-P. Calbimonte, “Personal
+data privacy semantics in multi-agent systems interactions,” in
+Advances in Practical Applications of Agents, Multi-Agent Systems,
+and Trustworthiness. The PAAMS Collection: 18th International
+Conference, PAAMS 2020, L’Aquila, Italy, October 7–9, 2020,
+Proceedings 18. Springer, 2020, pp. 55–67.
+[229] M. Standen, J. Kim, and C. Szabo, “Adversarial machine learning attacks
+and defences in multi-agent reinforcement learning,” ACM Computing
+Surveys, vol. 57, no. 5, pp. 1–35, 2025.
+[230] J. Tu, T. Wang, J. Wang, S. Manivasagam, M. Ren, and R. Urtasun,
+“Adversarial attacks on multi-agent communication,” in Proceedings of
+the IEEE/CVF International Conference on Computer Vision, 2021, pp.
+7768–7777.
+[231] L. Sun, Y. Dou, C. Yang, K. Zhang, J. Wang, P. S. Yu, L. He, and
+B. Li, “Adversarial attack and defense on graph data: A survey,” IEEE
+Transactions on Knowledge and Data Engineering, vol. 35, no. 8, pp.
+7693–7711, 2022.
+[232] Z. Liao, L. Mo, C. Xu, M. Kang, J. Zhang, C. Xiao, Y. Tian, B. Li,
+and H. Sun, “Eia: Environmental injection attack on generalist web
+agents for privacy leakage,” arXiv preprint arXiv:2409.11295, 2024.
+[233] M. Yu, S. Wang, G. Zhang, J. Mao, C. Yin, Q. Liu, Q. Wen, K. Wang,
+and Y. Wang, “Netsafe: Exploring the topological safety of multi-agent
+networks,” arXiv preprint arXiv:2410.15686, 2024.
+[234] S. Wang, G. Zhang, M. Yu, G. Wan, F. Meng, C. Guo, K. Wang, and
+Y. Wang, “G-safeguard: A topology-guided security lens and treatment
+on llm-based multi-agent systems,” arXiv preprint arXiv:2502.11127,
+2025.
+[235] P. Xu, W. Shao, K. Zhang, P. Gao, S. Liu, M. Lei, F. Meng,
+S. Huang, Y. Qiao, and P. Luo, “Lvlm-ehub: A comprehensive evaluation
+benchmark for large vision-language models,” IEEE Transactions on
+Pattern Analysis and Machine Intelligence, 2024.
+[236] Z. Liang, Y. Xu, Y. Hong, P. Shang, Q. Wang, Q. Fu, and K. Liu, “A
+survey of multimodel large language models,” in Proceedings of the
+3rd International Conference on Computer, Artificial Intelligence and
+Control Engineering, 2024, pp. 405–409.
+[237] Z. Durante, Q. Huang, N. Wake, R. Gong, J. S. Park, B. Sarkar, R. Taori,
+Y. Noda, D. Terzopoulos, Y. Choi et al., “Agent ai: Surveying the
+horizons of multimodal interaction,” arXiv preprint arXiv:2401.03568,
+2024.
+[238] J. Xie, Z. Chen, R. Zhang, X. Wan, and G. Li, “Large multimodal
+agents: A survey,” arXiv preprint arXiv:2402.15116, 2024.
+[239] C. Peng, J. He, and F. Xia, “Learning on multimodal graphs: A survey,”
+arXiv preprint arXiv:2402.05322, 2024.
+[240] X. Ning, D. Fu, T. Wei, W. Xu, and J. He, “Graph4MM: Weaving
+multimodal learning with structural information,” in Forty-second
+International Conference on Machine Learning, 2025.
+[241] X. Hou, Y. Zhao, S. Wang, and H. Wang, “Model context protocol
+(mcp): Landscape, security threats, and future research directions,” arXiv
+preprint arXiv:2503.23278, 2025.
+[242] Y. Yang, H. Chai, Y. Song, S. Qi, M. Wen, N. Li, J. Liao, H. Hu,
+J. Lin, G. Chang et al., “A survey of ai agent protocols,” arXiv preprint
+arXiv:2504.16736, 2025.
+[243] K.-T. Tran, D. Dao, M.-D. Nguyen, Q.-V. Pham, B. O’Sullivan, and
+H. D. Nguyen, “Multi-agent collaboration mechanisms: A survey of
+llms,” arXiv preprint arXiv:2501.06322, 2025.
+[244] S. Willmott, J. Dale, B. Burg, P. Charlton, and P. O’Brien, “Agentcities:
+a worldwide open agent network,” Agentlink News, vol. 8, pp. 13–15,
+2001.
+
+

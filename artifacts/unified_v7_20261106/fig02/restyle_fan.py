@@ -284,6 +284,11 @@ def main():
     for t in g.shapes:                                       # last Memory tag: a little inward, away from the Interface column
         if t.shape_type == 6 and tname(t) == 'TradingAgents': t.left += Inches(0.12)
 
+    # 3b) Task-Specific Harness sector: the four task groups of scripts/task_groups.py, in its order from the General
+    #     Time Series Harness boundary (50 deg) clockwise. The wedges are re-cut by the number of works they hold; the
+    #     representative works are unchanged and move to the wedge of their group.
+    retask_tsk(g, slide, sid, keep, wedge_labels, centre, to_child, to_slide, tname)
+
     # progressive spokes: each spoke is split at the ring edges; per band the width falls, the colour lightens and
     # the dash gets sparser (solid -> dense dash -> sparse dash), matching the fading fill
     EDGE = [r[0] / RINGS[3][0] for r in RINGS]               # normalised radii of the ring edges
@@ -337,7 +342,7 @@ def main():
 
     # 6) clay icons for the 14 wedges (top-level pictures), ordered left to right around the fan
     names = ['llm', 'chat', 'memory', 'tools', 'planning', 'runtime', 'calendar', 'window', 'timeline', 'cutoff',
-             'forecast', 'synthesis', 'anomaly', 'decision']
+             'anomaly', 'forecast', 'synthesis', 'decision']   # task groups: analysis, forecasting, generation, decision
     pics = [s for s in slide.shapes if s.shape_type == 13]
     cxs, cys = to_slide(CX, CY)
     pics.sort(key=lambda p: -math.atan2(cys - (p.top + p.height / 2), (p.left + p.width / 2) - cxs))
@@ -348,6 +353,77 @@ def main():
         p._element.getparent().remove(p._element)
     prs.save(OUT)
     print('saved', OUT, 'sectors at', [round(b, 1) for b in bounds], 'rotation factor', round(f, 4), 'icons', len(pics))
+
+
+# Task-Specific Harness wedges (scripts/task_groups.py, ORDER): new boundaries in degrees, from 50 (GTS | TSK) to 0.
+TSK_GROUPS = [('Analysis of', 'Observed Series'), ('Forecasting',), ('Generation',), ('Decision', 'Making')]
+TSK_BOUNDS = [50.0, 29.5, 18.5, 9.5, 0.0]
+# Representative works per group. A work goes to the group of its Task-Specific Harness modules (ledger task labels
+# mapped by task_groups.LEAF); a work whose modules span two groups stays in the group that matches its former family
+# wedge (MarsTSC, AgentFM, AQuA, AgriWorld), else its first source task decides (GenAutoML, ChatAD). MOSAIC has no
+# Task-Specific Harness module; its source tasks are forecasting and synthesis, and it fills the Generation wedge.
+# Stacks: (centre x of the top tag, top y, x shift per row, names), child inches; rows 0.26 in apart (as before).
+# The positions were searched so that every tag stays inside its wedge and the outer band (checked against the wedge spokes and the ring edges).
+TSK_STACKS = [
+    [(21.0, 4.30, -0.32, ['ARTIST', 'TS-Exam Agent', 'WeatherTGD', 'Time-RA', 'ChatAD', 'TraceBench']),
+     (22.15, 5.46, -0.5, ['SAGE-AD', 'AnomaMind', 'Argos', 'AgentFM', 'SAGE-Sleep'])],
+    [(23.1, 6.66, -0.5, ['MemCast', 'Dr-CiK', 'MarsTSC', 'MoiraiAgent', 'GenAutoML'])],
+    [(23.9, 8.22, -0.8, ['MERIT', 'MOSAIC'])],
+    [(23.9, 9.48, 0.0, ['AgriWorld', 'Fin-Analyst', 'LLMTraveler']), (21.6, 9.70, 0.0, ['AQuA', 'PandaAI'])],
+]
+
+
+def retask_tsk(g, slide, sid, keep, wedge_labels, centre, to_child, to_slide, tname):
+    P = lambda r, a: (CX + r * RINGS[3][0] * math.cos(math.radians(a)), CY - r * RINGS[3][1] * math.sin(math.radians(a)))
+    norm = lambda q: math.hypot((q[0] - CX) / RINGS[3][0], (CY - q[1]) / RINGS[3][1])
+    radial = lambda a: math.degrees(math.atan2(RINGS[3][1] * math.sin(math.radians(a)), RINGS[3][0] * math.cos(math.radians(a))))
+    lim = TSK_BOUNDS[0] - 1
+    mids = [(a0 + a1) / 2 for a0, a1 in zip(TSK_BOUNDS, TSK_BOUNDS[1:])]
+    label_at, icon_at = list(mids), list(mids)
+    label_at[0], icon_at[0] = 35.5, 43.0          # the wide Analysis wedge: label and icon side by side, not overlapping
+    # spokes: the three thin spokes inside the sector move to the new boundaries (same radii)
+    outer = lambda s: max(ends(s), key=norm)
+    thin = sorted((s for s in g.shapes if s.shape_type == 1 and s.line.fill.type == 1 and s.line.width.pt < 1.9
+                   and angle(*outer(s)) < lim), key=lambda s: -angle(*outer(s)))
+    assert len(thin) == 3, len(thin)
+    for s, a in zip(thin, TSK_BOUNDS[1:4]):
+        p0, p1 = ends(s); r0, r1 = norm(p0), norm(p1)
+        (x0, y0), (x1, y1) = P(r0, a), P(r1, a)
+        s.left, s.top = Inches(min(x0, x1)), Inches(min(y0, y1)); s.width, s.height = Inches(abs(x1 - x0)), Inches(abs(y1 - y0))
+        xf = s._element.spPr.find(qn('a:xfrm'))
+        for k, on in (('flipH', x1 < x0), ('flipV', y1 < y0)):
+            if on: xf.set(k, '1')
+            elif k in xf.attrib: del xf.attrib[k]
+    # wedge labels: group names, centred in the new wedge at the old radius, reading along the radius
+    labels = sorted((s for s in g.shapes if s.shape_id in wedge_labels and angle(*centre(s)) < lim), key=lambda s: -angle(*centre(s)))
+    assert len(labels) == 4
+    for s, lines, a in zip(labels, TSK_GROUPS, label_at):
+        r = norm(centre(s)) - 0.01
+        set_lines(s, list(lines), HUE['tsk'][0], align=PP_ALIGN.CENTER)
+        for p in s.text_frame.paragraphs:
+            for run in p.runs: run.font.size = Pt(16)
+        s.text_frame.word_wrap = False
+        s.width = Inches(2.4)
+        x, y = P(r, a)
+        s.left, s.top = int(Inches(x) - s.width / 2), int(Inches(y) - s.height / 2)
+        s.rotation = (-(radial(a) + 4)) % 360
+    # icons (top-level pictures, slide coordinates): to the middle of the new wedge, same radius
+    pics = [p for p in slide.shapes if p.shape_type == 13]
+    tsk_pics = sorted((p for p in pics if angle(*to_child(p.left + p.width / 2, p.top + p.height / 2)) < lim),
+                      key=lambda p: -angle(*to_child(p.left + p.width / 2, p.top + p.height / 2)))
+    assert len(tsk_pics) == 4
+    for p, a in zip(tsk_pics, icon_at):
+        r = norm(to_child(p.left + p.width / 2, p.top + p.height / 2))
+        X, Y = to_slide(*P(r, a)); p.left, p.top = int(X - p.width / 2), int(Y - p.height / 2)
+    # tags
+    tags = {tname(t): t for t in g.shapes if t.shape_type == 6 and sid(t) not in keep and angle(*centre(t)) < lim}
+    placed = set()
+    for stacks in TSK_STACKS:
+        for cx, top, dx, names in stacks:
+            for k, nm in enumerate(names):
+                t = tags[nm]; placed.add(nm)
+                t.left, t.top = int(Inches(cx + dx * k) - t.width / 2), Inches(top + 0.26 * k)
+    assert placed == set(tags), set(tags) ^ placed
 
 
 def crop(pdf):

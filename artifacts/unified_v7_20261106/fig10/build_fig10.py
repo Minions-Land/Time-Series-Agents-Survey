@@ -152,7 +152,7 @@ def detect(slide):
     pedestal(sh, x + 0.16, 1.3, 0.92, 0.24, 'llm')
     ic(sh, 'llm', x + 0.3, 0.78, 0.64)
     tx(sh, x + 1.18, 0.8, 1.95, 0.34, 'Learned Detector', size=15, bold=True, color=LL[0], align='l')
-    pill(sh, x + 1.2, 1.18, 1.18, 0.3, 'LLM-Side', key='llm', size=12.5)
+    pill(sh, x + 1.2, 1.18, 1.18, 0.3, 'LLM Side', key='llm', size=12.5)
     plot(sh, x + 0.15, 1.72, w - 0.3, 2.12, CAND, 'Candidate Region', 'llm')
     tx(sh, x + 0.1, 3.95, w - 0.2, 0.3, 'Interval Decisions', size=13.5, bold=True, color=LL[0])
     return g_

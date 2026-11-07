@@ -1,6 +1,7 @@
 """Figure 8 (fig:task-specific-harness), V7 house style.
 
-Four task panels (Section 6 headings). Each panel reads from the input series through the procedure to the resulting
+Four task panels, one per task group (scripts/task_groups.py, in its order: Analysis of Observed Series, Forecasting,
+Generation, Decision Making); the Analysis of Observed Series panel uses anomaly diagnosis with a localized interval. Each panel reads from the input series through the procedure to the resulting
 artifact; dashed indigo paths are feedback that revises the procedure; the indigo strip at the bottom names the
 evaluation target.
 """
@@ -120,9 +121,9 @@ def fc_glyph(sh, x, y, w, h, cut=0.55):
 SER = [0.35, 0.55, 0.4, 0.7, 0.5, 0.62, 0.45, 0.8, 0.55, 0.72, 0.5, 0.66]
 
 
-# ------------------------------------------------------------------------------------------------ (a) forecasting
+# ------------------------------------------------------------------------------------------------ forecasting
 def forecasting(slide):
-    g, sh, u, v = panel(slide, 0, 0, 'Forecasting and Prediction', 'forecast')
+    g, sh, u, v = panel(slide, 0, 1, 'Forecasting', 'forecast')
     ya, yb = v + 1.22, v + 2.6
     # history -> select models -> baseline -> revise (+context) -> revised forecast with its horizon
     sheet(sh, u + 0.18, ya - 0.3, 0.92, 0.6, SER)
@@ -166,9 +167,9 @@ def forecasting(slide):
     return g
 
 
-# ------------------------------------------------------------------------------------------------ (b) synthesis
+# ------------------------------------------------------------------------------------------------ generation
 def synthesis(slide):
-    g, sh, u, v = panel(slide, 0, 1, 'Data Augmentation and Synthesis', 'synthesis')
+    g, sh, u, v = panel(slide, 1, 0, 'Generation', 'synthesis')
     ys = [v + 0.98, v + 1.78, v + 2.58]
     sheet(sh, u + 0.18, ys[1] - 0.3, 0.86, 0.6, SER[::-1])
     caption(sh, u + 0.61, ys[1] + 0.33, 'Examples')
@@ -210,9 +211,9 @@ def synthesis(slide):
     return g
 
 
-# ------------------------------------------------------------------------------------------------ (c) anomaly
+# ------------------------------------------------------------------------------------------------ analysis of observed series
 def anomaly(slide):
-    g, sh, u, v = panel(slide, 1, 0, 'Anomaly Detection and Diagnosis', 'anomaly')
+    g, sh, u, v = panel(slide, 0, 0, 'Analysis of Observed Series', 'anomaly')
     ya, yb = v + 1.6, v + 2.62
     spike = [0.35, 0.45, 0.3, 0.42, 0.36, 0.5, 0.95, 0.4, 0.38, 0.5, 0.33, 0.45]
     sheet(sh, u + 0.18, ya - 0.3, 0.9, 0.6, spike)
@@ -261,9 +262,9 @@ def anomaly(slide):
     return g
 
 
-# ------------------------------------------------------------------------------------------------ (d) decision support
+# ------------------------------------------------------------------------------------------------ decision making
 def decision(slide):
-    g, sh, u, v = panel(slide, 1, 1, 'Decision Support', 'decision')
+    g, sh, u, v = panel(slide, 1, 1, 'Decision Making', 'decision')
     ya, yb, yr = v + 1.2, v + 2.34, v + 2.98
     sheet(sh, u + 0.26, ya - 0.3, 0.84, 0.6, SER)
     caption(sh, u + 0.68, ya + 0.33, 'State')

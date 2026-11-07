@@ -22,6 +22,7 @@ from datetime import datetime, timedelta
 
 import numpy as np
 from scipy.optimize import curve_fit
+import sys
 
 
 HERE = Path(__file__).resolve().parent
@@ -34,6 +35,8 @@ OUT_COVERAGE = HERE / "module_contribution_timeline_coverage.json"
 OUT_TEMPORAL = HERE / "temporal_function_placement.csv"     # panel (c) counts, quoted in the text
 TEMPORAL: list[tuple[str, str, str, str]] = []                # (month, temporal function, layer, reuse level)
 FUNCTIONS = ["data_management", "processing", "context_memory", "validation"]
+sys.path.insert(0, str(ROOT / "scripts"))
+from task_groups import module_groups                         # noqa: E402  task-group mapping of the survey
 
 
 def count_module_labels(value: dict) -> int:
@@ -64,9 +67,11 @@ def module_functions(module: dict) -> list[str]:
 
 
 def reuse_level(module: dict) -> str:
-    """demonstrated (source applies it to >= 2 of the four task families), inferred, or not_applicable."""
-    level = (module.get("reuse_evidence") or {}).get("level")
-    return level if level in {"demonstrated", "inferred"} else "not_applicable"
+    """GH/GTS: demonstrated when the module's tasks span >= 2 of the four task groups, else inferred.
+    TSK: not_applicable (a Task-Specific Harness module is bound to its task)."""
+    if module.get("layer") not in ("GH", "GTS"):
+        return "not_applicable"
+    return "demonstrated" if len(module_groups(module)) >= 2 else "inferred"
 
 
 def contribution_counts(record: dict) -> dict[str, int]:
@@ -193,7 +198,7 @@ OY = CH + 0.35                       # the top row sits above panel (c)
 ZONES = {"a": (0.12, OY + 0.10, 6.88, 5.10), "b": (7.16, OY + 0.10, 6.05, 5.10), "c": (0.12, 0.10, 13.09, CH - 0.1)}
 AXES = {"a": (1.02, OY + 0.80, 5.36, 3.98), "b": (8.16, OY + 1.12, 4.92, 3.48)}
 TITLES = {"a": "(a)  Cumulative Module Contributions", "b": "(b)  Share of New Modules by Period",
-          "c": "(c)  Where Temporal Functions Are Implemented"}
+          "c": "(c)  Temporal Functions by Layer and Reuse Evidence"}
 
 
 def zone_panel(fig, key):
@@ -322,7 +327,7 @@ NODE_FILL, NODE_EDGE = "#FFFFFF", "#D9DBE8"
 
 def parallel_paths(fig, months):
     """Period -> temporal function -> layer -> reuse evidence. Colour: shared module (General Time Series Harness,
-    sea teal; darker when its reuse across task families is demonstrated) or task procedure (terracotta)."""
+    sea teal; darker when its reuse across task groups is demonstrated) or task procedure (terracotta)."""
     from matplotlib.patches import FancyBboxPatch as Box
     from matplotlib.path import Path as MPath
     from matplotlib.patches import PathPatch
@@ -333,12 +338,12 @@ def parallel_paths(fig, months):
     axes = [
         ("Period", [p for p, _ in PERIODS], lambda it: it[0], lambda k: k),
         ("Temporal Function", FUNCTIONS, lambda it: it[1], lambda k: FUNC_LABEL[k]),
-        ("Implemented In", ["GTS", "TSK"], lambda it: it[2],
+        ("Layer", ["GTS", "TSK"], lambda it: it[2],
          lambda k: {"GTS": "General Time Series\nHarness", "TSK": "Task-Specific\nHarness"}[k]),
         ("Reuse Evidence", ["demonstrated", "inferred", "not_applicable"], lambda it: "demonstrated" if it[3] == "demonstrated"
          else ("inferred" if it[3] == "inferred" else "not_applicable"),
-         lambda k: {"demonstrated": "Demonstrated\n(≥2 Task Families)", "inferred": "Inferred\nfrom Interface",
-                    "not_applicable": "Task-Bound"}[k]),
+         lambda k: {"demonstrated": "Demonstrated\n(≥2 Task Groups)", "inferred": "Inferred",
+                    "not_applicable": "Not Applicable\n(Task-Specific)"}[k]),
     ]
     XS, BWS = [0.45, 3.75, 7.3, 10.75], [1.5, 2.05, 2.05, 2.05]   # left edge and width of each axis' boxes
     MINH, GAPS = [0.46, 0.86, 0.6, 0.6], [0.1, 0.12, 0.14, 0.14]   # near-equal function boxes, as in parallel sets
@@ -390,7 +395,7 @@ def parallel_paths(fig, months):
         sub = f"n = {n}"
         if a == 1:
             g = sum(1 for kk in keyed if kk[1] == k and kk[2] == "GTS")
-            sub = f"{g} shared · {n - g} in tasks"
+            sub = f"{g} GTS · {n - g} TSK"
             if g / n < 0.2:
                 edge, lwb, subcol, subw = COLORS["Task-Specific Harness"], 2.0, COLORS["Task-Specific Harness"], "bold"
         if a == 3 and k == "demonstrated": edge, lwb = COLORS["General Time Series Harness"], 2.0
@@ -404,14 +409,28 @@ def parallel_paths(fig, months):
                 fontweight="bold", color=INK, zorder=4, linespacing=1.0)
         cx.text(XS[a] + BW / 2, mid - block / 2 + 0.1, sub, ha="center", va="center", fontsize=11.5,
                 color=subcol, fontweight=subw, zorder=4)
-    # legend
+    # legend: entries centred as a row, spaced by their rendered text width
     ly = 0.24
-    for j, (lab, (col, lw, al)) in enumerate([("Shared Module, Reuse Demonstrated", style[("GTS", "demonstrated")]),
-                                              ("Shared Module, Reuse Inferred", style[("GTS", "inferred")]),
-                                              ("Inside a Task Procedure", style[("TSK", "not_applicable")])]):
-        xl = 0.9 + j * 4.15
-        cx.plot([xl, xl + 0.55], [ly, ly], color=col, lw=lw + 1.2, alpha=min(1, al + 0.15), solid_capstyle="round")
-        cx.text(xl + 0.7, ly, lab, va="center", fontsize=12.5, color=INK)
+    entries = [("General Time Series Harness:", None),           # a heading for the two teal entries
+               ("Demonstrated Reuse", style[("GTS", "demonstrated")]),
+               ("Inferred Reuse", style[("GTS", "inferred")]),
+               ("Task-Specific Harness", style[("TSK", "not_applicable")])]
+    renderer = fig.canvas.get_renderer()
+    widths = []
+    for lab, _ in entries:
+        probe = cx.text(0, -10, lab, fontsize=12.5)
+        widths.append(probe.get_window_extent(renderer).width / fig.dpi)
+        probe.remove()
+    sw, pad, sep = 0.55, 0.15, 0.6
+    lead = lambda st: 0 if st is None else sw + pad
+    total = sum(lead(st) + wt for (_, st), wt in zip(entries, widths)) + sep * (len(entries) - 1)
+    xl = (w - total) / 2
+    for (lab, st), wt in zip(entries, widths):
+        if st is not None:
+            col, lw, al = st
+            cx.plot([xl, xl + sw], [ly, ly], color=col, lw=lw + 1.2, alpha=min(1, al + 0.15), solid_capstyle="round")
+        cx.text(xl + lead(st), ly, lab, va="center", fontsize=12.5, color=INK, fontweight="bold" if st is None else "normal")
+        xl += lead(st) + wt + (sep if st is not None else 0.3)
 
 
 if __name__ == "__main__":

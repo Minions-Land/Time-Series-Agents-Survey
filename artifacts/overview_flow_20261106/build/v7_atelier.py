@@ -1,6 +1,6 @@
 """V7 Atelier: an exploded isometric build of a Time Series Agent.
 
-Left: scenario and data as stacked paper. Centre: General -> Time-Series -> Task-Specific harness plates with
+Left: scenario and data as stacked paper. Centre: General -> General Time Series -> Task-Specific Harness plates with
 the LLM on top, acting down and observing up through every layer. Right: an evaluation funnel that passes an
 accepted output (a forecast past the cutoff t0) or sends the agent back to revise.
 """
@@ -24,8 +24,11 @@ GLYPHS = dict(
     # captions follow the subsection headings of Sections 4-6
     gh=[('chat', 'Interaction'), ('memory', 'Memory'), ('tools', 'Tools'), ('planning', 'Planning'), ('runtime', 'Evolution')],
     gts=[('calendar', 'Data'), ('window', 'Processing'), ('timeline', 'Context'), ('cutoff', 'Validation')],
-    tsk=[('forecast', 'Forecasting'), ('synthesis', 'Synthesis'), ('anomaly', 'Anomaly'), ('decision', 'Decision')])
+    # the four task groups (scripts/task_groups.py, ORDER); two-line names break where the plate needs it
+    tsk=[('anomaly', ['Analysis of', 'Observed Series']), ('forecast', 'Forecasting'), ('synthesis', 'Generation'),
+         ('decision', ['Decision', 'Making'])])
 SPREAD = {4: [0.11, 0.33, 0.67, 0.89], 5: [0.1, 0.3, 0.5, 0.7, 0.9]}
+SPREAD_TSK = [0.16, 0.37, 0.67, 0.865]     # first lines share one row; "Observed Series" runs on below it
 
 
 def tx(sh, x, y, w, h, t, size=12, bold=False, color=INK, align='c', italic=False, anchor='m'):
@@ -93,8 +96,13 @@ def plate(slide, key):
             tl = 0.06 if k % 5 == 0 else 0.032
             arrow(sh, x + 0.07 + k * 0.14, y + T - tl, x + 0.07 + k * 0.14, y + T - 0.01, color='FFFFFF', lw=0.8, head=None)
     for k, (nm, cap) in enumerate(GLYPHS[key]):
-        cx = x + 0.45 * dx + w * SPREAD[len(GLYPHS[key])][k]
+        cx = x + 0.45 * dx + w * (SPREAD_TSK if key == 'tsk' else SPREAD[len(GLYPHS[key])])[k]
         base = y - 0.32
+        if key == 'tsk':   # slightly smaller icon so that two-line names fit on the top face
+            ic(sh, nm, cx - 0.27, base - 0.7, 0.54)
+            t = tx(sh, cx - 0.75, base - 0.15, 1.5, 0.34, cap, size=11.5, color=dk, bold=True, anchor='t')
+            for para in t.text_frame.paragraphs: para.line_spacing = 0.8
+            continue
         ic(sh, nm, cx - 0.33, base - 0.68, 0.66)
         tx(sh, cx - 0.7, base - 0.02, 1.4, 0.26, cap, size=13.5, color=dk, bold=True)
     return g
@@ -181,7 +189,7 @@ def llm_block(slide):
     g = group(slide); sh = g.shapes
     dk, md, lt = HUE['llm']
     pedestal(sh, 3.42, 1.3, 2.3, 0.36, 'llm')
-    st = box(sh, 3.48, 0.66, 1.62, 0.38, fill=dk, radius=0.5); label_in(st, 'LLM-Side', size=16, font=F)
+    st = box(sh, 3.48, 0.66, 1.62, 0.38, fill=dk, radius=0.5); label_in(st, 'LLM Side', size=16, font=F)
     for k, (nm, cap) in enumerate([('encode', 'Align'), ('reason', 'Reason'), ('policy', 'Operate')]):   # Section 3
         cx = 3.85 + k * 0.74
         ic(sh, nm, cx - 0.26, 1.03, 0.52)
