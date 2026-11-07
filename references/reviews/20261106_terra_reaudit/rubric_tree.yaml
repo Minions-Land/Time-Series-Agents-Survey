@@ -107,3 +107,20 @@ R10_evaluation_evidence:     # Section 7.1 evaluation contract; WORK level; new 
   temporal_validity: "Did the system preserve the data window, numerical meaning and information availability? (chronological splits, leakage control, information cutoff, availability-time checks)"
   task_performance: "Accuracy of the task output (forecast error, detection F1, fidelity of synthetic data, QA accuracy)."
   decision_utility: "Value of a downstream action (cost, profit, risk, utility of a decision or policy)."
+
+R11_task_impact:             # WORK x task family; added 2026-11-07 for the task-impact analysis (Section 6 and Section 8)
+  question: "For each task family the work addresses, what does the Agent change about that task, and does the work's own evaluation show it?"
+  automates: "true if the work makes an LLM or Agent carry out steps an analyst or engineer would otherwise do (choose or configure models, write and run code, retrieve and read context, assemble a pipeline, write the report). Quote the passage that states which steps are automated."
+  metric_gain: "true if the reported result is a better score on an existing task protocol (error, F1, accuracy, return, cost or latency) where the underlying task conditions are unchanged."
+  practical_problems:
+    rule: "List only time series obstacles the work explicitly targets with a named mechanism. 'tested' is true only if an experiment varies, isolates or measures that obstacle (not an average score on a standard split)."
+    values:
+      information_availability: "look-ahead leakage, knowledge cutoff, data release vintages, point-in-time state"
+      nonstationarity: "distribution shift, drift, regime change, concept drift, out-of-domain series"
+      data_quality: "missing values, irregular sampling, noise, sensor faults, few-shot or scarce data"
+      context_integration: "heterogeneous exogenous context (text, events, documents, other modalities) whose use changes the answer"
+      decision_consequence: "action costs, constraints, risk, delayed outcomes, effects of actions on later observations"
+      verifiability: "evidence-backed or auditable outputs, root cause, operator review, faithfulness of explanations"
+      operational_deployment: "use in a real operation or with real users under production constraints"
+      other: "a time series obstacle outside this list; name it in 'note'"
+  primary_gain: "automation | metric_gain | practical_problem | measurement (benchmarks and resources that measure rather than change the task). practical_problem requires at least one tested problem."

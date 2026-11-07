@@ -1,6 +1,7 @@
 """Validate re-audit outputs and report how they differ from the current Paper Cards. Read-only on inputs.
 
-usage: python3 check_outputs.py [out_dir]   -> <out_dir>/../check_report.md (default out/), changes.csv (one row per module decision)
+usage: python3 check_outputs.py <record.json>  -> print that record's errors only (OK if none)
+       python3 check_outputs.py [out_dir]   -> <out_dir>/../check_report.md (default out/), changes.csv (one row per module decision)
 Checks: closed vocabulary, required fields per layer, every quote verbatim in the packet (line-4 .. line+8, NFKC tokens in order,
 a few short noise tokens allowed), and agreement between the blind pass and the final record.
 """
@@ -9,7 +10,7 @@ from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-OUT = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else HERE / 'out'
+OUT = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 and not sys.argv[1].endswith('.json') else HERE / 'out'
 REP = HERE if OUT == HERE / 'out' else OUT
 LAYERS = {'LLM', 'GH', 'GTS', 'TSK'}
 DIMS = {'Interface and Interaction', 'Memory and Context', 'Tools and Execution', 'Planning and Orchestration',
@@ -153,4 +154,8 @@ def main():
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1].endswith('.json'):
+        rec = json.loads(Path(sys.argv[1]).read_text())
+        errs = check(rec, packet_lines(rec.get('citation_key') or Path(sys.argv[1]).stem))
+        print('\n'.join(errs) if errs else 'OK'); sys.exit(1 if errs else 0)
     main()
