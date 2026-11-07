@@ -37,7 +37,9 @@ def count_module_labels(value: dict) -> int:
 
 def contribution_counts(record: dict) -> dict[str, int]:
     module = record.get("module_level_contributions", {})
-    if "modules" in module and module.get("review_status") in {"paper_verified", "repository_verified"}:
+    # Schema 3.0: only reviewed contributions count; background references are excluded.
+    if (record.get("inclusion") == "reviewed_contribution" and "modules" in module
+            and module.get("review_status") in {"paper_verified", "repository_verified"}):
         counts = Counter(m["layer"] for m in module["modules"])
         return {"LLM-side": counts["LLM"], "General Harness": counts["GH"],
                 "General Time Series Harness": counts["GTS"], "Task-Specific Harness": counts["TSK"]}
@@ -186,7 +188,7 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
                     fontsize=7.6, color=INK, ha="left", va="bottom",
                     arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6, shrinkA=0, shrinkB=4))
     ax.set_ylabel("Cumulative modules")
-    ax.set_ylim(0, 210)
+    ax.set_ylim(0, 50 * int(np.ceil(max(c[-1] for c in cumulative.values()) * 1.08 / 50)))
     ax.set_xlim(dates[0] - timedelta(days=20), datetime(2026, 12, 15))
     ax.xaxis.set_major_locator(mdates.YearLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
