@@ -389,12 +389,12 @@ MAX_USES = 3                                                  # a work appears i
 TAG_FONT = '/System/Library/Fonts/Supplemental/Times New Roman Bold.ttf'
 
 
-def axis_map(shape, axis='x'):
+def axis_map(shape, axis='x', stop=None):
     """(a, b) with slide = a * local + b along one axis, for a shape inside any number of nested groups."""
     pos, ext = ('x', 'cx') if axis == 'x' else ('y', 'cy')
     a, b = 1.0, 0.0
     el = shape._element.getparent()
-    while el is not None:
+    while el is not None and el is not stop:
         if el.tag == qn('p:grpSp'):
             xf = el.find(qn('p:grpSpPr')).find(qn('a:xfrm'))
             k = int(xf.find(qn('a:ext')).get(ext)) / int(xf.find(qn('a:chExt')).get(ext))
@@ -407,20 +407,21 @@ def axis_map(shape, axis='x'):
 x_map = lambda shape: axis_map(shape, 'x')
 
 
-def slide_box(shape, x0=None, x1=None):
-    """Slide-space box (x0, y0, x1, y1) of a shape, optionally with other local x bounds."""
-    (ax, bx), (ay, by) = axis_map(shape, 'x'), axis_map(shape, 'y')
+def slide_box(shape, x0=None, x1=None, stop=None):
+    """Slide-space box (x0, y0, x1, y1) of a shape, optionally with other local x bounds (stop: measure in the
+    coordinates of that ancestor group instead of the slide)."""
+    (ax, bx), (ay, by) = axis_map(shape, 'x', stop), axis_map(shape, 'y', stop)
     lx0 = shape.left if x0 is None else x0
     lx1 = shape.left + shape.width if x1 is None else x1
     return ax * lx0 + bx, ay * shape.top + by, ax * lx1 + bx, ay * (shape.top + shape.height) + by
 
 
-def ink_boxes(t):
+def ink_boxes(t, stop=None):
     """Slide-space boxes of what a tag actually draws: its logo, and its name and year text at their measured widths."""
     out = []
     for k in walk(t.shapes):                               # logos: trimmed by their usual transparent margin
         if k.shape_type != 13: continue
-        x0, y0, x1, y1 = slide_box(k); dx, dy = 0.12 * (x1 - x0), 0.12 * (y1 - y0)
+        x0, y0, x1, y1 = slide_box(k, stop=stop); dx, dy = 0.12 * (x1 - x0), 0.12 * (y1 - y0)
         out.append((x0 + dx, y0 + dy, x1 - dx, y1 - dy))
     texts_ = [k for k in walk(t.shapes) if k.shape_type == 17 and k.text_frame.text.strip()]
     texts_.sort(key=lambda k: k.text_frame.text.strip().isdigit())          # name first, year last
@@ -428,10 +429,10 @@ def ink_boxes(t):
         rpr = k.text_frame.paragraphs[0].runs[0]._r.find(qn('a:rPr'))
         q = k.text_frame.paragraphs[0].runs[0].font.size
         pt = q.pt if q is not None else (int(rpr.get('sz')) / 100 if rpr is not None and rpr.get('sz') else 15.23)
-        ax, _ = x_map(k)
+        ax, _ = x_map(k)                                   # text is not scaled by groups: width in slide EMU
         ins = k.text_frame.margin_left if k.text_frame.margin_left is not None else 91440
         w = name_width(k.text_frame.text.strip(), pt) / ax
-        x0, y0, x1, y1 = slide_box(k, k.left + ins, k.left + ins + w)
+        x0, y0, x1, y1 = slide_box(k, k.left + ins, k.left + ins + w, stop=stop)
         h = (y1 - y0); yc = (y0 + y1) / 2; th = pt * 12700 * 0.75                   # glyph height, centred (anchor ctr)
         out.append((x0, yc - th / 2, x1, yc + th / 2))
     return out
@@ -446,9 +447,13 @@ def tag_parts(t):
     return name, year, pt
 
 
+_FONTS = {}
+
+
 def name_width(text, pt):
     from PIL import ImageFont
-    return ImageFont.truetype(TAG_FONT, 1000).getlength(text) / 1000 * pt * 12700      # slide EMU
+    if TAG_FONT not in _FONTS: _FONTS[TAG_FONT] = ImageFont.truetype(TAG_FONT, 1000)
+    return _FONTS[TAG_FONT].getlength(text) / 1000 * pt * 12700                        # slide EMU
 
 
 def slot_room(t, text, gap_in=0.06):
@@ -763,7 +768,7 @@ def arched_layer_names(slide, rpr, to_slide, kx, ky, labels, size_max=21.5, line
 
 # Task-Specific Harness wedges (scripts/task_groups.py, ORDER): new boundaries in degrees, from 50 (GTS | TSK) to 0.
 TSK_GROUPS = [('Analysis', 'of Observed', 'Series'), ('Forecasting',), ('Generation',), ('Decision', 'Making')]
-TSK_BOUNDS = [50.0, 29.5, 18.5, 9.5, 0.0]
+TSK_BOUNDS = [50.0, 37.5, 25.0, 12.5, 0.0]                 # four equal wedges
 # Representative works per group. A work goes to the group of its Task-Specific Harness modules (ledger task labels
 # mapped by task_groups.LEAF); a work whose modules span two groups stays in the group that matches its former family
 # wedge (MarsTSC, AgentFM, AQuA, AgriWorld), else its first source task decides (GenAutoML, ChatAD). MOSAIC has no
@@ -821,15 +826,89 @@ def retask_tsk(g, slide, sid, keep, wedge_labels, centre, to_child, to_slide, tn
     for p, a in zip(tsk_pics, icon_at):
         r = norm(to_child(p.left + p.width / 2, p.top + p.height / 2))
         X, Y = to_slide(*P(r, a)); p.left, p.top = int(X - p.width / 2), int(Y - p.height / 2)
-    # tags
+    # tags: stacked along each wedge's centre line, at the position farthest from the spokes and ring edges
     tags = {tname(t): t for t in g.shapes if t.shape_type == 6 and sid(t) not in keep and angle(*centre(t)) < lim}
-    placed = set()
-    for stacks in TSK_STACKS:
-        for cx, top, dx, names in stacks:
-            for k, nm in enumerate(names):
-                t = tags[nm]; placed.add(nm)
-                t.left, t.top = int(Inches(cx + dx * k) - t.width / 2), Inches(top + 0.26 * k)
-    assert placed == set(tags), set(tags) ^ placed
+    members = [[nm for stack in w_ for nm in stack[3]] for w_ in TSK_STACKS]
+    assert set(sum(members, [])) == set(tags), set(tags) ^ set(sum(members, []))
+    place_tsk_tags(g, tags, members)
+
+
+def place_tsk_tags(g, tags, members, rows=(0.26, 0.24), margin_deg=0.5):
+    """Lay out each Task-Specific wedge's tags in horizontal rows (child inches of the fan group): one tag per row,
+    each at the x that keeps it farthest from both spokes, inside the outer band and clear of the other tags; the
+    starting height is chosen to maximise the smallest clearance. A wedge that cannot hold one tag per row takes two;
+    one that cannot hold all its tags keeps as many as fit, dropping first the works that also appear in other wedges."""
+    def tag_name(t_):
+        return next((k.text_frame.text.strip() for k in walk(t_.shapes) if k.shape_type == 17 and k.text_frame.text.strip()
+                     and not k.text_frame.text.strip().isdigit()), '')
+    seen = {}
+    for t_ in g.shapes:
+        if t_.shape_type == 6:
+            n_ = tag_name(t_)
+            if n_: seen[n_] = seen.get(n_, 0) + 1
+    norm = lambda x, y: math.hypot((x - CX) / RINGS[3][0], (CY - y) / RINGS[3][1])
+    r_in = RINGS[2][0] / RINGS[3][0] + 0.02
+    rel = {}
+    for nm, t in tags.items():                            # ink boxes relative to the tag's own centre, child inches
+        cx_, cy_ = (t.left + t.width / 2) / E, (t.top + t.height / 2) / E
+        rel[nm] = [(b[0] / E - cx_, b[1] / E - cy_, b[2] / E - cx_, b[3] / E - cy_) for b in ink_boxes(t, stop=g._element)]
+    def clearance(nm, x, y, lo, hi):
+        worst = 1e9
+        for b in rel[nm]:
+            for X, Y in ((x + b[0], y + b[1]), (x + b[0], y + b[3]), (x + b[2], y + b[1]), (x + b[2], y + b[3])):
+                r = norm(X, Y)
+                if r < r_in or r > 0.985: return -1
+                a = angle(X, Y); worst = min(worst, a - lo, hi - a)
+        return worst
+    def width(nm): return max(b[2] for b in rel[nm]) - min(b[0] for b in rel[nm])
+    xs = [CX + 0.04 * i for i in range(int(RINGS[3][0] / 0.04))]
+    def best_x(nm, y, lo, hi, x_min=-1e9):
+        best = None
+        for x in xs:
+            if x + min(b[0] for b in rel[nm]) < x_min: continue
+            c = clearance(nm, x, y, lo, hi)
+            if c >= margin_deg and (best is None or c > best[0]): best = (c, x)
+        return best
+    def layout(names, lo, hi):
+        y_top = CY - RINGS[3][1] * math.sin(math.radians(hi))
+        found = None
+        for per_row in (1, 2):
+            groups = [names[i:i + per_row] for i in range(0, len(names), per_row)]
+            for step in rows:
+                cands = []
+                for i in range(int((CY - y_top) / 0.02)):
+                    y0 = y_top + 0.02 * i
+                    if y0 + step * (len(groups) - 1) > CY - 0.15: break
+                    pos, worst = [], 1e9
+                    for k, grp in enumerate(groups):
+                        y = y0 + step * k; x_min = -1e9; ok = True
+                        for nm in grp:
+                            bx = best_x(nm, y, lo, hi, x_min)
+                            if bx is None: ok = False; break
+                            pos.append((nm, bx[1], y)); worst = min(worst, bx[0])
+                            x_min = bx[1] + max(b[2] for b in rel[nm]) + 0.12
+                        if not ok: break
+                    if ok: cands.append((worst, pos))
+                if cands: found = (max(cands, key=lambda c_: c_[0]), per_row, step); break
+            if found: break
+        return found
+    for (lo, hi), names in zip(zip(TSK_BOUNDS[1:], TSK_BOUNDS[:-1]), members):
+        drop_order = sorted(names, key=lambda n_: (-seen.get(n_, 1), -names.index(n_)))   # shown elsewhere first
+        keep, found = list(names), None
+        while keep:
+            found = layout(keep, lo, hi)
+            if found: break
+            gone = next(n_ for n_ in drop_order if n_ in keep); keep.remove(gone)
+        assert found, f'no layout for wedge {lo}-{hi}'
+        for n_ in names:
+            if n_ not in keep:
+                tags[n_]._element.getparent().remove(tags[n_]._element)
+                print(f'TSK wedge {lo:.1f}-{hi:.1f}: {n_} dropped (also shown {seen.get(n_, 1) - 1} time(s) elsewhere)')
+        names = keep
+        (worst, pos), per_row, step = found
+        for nm, x, y in pos:
+            t = tags[nm]; t.left = int(Inches(x) - t.width / 2); t.top = int(Inches(y) - t.height / 2)
+        print(f'TSK wedge {lo:.1f}-{hi:.1f}: {len(names)} tags, {per_row} per row, row step {step}, clearance {worst:.2f} deg')
 
 
 def crop(pdf):
