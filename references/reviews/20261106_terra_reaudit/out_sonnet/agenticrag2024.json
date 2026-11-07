@@ -1,0 +1,298 @@
+{
+ "citation_key": "agenticrag2024",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "Proposes a hierarchical multi-agent Agentic RAG in which a ReAct master agent routes each request to a task-specialized sub-agent built on instruction-tuned, DPO-aligned SLMs with retrieval-conditioned prompt pools, evaluated on forecasting, imputation, classification and anomaly detection.",
+ "claim_evidence": [
+  {
+   "line": 46,
+   "quote": "Our Agentic RAG framework presents a hierarchical, multi-agent architecture composed of a master (top-level) agent and specialized sub-agents customized"
+  },
+  {
+   "line": 119,
+   "quote": "In summary, the master agent orchestrates sub-agents, selects the most appropriate sub-agent, and allocates the task to the specialized sub-agent."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction",
+  "anomaly_detection_diagnosis"
+ ],
+ "other_tasks": [
+  "imputation",
+  "time_series_classification"
+ ],
+ "modules": [
+  {
+   "id": "agenticrag2024:master-router",
+   "name": "ReAct master-agent routing",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Tools and Execution"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1 no: routing embeds no task output requirement; adding a task family only adds a sub-agent to the action set. R3_2 no: no temporal semantics. R3_3 yes: ReAct delegation to sub-agents invoked as tools (L112-L114).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - routing only, no task objective or validator",
+    "R3_2_GTS:no - no temporal semantics at router level",
+    "R3_3_GH:yes - delegation and execution control"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "anomaly_detection_diagnosis",
+     "imputation",
+     "time_series_classification"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 112,
+     "quote": "The master agent for sub-agent orchestration utilizes the ’ReAct’"
+    },
+    {
+     "line": 119,
+     "quote": "In summary, the master agent orchestrates sub-agents, selects the most appropriate sub-agent, and allocates the task to the specialized sub-agent."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "agenticrag2024:slm-adaptation",
+   "name": "Task-specific instruction tuning of SLMs (PEFT)",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 LLM: QLoRA/PEFT updates SLM parameters on task datasets. R6: supervision shaping analytical outputs, so instruction_reasoning. Scope is instruction tuning only; DPO is split out.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM - updates model parameters",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "evidence": [
+    {
+     "line": 107,
+     "quote": "We fine-tune each SLM using instruction-tuning on task-specific datasets and optimize them for time series tasks such as forecasting,"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "agenticrag2024:dpo-dynamic-masking",
+   "name": "DPO alignment with dynamic masking",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "instruction_reasoning"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "model_training",
+   "scope_reason": "R2 LLM: preference optimization updates SLM parameters; the masked binary classification supplies the preference signal. R6: aligns analytical outputs, so instruction_reasoning. Ablated separately (W/O DPO) in the paper.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM - updates model parameters",
+    "R6:instruction_reasoning"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "evidence": [
+    {
+     "line": 109,
+     "quote": "Additionally, we fine-tune using DPO[8] through a dynamic masking technique to align the SLMs task-specific outputs to preferred and non-preferred outcomes, providing adversarial feedback[47] through a binary classification task."
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "agenticrag2024:pattern-prompt-pool",
+   "name": "Differentiable temporal prompt-pool conditioning",
+   "layer": "LLM",
+   "dimensions": [],
+   "functions": [],
+   "view_status": "model_side",
+   "llm_route": [
+    "representation_alignment"
+   ],
+   "tasks": [
+    "forecasting_prediction",
+    "anomaly_detection_diagnosis"
+   ],
+   "other_tasks": [
+    "imputation",
+    "time_series_classification"
+   ],
+   "role": "method",
+   "scope_reason": "R2 LLM: the pool values are continuous embeddings concatenated with the input embedding and projected by a learnable matrix W, trained with the SLM (differentiable); this changes how the model receives temporal input. A Harness memory reading is the alternative, but R2's boundary (parameter-trained, not an external store) favours LLM.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:LLM - alters model input representation with learnable projection"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable"
+   },
+   "evidence": [
+    {
+     "line": 94,
+     "quote": "the prompt pools store both domain and task-specific knowledge as key-value pairs."
+    },
+    {
+     "line": 289,
+     "quote": "The selected prompts, along with the original input, are concatenated to form the input embedding"
+    },
+    {
+     "line": 314,
+     "quote": "data, we utilize a differentiable dynamic prompting mechanism[3]."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": false,
+   "line": null,
+   "quote": null
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 1389,
+   "quote": "We adopted a time-based division strategy to split multiple benchmark datasets into training, validation, and testing sets."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 1102,
+   "quote": "Our proposed framework outperforms baseline methods across the benchmark datasets, showing significant"
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "agenticrag2024:slm-adaptation",
+   "decision": "keep",
+   "new_ids": [
+    "agenticrag2024:slm-adaptation",
+    "agenticrag2024:dpo-dynamic-masking"
+   ],
+   "changes": [
+    "dimensions: Optimization and Evolution -> none (LLM side)",
+    "llm_route: instruction_reasoning",
+    "DPO with dynamic masking split into its own module"
+   ],
+   "reason": "L107-L111 give instruction tuning and DPO as separate parameter-updating steps; the paper ablates them separately (IT, DPO)."
+  },
+  {
+   "existing_id": "agenticrag2024:master-router",
+   "decision": "change",
+   "new_ids": [
+    "agenticrag2024:master-router"
+   ],
+   "changes": [
+    "dimensions: Planning and Workflow, Coordination and Scaling -> Planning and Orchestration, Tools and Execution",
+    "layer GH unchanged"
+   ],
+   "reason": "L112-L124: ReAct master selects and delegates to sub-agents used as tools; no task objective embedded, so GH."
+  },
+  {
+   "existing_id": "agenticrag2024:pattern-prompt-pool",
+   "decision": "keep",
+   "new_ids": [
+    "agenticrag2024:pattern-prompt-pool"
+   ],
+   "changes": [
+    "layer LLM unchanged",
+    "dimensions Memory and Context -> none",
+    "llm_route: representation_alignment"
+   ],
+   "reason": "L289-L296: retrieved prompt values concatenated and projected by learnable W; trained model-facing interface."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Role fixed_workflow: L117-L118 state sub-agents operate in isolation on one task each, and no experiment shows returned feedback changing later actions. Haiku's separate TSK 'task-specialized-subagents' module was rejected: it is the composition of the per-task SLM, prompt pool and routing already recorded, with no separate mechanism; sub-agent specialization (SAS) is only an ablation (L2829-L2831). Excluded as standard or not contributed: anomaly threshold (L259-L262), k-means regime labels (L1384), sliding window, SelfExtend. Packet tables are text-extracted.",
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "master-router layer",
+    "verdict": "accept",
+    "result": "GH, Planning and Orchestration + Tools and Execution, demonstrated across four tasks",
+    "reason": "Routing adds no task objective; counterfactual for TSK fails.",
+    "line": 119
+   },
+   {
+    "item": "task-specialized-subagents TSK module (Haiku)",
+    "verdict": "reject",
+    "result": "dropped",
+    "reason": "No mechanism beyond per-task SLM, prompt pool and router; specialization is an ablation, not a distinct procedure.",
+    "line": 117
+   },
+   {
+    "item": "role of work",
+    "verdict": "accept",
+    "result": "fixed_workflow",
+    "reason": "Sub-agents operate in isolation, one task each.",
+    "line": 117
+   },
+   {
+    "item": "DPO split (Codex dpo-training vs Haiku dpo-dynamic-masking)",
+    "verdict": "accept",
+    "result": "separate LLM module, id dpo-dynamic-masking",
+    "reason": "Distinct parameter-updating step, separately ablated.",
+    "line": 109
+   },
+   {
+    "item": "prompt-pool layer and tasks",
+    "verdict": "modify",
+    "result": "LLM, representation_alignment, all four evaluated tasks",
+    "reason": "Learnable projection of concatenated prompt embeddings; shared by all sub-agents.",
+    "line": 296
+   }
+  ],
+  "summary": "Merged record kept with the TSK sub-agent module removed and prompt-pool routing/tasks fixed. Layers: one GH, three LLM."
+ }
+}

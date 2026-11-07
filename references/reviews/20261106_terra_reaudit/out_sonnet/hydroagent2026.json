@@ -1,0 +1,290 @@
+{
+ "citation_key": "hydroagent2026",
+ "status": "paper_verified",
+ "role_of_work": "fixed_workflow",
+ "claim_summary": "HydroAgent is a skill-orchestrated flood forecasting workflow in which an LLM performs analog-case prior judgment within explicit skill contracts, deterministic Xinanjiang scheme selection and simulation run around it, and human experts gate each stage.",
+ "claim_evidence": [
+  {
+   "line": 51,
+   "quote": "To address this issue, we propose HydroAgent, a skill-orchestrated agent framework that embeds Large Language Models (LLMs)"
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [],
+ "modules": [
+  {
+   "id": "hydroagent2026:skill-orchestration",
+   "name": "Explicit skill contracts and deterministic executors",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 test fails: the skill contract (instructions, tools, resources, output contract, runtime tool filter) embeds no flood output objective, so changing the task would not redesign the mechanism; flood-specific sequencing is split into a separate TSK module. R3_2 fails: no temporal order or availability semantics in the contract. R3_3 applies: it fixes the execution boundary and state.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - contract mechanism embeds no task objective",
+    "R3_2_GTS:no - no temporal semantics in the contract itself",
+    "R3_3_GH:yes - fixed execution boundary, tool filtering and state transfer"
+   ],
+   "reuse_evidence": {
+    "level": "inferred",
+    "tasks": [
+     "forecasting_prediction"
+    ],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 147,
+     "quote": "The skill layer defines what should be done: it specifies the operational rules, input-output contracts, and quality constraints that govern each forecasting step."
+    },
+    {
+     "line": 233,
+     "quote": "A skill is defined as a statically authored, self-contained procedural specification that encodes a complete workflow, including instructions, permitted tools, accessible resources, and a required output structure."
+    },
+    {
+     "line": 237,
+     "quote": "During execution, the active skill boundary is fixed for the run, and the available"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "hydroagent2026:flood-workflow-review",
+   "name": "Flood forecasting Step 0-4 chain with expert review gates",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration",
+    "Interface and Interaction"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "R3_1 passes: the chain runs flood scheme preparation, prior judgment, scheme selection, rolling forecast and a warning bulletin with flood-specific outputs and review gates; a different task family would need a different chain (R3_1 counterfactual).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - flood chain and review gates embedded"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 154,
+     "quote": "HydroAgent workflow includes five steps: (1) scheme preparation, (2) scenario judgment, (3) scheme selection, (4) rolling forecasting, and (5) warning bulletin."
+    },
+    {
+     "line": 229,
+     "quote": "to await expert approval before advancing"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "id": "hydroagent2026:flood-prior-skill",
+   "name": "Analog flood prior judgment with physical checks and review gate",
+   "layer": "TSK",
+   "dimensions": [
+    "Memory and Context",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "context_memory"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Peak and volume prior ranges come from flood-specific similarity weights and runoff-coefficient rules; a different task would change these rules (R3_1 counterfactual).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - flood peak and volume interval rules embedded"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 276,
+     "quote": "a six-dimensional similarity retrieval is performed in which the executor computes a weighted score over the historical case library"
+    },
+    {
+     "line": 296,
+     "quote": "Third, before the prior judgment is finalized, a physical red-line validation verifies"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "hydroagent2026:hydrological-scheme",
+   "name": "Flood-type-indexed calibration and rolling simulation",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [],
+   "role": "method",
+   "scope_reason": "Event typing by peak-flow thresholds and selection against Step 1 ranges are flood-specific (R3_1 counterfactual).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - scheme library indexed by flood peak classes, selected against flood judgment ranges"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 159,
+     "quote": "Calibration yields one XAJ parameter set per flood"
+    },
+    {
+     "line": 384,
+     "quote": "Selected the optimal parameter set from the Step 0 scheme library, matching Step 1 constraints."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 44,
+   "quote": "All five state-of-the-art large language models successfully execute the workflow"
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 330,
+   "quote": "A subset of 113 events from 1995–2019 was used as the historical case library and as the calibration set for the Step 0 XAJ parameter schemes."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 433,
+   "quote": "with Pearson correlation coefficients (r) of 0.62 and 0.84 between observed values and predicted midpoints for peak flow and flood volume, respectively."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "hydroagent2026:skill-orchestration",
+   "decision": "split",
+   "new_ids": [
+    "hydroagent2026:skill-orchestration",
+    "hydroagent2026:flood-workflow-review"
+   ],
+   "changes": [
+    "layer stays GH for the task-independent skill contract",
+    "dimensions: Tools and Execution, Planning and Workflow -> Tools and Execution, Planning and Orchestration",
+    "flood-specific Step 0-4 chain and review gates moved to new TSK module hydroagent2026:flood-workflow-review"
+   ],
+   "reason": "Section 2.2 defines a task-independent skill contract (GH). The card merged it with the flood chain, which is TSK under R3_1. The card's claim that the mechanism is reusable beyond hydrology is not in the packet: the paper states transfer to other basins and to future skills, not to other task families, so reuse stays inferred for the contract only."
+  },
+  {
+   "existing_id": "hydroagent2026:flood-prior-skill",
+   "decision": "change",
+   "new_ids": [
+    "hydroagent2026:flood-prior-skill"
+   ],
+   "changes": [
+    "dimensions: Memory and Context, Control Verification and Feedback, Planning and Workflow -> Memory and Context, Planning and Orchestration",
+    "view_status: mapped -> task_procedure (mapped is reserved for GTS modules)",
+    "evidence locator replaced by verbatim line quotes"
+   ],
+   "reason": "The physical red-line check and the human gate act within one forecasting episode, which R4 maps to Planning and Orchestration. Context memory (analog retrieval) is retained. Layer TSK and task forecasting_prediction are kept."
+  },
+  {
+   "existing_id": "hydroagent2026:hydrological-scheme",
+   "decision": "change",
+   "new_ids": [
+    "hydroagent2026:hydrological-scheme"
+   ],
+   "changes": [
+    "dimensions: Planning and Workflow -> Planning and Orchestration"
+   ],
+   "reason": "Mechanism unchanged. Scheme selection and rolling execution control within an episode map to Planning and Orchestration; the calibration and simulation tooling remains Tools and Execution."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "Role fixed_workflow: the step order is predetermined and expert approval gates do not select among actions. Warning bulletin (Step 4) is not evaluated, so decision_support is not recorded; task is forecasting_prediction. Chronological split (1995-2019 library, 2020-2024 held out) is the temporal validity evidence. No LLM-side module (off-the-shelf LLMs).",
+ "adjudication": {
+  "reviewer": "sonnet-5.5",
+  "base": "merged",
+  "items": [
+   {
+    "item": "role_of_work (Codex feedback_driven_agent vs Haiku fixed_workflow)",
+    "verdict": "accept",
+    "result": "fixed_workflow",
+    "reason": "The five-step order is fixed; human gates pause and approve rather than choose actions, and the physical red-line check only adjusts an interval inside Step 1.",
+    "line": 154
+   },
+   {
+    "item": "layer move skill-orchestration GH->GH,TSK (split into GH skill contract + TSK flood chain)",
+    "verdict": "accept",
+    "result": "skill-orchestration stays GH; new TSK hydroagent2026:flood-workflow-review",
+    "reason": "The skill contract (instructions, tools, resources, output contract, tool filtering) embeds no flood objective (R3_1 no, R3_2 no, R3_3 yes); the Step 0-4 chain with review gates is flood-specific (R3_1 yes).",
+    "line": 233
+   },
+   {
+    "item": "task_memberships decision_support (Haiku/merged added)",
+    "verdict": "reject",
+    "result": "forecasting_prediction only",
+    "reason": "The warning bulletin is a report step; no experiment evaluates a decision output and the paper evaluates only prior judgment and scheme selection.",
+    "line": 226
+   },
+   {
+    "item": "skill-orchestration tasks / reuse",
+    "verdict": "modify",
+    "result": "tasks forecasting_prediction; reuse inferred, basis module",
+    "reason": "Only one task family is applied (R8 inferred).",
+    "line": 233
+   },
+   {
+    "item": "temporal_validity quote (Codex CV pool vs Haiku chronological split)",
+    "verdict": "accept",
+    "result": "chronological split 1995-2019 library, 2020-2024 held out",
+    "reason": "Chronological hold-out is the clearer temporal evidence.",
+    "line": 330
+   }
+  ],
+  "summary": "Kept the merged GH contract plus TSK flood-chain split and the three TSK modules, and corrected tasks to forecasting only. Role is a fixed workflow."
+ }
+}
