@@ -19,7 +19,8 @@ from collections import Counter
 from pathlib import Path
 
 import bibtexparser
-from ledger_schema import SCHEMA_VERSION, canonical_task, canonical_tasks
+from ledger_schema import (CONFIDENCE, DIMENSIONS, FUNCTIONS, LAYER_VIEW_STATUS, LLM_ROUTES, MODULE_ROLES,
+                           SCHEMA_VERSION, canonical_task, canonical_tasks, dimension_errors)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -101,6 +102,10 @@ FIELDS = [
     "resource_review_status",
     "task_aliases_source_json",
     "boundary_review_json",
+    "role_of_work",
+    "claim_evidence_json",
+    "evaluation_evidence_json",
+    "task_impact_json",
 ]
 
 MODULE_RULES = {
@@ -136,13 +141,15 @@ def read_csv(path: Path) -> list[dict[str, str]]:
 
 
 def write_csv(rows: list[dict[str, str]]) -> None:
-    with LEDGER.open("w", encoding="utf-8", newline="") as handle:
+    tmp = LEDGER.with_name(LEDGER.name + ".tmp")
+    with tmp.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
         writer.writeheader()
         for row in rows:
             for field in FIELDS:
                 row.setdefault(field, "")
             writer.writerow(row)
+    tmp.replace(LEDGER)
 
 
 def parse_json_value(raw: str, default):
@@ -154,15 +161,8 @@ def parse_json_value(raw: str, default):
         return default
 
 
-DIMENSION_NAMES = (
-    "Interface and Interaction",
-    "Memory and Context",
-    "Tools and Execution",
-    "Control, Verification, and Feedback",
-    "Planning and Workflow",
-    "Optimization and Evolution",
-    "Coordination and Scaling",
-)
+# The five General Harness dimensions (schema 3.0); the seven-dimension labels are retired.
+DIMENSION_NAMES = DIMENSIONS
 
 
 def empty_dimensions() -> dict[str, list[str]]:
@@ -176,7 +176,7 @@ def _add_dimension(out: dict[str, list[str]], name: str, labels: list[str]) -> N
 
 
 def derive_general_dimensions(row: dict[str, str]) -> dict[str, list[str]]:
-    """Map explicit harness module names to the seven comparison dimensions."""
+    """Map explicit harness module names to the five comparison dimensions (unreviewed rows only)."""
     out = empty_dimensions()
     modules = [part.strip().lower() for part in row.get("harness_modules", "").split(";") if part.strip()]
     for module in modules:
@@ -185,13 +185,13 @@ def derive_general_dimensions(row: dict[str, str]) -> dict[str, list[str]]:
         if "tool" in module or "execution" in module:
             _add_dimension(out, "Tools and Execution", ["tool_or_execution"])
         if "control" in module or "verification" in module or "evaluation" in module:
-            _add_dimension(out, "Control, Verification, and Feedback", ["control_or_verification"])
+            _add_dimension(out, "Planning and Orchestration", ["control_or_verification"])
         if "planning" in module or "workflow" in module or "lifecycle" in module:
-            _add_dimension(out, "Planning and Workflow", ["planning_or_workflow"])
+            _add_dimension(out, "Planning and Orchestration", ["planning_or_workflow"])
         if "optimization" in module or "evolution" in module or "adapt" in module:
             _add_dimension(out, "Optimization and Evolution", ["optimization_or_evolution"])
         if "coordination" in module or "scaling" in module or "multi-agent" in module:
-            _add_dimension(out, "Coordination and Scaling", ["coordination_or_scaling"])
+            _add_dimension(out, "Planning and Orchestration", ["coordination_or_scaling"])
         if any(token in module for token in ("interface", "interaction", "reasoning", "acting", "environment")):
             _add_dimension(out, "Interface and Interaction", ["interface_or_interaction"])
     return out
@@ -217,13 +217,13 @@ def derive_temporal_dimensions(row: dict[str, str]) -> dict[str, list[str]]:
     if any(k in joined for k in ("memory", "context", "retrieval", "evidence", "market state", "provenance")):
         _add_dimension(out, "Memory and Context", ["time_indexed_context"])
     if any(k in joined for k in ("leakage", "contract", "validation", "diagnos", "anomaly")):
-        _add_dimension(out, "Control, Verification, and Feedback", ["temporal_contract_check"])
+        _add_dimension(out, "Planning and Orchestration", ["temporal_contract_check"])
     if any(k in joined for k in ("forecast", "workflow", "operation")):
-        _add_dimension(out, "Planning and Workflow", ["temporal_workflow"])
+        _add_dimension(out, "Planning and Orchestration", ["temporal_workflow"])
     if any(k in joined for k in ("regime", "distribution shift", "adapt")):
         _add_dimension(out, "Optimization and Evolution", ["shift_or_regime_adaptation"])
     if any(k in joined for k in ("multi-agent", "coordination", "role")):
-        _add_dimension(out, "Coordination and Scaling", ["temporal_coordination"])
+        _add_dimension(out, "Planning and Orchestration", ["temporal_coordination"])
     return out
 
 
@@ -239,18 +239,18 @@ def derive_task_dimensions(row: dict[str, str], temporal: dict[str, list[str]]) 
         for name, labels in temporal.items():
             dims[name].extend(labels)
         if task_name == "forecasting_prediction":
-            _add_dimension(dims, "Control, Verification, and Feedback", ["horizon_and_backtest_contract"])
-            _add_dimension(dims, "Planning and Workflow", ["forecast_revision_workflow"])
+            _add_dimension(dims, "Planning and Orchestration", ["horizon_and_backtest_contract"])
+            _add_dimension(dims, "Planning and Orchestration", ["forecast_revision_workflow"])
         elif task_name == "augmentation_synthesis":
             _add_dimension(dims, "Tools and Execution", ["generator_and_transform_tools"])
-            _add_dimension(dims, "Control, Verification, and Feedback", ["fidelity_and_utility_check"])
+            _add_dimension(dims, "Planning and Orchestration", ["fidelity_and_utility_check"])
         elif task_name == "anomaly_detection_diagnosis":
-            _add_dimension(dims, "Control, Verification, and Feedback", ["alert_and_diagnosis_contract"])
-            _add_dimension(dims, "Planning and Workflow", ["detection_to_diagnosis_workflow"])
+            _add_dimension(dims, "Planning and Orchestration", ["alert_and_diagnosis_contract"])
+            _add_dimension(dims, "Planning and Orchestration", ["detection_to_diagnosis_workflow"])
         elif task_name == "decision_support":
-            _add_dimension(dims, "Control, Verification, and Feedback", ["risk_and_constraint_check"])
-            _add_dimension(dims, "Planning and Workflow", ["action_policy_workflow"])
-            _add_dimension(dims, "Coordination and Scaling", ["human_or_specialist_review"])
+            _add_dimension(dims, "Planning and Orchestration", ["risk_and_constraint_check"])
+            _add_dimension(dims, "Planning and Orchestration", ["action_policy_workflow"])
+            _add_dimension(dims, "Planning and Orchestration", ["human_or_specialist_review"])
         item = dict(item)
         item["dimensions"] = dims
         item["dimension_coding_basis"] = "derived_from_task_contract_and_temporal_reason"
@@ -294,8 +294,17 @@ def reviewed_module_record(row: dict[str, str]) -> dict | None:
         if not m.get("evidence") or not m.get("scope_reason"):
             raise ValueError(f"{mid}: missing evidence or scope reason")
         dims = m.get("dimensions", [])
-        if any(d not in DIMENSION_NAMES for d in dims):
-            raise ValueError(f"{mid}: unknown mechanism dimension")
+        if dimension_errors(dims):
+            raise ValueError(f"{mid}: " + "; ".join(dimension_errors(dims)))
+        for field, allowed in (("functions", FUNCTIONS), ("llm_route", LLM_ROUTES)):
+            if set(m.get(field, [])) - set(allowed):
+                raise ValueError(f"{mid}: unknown {field} {sorted(set(m[field]) - set(allowed))}")
+        if "view_status" in m and m["view_status"] not in LAYER_VIEW_STATUS[m["layer"]]:
+            raise ValueError(f"{mid}: view_status {m['view_status']} not allowed for {m['layer']}")
+        if "role" in m and m["role"] not in MODULE_ROLES:
+            raise ValueError(f"{mid}: unknown role {m['role']}")
+        if "confidence" in m and m["confidence"] not in CONFIDENCE:
+            raise ValueError(f"{mid}: unknown confidence {m['confidence']}")
         if m["layer"] == "LLM":
             llm.append(mid)
         elif m["layer"] in {"GH", "GTS"}:
@@ -596,7 +605,11 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                     "summary": row["paper_claim_summary"],
                     "evidence_basis": row["claim_evidence_basis"],
                     "review_status": row["claim_review_status"],
+                    "evidence": parse_json_field(row, "claim_evidence_json", []),
                 },
+                "role_of_work": row.get("role_of_work") or None,
+                "evaluation_evidence": parse_json_field(row, "evaluation_evidence_json", {}),
+                "task_impact": parse_json_field(row, "task_impact_json", None),
                 "source_evidence": json.loads(row["source_evidence_json"]) if row.get("source_evidence_json") else [],
                 "harness": {
                     "primary_locus": row["primary_locus"],
@@ -655,7 +668,9 @@ def generate_json(rows: list[dict[str, str]]) -> None:
                 "taxonomy_review_status": row.get("taxonomy_review_status") or "survey_coded_needs_pdf_review",
             }
         )
-    JSON_LEDGER.write_text(json.dumps(output, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    tmp = JSON_LEDGER.with_name(JSON_LEDGER.name + ".tmp")
+    tmp.write_text(json.dumps(output, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    tmp.replace(JSON_LEDGER)
 
 
 def sync(_: argparse.Namespace) -> None:
