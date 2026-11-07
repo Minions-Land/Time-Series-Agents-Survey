@@ -133,7 +133,7 @@ A Paper Card records what a work contributes, module by module, with the passage
 ## 📈 What the records show
 
 <p align="center">
-  <img src="docs/assets/trends.png" width="88%" alt="Module contributions over time: cumulative counts and doubling times by layer, share of new modules by period, and paths showing where temporal functions are implemented.">
+  <img src="docs/assets/trends.png" width="88%" alt="Module contributions over time: cumulative counts and doubling times by layer, share of new modules by period, and paths showing in which Harness layer each of the five mechanism dimensions is implemented.">
 </p>
 
 - **How to assess a new work.** Place its modules in the formula; check the claimed scope (a general mechanism

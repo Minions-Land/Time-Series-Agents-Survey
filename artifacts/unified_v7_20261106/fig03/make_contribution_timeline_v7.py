@@ -32,11 +32,12 @@ OUT_PNG = HERE / "Figure03_V7.png"
 OUT_PDF = HERE / "Figure03_V7.pdf"
 OUT_CSV = HERE / "module_contribution_timeline.csv"
 OUT_COVERAGE = HERE / "module_contribution_timeline_coverage.json"
-OUT_TEMPORAL = HERE / "temporal_function_placement.csv"     # panel (c) counts, quoted in the text
-TEMPORAL: list[tuple[str, str, str, str]] = []                # (month, temporal function, layer, reuse level)
-FUNCTIONS = ["data_management", "processing", "context_memory", "validation"]
-sys.path.insert(0, str(ROOT / "scripts"))
-from task_groups import module_groups                         # noqa: E402  task-group mapping of the survey
+OUT_MECHANISM = HERE / "mechanism_placement.csv"            # panel (c) counts, quoted in the text
+MECHANISM: list[tuple[str, str, str]] = []                    # (month, mechanism dimension, layer)
+# The five mechanism dimensions of the General Harness (Table tab:component-vocab), in the order of Section 4.
+DIMENSIONS = ["Interface and Interaction", "Memory and Context", "Tools and Execution",
+              "Planning and Orchestration", "Optimization and Evolution"]
+HARNESS = ["GH", "GTS", "TSK"]                                 # Harness layers; LLM-side modules carry no dimension
 
 
 def count_module_labels(value: dict) -> int:
@@ -56,22 +57,6 @@ def in_scope(record: dict) -> bool:
     module = record.get("module_level_contributions", {})
     return (record.get("inclusion") == "reviewed_contribution" and "modules" in module
             and module.get("review_status") in {"paper_verified", "repository_verified"})
-
-
-def module_functions(module: dict) -> list[str]:
-    """Temporal functions of one module (schema 3.0 top-level field; older ledgers keep them in function_view)."""
-    functions = module.get("functions")
-    if functions is None:
-        functions = (module.get("function_view") or {}).get("functions") or []
-    return [f for f in functions if f in FUNCTIONS]
-
-
-def reuse_level(module: dict) -> str:
-    """GH/GTS: demonstrated when the module's tasks span >= 2 of the four task groups, else inferred.
-    TSK: not_applicable (a Task-Specific Harness module is bound to its task)."""
-    if module.get("layer") not in ("GH", "GTS"):
-        return "not_applicable"
-    return "demonstrated" if len(module_groups(module)) >= 2 else "inferred"
 
 
 def contribution_counts(record: dict) -> dict[str, int]:
@@ -110,9 +95,10 @@ def main() -> None:
         dated_records.append(record["citation"]["key"])
         monthly.setdefault(month, Counter()).update(counts)
         for module in record["module_level_contributions"]["modules"]:
-            if module["layer"] in ("GTS", "TSK"):
-                for function in module_functions(module):
-                    TEMPORAL.append((month, function, module["layer"], reuse_level(module)))
+            if module["layer"] in HARNESS:
+                for dimension in module.get("dimensions") or []:
+                    if dimension in DIMENSIONS:
+                        MECHANISM.append((month, dimension, module["layer"]))
 
     months = sorted(monthly)
     running = Counter()
@@ -137,15 +123,11 @@ def main() -> None:
         'plotted_modules': dict(running), 'counting_unit': 'unique reviewed module ID',
         'year_only_placement': 'January; date precision retained in ledger'
     }, indent=2)+'\n')
-    with OUT_TEMPORAL.open("w", encoding="utf-8", newline="") as handle:
+    with OUT_MECHANISM.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle, lineterminator="\n")
-        writer.writerow(["function", "General Time Series Harness", "Task-Specific Harness",
-                         "GTS demonstrated reuse", "GTS inferred reuse"])
-        for function in FUNCTIONS:
-            rows_f = [t for t in TEMPORAL if t[1] == function]
-            writer.writerow([function, sum(t[2] == "GTS" for t in rows_f), sum(t[2] == "TSK" for t in rows_f),
-                             sum(t[2] == "GTS" and t[3] == "demonstrated" for t in rows_f),
-                             sum(t[2] == "GTS" and t[3] == "inferred" for t in rows_f)])
+        writer.writerow(["mechanism dimension", *HARNESS])
+        for dimension in DIMENSIONS:
+            writer.writerow([dimension, *(sum(t[1] == dimension and t[2] == layer for t in MECHANISM) for layer in HARNESS)])
     plot_timeline(months, cumulative)
 
 
@@ -155,7 +137,7 @@ LAYERS = ["LLM-side", "General Harness", "General Time Series Harness", "Task-Sp
 COLORS = dict(zip(LAYERS, ["#B0852F", "#44689F", "#37807A", "#BC6E52"]))
 MID = dict(zip(LAYERS, ["#E5CD9B", "#AFC1DE", "#A3CCC8", "#E8B8A5"]))
 LABEL_INK = {name: "white" for name in LAYERS}
-DISPLAY = {"LLM-side": "LLM-Side", "General Harness": "General Harness",
+DISPLAY = {"LLM-side": "LLM Side", "General Harness": "General Harness",
            "General Time Series Harness": "General Time Series Harness",
            "Task-Specific Harness": "Task-Specific Harness"}   # Title Case labels; data keys stay unchanged
 INK, MUTED, BANNER = "#262A4D", "#666A84", "#4B4F96"
@@ -198,7 +180,7 @@ OY = CH + 0.35                       # the top row sits above panel (c)
 ZONES = {"a": (0.12, OY + 0.10, 6.88, 5.10), "b": (7.16, OY + 0.10, 6.05, 5.10), "c": (0.12, 0.10, 13.09, CH - 0.1)}
 AXES = {"a": (1.02, OY + 0.80, 5.36, 3.98), "b": (8.16, OY + 1.12, 4.92, 3.48)}
 TITLES = {"a": "(a)  Cumulative Module Contributions", "b": "(b)  Share of New Modules by Period",
-          "c": "(c)  Temporal Functions by Layer and Reuse Evidence"}
+          "c": "(c)  Mechanism Dimensions by Layer"}
 
 
 def zone_panel(fig, key):
@@ -319,40 +301,39 @@ def plot_timeline(months: list[str], cumulative: dict[str, list[int]]) -> None:
     plt.close(fig)
 
 
-# ---- (c) parallel paths: one path per (module, temporal function) assignment -------------------------------------
-FUNC_LABEL = {"data_management": "Temporal Data\nManagement", "processing": "Temporal\nProcessing",
-              "context_memory": "Temporal Context\nand Memory", "validation": "Temporal\nValidation"}
+# ---- (c) parallel paths: one path per (Harness module, mechanism dimension) assignment ----------------------------
+DIM_LABEL = {"Interface and Interaction": "Interface and\nInteraction", "Memory and Context": "Memory and\nContext",
+             "Tools and Execution": "Tools and\nExecution", "Planning and Orchestration": "Planning and\nOrchestration",
+             "Optimization and Evolution": "Optimization\nand Evolution"}
+LAYER_NAME = {"GH": "General Harness", "GTS": "General Time Series Harness", "TSK": "Task-Specific Harness"}
 NODE_FILL, NODE_EDGE = "#FFFFFF", "#D9DBE8"
 
 
 def parallel_paths(fig, months):
-    """Period -> temporal function -> layer -> reuse evidence. Colour: shared module (General Time Series Harness,
-    sea teal; darker when its reuse across task groups is demonstrated) or task procedure (terracotta)."""
+    """Period -> mechanism dimension -> Harness layer. Each path is one mechanism label of one Harness module and is
+    coloured by the layer the module is assigned to, so the panel shows where each mechanism is implemented."""
     from matplotlib.patches import FancyBboxPatch as Box
     from matplotlib.path import Path as MPath
     from matplotlib.patches import PathPatch
     x0, y0, w, h = ZONES["c"]
     cx = fig.add_axes((x0 / FIG_W, y0 / FIG_H, w / FIG_W, h / FIG_H)); cx.set_xlim(0, w); cx.set_ylim(0, h); cx.axis("off")
     period_of = lambda m: next(label for label, end in PERIODS if m <= end)
-    items = [(period_of(m), f, layer, reuse) for m, f, layer, reuse in TEMPORAL]
+    items = [(period_of(m), d, layer) for m, d, layer in MECHANISM]
     axes = [
-        ("Period", [p for p, _ in PERIODS], lambda it: it[0], lambda k: k),
-        ("Temporal Function", FUNCTIONS, lambda it: it[1], lambda k: FUNC_LABEL[k]),
-        ("Layer", ["GTS", "TSK"], lambda it: it[2],
-         lambda k: {"GTS": "General Time Series\nHarness", "TSK": "Task-Specific\nHarness"}[k]),
-        ("Reuse Evidence", ["demonstrated", "inferred", "not_applicable"], lambda it: "demonstrated" if it[3] == "demonstrated"
-         else ("inferred" if it[3] == "inferred" else "not_applicable"),
-         lambda k: {"demonstrated": "Demonstrated\n(≥2 Task Groups)", "inferred": "Inferred",
-                    "not_applicable": "Not Applicable\n(Task-Specific)"}[k]),
+        ("Period", [p for p, _ in PERIODS], lambda k: k),
+        ("Mechanism Dimension", DIMENSIONS, lambda k: DIM_LABEL[k]),
+        ("Layer", HARNESS, lambda k: LAYER_NAME[k].replace("General Time Series ", "General Time Series\n")
+                                                   .replace("Task-Specific ", "Task-Specific\n")),
     ]
-    XS, BWS = [0.45, 3.75, 7.3, 10.75], [1.5, 2.05, 2.05, 2.05]   # left edge and width of each axis' boxes
-    MINH, GAPS = [0.46, 0.86, 0.6, 0.6], [0.1, 0.12, 0.14, 0.14]   # near-equal function boxes, as in parallel sets
+    NA = len(axes)
+    XS, BWS = [0.7, 5.25, 10.0], [1.7, 2.6, 2.6]          # left edge and width of each axis' boxes
+    MINH, GAPS = [0.46, 0.62, 0.8], [0.1, 0.13, 0.16]
     top, bottom = h - 1.05, 0.62
     boxes = {}
-    for a, (title, keys, key_of, label) in enumerate(axes):
+    for a, (title, keys, label) in enumerate(axes):
         BW, gap, minh = BWS[a], GAPS[a], MINH[a]
         cx.text(XS[a] + BW / 2, h - 0.62, title, ha="center", va="center", fontsize=14.5, fontweight="bold", color=INK)
-        counts = Counter(key_of(it) for it in items)
+        counts = Counter(it[a] for it in items)
         span = top - bottom - gap * (len(keys) - 1)
         free = span - minh * len(keys)
         y = top
@@ -361,44 +342,40 @@ def parallel_paths(fig, months):
             boxes[(a, k)] = (y - hh, hh)
             y -= hh + gap
     # slot positions: on each side of a box, order paths by the node they come from / go to (fewer crossings)
-    order = {a: {k: i for i, k in enumerate(axes[a][1])} for a in range(4)}
-    keyed = [[axes[a][2](it) for a in range(4)] for it in items]
+    order = {a: {k: i for i, k in enumerate(axes[a][1])} for a in range(NA)}
     slots = {}
-    for a in range(4):
+    for a in range(NA):
         for side, nb in (("L", a - 1), ("R", a + 1)):
-            if nb < 0 or nb > 3: continue
+            if nb < 0 or nb >= NA: continue
             for k in axes[a][1]:
-                idx = [i for i, kk in enumerate(keyed) if kk[a] == k]
-                idx.sort(key=lambda i: (order[nb][keyed[i][nb]], order[max(0, a - 1)][keyed[i][max(0, a - 1)]],
-                                        order[min(3, a + 1)][keyed[i][min(3, a + 1)]]))
+                idx = [i for i, it in enumerate(items) if it[a] == k]
+                idx.sort(key=lambda i: tuple(order[b][items[i][b]] for b in (nb, *range(NA)) if b != a))
                 yb, hh = boxes[(a, k)]
                 for j, i in enumerate(idx):
                     slots[(i, a, side)] = yb + hh - hh * (j + 1) / (len(idx) + 1)
-    style = {("GTS", "demonstrated"): (COLORS["General Time Series Harness"], 1.9, 0.9),
-             ("GTS", "inferred"): ("#7FB7B1", 1.4, 0.75),
-             ("TSK", "not_applicable"): (COLORS["Task-Specific Harness"], 1.1, 0.42)}
-    draw = sorted(range(len(items)), key=lambda i: (items[i][2] == "GTS", items[i][3] == "demonstrated"))   # strong on top
+    style = {"GH": (COLORS["General Harness"], 1.3, 0.75), "GTS": (COLORS["General Time Series Harness"], 1.5, 0.85),
+             "TSK": (COLORS["Task-Specific Harness"], 0.9, 0.38)}
+    draw = sorted(range(len(items)), key=lambda i: ("TSK", "GH", "GTS").index(items[i][2]))   # shared layers on top
     for i in draw:
-        col, lw, al = style[(items[i][2], keyed[i][3])]
-        for a in range(3):
+        col, lw, al = style[items[i][2]]
+        for a in range(NA - 1):
             xa, xb = XS[a] + BWS[a], XS[a + 1]
             ya, yb = slots[(i, a, "R")], slots[(i, a + 1, "L")]
             xm = (xa + xb) / 2
             p = MPath([(xa, ya), (xm, ya), (xm, yb), (xb, yb)], [MPath.MOVETO, MPath.CURVE4, MPath.CURVE4, MPath.CURVE4])
             cx.add_patch(PathPatch(p, fc="none", ec=col, lw=lw, alpha=al, zorder=2, capstyle="round"))
-    # boxes with counts; the function boxes carry the shared share, the key quantity of the panel
+    # boxes with counts; each dimension box gives its split over the three Harness layers
     for (a, k), (yb, hh) in boxes.items():
-        title, keys, key_of, label = axes[a]
+        title, keys, label = axes[a]
         BW = BWS[a]
-        n = sum(1 for kk in keyed if kk[a] == k)
-        edge, lwb, subcol, subw = NODE_EDGE, 1.1, MUTED, "normal"
+        n = sum(1 for it in items if it[a] == k)
+        edge, lwb = NODE_EDGE, 1.1
         sub = f"n = {n}"
         if a == 1:
-            g = sum(1 for kk in keyed if kk[1] == k and kk[2] == "GTS")
-            sub = f"{g} GTS · {n - g} TSK"
-            if g / n < 0.2:
-                edge, lwb, subcol, subw = COLORS["Task-Specific Harness"], 2.0, COLORS["Task-Specific Harness"], "bold"
-        if a == 3 and k == "demonstrated": edge, lwb = COLORS["General Time Series Harness"], 2.0
+            c = Counter(it[2] for it in items if it[1] == k)
+            sub = " · ".join(f"{c[l]} {l}" for l in HARNESS)
+        if a == 2:
+            edge, lwb = COLORS[LAYER_NAME[k]], 2.0
         cx.add_patch(Box((XS[a], yb), BW, hh, boxstyle="round,pad=0,rounding_size=0.07", fc=NODE_FILL, ec=edge, lw=lwb, zorder=3))
         lines = label(k).split("\n")
         mid = yb + hh / 2
@@ -408,13 +385,10 @@ def parallel_paths(fig, months):
         cx.text(XS[a] + BW / 2, t_y, "\n".join(lines), ha="center", va="center", fontsize=12.5,
                 fontweight="bold", color=INK, zorder=4, linespacing=1.0)
         cx.text(XS[a] + BW / 2, mid - block / 2 + 0.1, sub, ha="center", va="center", fontsize=11.5,
-                color=subcol, fontweight=subw, zorder=4)
-    # legend: entries centred as a row, spaced by their rendered text width
+                color=MUTED, zorder=4)
+    # legend: one entry per Harness layer, centred as a row
     ly = 0.24
-    entries = [("General Time Series Harness:", None),           # a heading for the two teal entries
-               ("Demonstrated Reuse", style[("GTS", "demonstrated")]),
-               ("Inferred Reuse", style[("GTS", "inferred")]),
-               ("Task-Specific Harness", style[("TSK", "not_applicable")])]
+    entries = [(LAYER_NAME[l], style[l]) for l in HARNESS]
     renderer = fig.canvas.get_renderer()
     widths = []
     for lab, _ in entries:
@@ -422,15 +396,12 @@ def parallel_paths(fig, months):
         widths.append(probe.get_window_extent(renderer).width / fig.dpi)
         probe.remove()
     sw, pad, sep = 0.55, 0.15, 0.6
-    lead = lambda st: 0 if st is None else sw + pad
-    total = sum(lead(st) + wt for (_, st), wt in zip(entries, widths)) + sep * (len(entries) - 1)
+    total = sum(sw + pad + wt for wt in widths) + sep * (len(entries) - 1)
     xl = (w - total) / 2
-    for (lab, st), wt in zip(entries, widths):
-        if st is not None:
-            col, lw, al = st
-            cx.plot([xl, xl + sw], [ly, ly], color=col, lw=lw + 1.2, alpha=min(1, al + 0.15), solid_capstyle="round")
-        cx.text(xl + lead(st), ly, lab, va="center", fontsize=12.5, color=INK, fontweight="bold" if st is None else "normal")
-        xl += lead(st) + wt + (sep if st is not None else 0.3)
+    for (lab, (col, lw, al)), wt in zip(entries, widths):
+        cx.plot([xl, xl + sw], [ly, ly], color=col, lw=lw + 1.4, alpha=min(1, al + 0.2), solid_capstyle="round")
+        cx.text(xl + sw + pad, ly, lab, va="center", fontsize=12.5, color=INK)
+        xl += sw + pad + wt + sep
 
 
 if __name__ == "__main__":
