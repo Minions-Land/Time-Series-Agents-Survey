@@ -313,7 +313,7 @@ def series(sh, x, y, w, h, color=INK, phase=0.0, amp=1.0, lw=1.6, smooth=False, 
     return pts
 
 
-def mini_forecast(sh, x, y, w, h, cut=0.62, t0_label=True):   # the pill shows the decision time τ
+def mini_forecast(sh, x, y, w, h, cut=0.62, t0_label=True):   # the pill marks the current time (Now)
     """Observed history up to t0, then a dashed forecast inside a widening band."""
     n = 110; kc = int(n * cut); amp = h / 2.6
     xs = [x + w * k / n for k in range(n + 1)]
@@ -330,9 +330,8 @@ def mini_forecast(sh, x, y, w, h, cut=0.62, t0_label=True):   # the pill shows t
     t0 = xs[kc]
     arrow(sh, t0, y - 0.06, t0, y + h + 0.02, color=HUE['gts'][0], lw=1.4, dash=MSO_LINE.DASH, head=None)
     if t0_label:
-        p = box(sh, t0 - 0.22, y + h + 0.02, 0.44, 0.24, fill=HUE['gts'][0], radius=0.5)
-        runs(p, [('τ', 'FFFFFF', True, False)], 15)
-        r = p.text_frame.paragraphs[0].runs[0]; r.font.name = 'Times New Roman'; r.font.italic = True   # matches $\tau$ in the text
+        p = box(sh, t0 - 0.29, y + h + 0.02, 0.58, 0.24, fill=HUE['gts'][0], radius=0.5)
+        runs(p, [('Now', 'FFFFFF', True, False)], 12)
     return t0
 
 

@@ -72,9 +72,8 @@ def shaded(sh, x0, x1, y0, y1, key, fill=None, alpha=70):
 
 
 def t0_pill(sh, x, y):
-    p = box(sh, x - 0.2, y, 0.4, 0.22, fill=TS[0], radius=0.5)
-    runs(p, [('τ', 'FFFFFF', True, False)], 14.5)
-    r = p.text_frame.paragraphs[0].runs[0]; r.font.name = 'Times New Roman'; r.font.italic = True   # matches $\tau$ in the text
+    p = box(sh, x - 0.29, y, 0.58, 0.22, fill=TS[0], radius=0.5)   # the current time (Now)
+    runs(p, [('Now', 'FFFFFF', True, False)], 12)
 
 
 def glyph(sh, kind, x, y, w, h):

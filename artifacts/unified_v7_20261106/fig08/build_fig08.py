@@ -111,10 +111,10 @@ def fc_glyph(sh, x, y, w, h, cut=0.55):
     poly(sh, hp, INK, lw=1.6)
     poly(sh, fp, TK, lw=1.8, dash=MSO_LINE.DASH)
     arrow(sh, t0, y - 0.08, t0, y + h + 0.04, color=HUE['gts'][0], lw=1.3, dash=MSO_LINE.DASH, head=None)
-    p = box(sh, t0 - 0.17, y + h + 0.04, 0.34, 0.25, fill=HUE['gts'][0], radius=0.5)   # forecast origin = tau
+    p = box(sh, t0 - 0.29, y + h + 0.04, 0.58, 0.25, fill=HUE['gts'][0], radius=0.5)   # forecast origin = current time (Now)
     tf = p.text_frame; tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
-    r = tf.paragraphs[0].add_run(); r.text = 'τ'; tf.paragraphs[0].alignment = PP_ALIGN.CENTER
-    r.font.size = Pt(15); r.font.italic = True; r.font.name = MATH; r.font.color.rgb = rgb('FFFFFF')
+    r = tf.paragraphs[0].add_run(); r.text = 'Now'; tf.paragraphs[0].alignment = PP_ALIGN.CENTER
+    r.font.size = Pt(12); r.font.bold = True; r.font.name = F; r.font.color.rgb = rgb('FFFFFF')
     return t0
 
 

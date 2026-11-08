@@ -106,8 +106,7 @@ def release(slide):
     # decision cutoff tau
     arrow(sh, TAU, 0.95, TAU, AX_Y + 0.3, color=INK, lw=1.8, dash=MSO_LINE.DASH, head=None)
     p = box(sh, TAU - 1.0, 0.64, 2.0, 0.36, fill=INK, radius=0.5); shadow(p)
-    pt = R(sh, TAU - 1.0, 0.64, 2.0, 0.36, [('Decision Cutoff ', 'FFFFFF', True, False, False),
-                                             ('τ', 'FFFFFF', True, False, True)], 14)
+    pt = R(sh, TAU - 1.0, 0.64, 2.0, 0.36, [('Current Time', 'FFFFFF', True, False, False)], 14)
     # late report, released after tau
     ic(sh, 'late_report', 10.3, 0.7, 0.62)
     T(sh, 10.96, 0.76, 1.9, 0.42, 'Late Report', size=15, align='l')
@@ -215,8 +214,7 @@ def context_card(slide):
 
 def validation_card(slide):
     g, sh, x = fcard(slide, 3, 'cutoff', ['Temporal', 'Validation'])
-    R(sh, x, CY + 0.86, CW, 0.38, [('v', INK, True, False, True), (' ≤ ', INK, True, False, False),
-                                   ('τ', INK, True, False, True)], 18)
+    R(sh, x, CY + 0.86, CW, 0.38, [('v', INK, True, False, True), (' ≤ Now', INK, True, False, False)], 18)
     for i, (lab, res, cap, col) in enumerate([('Available', 'validate', 'Admit', GT), ('Late', 'reject', 'Exclude', TK)]):
         ry = CY + 1.35 + i * 0.75
         sheet(sh, x + 0.55, ry, 0.36, 0.42, line=col)

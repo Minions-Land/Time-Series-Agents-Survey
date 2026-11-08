@@ -295,7 +295,7 @@ Figure~\ref{fig:task-function-grid} provides two routes through the literature. 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig04/Figure04_V7.pdf}
-\caption{From task requirements to Harness modules. (a) Columns identify task groups and rows identify shared temporal functions. Read a column to assemble requirements for one task, or a row to compare how a function serves different tasks. Shaded regions and solid boundaries mark a forecast horizon, a diagnostic interval, information beyond the current time $\tau$, and an admissible action range. (b) A demand-planning workflow combines general execution, shared temporal preparation, forecasting, and inventory decisions. The forecast panel separates observed history from a schematic prediction and its range. The grid synthesizes requirements illustrated by TimeSeriesScientist \citep{timeseriesscientist2025}, SAGE-AD \citep{sagead2026}, MERIT \citep{merit2025}, and FinMem \citep{finmem2023}.}
+\caption{From task requirements to Harness modules. (a) Columns identify task groups and rows identify shared temporal functions. Read a column to assemble requirements for one task, or a row to compare how a function serves different tasks. Shaded regions and solid boundaries mark a forecast horizon, a diagnostic interval, information after the current time (Now), and an admissible action range. (b) A demand-planning workflow combines general execution, shared temporal preparation, forecasting, and inventory decisions. The forecast panel separates observed history from a schematic prediction and its range. The grid synthesizes requirements illustrated by TimeSeriesScientist \citep{timeseriesscientist2025}, SAGE-AD \citep{sagead2026}, MERIT \citep{merit2025}, and FinMem \citep{finmem2023}.}
 \label{fig:task-function-grid}
 \end{figure}
 
@@ -504,12 +504,12 @@ At the current time $\tau$, when the Agent issues its output, the admissible inf
 \end{equation}
 where $t_i$ is the event time and $v_i$ is the time at which the value became available. In a backtest, $\tau$ is the simulated origin rather than the time the experiment is run. The information boundary admits information published by $\tau$, including a known future calendar event; the task specifies which observation and target windows may be used.
 
-Figure~\ref{fig:temporal-harness-functions} connects the four shared functions through the objects they manage. Read the upper timeline first: availability time determines whether a source can be used at the current time $\tau$. The middle row follows timestamped values, a selected processing window, an aligned event, and an evidence-admission check. The lower paths connect the LLM to requests and returned observations. These operations implement the temporal grounding and evidence checks emphasized by AION \citep{aion2026} and TimeClaw-Harness \citep{timeclaw2026harness}.
+Figure~\ref{fig:temporal-harness-functions} connects the four shared functions through the objects they manage. Read the upper timeline first: availability time determines whether a source can be used at the current time. The middle row follows timestamped values, a selected processing window, an aligned event, and an evidence-admission check. The lower paths connect the LLM to requests and returned observations. These operations implement the temporal grounding and evidence checks emphasized by AION \citep{aion2026} and TimeClaw-Harness \citep{timeclaw2026harness}.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig07/Figure07_V7.pdf}
-\caption{A temporal workspace connecting sources, operations, and the LLM. The upper timeline separates available evidence from a late release at the current time $\tau$. The middle row illustrates timestamped data and versions; windowing, resampling, and alignment; event context and retrieved cases; and evidence-admission checks. Requests and observations connect these shared functions to the LLM. This synthesis follows the temporal-runtime requirements of AION \citep{aion2026} and TimeClaw-Harness \citep{timeclaw2026harness}.}
+\caption{A temporal workspace connecting sources, operations, and the LLM. The upper timeline separates available evidence from a late release at the current time. The middle row illustrates timestamped data and versions; windowing, resampling, and alignment; event context and retrieved cases; and evidence-admission checks. Requests and observations connect these shared functions to the LLM. This synthesis follows the temporal-runtime requirements of AION \citep{aion2026} and TimeClaw-Harness \citep{timeclaw2026harness}.}
 \label{fig:temporal-harness-functions}
 \end{figure}
 
