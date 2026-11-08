@@ -143,8 +143,8 @@ A Paper Card records what a work contributes, module by module, with the passage
   Only 70 of the 143 method works test the requirement their modules address (leakage, regime change, data quality,
   context, decision consequences, verifiability or deployment).
 - **Generality is often claimed, less often shown.** Reuse across at least two task groups is demonstrated for 89 of
-  the 189 General Harness and General Time Series Harness modules. Of 12 rejected layer changes in the re-audit, 10
-  would have moved a general mechanism into a more specific layer.
+  the 189 General Harness and General Time Series Harness modules; the generality of the rest is inferred from their
+  interfaces.
 - **Effort is moving from the model to the runtime.** The LLM side supplied about a third of new modules until the
   end of 2024 and 7–18% in each later period. Shared temporal modules grow fastest, doubling about every 5 months.
 - **Time series adaptation is mostly tools.** 67 of the 97 General Time Series Harness modules provide tools and
