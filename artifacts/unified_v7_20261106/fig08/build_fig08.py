@@ -1,21 +1,25 @@
 """Figure 8 (fig:task-specific-harness), V7 house style.
 
 Four task panels, one per task group (scripts/task_groups.py, in its order: Analysis of Observed Series, Forecasting,
-Generation, Decision Making); the Analysis of Observed Series panel uses anomaly diagnosis with a localized interval. Each panel reads from the input series through the procedure to the resulting
-artifact; dashed indigo paths are feedback that revises the procedure; the indigo strip at the bottom names the
-evaluation target.
+Generation, Decision Making); a subtitle under each title lists the group's second-level tasks. The Analysis of
+Observed Series panel uses anomaly diagnosis with a localized interval; Forecasting shows a value path and an event
+path; Generation shows Conditioned Synthesis and Augmentation; Decision Making shows Autonomous Control (act in a
+simulator) and Decision Support (recommend to an operator). Each panel reads from the input series through the
+procedure to the resulting artifact; dashed indigo paths are feedback that revises the procedure; the indigo strip
+at the bottom names the evaluation target.
 """
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'kit')))
 from v7kit import *
 from PIL import ImageFont
 
-H = 8.5
+DP = 0.28          # extra panel height for the subtitle that lists the second-level tasks
+H = 8.5 + 2 * DP
 MATH = 'Times New Roman'
 TK, TKm, TKl = HUE['tsk']
 EV, EVm, EVl = HUE['ev']
 SD, SDm, SDl = HUE['data']
-PW, PH = 6.366, 3.72
+PW, PH = 6.366, 3.72 + DP
 PX = [0.2, 0.2 + PW + 0.2]
 PY = [0.42, 0.42 + PH + 0.5]
 FONTS = {False: '/System/Library/Fonts/Supplemental/Comic Sans MS.ttf',
@@ -82,19 +86,24 @@ def caption(sh, cx, y, t, w=1.3, color=MUTE, size=13):
     return T(sh, cx - w / 2, y, w, 0.26, t, size=size, color=color)
 
 
-def evaluation(sh, u, v, t):
-    b = box(sh, u + 0.15, v + 3.2, PW - 0.3, 0.4, fill=EVl, line=EVm, lw=1.0, radius=0.5)
-    p = box(sh, u + 0.2, v + 3.24, 1.2, 0.32, fill=EV, radius=0.5)
+def evaluation(sh, u, vz, t):
+    """Evaluation strip at the bottom of the panel whose zone starts at vz."""
+    y = vz + PH - 0.52
+    b = box(sh, u + 0.15, y, PW - 0.3, 0.4, fill=EVl, line=EVm, lw=1.0, radius=0.5)
+    p = box(sh, u + 0.2, y + 0.04, 1.2, 0.32, fill=EV, radius=0.5)
     label_in(p, 'Evaluation', size=13)
-    T(sh, u + 1.45, v + 3.2, PW - 1.7, 0.4, t, size=13.5, color=EV, align='l')
+    T(sh, u + 1.45, y, PW - 1.7, 0.4, t, size=13.5, color=EV, align='l')
 
 
-def panel(slide, i, j, title, hero):
+def panel(slide, i, j, title, hero, sub, dy=DP):
+    """Zone with title pill, hero icon and the subtitle of second-level tasks; returns the content origin (zone top + dy)."""
     u, v = PX[j], PY[i]
     zone(slide, u, v, PW, PH, title, 'tsk')
     g = group(slide); sh = g.shapes
     ic(sh, hero, u + 0.12, v - 0.33, 0.64)
-    return g, sh, u, v
+    lines = sub if isinstance(sub, list) else [sub]
+    T(sh, u + 0.2, v + 0.27, PW - 0.4, 0.24 * len(lines), lines, size=12.5, color=TK)
+    return g, sh, u, v + dy, v
 
 
 def fc_glyph(sh, x, y, w, h, cut=0.55):
@@ -123,7 +132,7 @@ SER = [0.35, 0.55, 0.4, 0.7, 0.5, 0.62, 0.45, 0.8, 0.55, 0.72, 0.5, 0.66]
 
 # ------------------------------------------------------------------------------------------------ forecasting
 def forecasting(slide):
-    g, sh, u, v = panel(slide, 0, 1, 'Forecasting', 'forecast')
+    g, sh, u, v, vz = panel(slide, 0, 1, 'Forecasting', 'forecast', 'Value Forecasting · Event and Probability Forecasting')
     ya, yb = v + 1.22, v + 2.6
     # history -> select models -> baseline -> revise (+context) -> revised forecast with its horizon
     sheet(sh, u + 0.18, ya - 0.3, 0.92, 0.6, SER)
@@ -145,7 +154,7 @@ def forecasting(slide):
     arrow(sh, u + 4.72, ya, u + 4.9, ya, color=TK, lw=2.0)
     fx, fw = u + 4.95, 1.1
     t0 = fc_glyph(sh, fx, ya - 0.27, fw, 0.5, cut=0.46)
-    caption(sh, fx + fw / 2 - 0.12, ya + 0.5, 'Revised', w=1.0)
+    caption(sh, fx + fw / 2 - 0.12, ya + 0.5, 'Revised Value', w=1.3)
     yh = ya - 0.42   # horizon bracket over the forecast part
     poly(sh, [(t0 + 0.02, yh + 0.06), (t0 + 0.02, yh), (fx + fw, yh), (fx + fw, yh + 0.06)], TK, lw=1.4)
     T(sh, (t0 + fx + fw) / 2 - 0.5, yh - 0.29, 1.0, 0.26, 'Horizon', size=12.5, color=TK)
@@ -163,28 +172,31 @@ def forecasting(slide):
     fb(sh, [(fx + fw + 0.08, ya), (fx + fw + 0.08, yb), (rx + 1.92, yb)])
     T(sh, u + 4.4, yb + 0.28, 1.7, 0.26, 'Observed Error', size=13, italic=True, color=EV, align='r')
     fb(sh, [(u + 4.28, yb - 0.27), (u + 4.28, ya + 0.27)])
-    evaluation(sh, u, v, 'Forecast Error · Calibration')
+    evaluation(sh, u, vz, 'Forecast Error · Calibration')
     return g
 
 
 # ------------------------------------------------------------------------------------------------ generation
 def synthesis(slide):
-    g, sh, u, v = panel(slide, 1, 0, 'Generation', 'synthesis')
-    ys = [v + 0.98, v + 1.78, v + 2.58]
-    sheet(sh, u + 0.18, ys[1] - 0.3, 0.86, 0.6, SER[::-1])
-    caption(sh, u + 0.61, ys[1] + 0.33, 'Examples')
+    g, sh, u, v, vz = panel(slide, 1, 0, 'Generation', 'synthesis', 'Augmentation · Conditioned Synthesis')
+    ys = [v + 1.25, v + 2.25]
+    ym = (ys[0] + ys[1]) / 2
+    sheet(sh, u + 0.18, ym - 0.3, 0.86, 0.6, SER[::-1])
+    caption(sh, u + 0.61, ym + 0.33, 'Examples')
     bx = u + 1.24
-    arrow(sh, u + 1.1, ys[1], bx, ys[1], color=TK, lw=2.0, head=None)
-    poly(sh, [(bx, ys[0]), (bx, ys[2])], TK, lw=2.0)
+    arrow(sh, u + 1.1, ym, bx, ym, color=TK, lw=2.0, head=None)
+    poly(sh, [(bx, ys[0]), (bx, ys[1])], TK, lw=2.0)
     c1, c2 = u + 1.4, u + 3.02
-    for y, a, b in ((ys[0], 'Set Conditions', 'Generator'), (ys[1], 'Configure', 'Transform'), (ys[2], 'Write Q&A', None)):
+    for y, a, b, cls in ((ys[0], 'Set Conditions', 'Generator', 'Conditioned Synthesis'),
+                         (ys[1], 'Configure', 'Transform', 'Augmentation')):
+        T(sh, c1 + 0.84, y - 0.56, 2.1, 0.26, cls, size=12.5, italic=True, color=TK, align='l')
         arrow(sh, bx, y, c1 - 0.02, y, color=TK, lw=2.0)
         step(sh, c1, 0, 1.44, a, cy=y)
         arrow(sh, c1 + 1.46, y, c2 - 0.02, y, color=TK, lw=2.0)
-        if b: step(sh, c2, 0, 1.08, b, cy=y)
-    # generated samples, transformed views, Q/A pairs
+        step(sh, c2, 0, 1.08, b, cy=y)
+    # generated samples and transformed views
     sx, sw, mx = u + 4.2, 0.42, u + 4.74
-    for k, y in enumerate(ys[:2]):
+    for k, y in enumerate(ys):
         arrow(sh, c2 + 1.1, y, sx - 0.04, y, color=TK, lw=2.0, head=None)
         n = 3 - k
         for m in range(n):
@@ -192,36 +204,33 @@ def synthesis(slide):
             pts = [(sx + sw * q / 24, yy - 0.05 * math.sin(2 * math.pi * (q / 24 * 1.6 + 0.3 * m))) for q in range(25)]
             poly(sh, pts, [INK, TK, HUE['gts'][0]][m], lw=1.5)
         arrow(sh, sx + sw + 0.04, y, mx, y, color=TK, lw=2.0, head=None)
-    for k, (q, yy) in enumerate((('Q', ys[2] - 0.15), ('A', ys[2] + 0.15))):
-        c = box(sh, c2 + 0.08 * k, yy - 0.12, 0.98, 0.25, fill='FFFFFF', line=TKm, lw=1.0, radius=0.3); shadow(c)
-        T(sh, c2 + 0.08 * k + 0.04, yy - 0.12, 0.3, 0.25, q, size=12.5, color=TK)
-        arrow(sh, c2 + 0.08 * k + 0.34, yy, c2 + 0.08 * k + 0.86, yy, color=MUTE, lw=1.2, head=None)
-    arrow(sh, c2 + 1.1, ys[2], mx, ys[2], color=TK, lw=2.0, head=None)
-    poly(sh, [(mx, ys[0]), (mx, ys[2])], TK, lw=2.0)
+    poly(sh, [(mx, ys[0]), (mx, ys[1])], TK, lw=2.0)
     rx = u + 4.88
-    arrow(sh, mx, ys[1], rx - 0.02, ys[1], color=TK, lw=2.0)
-    step(sh, rx, 0, 1.34, 'Review', icon='evidence_check', cy=ys[1])
-    arrow(sh, rx + 0.67, ys[1] + 0.27, rx + 0.67, ys[2] - 0.29, color=TK, lw=2.0)
-    step(sh, rx, 0, 1.34, 'Learner', icon='learner', cy=ys[2])
+    arrow(sh, mx, ym, rx - 0.02, ym, color=TK, lw=2.0)
+    step(sh, rx, 0, 1.34, 'Review', icon='evidence_check', cy=ym)
+    yl = ym + 0.86
+    arrow(sh, rx + 0.67, ym + 0.27, rx + 0.67, yl - 0.29, color=TK, lw=2.0)
+    step(sh, rx, 0, 1.34, 'Learner', icon='learner', cy=yl)
     # refine loop back to the conditions
     yt = v + 0.46
-    fb(sh, [(rx + 1.1, ys[1] - 0.27), (rx + 1.1, yt), (c1 + 0.72, yt), (c1 + 0.72, ys[0] - 0.27)])
+    fb(sh, [(rx + 1.1, ym - 0.27), (rx + 1.1, yt), (c1 + 0.72, yt), (c1 + 0.72, ys[0] - 0.27)])
     T(sh, rx + 0.2, yt + 0.04, 0.84, 0.28, 'Refine', size=13, italic=True, color=EV, align='r')
-    evaluation(sh, u, v, 'Fidelity · Downstream Learning Utility')
+    evaluation(sh, u, vz, 'Fidelity · Downstream Learning Utility')
     return g
 
 
 # ------------------------------------------------------------------------------------------------ analysis of observed series
 def anomaly(slide):
-    g, sh, u, v = panel(slide, 0, 0, 'Analysis of Observed Series', 'anomaly')
-    ya, yb = v + 1.6, v + 2.62
+    g, sh, u, v, vz = panel(slide, 0, 0, 'Analysis of Observed Series', 'anomaly',
+                            ['Classification · Imputation', 'Anomaly Detection and Diagnosis · Question Answering'], dy=0.38)
+    ya, yb = v + 1.55, v + 2.55
     spike = [0.35, 0.45, 0.3, 0.42, 0.36, 0.5, 0.95, 0.4, 0.38, 0.5, 0.33, 0.45]
     sheet(sh, u + 0.18, ya - 0.3, 0.9, 0.6, spike)
     caption(sh, u + 0.63, ya + 0.33, 'Series')
     # choose probes -> diagnostics / detector -> refine intervals -> intervals
     dx, dw = u + 1.42, 1.2
-    step(sh, dx + 0.6 - 0.95, v + 0.44, 1.9, 'Choose Probes', icon='reference_lookup', h=0.48)
-    arrow(sh, dx + 0.6, v + 0.93, dx + 0.6, ya - 0.52, color=TK, lw=2.0)
+    step(sh, dx + 0.6 - 0.95, v + 0.44, 1.9, 'Choose Probes', icon='reference_lookup', h=0.44)
+    arrow(sh, dx + 0.6, v + 0.89, dx + 0.6, ya - 0.52, color=TK, lw=2.0)
     fx = u + 1.26
     arrow(sh, u + 1.14, ya, fx, ya, color=TK, lw=2.0, head=None)
     poly(sh, [(fx, ya - 0.27), (fx, ya + 0.27)], TK, lw=2.0)
@@ -258,51 +267,60 @@ def anomaly(slide):
     arrow(sh, qx + 1.02, yb, qx + 1.14, yb, color=TK, lw=2.0)
     c = box(sh, qx + 1.16, yb - 0.36, 0.94, 0.72, fill='FFFFFF', line=TK, lw=1.3, dash=MSO_LINE.DASH, radius=0.12)
     T(sh, qx + 1.16, yb - 0.34, 0.94, 0.68, ['Cause A?', 'Cause B?'], size=12.5, bold=True, color=TK)
-    evaluation(sh, u, v, 'Detection · Validation of Proposed Causes')
+    evaluation(sh, u, vz, 'Detection · Validation of Proposed Causes')
     return g
 
 
 # ------------------------------------------------------------------------------------------------ decision making
 def decision(slide):
-    g, sh, u, v = panel(slide, 1, 1, 'Decision Making', 'decision')
-    ya, yb, yr = v + 1.2, v + 2.34, v + 2.98
+    g, sh, u, v, vz = panel(slide, 1, 1, 'Decision Making', 'decision', 'Decision Support · Autonomous Control')
+    ya, yb = v + 1.42, v + 2.42
+    yr = yb + 0.64
     sheet(sh, u + 0.26, ya - 0.3, 0.84, 0.6, SER)
     caption(sh, u + 0.68, ya + 0.33, 'State')
     ic(sh, 'memory', u + 0.43, yb - 0.32, 0.5)
     caption(sh, u + 0.68, yb + 0.17, 'Memory', w=1.0)
     rx = u + 1.34
     arrow(sh, u + 1.18, ya, rx - 0.02, ya, color=TK, lw=2.0)
-    step(sh, rx, 0, 0.94, 'Retrieve', cy=ya)
-    go(sh, [(u + 0.97, yb - 0.07), (rx + 0.47, yb - 0.07), (rx + 0.47, ya + 0.27)])
-    px = rx + 1.1
-    arrow(sh, rx + 0.96, ya, px - 0.02, ya, color=TK, lw=2.0)
+    step(sh, rx, 0, 0.9, 'Retrieve', cy=ya)
+    go(sh, [(u + 0.97, yb - 0.07), (rx + 0.45, yb - 0.07), (rx + 0.45, ya + 0.27)])
+    px = rx + 1.06
+    arrow(sh, rx + 0.92, ya, px - 0.02, ya, color=TK, lw=2.0)
     step(sh, px, 0, 1.5, 'Predict Futures', cy=ya)
-    fx = px + 1.62
-    arrow(sh, px + 1.54, ya, fx, ya, color=TK, lw=2.0, head=None)
-    poly(sh, [(fx, ya - 0.45), (fx, ya + 0.45)], TK, lw=2.0)
-    ax, aw = fx + 0.44, 0.5
-    mx = ax + aw + 0.1
-    for y, lab, vals, dash in ((ya - 0.45, 'A', [0.2, 0.35, 0.3, 0.55, 0.5, 0.8], None),
-                               (ya + 0.45, 'B', [0.7, 0.6, 0.65, 0.4, 0.45, 0.2], MSO_LINE.DASH)):
+    fx = px + 1.6
+    arrow(sh, px + 1.52, ya, fx, ya, color=TK, lw=2.0, head=None)
+    poly(sh, [(fx, ya - 0.4), (fx, ya + 0.4)], TK, lw=2.0)
+    ax, aw = fx + 0.44, 0.4
+    mx = ax + aw + 0.08
+    for y, lab, vals, dash in ((ya - 0.4, 'A', [0.2, 0.35, 0.3, 0.55, 0.5, 0.8], None),
+                               (ya + 0.4, 'B', [0.7, 0.6, 0.65, 0.4, 0.45, 0.2], MSO_LINE.DASH)):
         arrow(sh, fx, y, fx + 0.1, y, color=TK, lw=2.0, head=None)
         c = box(sh, fx + 0.1, y - 0.15, 0.3, 0.3, fill='FFFFFF', line=TK, lw=1.4, shape=MSO_SHAPE.OVAL)
         runs(c, [(lab, TK, True, False)], 12.5)
         pline(sh, ax, y - 0.16, aw, 0.32, vals, INK, lw=1.6, dash=dash)
         arrow(sh, ax + aw + 0.02, y, mx, y, color=TK, lw=2.0, head=None)
-    poly(sh, [(mx, ya - 0.45), (mx, ya + 0.45)], TK, lw=2.0)
-    sx = mx + 0.14
+    poly(sh, [(mx, ya - 0.4), (mx, ya + 0.4)], TK, lw=2.0)
+    sx = mx + 0.12
+    xr = u + PW - 0.14
     arrow(sh, mx, ya, sx - 0.02, ya, color=TK, lw=2.0)
-    step(sh, sx, 0, u + PW - 0.14 - sx, ['Select /', 'Check Risk'], h=0.74, size=12.5, cy=ya)
-    # act in the environment, observe the outcome
+    step(sh, sx, 0, xr - sx, ['Select /', 'Check Risk'], h=0.74, size=12.5, cy=ya)
+    # decision support: recommend to an operator, who reviews the choice
+    ow = 0.86
+    oy = v + 0.38
+    step(sh, xr - ow, 0, ow, ['Operator', 'Review'], h=0.52, size=12.5, cy=oy)
+    rcx = sx + 0.16
+    go(sh, [(rcx, ya - 0.38), (rcx, oy), (xr - ow - 0.02, oy)])
+    T(sh, rcx - 1.06, oy + 0.12, 1.0, 0.26, 'Recommend', size=12.5, italic=True, color=TK, align='r')
+    # autonomous control: act in the environment, observe the outcome
     sim_w = 1.5
-    smx = u + PW - 0.14 - sim_w
-    acx = (sx + u + PW - 0.14) / 2
+    smx = xr - sim_w
+    acx = (sx + xr) / 2
     arrow(sh, acx, ya + 0.38, acx, yb - 0.27, color=TK, lw=2.0)
     T(sh, acx - 0.82, (ya + 0.38 + yb - 0.27) / 2 - 0.14, 0.76, 0.28, 'Action', size=13, italic=True, color=TK, align='r')
     step(sh, smx, 0, sim_w, 'Simulator', icon='simulator', cy=yb)
     fb(sh, [(smx + sim_w / 2, yb + 0.27), (smx + sim_w / 2, yr), (u + 0.12, yr), (u + 0.12, ya), (u + 0.24, ya)])
     T(sh, u + 1.6, yr - 0.31, 2.2, 0.28, 'Observed Outcome', size=13, italic=True, color=EV)
-    evaluation(sh, u, v, 'Action Utility · Risk · Latency')
+    evaluation(sh, u, vz, 'Action Utility · Risk · Latency')
     return g
 
 

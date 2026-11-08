@@ -2,7 +2,8 @@
 
 A temporal workspace connecting sources, operations, and the LLM:
   top    - Information Release: sources placed on an availability-time axis, split at the decision cutoff tau
-  middle - Shared Temporal Workspace: the four General Time Series Harness functions (Section 5 headings)
+  middle - Shared Temporal Workspace: the four General Time Series Harness functions (Section 5 headings), each
+           card listing its second-level classes above one illustration
   bottom - the LLM sends requests to every function and receives observations back.
 """
 import os, sys
@@ -10,7 +11,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(
 from v7kit import *
 from PIL import ImageFont
 
-H = 7.65
+DH = 0.67          # extra card height for the class lists
+H = 7.65 + DH
 MATH = 'Times New Roman'
 GT, GTm, GTl = HUE['gts']
 TK = HUE['tsk'][0]
@@ -122,23 +124,31 @@ def release(slide):
 
 
 # ---------------------------------------------------------------- middle: the four shared functions
-CW, CH, CY, GAP = 2.98, 2.85, 3.28, 0.2
+CW, CH, CY, GAP = 2.98, 2.85 + DH, 3.28, 0.2
 X = [0.42 + k * (CW + GAP) for k in range(4)]
+LP = 0.225                      # class list line pitch
+I0 = CY + 0.88 + 4 * LP + 0.12  # top of the illustration
 
 
-def fcard(slide, k, icon, title):
+def fcard(slide, k, icon, title, classes):
     g = group(slide); sh = g.shapes
     x = X[k]
     card(sh, x, CY, CW, CH, key='gts', lw=1.4)
     ic(sh, icon, x + 0.12, CY + 0.1, 0.62)
     T(sh, x + 0.82, CY + 0.07, CW - 0.86, 0.64, title, size=15, color=GT, align='l')
     arrow(sh, x + 0.15, CY + 0.8, x + CW - 0.15, CY + 0.8, color=GTm, lw=1.0, dash=MSO_LINE.ROUND_DOT, head=None)
+    for i, c in enumerate(classes):    # second-level classes of this function
+        yl = CY + 0.88 + i * LP
+        dot(sh, x + 0.13, yl + LP / 2, 0.035, GT)
+        T(sh, x + 0.2, yl, CW - 0.24, LP, c, size=12, bold=False, color=INK, align='l')
+    arrow(sh, x + 0.15, I0 - 0.07, x + CW - 0.15, I0 - 0.07, color=GTm, lw=1.0, dash=MSO_LINE.ROUND_DOT, head=None)
     return g, sh, x
 
 
 def data_card(slide):
-    g, sh, x = fcard(slide, 0, 'data', ['Temporal Data', 'Management'])
-    x0, y0, cw, rh = x + 0.2, CY + 0.92, 0.86, 0.28
+    g, sh, x = fcard(slide, 0, 'data', ['Temporal Data', 'Management'],
+                     ['Measurement Schema', 'Time Index and Alignment', 'Point-in-Time Access', 'Temporal Workspace'])
+    x0, y0, cw, rh = x + 0.2, I0, 0.86, 0.235
     rows = [[('Time', 0), ('Value', 0), ('Unit', 0)],
             [('t', '1'), ('x', '1'), ('u', None)], [('t', '2'), ('—', None), ('u', None)], [('t', '3'), ('x', '3'), ('u', None)]]
     for r, row in enumerate(rows):
@@ -151,97 +161,105 @@ def data_card(slide):
                 parts = [(t, MUTE if t == '—' else INK, False, False, t in 'txu')]
                 if sub: parts.append((sub, INK, False, True, False))
                 R(sh, x0 + c * cw, y0 + r * rh, cw, rh, parts, 13.5)
-    yb = CY + 2.27
-    cylinder(sh, x + 0.28, yb - 0.04, 0.4, 0.46, key='gts')
-    T(sh, x + 0.72, yb, 0.8, 0.36, 'Source', size=13, align='l')
+    yb = I0 + 4 * rh + 0.08            # workspace store and point-in-time snapshots, captions below
+    ca, cb = x + 0.78, x + 2.16
+    cylinder(sh, ca - 0.15, yb, 0.3, 0.3, key='gts')
+    T(sh, ca - 0.7, yb + 0.3, 1.4, 0.24, 'Workspace', size=12.5, align='c')
     for k in (2, 1, 0):
-        s = box(sh, x + 1.52 + 0.06 * k, yb + 0.04 - 0.06 * k, 0.32, 0.38, fill='FFFFFF', line=GTm if k else GT, lw=1.1,
-                shape=MSO_SHAPE.RECTANGLE)
+        sx0 = cb - 0.18 + 0.05 * k; sy0 = yb + 0.06 - 0.05 * k
+        s = box(sh, sx0, sy0, 0.24, 0.26, fill='FFFFFF', line=GTm if k else GT, lw=1.1, shape=MSO_SHAPE.RECTANGLE)
         if k == 2: shadow(s)
         if k == 0:
             for j in range(3):
-                arrow(sh, x + 1.58, yb + 0.14 + j * 0.09, x + 1.78 - (0.05 if j == 2 else 0), yb + 0.14 + j * 0.09, color=GTm, lw=1.0, head=None)
-    T(sh, x + 2.04, yb, 0.9, 0.36, 'Version', size=13, align='l')
+                arrow(sh, sx0 + 0.05, sy0 + 0.07 + j * 0.06, sx0 + 0.19 - (0.04 if j == 2 else 0), sy0 + 0.07 + j * 0.06,
+                      color=GTm, lw=1.0, head=None)
+    T(sh, cb - 0.7, yb + 0.3, 1.4, 0.24, 'Point-in-Time', size=12.5, align='c')
     return g
 
 
 def processing_card(slide):
-    g, sh, x = fcard(slide, 1, 'window', ['Temporal', 'Processing'])
-    gx, gw = x + 1.12, 1.72
-    for i, lab in enumerate(['Window', 'Resample', 'Align']):
-        ry = CY + 0.93 + i * 0.63
-        T(sh, x + 0.12, ry, 1.0, 0.46, lab, size=13, align='l')
-        gy, gh = ry + 0.04, 0.4
-        if lab == 'Window':
+    g, sh, x = fcard(slide, 1, 'window', ['Temporal', 'Processing'],
+                     ['Preprocessing and Transformation', 'Statistical and Spectral Analysis', 'Series Views for the LLM',
+                      'Operator and Skill Libraries'])
+    gx, gw = x + 1.15, 1.7
+    for i, lab in enumerate(['Transform', 'Analyze', 'LLM View']):
+        ry = I0 + 0.02 + i * 0.52
+        T(sh, x + 0.12, ry, 0.98, 0.42, lab, size=12.5, align='l')
+        gy, gh = ry + 0.04, 0.34
+        if lab == 'LLM View':           # a window of the series selected as the view shown to the LLM
             wx0, wx1 = gx + 0.42 * gw, gx + 0.75 * gw
             b = box(sh, wx0, gy - 0.04, wx1 - wx0, gh + 0.08, fill=GTm, shape=MSO_SHAPE.RECTANGLE); alpha_fill(b, 40)
             for xx in (wx0, wx1):
                 arrow(sh, xx, gy - 0.06, xx, gy + gh + 0.06, color=GT, lw=1.2, dash=MSO_LINE.DASH, head=None)
             pline(sh, gx, gy, gw, gh, [0.4, 0.55, 0.3, 0.5, 0.75, 0.45, 0.65, 0.8, 0.6, 0.35, 0.55, 0.45], INK, lw=1.4, r=0.03)
-        elif lab == 'Resample':
+        elif lab == 'Transform':        # raw series -> transformed (resampled) series
             pline(sh, gx, gy, 0.66, gh, [0.3, 0.55, 0.8, 0.4], INK, lw=1.4, r=0.03)
             arrow(sh, gx + 0.74, gy + gh / 2, gx + 1.0, gy + gh / 2, color=GT, lw=1.8)
             pline(sh, gx + 1.06, gy, 0.66, gh, [0.3, 0.42, 0.55, 0.7, 0.8, 0.6, 0.4, 0.45], INK, lw=1.4, r=0.026)
-        else:
-            a = pline(sh, gx, gy - 0.02, gw, 0.17, [0.2, 0.7, 0.4, 0.9, 0.5, 0.6, 0.3, 0.8, 0.45], INK, lw=1.4, r=0.028)
-            b2 = pline(sh, gx, gy + 0.25, gw, 0.17, [0.5, 0.2, 0.7, 0.4, 0.9, 0.5, 0.6, 0.3, 0.6], GT, lw=1.4, r=0.028)
-            for k in range(0, 9, 2):
-                arrow(sh, a[k][0], a[k][1] + 0.04, b2[k][0], b2[k][1] - 0.04, color=MUTE, lw=0.9,
-                      dash=MSO_LINE.ROUND_DOT, head=None)
+        else:                           # series -> spectrum
+            pline(sh, gx, gy, 0.66, gh, [0.4, 0.75, 0.3, 0.7, 0.35, 0.8, 0.3, 0.65], INK, lw=1.4, r=0.026)
+            arrow(sh, gx + 0.74, gy + gh / 2, gx + 1.0, gy + gh / 2, color=GT, lw=1.8)
+            for k, hv in enumerate([0.25, 0.95, 0.5, 0.3, 0.6, 0.2, 0.12]):
+                bw = 0.07
+                box(sh, gx + 1.08 + k * 0.092, gy + gh * (1 - hv), bw, gh * hv, fill=GT, shape=MSO_SHAPE.RECTANGLE)
+            arrow(sh, gx + 1.04, gy + gh + 0.01, gx + 1.7, gy + gh + 0.01, color=INK, lw=1.0, head=None)
     return g
 
 
 def context_card(slide):
-    g, sh, x = fcard(slide, 2, 'timeline', ['Temporal Context', 'and Memory'])
+    g, sh, x = fcard(slide, 2, 'timeline', ['Temporal Context', 'and Memory'],
+                     ['External Events and Text', 'Historical Analogues', 'Procedural Experience'])
     # events aligned to the series
     vals = [0.3, 0.5, 0.35, 0.55, 0.4, 0.2, 0.5, 0.8, 0.45, 0.55, 0.35, 0.6]
-    pts = pline(sh, x + 0.2, CY + 1.28, 2.58, 0.36, vals, INK, lw=1.4, r=0.03)
+    pts = pline(sh, x + 0.2, I0 + 0.38, 2.58, 0.26, vals, INK, lw=1.4, r=0.03)
     for i, lab in ((3, 'Event A'), (8, 'Event B')):
         px, py = pts[i]
-        arrow(sh, px, CY + 1.17, px, py - 0.05, color=GT, lw=1.3, dash=MSO_LINE.DASH, head=None)
-        dot(sh, px, CY + 1.13, 0.06, 'FFFFFF', GT)
-        T(sh, px - 0.6, CY + 0.84, 1.2, 0.26, lab, size=12.5, color=GT)
+        arrow(sh, px, I0 + 0.33, px, py - 0.05, color=GT, lw=1.3, dash=MSO_LINE.DASH, head=None)
+        dot(sh, px, I0 + 0.29, 0.055, 'FFFFFF', GT)
+        T(sh, px - 0.6, I0 - 0.02, 1.2, 0.26, lab, size=12.5, color=GT)
     # a retrieved past case matched to the current window
-    T(sh, x + 0.12, CY + 1.8, 1.2, 0.28, 'Past Case', size=13, align='l')
+    yc = I0 + 0.76
+    T(sh, x + 0.12, yc - 0.07, 1.2, 0.26, 'Past Case', size=12.5, align='l')
     hx0, hx1 = x + 1.42, x + 2.2
-    b = box(sh, hx0, CY + 1.84, hx1 - hx0, 0.9, fill=GTm, line=GT, lw=1.1, dash=MSO_LINE.DASH, shape=MSO_SHAPE.RECTANGLE)
+    b = box(sh, hx0, yc, hx1 - hx0, 0.74, fill=GTm, line=GT, lw=1.1, dash=MSO_LINE.DASH, shape=MSO_SHAPE.RECTANGLE)
     alpha_fill(b, 35)
-    pline(sh, x + 0.2, CY + 1.98, 2.58, 0.22, [0.5, 0.3, 0.6, 0.4, 0.7, 0.3, 0.1, 0.4, 0.8, 0.5, 0.6, 0.45], MUTE, lw=1.3, r=0.026)
-    pline(sh, x + 0.2, CY + 2.44, 2.58, 0.22, [0.4, 0.6, 0.35, 0.65, 0.45, 0.35, 0.1, 0.45, 0.85, 0.4, 0.55, 0.5], INK, lw=1.4, r=0.026)
-    arrow(sh, (hx0 + hx1) / 2 - 0.1, CY + 2.2, (hx0 + hx1) / 2 - 0.1, CY + 2.45, color=GT, lw=1.8)
+    pline(sh, x + 0.2, yc + 0.2, 2.58, 0.18, [0.5, 0.3, 0.6, 0.4, 0.7, 0.3, 0.1, 0.4, 0.8, 0.5, 0.6, 0.45], MUTE, lw=1.3, r=0.026)
+    pline(sh, x + 0.2, yc + 0.5, 2.58, 0.18, [0.4, 0.6, 0.35, 0.65, 0.45, 0.35, 0.1, 0.45, 0.85, 0.4, 0.55, 0.5], INK, lw=1.4, r=0.026)
+    arrow(sh, (hx0 + hx1) / 2 - 0.1, yc + 0.36, (hx0 + hx1) / 2 - 0.1, yc + 0.52, color=GT, lw=1.8)
     return g
 
 
 def validation_card(slide):
-    g, sh, x = fcard(slide, 3, 'cutoff', ['Temporal', 'Validation'])
-    R(sh, x, CY + 0.86, CW, 0.38, [('v', INK, True, False, True), (' ≤ Now', INK, True, False, False)], 18)
+    g, sh, x = fcard(slide, 3, 'cutoff', ['Temporal', 'Validation'],
+                     ['Availability Checks', 'Past-Only Computation', 'Data and Schema Checks', 'Temporal Claim Verification'])
+    R(sh, x, I0, CW, 0.32, [('v', INK, True, False, True), (' ≤ Now', INK, True, False, False)], 16)
     for i, (lab, res, cap, col) in enumerate([('Available', 'validate', 'Admit', GT), ('Late', 'reject', 'Exclude', TK)]):
-        ry = CY + 1.35 + i * 0.75
-        sheet(sh, x + 0.55, ry, 0.36, 0.42, line=col)
-        T(sh, x + 0.13, ry + 0.43, 1.2, 0.25, lab, size=12.5, color=col)
-        arrow(sh, x + 1.05, ry + 0.21, x + 1.85, ry + 0.21, color=col, lw=2.2)
-        ic(sh, res, x + 2.0, ry - 0.02, 0.46)
-        T(sh, x + 1.73, ry + 0.43, 1.0, 0.25, cap, size=12.5, color=col)
+        ry = I0 + 0.38 + i * 0.6
+        sheet(sh, x + 0.58, ry, 0.3, 0.34, line=col)
+        T(sh, x + 0.13, ry + 0.34, 1.2, 0.24, lab, size=12.5, color=col)
+        arrow(sh, x + 1.05, ry + 0.17, x + 1.85, ry + 0.17, color=col, lw=2.2)
+        ic(sh, res, x + 2.04, ry - 0.02, 0.38)
+        T(sh, x + 1.73, ry + 0.34, 1.0, 0.24, cap, size=12.5, color=col)
     return g
 
 
 def workspace(slide):
-    zone(slide, 0.2, 2.9, 12.93, 3.41, 'Shared Temporal Workspace', 'gts')
+    zone(slide, 0.2, 2.9, 12.93, 3.41 + DH, 'Shared Temporal Workspace', 'gts')
     data_card(slide); processing_card(slide); context_card(slide); validation_card(slide)
     g = group(slide)   # released sources enter the workspace through data management
     arrow(g.shapes, X[0] + CW - 0.45, AX_Y + 0.12, X[0] + CW - 0.45, CY - 0.04, color=SD, lw=3.0)
 
 
 # ---------------------------------------------------------------- bottom: LLM requests and observations
-YR, YO = 6.68, 7.1
+YR, YO = 6.68 + DH, 7.1 + DH
 
 
 def llm(slide):
     g = group(slide); sh = g.shapes
-    halo(sh, 0.95, 6.86, 1.3, 1.1)
-    pedestal(sh, 0.38, 7.2, 1.14, 0.28, 'llm')
-    ic(sh, 'robot', 0.5, 6.38, 0.92)
-    p = box(sh, 0.12, 6.42, 0.62, 0.34, fill=AM, radius=0.5); shadow(p)
+    halo(sh, 0.95, 6.86 + DH, 1.3, 1.1)
+    pedestal(sh, 0.38, 7.2 + DH, 1.14, 0.28, 'llm')
+    ic(sh, 'robot', 0.5, 6.38 + DH, 0.92)
+    p = box(sh, 0.12, 6.42 + DH, 0.62, 0.34, fill=AM, radius=0.5); shadow(p)
     label_in(p, 'LLM', size=14)
     xs = [x + CW / 2 for x in X]
     x_start = 1.5
