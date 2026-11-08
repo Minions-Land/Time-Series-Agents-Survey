@@ -79,7 +79,7 @@ Every other label describes one term, and none is a new classification:
 | **LLM side** | Temporal representation and alignment · temporal instruction and reasoning · learning to operate temporal workflows | Where the model enters the Agent loop $a_k=\pi_\theta(s_k)$: the state it reads, its parameters, its action policy |
 | **General Harness** | Interface and Interaction · Memory and Context · Tools and Execution · Planning and Orchestration · Optimization and Evolution | Synthesized from Agent and Harness research (CoALA, Wang et al., code-harness and agentic-harness surveys) |
 | **General Time Series Harness** | Temporal Data Management · Temporal Processing · Temporal Context and Memory · Temporal Validation | The availability record $(x_i,t_i,v_i)$: store it, operate on it over windows, admit outside context, check $v_i\le\tau$ |
-| **Task-Specific Harness** | Analysis of Observed Series (classification · imputation · anomaly detection · question answering) · Forecasting · Generation · Decision Making | What the output refers to relative to the decision time τ; task names from TimesNet/TSLib and Time-MQA |
+| **Task-Specific Harness** | Analysis of Observed Series (classification · imputation · anomaly detection · question answering) · Forecasting · Generation · Decision Making | What the output refers to relative to the current time; task names from TimesNet/TSLib and Time-MQA |
 | **Evaluation** | Process Validity · Temporal Validity · Task Performance · Decision Utility | One check per term |
 
 <p align="center">

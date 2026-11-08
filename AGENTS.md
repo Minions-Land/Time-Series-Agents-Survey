@@ -36,7 +36,7 @@ context_memory,validation}`, `--task <family label>` (ledger labels; group them 
 Follow the construction order of Section 2 of `main.tex` and produce a short design document:
 
 1. **Scenario.** Data sources, event and availability times, channels, units, missingness, and the decision that follows.
-2. **Task contract.** Output, horizon, admissible information at decision time τ, constraints, metric, reviewer.
+2. **Task contract.** Output, horizon, admissible information at the current time τ (the forecast origin), constraints, metric, reviewer.
 3. **Reuse (General Harness).** For each needed dimension, candidate modules from the cards (`--layer GH`).
 4. **Adapt (General Time Series Harness).** Temporal data management, processing, context and memory, and validation:
    which shared modules apply (`--layer GTS --function ...`) and where an information-cutoff check is needed.

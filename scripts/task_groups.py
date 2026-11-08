@@ -1,4 +1,4 @@
-"""Task groups: the task axis of the survey, grouped by what a task output refers to relative to the decision time tau.
+"""Task groups: the task axis of the survey, grouped by what a task output refers to relative to the current time tau.
 
 Leaves keep the standard task names (TimesNet/TSLib: forecasting, imputation, classification, anomaly detection;
 Time-MQA: question answering). Groups:
