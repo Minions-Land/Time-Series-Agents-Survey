@@ -191,7 +191,7 @@ Figure~\ref{fig:contribution-trend} traces how the reviewed module contributions
 
 Figure~\ref{fig:contribution-trend}c classifies every Harness module in the vocabularies of Table~\ref{tab:term-basis}, from its layer through its mechanism dimensions (Table~\ref{tab:component-vocab}) to the task groups it is applied to. Three observations follow. First, the layers differ in what they implement. Most General Time Series Harness modules provide tools and execution (67 of 97): time series adaptation mostly exposes windowed statistical and spectral operations, preprocessing, and point-in-time retrieval as tools. General Harness and Task-Specific Harness modules are instead dominated by planning and orchestration (57 of 92 and 210 of 325). The General Time Series Harness thus supplies 28\% of the modules for tools and execution but only 6\% of those for planning and orchestration (18 modules) and 3\% of those for optimization and evolution (2 modules), so temporal control of a workflow, such as horizon-aware planning or cutoff-aware execution control, is still written either as a general mechanism or inside a task procedure. Second, sharing depends on the task group. Shared modules make up 49\% of the modules applied to analysis of observed series and 44\% of those applied to forecasting, but 35\% for decision making. In analysis and forecasting, interface, memory, and tool mechanisms come from shared modules at least as often as from task modules (for tools and execution, 62 shared against 54 task modules in analysis and 68 against 60 in forecasting), whereas planning remains task-specific (46 against 77 and 56 against 103). In decision making, task modules outnumber shared ones in every dimension, because the action space, constraints, and feedback are bound to the application. Third, generation is thin in every layer (22 module labels in all), and the panel locates empty cells: no General Time Series Harness module provides an interface or planning for generation, none optimizes or evolves the Harness for generation or decision making, and only 2 plan for decision making. These are the cells in which Section~\ref{sec:task-impact} reads a new work as filling a gap rather than adding another implementation.
 
-Across the temporal functions of Section~\ref{sec:general-ts-harness}, data management is provided mostly by shared modules (43 shared, 10 inside task procedures), whereas processing, context and memory, and validation are implemented about twice as often inside task procedures (58 and 108; 29 and 67; 32 and 60). Reuse is demonstrated for 42 of the 97 General Time Series Harness modules, that is, their sources apply them to at least two task groups. Together with its faster growth, this indicates that time series modules are consolidating around tools and data management, while orchestration, validation, and the improvement of the Harness itself remain task-bound. Section~\ref{sec:task-impact} shows that the same holds more strongly for tested solutions to time series requirements. Agent-agnostic workbenches carry this consolidation further: TSFLab \citep{tsflab2026} moves forecasting knowledge, temporal data protocols, and experiment execution out of individual Agents into shared infrastructure that any compatible coding Agent can use and that maintains itself. The coding procedure and complete profiles appear in Appendix~\ref{app:full-ledger}.
+Across the temporal functions of Section~\ref{sec:general-ts-harness}, data management is provided mostly by shared modules (43 shared, 10 inside task procedures), whereas processing, context and memory, and validation are implemented about twice as often inside task procedures (58 and 108; 29 and 67; 32 and 60). Reuse is demonstrated for 42 of the 97 General Time Series Harness modules, that is, their sources apply them to at least two task groups. Together with its faster growth, this indicates that time series modules are consolidating around tools and data management, while orchestration, validation, and the improvement of the Harness itself remain task-bound. Section~\ref{sec:task-impact} shows that the same holds more strongly for tested solutions to time series requirements. Agent-agnostic workbenches carry this consolidation further: TSFLab \citep{tsflab2026} moves forecasting knowledge, temporal data protocols, and experiment execution out of individual Agents into shared infrastructure that any compatible coding Agent can use and that maintains itself. The record schema and complete profiles appear in Appendix~\ref{app:full-ledger}.
 
 
 
@@ -1031,7 +1031,7 @@ The experience-update mechanism can use different task losses and is recorded as
 \label{sec:conclusion}
 
 This survey reviews Time Series Agents through one formula: an LLM, a General Harness, and a Time Series Harness that consists of a General Time Series Harness and a Task-Specific Harness. Every reviewed module is assigned to one term by its scope of reuse, and every other label in the survey describes one term and follows from prior work or from the term's definition; task modules are grouped by what their output refers to relative to the decision time. The assignment supports three design judgments for a new scenario: which runtime mechanisms can be retained, which operations require temporal semantics such as availability time and chronology guards, and which procedures must be rebuilt around the task objective. Evaluation follows the same terms, separating process validity, temporal validity, task performance, and decision utility. The formula also assesses a new work: where its modules sit, whether its claimed scope holds, and whether it automates an analysis, adds another implementation, fills an empty cell, or consolidates a task solution into a shared module. Applied to the 162 reviewed works, this shows that most works automate an analysis, that tested solutions to time series requirements appear in fewer than half of the method works and are mostly built inside task modules, and that verifiable diagnosis, measured information availability, robustness to regime change, and evidence from deployment remain largely claimed. Progress in Time Series Agents should therefore be judged by the requirements it meets under controlled tests and by whether those solutions move from task modules into shared time series modules. The accompanying source-linked records support continued comparison as new modules and tasks emerge.
-% Keep the references between the main conclusion and the audit appendix.
+% Keep the references between the main conclusion and the ledger appendix.
 
 \reftitle{References}
 \bibliography{TS_AGENT_HARNESS_SURVEY}
@@ -1043,14 +1043,14 @@ This survey reviews Time Series Agents through one formula: an LLM, a General Ha
 \appendix
 \section{Module-Level Contribution Ledger}
 \label{app:full-ledger}
-The machine-readable JSON ledger is a central research artifact of this survey. It records, for each work, the bibliographic identity, publication date, claim, source locator and quotation, LLM-side contribution, General Harness dimensions, General Time Series Harness dimensions, Task-Specific Harness dimensions, task group, work type, and review status. The ledger is extensible: each new paper adds a supported module-level record to the construction hierarchy. The human-readable profiles below expose the same information in a form suitable for inspection. The function view additionally links each module to the four temporal functions in Section~\ref{sec:general-ts-harness}, with explicit applicability decisions for LLM-side contributions, general runtime mechanisms, broad resources, and task procedures outside those categories. Function tags preserve the original scope, detailed mechanism labels, task memberships, and source evidence. Source-derived interface summaries are kept separately from proposed reuse. The cards also retain author-provided repository, project, data, and evaluation links together with their source locations and availability checks. These links connect a module description to its original development resources.
+The machine-readable ledger records, for each work, the bibliographic identity, publication date, claim, source locator and quotation, LLM-side contribution, General Harness, General Time Series Harness, and Task-Specific Harness modules, task group, and work type. The human-readable profiles below show the same information. The function view links each module to the four temporal functions of Section~\ref{sec:general-ts-harness}. The cards also record author-provided repository, project, data, and evaluation links with their source locations, which connect a module description to its original development resources.
 
 \subsection{Paper Card schema}
 
 The contribution layers in Figure~\ref{fig:overview} supply the coordinates for the Paper Card below.
 
 \label{app:paper-card}
-A Paper Card is the evidence unit used to maintain the survey. It keeps bibliographic identity, the paper's own claim, source evidence, module contributions, task contract, evaluation evidence, and review status in one record. The card is multi-label: one work may contribute to the LLM side and to several Harness modules. Aggregate Harness plots apply the deepest-layer rule to each concrete module, while the inclusive evidence fields remain available for audit.
+A Paper Card is the record of one work. It keeps bibliographic identity, the paper's own claim, source evidence, module contributions, task contract, and evaluation evidence. The card is multi-label: one work may contribute to the LLM side and to several Harness modules, and each module is assigned to one layer by the rule of Table~\ref{tab:layer-rules}.
 
 \begin{tcolorbox}[
   colback=surveyCard,
@@ -1067,17 +1067,17 @@ A Paper Card is the evidence unit used to maintain the survey. It keeps bibliogr
 ]
 \small
 \begin{tabularx}{\linewidth}{@{}>{\sffamily\bfseries}p{0.22\linewidth}X@{}}
-Identity & Authors, year, landing page, BibTeX key, PDF, and source status.\\
+Identity & Authors, year, landing page, and BibTeX key.\\
 Claim & The central claim and concrete contribution stated by the work.\\
-Evidence & Page or section locator, quotation, figure or table, and verification status.\\
+Evidence & Page or section locator, quotation, and figure or table.\\
 Modules & LLM-side capability, General Harness, General Time Series Harness, and Task-Specific Harness entries.\\
-Reuse evidence & For General Harness and General Time Series Harness modules, whether the source applies the module to two or more task families (demonstrated) or to one (inferred).\\
-Task contract & Forecasting and prediction, data augmentation and synthesis, anomaly detection and diagnosis, decision support, or another supported task family.\\
+Reuse evidence & For General Harness and General Time Series Harness modules, whether the source applies the module to two or more task groups (demonstrated) or to one (inferred).\\
+Task contract & Task group (analysis of observed series, forecasting, generation, or decision making) and the standard task names within it.\\
 Evaluation & Process validity, temporal validity, task performance, and decision utility.
 \end{tabularx}
 \end{tcolorbox}
 
-We construct each card in four passes: verify the work identity and publication record; extract the paper's claim with a page- or section-level quotation; code the concrete mechanisms it changes; and record task and evaluation evidence. A mechanism that transfers across temporal tasks is coded as General Time Series Harness, a task-bound state, action, reward, or validator as Task-Specific Harness, and a domain-independent runtime mechanism as General Harness. The card can therefore support citation management, module tables, cumulative plots, and open-problem analysis without assigning a paper to a single mutually exclusive class.
+Each concrete mechanism a work changes is assigned with the rule of Table~\ref{tab:layer-rules}: a task-bound state, action, reward, or validator to the Task-Specific Harness, a mechanism that depends on temporal semantics without binding to one task to the General Time Series Harness, and a domain-independent runtime mechanism to the General Harness. A work is therefore described by a set of modules rather than by a single mutually exclusive class.
 
 \begin{tcolorbox}[
   colback=surveyCard,
@@ -1090,37 +1090,36 @@ We construct each card in four passes: verify the work identity and publication 
   bottom=6pt
 ]
 \small
-\noindent\textbf{Current ledger snapshot.} The database contains \textbf{167} examined records: 162 works in scope (160 paper-supported works and 2 repository-supported resources) and 5 background records excluded from contribution counts. By role, the works in scope comprise 106 feedback-driven Agents, 21 fixed workflows, 18 LLM-side techniques, and 17 resources. They contain 604 source-located modules: 90 LLM-side, 92 General Harness, 97 General Time Series Harness, and 325 Task-Specific Harness modules. Task memberships comprise 94 forecasting and prediction, 10 data augmentation and synthesis, 45 anomaly detection and diagnosis, and 47 decision support works; the most frequent other task labels are temporal question answering, time series classification, temporal analysis, and imputation. Their own experiments provide evidence for process validity in 66, temporal validity in 104, task performance in 154, and decision utility in 32 works. Each module has one layer and may have several mechanism, temporal function, and task labels.
+\noindent\textbf{Corpus summary.} The 162 works in scope comprise 106 feedback-driven Agents, 21 fixed workflows, 18 LLM-side techniques, and 17 resources. They contain 604 source-located modules: 90 LLM-side, 92 General Harness, 97 General Time Series Harness, and 325 Task-Specific Harness modules. By task group, 95 works address forecasting, 80 analysis of observed series, 47 decision making, and 10 generation; a work may address several groups. Their own experiments provide evidence for process validity in 66, temporal validity in 104, task performance in 154, and decision utility in 32 works. Each module has one layer and may have several mechanism, temporal function, and task labels.
 \end{tcolorbox}
 
-The coding unit is a concrete module contribution. A paper may contribute to several modules and may therefore appear in several dimensions. For Harness plotting, the exclusive layer is the deepest applicable one: a task-bound module is counted as Task-Specific Harness, an otherwise reusable temporal module as General Time Series Harness, and only a domain-independent runtime module as General Harness. The inclusive descriptions are retained as source evidence, while every claim remains tied to a paper locator and an explicit review status.
+The unit of analysis is a concrete module contribution. A paper may contribute several modules and may therefore appear in several dimensions. Each module is counted once, at the most specific layer whose condition it meets: a task-bound module as Task-Specific Harness, an otherwise reusable temporal module as General Time Series Harness, and only a domain-independent runtime module as General Harness. Every module is tied to a source locator.
 
 \begingroup
 \small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.08}
-Each row in Table~\ref{tab:ledger-sample} is a work-level record whose module and task fields can contain several entries. Read the claim together with the evidence status: this table illustrates the human-readable view, and the JSON ledger retains the page locators and quotations used to audit it.
+Each row in Table~\ref{tab:ledger-sample} is a work-level record whose module and task fields can contain several entries. The JSON ledger keeps the page locator and quotation of each module.
 \begin{longtable}{L{\fulltextcol{0.18}} L{\fulltextcol{0.25}} L{\fulltextcol{0.14}} L{\fulltextcol{0.14}} L{\fulltextcol{0.14}} L{\fulltextcol{0.15}}}
 \caption{Human-readable view of representative module-level records from the JSON ledger. The complete profiles follow; source locators and quotations are retained in the machine-readable record.}\label{tab:ledger-sample}\\
 \toprule
-\textbf{Work} & \textbf{Claim} & \textbf{LLM} & \textbf{Harness} & \textbf{Task} & \textbf{Evidence}\\
+\textbf{Work} & \textbf{Claim} & \textbf{LLM} & \textbf{Harness} & \textbf{Task} & \textbf{Locator}\\
 \midrule
 \endfirsthead
 \toprule
-\textbf{Work} & \textbf{Claim} & \textbf{LLM} & \textbf{Harness} & \textbf{Task} & \textbf{Evidence}\\
+\textbf{Work} & \textbf{Claim} & \textbf{LLM} & \textbf{Harness} & \textbf{Task} & \textbf{Locator}\\
 \midrule
 \endhead
-ChatTS \citep{chatts2025} & Synthetic temporal instruction data and alignment for time series understanding and reasoning. & Alignment; instruction tuning & -- & Cross-task reasoning & PDF locator recorded\\
+ChatTS \citep{chatts2025} & Synthetic temporal instruction data and alignment for time series understanding and reasoning. & Alignment; instruction tuning & -- & Cross-task reasoning & PDF pp.~4--5\\
 TimeSeries\allowbreak Scientist \citep{timeseriesscientist2025} & Role-based curation, planning, forecasting, validation, and reporting workflow. & -- & GTS; TSK & Forecasting & Section 3.2--3.3\\
 TimeClaw-Harness \citep{timeclaw2026harness} & Auditable temporal tools, episodic experience, and capability evolution in a time series runtime. & -- & GH; GTS & Temporal infrastructure & Sections 3.2--3.4\\
-FinCon \citep{fincon2024} & Multi-agent financial evidence synthesis for portfolio decision making. & -- & TSK & Decision support & PDF locator recorded\\
+FinCon \citep{fincon2024} & Multi-agent financial evidence synthesis for portfolio decision making. & -- & TSK & Decision support & PDF pp.~3--7\\
 \bottomrule
 \end{longtable}
 \endgroup
 
-The five mechanism dimensions in Table~\ref{tab:component-vocab} organize the Harness chapters. In the cards, detailed control, verification, feedback, and coordination labels map to planning and orchestration. Fine-grained labels name concrete procedures within those dimensions. A reviewed module has a stable identifier, one contribution layer, one or more mechanism labels, task memberships, and source evidence. Its function view records applicable temporal functions and the supporting evidence indices; selected interfaces also summarize the source-defined inputs, outputs, and scope boundary. Mechanism labels and task memberships do not create additional contribution units.
+The five mechanism dimensions of Table~\ref{tab:component-vocab} organize Section~\ref{sec:general-harness}. A module record has a stable identifier, one contribution layer, one or more mechanism labels, task memberships, and source evidence. Its function view records the applicable temporal functions and the supporting evidence; selected records also summarize the source-defined inputs, outputs, and scope boundary. Mechanism labels and task memberships do not create additional contribution units.
 
-Three examined works remain background records: GridMind \citep{gridmind2025} studies static power-system optimization and contingency scenarios; Grid-Agent \citep{gridagent2025} addresses static power-flow violation repair; and Tree-of-Evidence \citep{treeofevidence2026} uses encoder-based evidence search without an LLM Agent. Their source evidence is retained in the review history, and they contribute zero modules to the statistics.
 
 The complete work-level profiles are provided here. The main text uses aggregate patterns and representative examples. Repository-only resources are identified with footnotes.
 
