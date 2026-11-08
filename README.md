@@ -82,6 +82,27 @@ Every other label describes one term, and none is a new classification:
 | **Task-Specific Harness** | Analysis of Observed Series (classification · imputation · anomaly detection · question answering) · Forecasting · Generation · Decision Making | What the output refers to relative to the current time; task names from TimesNet/TSLib and Time-MQA |
 | **Evaluation** | Process Validity · Temporal Validity · Task Performance · Decision Utility | One check per term |
 
+<details>
+<summary><strong>Second-level classes</strong> (manuscript Tables 5–7)</summary>
+
+| First level | Second-level classes | Criterion |
+|---|---|---|
+| Interface and Interaction | Reasoning loop · action interface · environment and users | Part of the Agent loop |
+| Memory and Context | Working context · episodic records · knowledge retrieval · shared state | Scope and lifetime |
+| Tools and Execution | Function calls · code and job execution · verification tools | Object executed |
+| Planning and Orchestration | Decomposition and planning · execution control · checkpoints and governance · multi-agent coordination | Object organized |
+| Optimization and Evolution | Prompt optimization · experience distillation · tool and skill evolution · Harness configuration search | Asset changed |
+| Temporal Data Management | Measurement schema ($x$) · time index and alignment ($t$) · point-in-time access ($v$) · temporal workspace | Record component |
+| Temporal Processing | Preprocessing and transformation · statistical and spectral analysis · series views for the LLM · operator and skill libraries | Returned object |
+| Temporal Context and Memory | External events and text · historical analogues · procedural experience | Admitted information |
+| Temporal Validation | Availability checks ($v$) · past-only computation ($t$) · data and schema checks ($x$) · temporal claim verification | Checked component |
+| Analysis of Observed Series | Classification · imputation · anomaly detection and diagnosis · question answering | Standard task names |
+| Forecasting | Value forecasting · event and probability forecasting | Output contract |
+| Generation | Augmentation · conditioned synthesis | Source of the new series |
+| Decision Making | Decision support · autonomous control | Who executes the action |
+
+</details>
+
 <p align="center">
   <img src="docs/assets/landscape.png" width="96%" alt="Landscape fan chart: the LLM side and the three Harness sectors, their wedges, and representative works as outer tags.">
 </p>

@@ -3,61 +3,41 @@
   "description": "Multi-dimensional evidence ledger for the Time Series Agent survey",
   "dimensions": {
     "Interface and Interaction": {
-      "fine_labels": [
-        "inference_interface",
+      "second_level": [
+        "reasoning_loop",
         "action_interface",
-        "environment_modeling",
-        "user_interaction",
-        "state_action_loop"
+        "environment_and_users"
       ]
     },
     "Memory and Context": {
-      "fine_labels": [
-        "context_management",
-        "working_memory",
-        "long_term_memory",
-        "retrieval",
-        "state_store",
-        "provenance"
+      "second_level": [
+        "working_context",
+        "episodic_records",
+        "knowledge_retrieval",
+        "shared_state"
       ]
     },
     "Tools and Execution": {
-      "fine_labels": [
-        "tool_registry",
-        "retrieval_tools",
-        "code_execution",
-        "temporal_models",
-        "simulator",
-        "validator_tools"
+      "second_level": [
+        "function_calls",
+        "code_and_job_execution",
+        "verification_tools"
       ]
     },
     "Planning and Orchestration": {
-      "fine_labels": [
-        "task_decomposition",
-        "workflow_orchestration",
-        "search",
-        "policy_selection",
-        "stopping_conditions",
-        "role_assignment",
-        "delegation",
-        "shared_state",
-        "debate_review",
-        "multi_agent_orchestration",
-        "verification_checkpoint",
-        "error_recovery",
-        "observability",
-        "governance"
+      "second_level": [
+        "decomposition_and_planning",
+        "execution_control",
+        "checkpoints_and_governance",
+        "multi_agent_coordination"
       ]
     },
     "Optimization and Evolution": {
-      "fine_labels": [
+      "second_level": [
         "prompt_optimization",
-        "tool_optimization",
-        "memory_optimization",
-        "policy_learning",
-        "trajectory_evolution",
-        "reflection",
-        "cross_episode_feedback"
+        "experience_distillation",
+        "tool_and_skill_evolution",
+        "harness_configuration_search"
       ]
     }
   },
@@ -137,7 +117,32 @@
       "general_runtime",
       "task_procedure"
     ],
-    "counting": "Unique module id, regardless of functions or task memberships."
+    "counting": "Unique module id, regardless of functions or task memberships.",
+    "second_level": {
+      "data_management": [
+        "measurement_schema",
+        "time_index_and_alignment",
+        "point_in_time_access",
+        "temporal_workspace"
+      ],
+      "processing": [
+        "preprocessing_and_transformation",
+        "statistical_and_spectral_analysis",
+        "series_views_for_the_llm",
+        "operator_and_skill_libraries"
+      ],
+      "context_memory": [
+        "external_events_and_text",
+        "historical_analogues",
+        "procedural_experience"
+      ],
+      "validation": [
+        "availability_checks",
+        "past_only_computation",
+        "data_and_schema_checks",
+        "temporal_claim_verification"
+      ]
+    }
   },
   "task_aliases": {
     "forecasting_reasoning": "forecasting_prediction",
@@ -244,5 +249,27 @@
   "evidence_locators": {
     "pdf_page": "\"PDF p.X; source text L<n>\": page of the local PDF that contains the quote; L<n> is the line in the re-audit packet.",
     "packet_line": "\"Source text L<n>\": line in the re-audit packet when no PDF page was found (repository sources, or a quote not located on a page)."
-  }
+  },
+  "task_group_second_level": {
+    "description": "Second-level tasks of the four task groups (scripts/task_groups.py); manuscript Table tab:tsk-vocab.",
+    "analysis": [
+      "classification",
+      "imputation",
+      "anomaly_detection_and_diagnosis",
+      "question_answering"
+    ],
+    "forecasting": [
+      "value_forecasting",
+      "event_and_probability_forecasting"
+    ],
+    "generation": [
+      "augmentation",
+      "conditioned_synthesis"
+    ],
+    "decision": [
+      "decision_support",
+      "autonomous_control"
+    ]
+  },
+  "second_level_note": "Second-level classes are a reading structure of the manuscript (Tables tab:component-vocab, tab:gts-vocab, tab:tsk-vocab); module records carry first-level labels only."
 }

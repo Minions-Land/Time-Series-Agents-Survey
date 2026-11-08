@@ -25,7 +25,8 @@ context_memory,validation}`, `--task <family label>` (ledger labels; group them 
 2. Use the survey's terms exactly: Time Series Agent = LLM + General Harness + Time Series Harness, where Time Series
    Harness = General Time Series Harness + Task-Specific Harness; LLM side; General Harness; General Time Series Harness;
    Task-Specific Harness; the five mechanism dimensions; the four temporal functions; the four task groups (analysis of observed series, forecasting, generation, decision
-   making; mapping in `scripts/task_groups.py`); the four
+   making; mapping in `scripts/task_groups.py`); their second-level classes (Tables 5-7 of `main.tex`, `second_level` in
+   `references/taxonomy_schema.json`); the four
    evaluation criteria (process validity, temporal validity, task performance, decision utility). "time series" is
    never hyphenated.
 3. Distinguish what a source demonstrates from what is inferred (`reuse_evidence`: demonstrated vs inferred).
