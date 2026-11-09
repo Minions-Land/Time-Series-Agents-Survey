@@ -346,7 +346,7 @@ Figure~\ref{fig:llm-contributions} places these contributions in the interaction
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig05/Figure05_V7.pdf}
-\caption{LLM-side intervention points in a Time Series Agent. Representation learning connects numerical inputs to language space; temporal supervision shapes analytical responses; workflow learning shapes action selection. These routes can overlap within one method, as the link between the first two routes indicates. The lower loop separates model contributions from the Harness that executes calls and returns observations. Forecast accuracy, explanation faithfulness, evidence grounding, and action quality require distinct evaluation evidence.}
+\caption{The LLM as the caller of the Harness. Top: what training adds to the caller, namely reading series inside the model, training the call policy, and, as an outlook, perceiving series as a native modality; dotted lines locate each in the loop. Middle: the LLM reads the state and makes function calls; the Harness executes them, returns observations, and holds the forecasting tools, whether foundation, statistical, or lightweight models. Bottom: forecast accuracy, explanation faithfulness, evidence grounding, and action quality require distinct evaluation evidence.}
 \label{fig:llm-contributions}
 \end{figure}
 
@@ -884,6 +884,33 @@ Here $D$ supplies the control instructions. Simpler situations omit some reasoni
 Decision procedures also differ in how the action is produced. Most reviewed Agents map the current evidence to an action directly. Others first project the consequences of candidate actions and then choose among them, as EpiWorld, AgriWorld, and NeuroAgentic do. This is model-based planning in the sense of reinforcement learning \citep{sutton2018rl}, and it is where the empty projection cell is used.
 
 A new decision-making Agent should specify these quantities before choosing its reasoning workflow. The numerical or language prediction supplies evidence; the action contract determines how that evidence becomes a position, a control signal, or a recommendation. Section~\ref{sec:evaluation} connects each resulting artifact to an appropriate evaluation protocol.
+
+\subsection{Reference modules for each cell}
+\label{sec:task-lookup}
+
+A reader who knows the cell of a task can look up reference modules in every layer (Table~\ref{tab:cell-lookup}). For each cell with task outputs, the table gives the leading mechanism dimensions of its General Harness modules and the leading temporal functions of its General Time Series Harness modules, with module counts; two shared modules whose sources apply them to tasks in at least two cells, so that their reuse is demonstrated; the task procedures discussed in the subsections above; and the evaluation resources that test the cell. Complete lists for each cell can be queried in the Paper Cards with the companion tool.
+
+\begin{table}[!htbp]
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.2\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}@{}}
+\toprule
+\textbf{Cell (works)} & \textbf{General Harness} & \textbf{General Time Series Harness} & \textbf{Task-Specific Harness} & \textbf{Evaluation}\\
+\midrule
+Regression, observed (15) & Planning 9, memory 4. Master-agent routing in Agentic RAG \citep{agenticrag2024}; confidence-gated shared memory in MAS4TS \citep{mas4ts2026}. & Processing 6, data management 3. Operator suite of TS-Reasoner \citep{tsreasoner2026}; time-frequency charts and lookup in TS-Debate \citep{multimodaldebate2026}. & Task-routed tool chains in MAS4TS; calibration episodes in HydroAgent \citep{hydroagentcalibration2026}. & TimeSage-MT \citep{timesagemt2026}; TimeSeriesGym \citep{timeseriesgym2025}.\\
+Regression, after (74) & Planning 33, tools 22. Roles and execution protocols in AION \citep{aion2026}; execution verification and recovery in MOSAIC \citep{mosaic2026}. & Processing 32, data management 25, validation 23. Temporal admissibility checks in AION; causal resampling in GenAutoML \citep{genautoml2026}. & Model selection in TimeSeriesScientist \citep{timeseriesscientist2025}; prompt refinement in FLAIRR-TS \citep{flairr2025}; fast--slow--reflect in CastFSR \citep{castfsr2026}. & Dr-CiK \citep{drcik2026}; TFRBench \citep{tfrbench2026}; FairAMO \citep{fairamo2026}.\\
+Classification, observed (65) & Planning 29, tools 17. Intent-routed workflow in SAGE-Sleep \citep{sagesleep2026}; tool workflow in TSAG \citep{tsag2026}. & Processing 33, data management 21. Timestamp alignment in LEMAD \citep{ji2025lemad}; precise tools with compressed views in SAGE-AD \citep{sagead2026}. & Coarse-to-fine workflow in AnomaMind \citep{anomamind2026}; executable rules in ARGOS \citep{argos2025}; pipeline construction in AD-AGENT \citep{adagent2025}. & TraceBench \citep{tracebench2026}; TimeSeriesExamAgent \citep{timeseriesexamagent2026}; TSAG.\\
+Classification, after (14) & Planning 6, tools 5. Skill induction in TimeSage-EV \citep{timesageev2026}; hierarchical orchestration in ElliottAgents \citep{elliottagents2025}. & Data management 6, validation 5. Cutoff-isolated releases and next-period skill activation in TimeSage-EV. & Probability calibration in AIA Forecaster \citep{aiaforecaster2025}; calibration memory in ForecastCompass \citep{forecastcompass2026}. & WorldReasoner \citep{worldreasoner2026}; TimeSage-EV.\\
+Generation, observed (40) & Planning 31, tools 17. Blueprint synthesis in MOSAIC; intent-to-tool interface in Open-TI \citep{openti2024}. & Processing 22, data management 20. Evidence-gated hypothesis registry in EpiCoach \citep{epicoach2026}; queryable series layer in SAGE-Sleep. & Positive views in MERIT \citep{merit2025}; description refinement in BRIDGE \citep{bridge2025}; structured diagnosis in Time-RA \citep{timera2025}. & TS-Skill \citep{tsskill2026}; TSAG.\\
+Decision, after (46) & Planning 15, tools 10. Runtime role reassignment in AgentFM \citep{agentfm2025}; execute--observe--refine loop in AgriWorld \citep{agriworld2026}. & Processing 16, data management 15. Sealed validation sandbox in AQuA \citep{aqua2026}; dated weather and crop evidence in WxCrop \citep{wxcrop2026}. & Analyst hierarchy in FinCon \citep{fincon2024}; layered memory in FinMem \citep{finmem2023}; prediction-to-action reasoning in CoLLMLight \citep{collmllight2026}. & Quant-Arena \citep{quantarena2026}; Vendster \citep{vendster2026}.\\
+\midrule
+Projection; hindsight decision (0) & \multicolumn{4}{l}{No task output; used only inside decision procedures and reflection memories (Sections~\ref{sec:task-generation} and~\ref{sec:task-decision}).}\\
+\bottomrule
+\end{tabularx}
+\caption{Reference modules for each cell of the task grid (Table~\ref{tab:tsk-vocab}). Shared columns give the leading mechanism dimensions or temporal functions with module counts and two modules with demonstrated reuse; the task column gives procedures discussed in this section; the last column gives evaluation resources that test the cell.}
+\label{tab:cell-lookup}
+\end{table}
 
 \subsection{Cross-task comparison of representative systems}
 \label{sec:task-comparison}

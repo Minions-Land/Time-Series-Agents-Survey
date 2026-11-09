@@ -1,10 +1,11 @@
-"""Figure 5 (fig:llm-contributions): LLM-side intervention points in a Time Series Agent, V7 house style.
+"""Figure 5 (fig:llm-contributions): the LLM as the caller of the Harness, V7 house style.
 
-Top: the three LLM-side routes (Section 3 subsections), each as input -> learned target plus its feedback signal;
-A 'One Method' link joins the first two routes (caption: routes can overlap within one method).
-Middle: the interaction loop. The LLM (amber) floats above the Harness plate (blue), which executes calls and
-returns observations; dotted drop lines locate each route in the loop.
-Bottom: the four evaluation targets named in the caption.
+Top: what training adds to the caller (Section 3): reading series inside the model, toward native perception
+(outlook), and training the caller; dotted drop lines locate each in the loop (read state, the LLM, function calls).
+Middle: the interaction loop. The LLM (amber) reads the state and makes function calls; the Harness plate (blue)
+executes them and returns observations. Forecasting tools (foundation, statistical, lightweight models) sit in the
+Harness, not on the LLM side.
+Bottom: the four evaluation targets of Section 3.
 """
 import os, sys
 sys.path.insert(0, '/Users/mjm/Papers/Qingsong/IJCAI2027-Time-Series-Agents-Survey/artifacts/unified_v7_20261106/kit')
@@ -17,12 +18,12 @@ ED, EM, EL = HUE['ev']
 CX = W / 2
 CARD_W, CARD_GAP, CARD_Y, CARD_H = 3.95, 0.3, 0.84, 1.92
 CARD_X = [0.2 + (12.93 - 3 * CARD_W - 2 * CARD_GAP) / 2 + k * (CARD_W + CARD_GAP) for k in range(3)]
-ROUTES = [  # (title, (icon, caption), (icon, caption), feedback) -- wording from the old figure / Section 3
-    ('Representation and Alignment', ('window', 'Series Patches'), ('encode', 'Language Space'),
-     'Scale and Temporal Structure'),
-    ('Instruction and Reasoning', ('request', 'Temporal Questions'), ('grounded_answer', 'Grounded Answers'),
+ROUTES = [  # (title, (icon, caption), (icon, caption), note) -- wording from Section 3 headings and text
+    ('Reading Series in the Model', ('window', 'Series Patches'), ('encode', 'Language Space'),
      'Instructions and Outcome Feedback'),
-    ('Workflow Learning', ('trajectory_path', 'Tool Trajectories'), ('policy', 'Action Policy'),
+    ('Toward Native Perception', ('timeseries', 'Series'), ('llm', 'Omni-Modal LLM'),
+     'Outlook: Series as a Native Modality'),
+    ('Training the Caller', ('trajectory_path', 'Tool Trajectories'), ('policy', 'Call Policy'),
      'Execution and Preference Feedback'),
 ]
 # interaction loop geometry
@@ -38,7 +39,7 @@ def ico(name):
 
 
 def routes(slide):
-    zone(slide, 0.2, 0.42, 12.93, 2.56, 'LLM-Side Intervention Points', 'llm')
+    zone(slide, 0.2, 0.42, 12.93, 2.56, 'What Training Adds to the Caller', 'llm')
     g = group(slide); sh = g.shapes
     root = sh
     for x0, (title, a, b, fb) in zip(CARD_X, ROUTES):
@@ -51,13 +52,6 @@ def routes(slide):
             tx(sh, cx - 1.0, iy + isz + 0.02, 2.0, 0.28, cap, size=13.5, bold=True, color=LD)
         arrow(sh, x0 + 1.47, iy + isz / 2, x0 + CARD_W - 1.47, iy + isz / 2, color=LD, lw=2.6)
         pill(sh, x0 + 0.22, CARD_Y + CARD_H - 0.42, CARD_W - 0.44, 0.31, fb, 'llm', size=12.5, light=True)
-    # one method can span the first two routes (no work names in figures)
-    sh = root.add_group_shape().shapes
-    gx = CARD_X[0] + CARD_W + CARD_GAP / 2
-    yy = CARD_Y + 0.5 + 0.35
-    arrow(sh, gx - 0.66, yy, gx + 0.66, yy, color=LD, lw=1.6, dash=MSO_LINE.ROUND_DOT, head=None)
-    t = pill(sh, gx - 0.6, yy - 0.17, 1.2, 0.34, 'One Method', 'llm', size=12.5)
-    shadow(t)
     return g
 
 
@@ -67,7 +61,7 @@ def loop(slide):
     plate(sh, PX, P, PW, 'gh', [('Harness:  ', 'FFFFFF', True, False),
                                 ('Execution, State and Feedback', 'FFFFFF', False, False)], size=17)
     base = P - 0.3                    # captions sit on the plate's top face
-    items = [('obs', 'timeseries', 'Observations'), ('tool', 'tools', 'Tool Actions'), ('out', 'data', 'Outputs')]
+    items = [('obs', 'timeseries', 'Observations'), ('tool', 'tools', 'Tools'), ('out', 'data', 'Outputs')]
     for key, nm, cap in items:
         cx = LOOP[key]
         ic(sh, nm, cx - 0.43, base - 0.88, 0.86)
@@ -77,17 +71,23 @@ def loop(slide):
     halo(sh, rx, ry + 0.62, 1.85, 1.6)
     pedestal(sh, rx - 0.62, ry + rs - 0.2, 1.24, 0.32, 'llm')
     ic(sh, 'robot', rx - rs / 2, ry, rs)
-    lab = box(sh, rx + 0.5, ry + 0.02, 0.7, 0.34, fill=LD, radius=0.5); label_in(lab, 'LLM', size=14)
+    lab = box(sh, rx + 0.62, ry + 0.98, 1.4, 0.34, fill=LD, radius=0.5); label_in(lab, 'LLM: Caller', size=14)
     # Observations -> LLM (Harness encodes / retrieves), LLM -> Tool Actions (select and assess)
     ox = LOOP['obs']
     curve(sh, [(ox + 0.5, base - 0.62), (3.4, 3.05), (rx - 0.8, ry + 0.6)], GD, lw=2.8)
-    tx(sh, 2.55, 3.1, 2.4, 0.3, 'Encode / Retrieve', size=14, bold=True, italic=True, color=GD)
+    tx(sh, 2.55, 3.1, 2.4, 0.3, 'Read State', size=14, bold=True, italic=True, color=GD)
     tox = LOOP['tool']
     curve(sh, [(rx + 0.8, ry + 0.6), (9.1, 3.05), (tox - 0.42, base - 0.72)], LD, lw=2.8)
-    tx(sh, 7.95, 3.1, 2.4, 0.3, 'Select and Assess', size=14, bold=True, italic=True, color=LD)
+    tx(sh, 7.55, 3.1, 2.2, 0.3, 'Function Calls', size=14, bold=True, italic=True, color=LD)
     arrow(sh, tox + 0.5, base - 0.44, LOOP['out'] - 0.5, base - 0.44, color=GD, lw=2.6)
     # returned observations: Tool Actions back to Observations, under the LLM
     curve(sh, [(tox - 0.5, base - 0.42), (rx, base - 0.25), (ox + 0.5, base - 0.42)], GD, lw=2.4, dash=MSO_LINE.DASH)
+    # forecasting tools live in the Harness: foundation, statistical and lightweight models
+    fx, fy, fw, fh = 9.95, 3.0, 3.05, 0.86
+    card(sh, fx, fy, fw, fh, 'gh')
+    tx(sh, fx, fy + 0.06, fw, 0.34, 'Forecasting Tools', size=14.5, bold=True, color=GD)
+    tx(sh, fx, fy + 0.42, fw, 0.32, 'Foundation · Statistical · Lightweight', size=12, color=GD)
+    arrow(sh, fx + 0.35, fy + fh + 0.02, tox + 0.2, base - 0.86, color=GD, lw=1.8, dash=MSO_LINE.ROUND_DOT, head=None)
     # drop lines: where each route acts in the loop
     for x, y1 in ((3.75, 3.08), (rx, ry - 0.02), (9.15, 3.08)):
         arrow(sh, x, CARD_Y + CARD_H + 0.04, x, y1, color=LD, lw=2.0, dash=MSO_LINE.ROUND_DOT, head=None)
