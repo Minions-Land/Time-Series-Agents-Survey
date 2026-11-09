@@ -21,7 +21,13 @@
  "other_tasks": [
   "temporal_question_answering",
   "temporal_analysis",
-  "value_forecasting"
+  "value_forecasting",
+  "anomaly_detection",
+  "advisory_decision",
+  "point_forecast",
+  "probabilistic_forecast",
+  "closed_question_answering",
+  "open_question_answering"
  ],
  "modules": [
   {
@@ -47,7 +53,13 @@
    "other_tasks": [
     "temporal_question_answering",
     "temporal_analysis",
-    "value_forecasting"
+    "value_forecasting",
+    "anomaly_detection",
+    "advisory_decision",
+    "probabilistic_forecast",
+    "point_forecast",
+    "closed_question_answering",
+    "open_question_answering"
    ],
    "role": "method",
    "scope_reason": "R3_1: the shared workspace and inspection interface impose no task output or objective; changing task family preserves their logic. R3_2: channel state, bounded temporal slices, autocorrelation and periodicity require temporal semantics. Numerical-claim grounding is integrated with execution, without a separate chronology validator.",
@@ -101,7 +113,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "advisory_decision"
+   ],
    "role": "method",
    "scope_reason": "R3_1: the synthesis/admission operator accepts supplied tasks and success criteria rather than embedding a financial objective. R3_2: its clustering, code synthesis, held-out execution and threshold admission require neither temporal order nor windows. R3_3 therefore selects GH; the generated financial procedures are separate TSK modules.",
    "rubric_path": [
@@ -156,7 +170,13 @@
    "other_tasks": [
     "temporal_question_answering",
     "temporal_analysis",
-    "value_forecasting"
+    "value_forecasting",
+    "anomaly_detection",
+    "advisory_decision",
+    "probabilistic_forecast",
+    "point_forecast",
+    "closed_question_answering",
+    "open_question_answering"
    ],
    "role": "method",
    "scope_reason": "R3_1: stored analytical traces and retrieval are independent of a particular output objective; switching task family changes records, not retrieval logic. R3_2: numerical fingerprints explicitly depend on lagged autocorrelation, spectral structure and temporal dynamics, making the memory GTS.",
@@ -211,7 +231,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "advisory_decision"
+   ],
    "role": "method",
    "scope_reason": "R3_1: computes portfolio loss over a specified horizon and compares options by downside risk; changing task family requires replacing the financial state, metric and comparison objective, so TSK wins before GTS.",
    "rubric_path": [
@@ -252,7 +274,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "advisory_decision"
+   ],
    "role": "method",
    "scope_reason": "R3_1: evaluates candidate portfolios using a risk-free-adjusted return criterion. Changing task family requires redesigning portfolio inputs and the financial comparison objective, so TSK precedes GTS.",
    "rubric_path": [
@@ -293,7 +317,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "advisory_decision"
+   ],
    "role": "method",
    "scope_reason": "R3_1: estimates market-relative asset statistics to select the matching answer option. A different task family requires replacing the asset/market semantics and target financial statistic; this is a task-specific financial analysis procedure.",
    "rubric_path": [

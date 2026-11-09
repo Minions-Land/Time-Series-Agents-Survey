@@ -16,7 +16,9 @@
   "time_series_classification",
   "temporal_question_answering",
   "temporal_analysis",
-  "physiological_signal_estimation"
+  "physiological_signal_estimation",
+  "root_cause_identification",
+  "closed_question_answering"
  ],
  "modules": [
   {
@@ -37,7 +39,9 @@
     "time_series_classification",
     "temporal_question_answering",
     "temporal_analysis",
-    "physiological_signal_estimation"
+    "physiological_signal_estimation",
+    "root_cause_identification",
+    "closed_question_answering"
    ],
    "role": "method",
    "scope_reason": "The core logic decomposes objectives, dispatches specialists, reviews handoffs, and chooses the next action from feedback; it has no temporal semantics or task-specific objective, so GH. Changing task family changes assignments and evidence, not the coordinator's scheduling and state logic.",
@@ -91,7 +95,9 @@
     "time_series_classification",
     "temporal_question_answering",
     "temporal_analysis",
-    "physiological_signal_estimation"
+    "physiological_signal_estimation",
+    "root_cause_identification",
+    "closed_question_answering"
    ],
    "role": "method",
    "scope_reason": "The mechanism controls which tool contracts, runtime skills, permissions, and context enter each conversation; it does not encode a task objective or temporal order, windows, frequency, units, or information cutoff, so GH. Replacing EEG tasks changes the exposed capabilities, not the disclosure and permission mechanism.",
@@ -195,7 +201,9 @@
     "time_series_classification",
     "temporal_question_answering",
     "temporal_analysis",
-    "physiological_signal_estimation"
+    "physiological_signal_estimation",
+    "root_cause_identification",
+    "closed_question_answering"
    ],
    "role": "method",
    "scope_reason": "The tools consume EEG recordings and windows with channel and frequency structure, computing spectral, spatial, and model diagnostics; changing to a non-temporal input would require different measurements, so GTS rather than GH or TSK. They are not bound to one task objective.",
@@ -250,7 +258,8 @@
    ],
    "other_tasks": [
     "time_series_classification",
-    "physiological_signal_estimation"
+    "physiological_signal_estimation",
+    "root_cause_identification"
    ],
    "role": "infrastructure",
    "scope_reason": "The contributed service checks EEG input shapes, channels, units, and executable interfaces before windowed training and returns run feedback; those signal-schema requirements are temporal-data semantics without embedding a task metric, so GTS. A different task family would require a different signal schema while retaining the execution service.",

@@ -23,6 +23,9 @@ FAMILIES = {"forecasting_prediction": "Forecasting and prediction",
             "decision_support": "Decision support"}
 # second label of a forecasting work: rendered in place of the family name
 FORECAST = {"value_forecasting": "Value forecasting", "event_forecasting": "Event forecasting"}
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from task_groups import FINE, FORM   # noqa: E402  second labels that refine a coarse task label
+DECISION = {"advisory_decision", "autonomous_control"}
 ROLES = [("feedback_driven_agent", "feedback-driven Agents"), ("fixed_workflow", "fixed workflows"),
          ("llm_side_technique", "LLM-side techniques"), ("resource", "resources")]
 CRITERIA = [("process_validity", "process validity"), ("temporal_validity", "temporal validity"),
@@ -48,14 +51,18 @@ def in_scope(r):
 def task_label(r):
     """Task families in canonical wording, then other task labels in lower case (e.g. time series classification)."""
     tasks = r['tasks']
-    other = tasks.get('other_labels', [])
+    other = [o for o in tasks.get('other_labels', []) if o not in FORM]
     fc = [FORECAST[o] for o in FORECAST if o in other]
+    hidden = {c for c, fine in FINE.items() if set(other) & fine}       # coarse labels refined by a second label
     labels = []
     for a in tasks.get('axes', []):
         if a == 'forecasting_prediction' and fc: labels += fc
-        elif a in FAMILIES: labels.append(FAMILIES[a])
-    labels += [o.replace('_', ' ') for o in other if o not in FORECAST]
-    return '; '.join(dict.fromkeys(labels))
+        elif a in FAMILIES and a not in hidden and not (a == 'decision_support' and set(other) & DECISION):
+            labels.append(FAMILIES[a])
+    labels += [o.replace('_', ' ') for o in other if o not in FORECAST and o not in hidden]
+    labels = list(dict.fromkeys(labels))
+    if labels: labels[0] = labels[0][0].upper() + labels[0][1:]
+    return '; '.join(labels)
 
 
 def render_profiles(s, bykey):

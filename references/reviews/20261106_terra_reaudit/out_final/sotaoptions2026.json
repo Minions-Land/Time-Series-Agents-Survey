@@ -24,7 +24,9 @@
  "task_memberships": [
   "decision_support"
  ],
- "other_tasks": [],
+ "other_tasks": [
+  "autonomous_control"
+ ],
  "modules": [
   {
    "id": "sotaoptions2026:policy-training",
@@ -39,7 +41,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "model_training",
    "scope_reason": "R2: SFT and GRPO update the action-selection policy's parameters from trading trajectories and portfolio rewards; this is learned workflow operation, not a Harness optimization module.",
    "rubric_path": [
@@ -84,7 +88,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "training_data",
    "scope_reason": "R1 includes a constructed model-training corpus; R2 places the anonymized, Sharpe-filtered action trajectories on the LLM side because they supervise the trading policy.",
    "rubric_path": [
@@ -139,7 +145,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "method",
    "scope_reason": "R3_1: no trading objective or required action is embedded in the feature calculations. R3_2: trailing volatility, session returns and maturity-aligned implied-volatility features depend on temporal windows and units. The same numerical features could serve forecasting or analysis without changing their core calculations; only decision-support use is demonstrated.",
    "rubric_path": [
@@ -195,7 +203,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "method",
    "scope_reason": "R3_1: the state-action loop embeds option-strategy actions, carried portfolio exposure and a net-portfolio-value reward. Changing to forecasting would require redesigning the action space, portfolio state and objective; temporal ordering alone does not make this GTS.",
    "rubric_path": [
@@ -254,7 +264,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "method",
    "scope_reason": "R3_1: maps a requested option strategy and delta coordinates to executable expiry/strike contracts. A different task family would require replacing these trading actions and contract-selection semantics; expiry matching is subordinate to the task.",
    "rubric_path": [
@@ -301,7 +313,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "method",
    "scope_reason": "R3_1: determines integer trade sizes from package notional and option-Greek scenario risk. Switching task family requires redesigning the action quantity, exposure state and risk objective.",
    "rubric_path": [
@@ -348,7 +362,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "method",
    "scope_reason": "R1 counts the integration of deterministic hedge execution for selected strategy families, not the unchanged cited hedge-band formula. R3_1: neutralizing portfolio delta under transaction costs embeds a trading objective; another task family would require different actions and exposure semantics.",
    "rubric_path": [

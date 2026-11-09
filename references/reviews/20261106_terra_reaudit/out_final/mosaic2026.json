@@ -18,7 +18,8 @@
   "data_augmentation_synthesis"
  ],
  "other_tasks": [
-  "value_forecasting"
+  "value_forecasting",
+  "point_forecast"
  ],
  "modules": [
   {
@@ -38,7 +39,8 @@
     "data_augmentation_synthesis"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK is no: profiling does not embed a forecast or generation objective. R3_2_GTS is yes: it computes time-series statistics and temporal plots; changing task family leaves the temporal profiling need intact, whereas a non-temporal runtime would not preserve these semantics.",
@@ -86,7 +88,8 @@
     "data_augmentation_synthesis"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK is no: retrieval serves both task families without implementing either output criterion. R3_2_GTS is yes: the query uses the temporal data profile; changing task family preserves this retrieval interface, while removing temporal profile evidence changes what the case match means.",
@@ -133,7 +136,8 @@
     "data_augmentation_synthesis"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK is no: the same pipeline (architecture-family analysis, AST module extraction, blueprint construction, code generation) is applied unchanged to forecasting and generation; no output requirement or objective of one task family is embedded in its logic, and the retrieved repository is just the source of modules. R3_2_GTS is no: it composes neural-network code modules and shape constraints with no dependence on timestamps, windows, frequency or information availability. R3_3_GH is yes: it is plan construction and code synthesis orchestration.",
@@ -185,7 +189,8 @@
     "data_augmentation_synthesis"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK is no: this checks executable output shape and numerical stability rather than task quality. R3_2_GTS is no: it has no temporal-order, window, or information-cutoff check. R3_3_GH is yes: it executes candidates, diagnoses failures, and schedules bounded correction.",
@@ -232,7 +237,8 @@
     "data_augmentation_synthesis"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "training_data",
    "scope_reason": "R2: the generated tasks and the branched trajectories with negative supervision and invalid-action masks are offline training data built to train the refinement policy, so they are LLM side (workflow_learning); R3 does not apply. The two parts only function together as one corpus.",
@@ -275,7 +281,8 @@
     "data_augmentation_synthesis"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "model_training",
    "scope_reason": "R2 classifies the trained policy that selects refinement actions from execution and validation feedback on the model side; the LLM executor is separate. This learned policy is trained for the two task-specific losses, while R3 applies only to Harness mechanisms.",
@@ -319,7 +326,8 @@
     "data_augmentation_synthesis"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK is no: the harness executes the selected edit and reports diagnostics, while the task-specific loss and action policy determine the objective. R3_2_GTS is no: its recovery logic does not depend on temporal ordering or information availability. R3_3_GH is yes: it coordinates execution, rollback, masking, and the next policy query.",

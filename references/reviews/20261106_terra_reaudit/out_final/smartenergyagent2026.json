@@ -15,7 +15,11 @@
   "decision_support"
  ],
  "other_tasks": [
-  "value_forecasting"
+  "value_forecasting",
+  "anomaly_detection",
+  "diagnostic_explanation",
+  "advisory_decision",
+  "point_forecast"
  ],
  "modules": [
   {
@@ -34,7 +38,8 @@
     "forecasting_prediction"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "model_training",
    "scope_reason": "R3_1 TSK applies because the module produces an appliance forecast for a defined horizon; changing task family requires changing the prediction objective and output. Its lagged temporal inputs do not make it task-general GTS infrastructure, so R3_2 does not apply.",
@@ -81,7 +86,9 @@
    "tasks": [
     "anomaly_detection_diagnosis"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "anomaly_detection"
+   ],
    "role": "model_training",
    "scope_reason": "R3_1 TSK applies because reconstruction scores and appliance-specific thresholds directly define anomaly flags; another task family requires a different detector objective and decision threshold. Sliding windows and chronological calibration are temporal, but this is task-bound anomaly logic rather than general GTS infrastructure, so R3_2 does not apply.",
    "rubric_path": [
@@ -133,7 +140,10 @@
     "anomaly_detection_diagnosis",
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "diagnostic_explanation",
+    "advisory_decision"
+   ],
    "role": "method",
    "scope_reason": "R3_1 TSK applies because source selection is conditioned on appliance-event ambiguity, severity, and baseline sparsity to support anomaly diagnosis and recommendations; changing task family requires redesigning its evidence sources and selection criteria. Although it uses temporal history and time-of-day context, it is task-bound rather than a general temporal service, so R3_2 does not apply.",
    "rubric_path": [
@@ -180,7 +190,10 @@
     "anomaly_detection_diagnosis",
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "diagnostic_explanation",
+    "advisory_decision"
+   ],
    "role": "method",
    "scope_reason": "R3_1 TSK applies because the event coordinator, diagnostic routing, reliability caps, and urgency rules embed appliance-anomaly diagnosis criteria; changing task family requires redesigning the event states and verifiers. It uses temporal history and time-of-day rules but is task-bound, so it does not meet R3_2's general temporal-service condition.",
    "rubric_path": [
@@ -235,7 +248,10 @@
     "anomaly_detection_diagnosis",
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "diagnostic_explanation",
+    "advisory_decision"
+   ],
    "role": "method",
    "scope_reason": "R3_1 TSK applies because operator corrections are matched by appliance and anomaly pattern to revise future anomaly diagnoses; changing task family requires redesigning the match keys and correction semantics. The time-of-day window is temporal, but the memory is tied to this diagnosis task rather than a general temporal service, so R3_2 does not apply.",
    "rubric_path": [

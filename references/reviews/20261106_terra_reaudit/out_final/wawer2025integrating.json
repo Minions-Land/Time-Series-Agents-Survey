@@ -14,7 +14,9 @@
   "decision_support"
  ],
  "other_tasks": [
-  "value_forecasting"
+  "value_forecasting",
+  "advisory_decision",
+  "point_forecast"
  ],
  "modules": [
   {
@@ -32,7 +34,9 @@
     "decision_support"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "advisory_decision",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1 no: the coordinator, hierarchical roles, asynchronous parallel execution, task decomposition and memory identifiers (Sec. 4.5) do not embed a task objective or verifier; the stock-specific stage order is an instantiation of the flow, not the mechanism. R3_2 no: no temporal semantics. R3_3 yes: scheduling, delegation and state passing between agents.",
@@ -85,7 +89,9 @@
     "decision_support"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "advisory_decision",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1 no: the Elliott-wave reader identifies and classifies wave structure in ordered price series and feeds both the forecast and the advice; it carries no output requirement or verifier of either task family, so replacing the task does not force a redesign. R3_2 yes: detection depends on temporal order and multiple timeframes (daily, hourly).",
@@ -135,7 +141,8 @@
     "forecasting_prediction"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1 yes: the Backtester validates detected wave patterns against historical price outcomes with a DRL model and stores pattern-outcome records for later forecasts; its reward, verifier and stored state are defined by the price-prediction objective and would be redesigned for another task family. The DRL model is separate from the LLM, so it is Harness, not LLM side. The knowledge-base lookup and storage only function inside this procedure, so they are merged here.",
@@ -180,7 +187,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "advisory_decision"
+   ],
    "role": "method",
    "scope_reason": "R3_1 yes: the Investment Advisor procedure embeds the decision output requirement (buy/sell/hold, entry and exit price targets, stop-loss, time frames); another decision task needs a different output and risk criterion. The generic orchestration moved to multi-agent-workflow.",
    "rubric_path": [

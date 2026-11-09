@@ -15,7 +15,9 @@
  "other_tasks": [
   "temporal_question_answering",
   "time_series_classification",
-  "temporal_analysis"
+  "temporal_analysis",
+  "anomaly_detection",
+  "closed_question_answering"
  ],
  "modules": [
   {
@@ -34,7 +36,9 @@
    "other_tasks": [
     "temporal_question_answering",
     "time_series_classification",
-    "temporal_analysis"
+    "temporal_analysis",
+    "anomaly_detection",
+    "closed_question_answering"
    ],
    "role": "training_data",
    "scope_reason": "R2 places training data built to shape time series reasoning on the LLM side. The six-step CoT is the template TSRgen uses to generate trajectories and the structure that the process-level labels and rewards attach to; it is not a deployed runtime procedure and only functions together with the dataset, so it is merged here rather than split as a Harness module. Task coverage is not a Harness layer claim.",
@@ -80,7 +84,9 @@
    "other_tasks": [
     "temporal_question_answering",
     "time_series_classification",
-    "temporal_analysis"
+    "temporal_analysis",
+    "anomaly_detection",
+    "closed_question_answering"
    ],
    "role": "model_training",
    "scope_reason": "R2 places SFT and RL that update model parameters on the LLM side. Scheduling assigns samples to SFT or GRPO based on difficulty, while process rewards supervise reasoning; it is not a deployment workflow or trained tool-selection policy.",

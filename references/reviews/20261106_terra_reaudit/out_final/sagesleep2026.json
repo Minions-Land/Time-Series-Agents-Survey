@@ -13,7 +13,9 @@
   "anomaly_detection_diagnosis"
  ],
  "other_tasks": [
-  "temporal_question_answering"
+  "temporal_question_answering",
+  "anomaly_detection",
+  "closed_question_answering"
  ],
  "modules": [
   {
@@ -33,7 +35,9 @@
     "anomaly_detection_diagnosis"
    ],
    "other_tasks": [
-    "temporal_question_answering"
+    "temporal_question_answering",
+    "anomaly_detection",
+    "closed_question_answering"
    ],
    "role": "infrastructure",
    "scope_reason": "R3_1_TSK fails: the normalized store and its schema do not change when the task family changes. R3_2_GTS applies: timestamps are normalized to the user time zone, fields are cast to computable types, and session tables keep numerical state addressable.",
@@ -79,7 +83,8 @@
    "llm_route": [],
    "tasks": [],
    "other_tasks": [
-    "temporal_question_answering"
+    "temporal_question_answering",
+    "closed_question_answering"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK chosen: the procedure embeds the Q&A output requirement (period, comparison and metric structure, answer grounded in retrieved facts). Counterfactual: a change to forecasting or anomaly detection would need a different action space, not only a different query. Borderline with GTS, see notes.",
@@ -119,7 +124,8 @@
    "llm_route": [],
    "tasks": [],
    "other_tasks": [
-    "temporal_question_answering"
+    "temporal_question_answering",
+    "closed_question_answering"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK no: the router classifies inputs into chat, data or unsupported without a task objective. R3_2_GTS no: routing has no temporal semantics. R3_3_GH yes: state-graph execution control.",
@@ -162,7 +168,9 @@
    "tasks": [
     "anomaly_detection_diagnosis"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "anomaly_detection"
+   ],
    "role": "method",
    "scope_reason": "R3_1_TSK yes: the deviation criterion (more than 30 percent from the 7-day moving average, or critical sleep debt) is the anomaly-detection validation criterion. Counterfactual: changing the task would change the criterion and templates.",
    "rubric_path": [

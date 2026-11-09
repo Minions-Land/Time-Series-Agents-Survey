@@ -20,7 +20,11 @@
  ],
  "other_tasks": [
   "temporal_analysis",
-  "value_forecasting"
+  "value_forecasting",
+  "diagnostic_explanation",
+  "advisory_decision",
+  "point_forecast",
+  "open_question_answering"
  ],
  "modules": [
   {
@@ -42,7 +46,11 @@
    ],
    "other_tasks": [
     "temporal_analysis",
-    "value_forecasting"
+    "value_forecasting",
+    "diagnostic_explanation",
+    "advisory_decision",
+    "point_forecast",
+    "open_question_answering"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK does not apply to the generic query-to-plan, delegation and step-execution mechanism: changing task families changes tool descriptions and domain templates, not this controller's execution semantics. R3_2_GTS does not apply because this controller has no timestamp, lag or availability logic. R3_3_GH applies to hierarchical execution and communication. Task-specific forecasting and explanation semantics are counted separately.",
@@ -110,7 +118,11 @@
    ],
    "other_tasks": [
     "temporal_analysis",
-    "value_forecasting"
+    "value_forecasting",
+    "diagnostic_explanation",
+    "advisory_decision",
+    "point_forecast",
+    "open_question_answering"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK does not apply: supplying system configuration and operational knowledge to downstream reasoning does not embed a forecasting or decision objective. R3_2_GTS does not apply: deployment schedules and historical incidents are example content, but no temporal alignment, ordering or availability-aware retrieval mechanism is specified. R3_3_GH applies to context provision across agents; changing tasks changes knowledge content rather than the interface.",
@@ -178,7 +190,8 @@
     "forecasting_prediction"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK applies first: the tool recursively produces future values over a forecast horizon and exports the model, features and step inputs for explanation. Replacing forecasting with detection or classification would require redesigning the prediction state, outputs and artifact semantics. Lag-window processing and artifact retention therefore remain functions of a task-specific forecasting interface, not a task-independent GTS module. Random Forest itself is unchanged and is not counted separately.",
@@ -235,7 +248,11 @@
    ],
    "other_tasks": [
     "temporal_analysis",
-    "value_forecasting"
+    "value_forecasting",
+    "diagnostic_explanation",
+    "advisory_decision",
+    "point_forecast",
+    "open_question_answering"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK applies first: the Explain Tool and its explainability-signal integration require output text to explain forecast behavior using forecast plots, lag attributions and horizon-wise uncertainty. A different task objective requires redesigning the signals and explanation constraints. Grouped temporal attribution is numerical processing within that task procedure. Structured prompting is Harness under R2; no model parameters are updated. Prompted consistency is not a separately implemented temporal validator.",

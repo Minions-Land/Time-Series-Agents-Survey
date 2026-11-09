@@ -12,7 +12,9 @@
  "task_memberships": [
   "decision_support"
  ],
- "other_tasks": [],
+ "other_tasks": [
+  "autonomous_control"
+ ],
  "modules": [
   {
    "id": "heraldlight2025:herald-timing",
@@ -29,7 +31,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "method",
    "scope_reason": "Computes phase-specific signal durations from queues and approaching vehicles. R3_1 TSK applies because the output is the task's control duration; changing task family changes its objective and action space. Counterfactually, despite temporal inputs, this is not task-independent GTS temporal data handling.",
    "rubric_path": [
@@ -65,7 +69,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "method",
    "scope_reason": "The structured prompt specifies the traffic-control context, objective, constraints and output. R3_1 TSK applies because the interface embeds the phase-and-duration action format. Counterfactually, another task needs a different objective and output schema; it is not task-independent GTS handling.",
    "rubric_path": [
@@ -101,7 +107,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "method",
    "scope_reason": "The critic evaluates, corrects and scores signal-control actions. R3_1 TSK applies because correctness is judged against the phase-and-duration control task. Counterfactually, a different task changes action semantics and verifier; this is not task-independent GTS handling.",
    "rubric_path": [
@@ -137,7 +145,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "model_training",
    "scope_reason": "LoRA updates model parameters from prompt/action interaction logs to specialize traffic-control decisions; R2 places parameter-updating policy training on the LLM side.",
    "rubric_path": [
@@ -171,7 +181,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "model_training",
    "scope_reason": "Critic-corrected trajectories and scores train the policy to improve later traffic-control actions from workflow feedback. R2 places parameter updates on the LLM side.",
    "rubric_path": [

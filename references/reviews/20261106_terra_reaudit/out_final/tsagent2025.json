@@ -13,7 +13,9 @@
   "anomaly_detection_diagnosis"
  ],
  "other_tasks": [
-  "temporal_question_answering"
+  "temporal_question_answering",
+  "anomaly_detection",
+  "closed_question_answering"
  ],
  "modules": [
   {
@@ -32,7 +34,9 @@
     "anomaly_detection_diagnosis"
    ],
    "other_tasks": [
-    "temporal_question_answering"
+    "temporal_question_answering",
+    "anomaly_detection",
+    "closed_question_answering"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK no: the loop selects actions across question types without embedding one task family's output requirement or verifier. R3_2_GTS no: the thought/action/observation state and the evidence log accumulate observations of any tool; the log imposes no windows, frequency, units or availability-time semantics. R3_3_GH yes: it manages execution and state; the evidence log only functions together with the loop, so it is merged here.",
@@ -85,7 +89,9 @@
     "anomaly_detection_diagnosis"
    ],
    "other_tasks": [
-    "temporal_question_answering"
+    "temporal_question_answering",
+    "anomaly_detection",
+    "closed_question_answering"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK no: the library supports summarization, extraction, querying, detection, prediction, and relations across question types. R3_2_GTS yes: its tools operate on raw numerical series and temporal windows, slices, segments, and resampling; the same operators remain useful across task families. R3_3_GH is not reached because temporal data semantics are more specific.",
@@ -134,7 +140,9 @@
     "anomaly_detection_diagnosis"
    ],
    "other_tasks": [
-    "temporal_question_answering"
+    "temporal_question_answering",
+    "anomaly_detection",
+    "closed_question_answering"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK no: it reviews tool use and evidence across question types, rather than imposing one task-family criterion. R3_2_GTS no: it consumes time-series results but does not itself implement windows, chronology, or availability semantics. R3_3_GH yes: it changes later runtime actions through feedback; a TSK critic would require task-specific review rules, while this execution review is shared.",
@@ -179,7 +187,8 @@
    "llm_route": [],
    "tasks": [],
    "other_tasks": [
-    "temporal_question_answering"
+    "temporal_question_answering",
+    "closed_question_answering"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK yes: the gate checks question-intent predicates and answer schemas, so another task family would require different requirements and verifiers. If it were GTS, it would validate temporal validity independently of task; this gate validates a temporal QA answer's task-specific schema and evidence requirements. R3_2_GTS is not selected because R3_1 matches first.",

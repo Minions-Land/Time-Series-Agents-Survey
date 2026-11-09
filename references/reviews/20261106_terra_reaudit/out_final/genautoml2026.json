@@ -18,7 +18,9 @@
   "anomaly_detection_diagnosis"
  ],
  "other_tasks": [
-  "value_forecasting"
+  "value_forecasting",
+  "anomaly_detection",
+  "point_forecast"
  ],
  "modules": [
   {
@@ -36,7 +38,9 @@
     "anomaly_detection_diagnosis"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "anomaly_detection",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1 TSK: the procedure generates candidate architectures for defined forecast/reconstruction objectives and evaluates them by task losses; changing task objectives changes the architectures and optimization criteria. Counterfactual: the synthesis objective and training/search setup must change across forecasting and anomaly detection, so not generic temporal handling (GTS) or task-neutral runtime (GH).",
@@ -82,7 +86,8 @@
     "forecasting_prediction"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1 TSK: validation asserts the required forecast horizon output shape and repairs violations against this task-specific contract. Counterfactual: the output horizon and verifier must be redesigned for another task; it is not generic GTS temporal evidence validation or task-neutral GH error recovery.",
@@ -127,7 +132,9 @@
     "anomaly_detection_diagnosis"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "anomaly_detection",
+    "point_forecast"
    ],
    "role": "infrastructure",
    "scope_reason": "R3_1 TSK no: registry discovery and code hot-swapping do not embody a task output criterion. R3_2 GTS no: class loading and module-cache updates need no temporal semantics. R3_3 GH yes: this is task-neutral runtime execution and integration.",
@@ -180,7 +187,9 @@
     "anomaly_detection_diagnosis"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "anomaly_detection",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1 TSK no: the wrapper does not define a task objective; R3_2 GTS yes: it computes and reverses per-instance statistics across temporal input windows to stabilize numerical series, independent of a single task; R3_3 GH is therefore not reached.",
@@ -234,7 +243,9 @@
     "anomaly_detection_diagnosis"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "anomaly_detection",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1 TSK no: resampling and causal imputation do not embed one task's output criterion; R3_2 GTS yes: they explicitly depend on sampling frequency, timestamps, and information availability to prevent look-ahead leakage; R3_3 GH is not reached.",

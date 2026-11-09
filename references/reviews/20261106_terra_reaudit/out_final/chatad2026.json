@@ -26,7 +26,10 @@
   "time_series_classification",
   "imputation",
   "temporal_question_answering",
-  "value_forecasting"
+  "value_forecasting",
+  "anomaly_detection",
+  "point_forecast",
+  "open_question_answering"
  ],
  "modules": [
   {
@@ -43,7 +46,9 @@
     "data_augmentation_synthesis",
     "anomaly_detection_diagnosis"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "anomaly_detection"
+   ],
    "role": "training_data",
    "scope_reason": "R2 places this on the LLM side because the multi-agent procedure synthesizes time-series instruction supervision for SFT rather than serving as an inference harness. R3 does not apply to this model-side module.",
    "rubric_path": [
@@ -85,7 +90,9 @@
     "data_augmentation_synthesis",
     "anomaly_detection_diagnosis"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "anomaly_detection"
+   ],
    "role": "training_data",
    "scope_reason": "R2 places this contributed dataset on the LLM side because it supplies multi-turn anomaly-detection instruction data used to train ChatAD. R3 does not apply to this model-side module.",
    "rubric_path": [
@@ -126,7 +133,9 @@
    "tasks": [
     "anomaly_detection_diagnosis"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "anomaly_detection"
+   ],
    "role": "model_training",
    "scope_reason": "R2 places LoRA SFT on the LLM side because it updates the model adapter to produce anomaly-detection responses. R3 does not apply to this model-side module.",
    "rubric_path": [
@@ -170,7 +179,9 @@
    "other_tasks": [
     "time_series_classification",
     "imputation",
-    "temporal_question_answering"
+    "temporal_question_answering",
+    "anomaly_detection",
+    "open_question_answering"
    ],
    "role": "model_training",
    "scope_reason": "R2 places TKTO on the LLM side because it optimizes ChatAD model parameters using scored outputs. R3 does not apply to this model-side module.",
@@ -217,7 +228,10 @@
     "time_series_classification",
     "imputation",
     "temporal_question_answering",
-    "value_forecasting"
+    "value_forecasting",
+    "anomaly_detection",
+    "point_forecast",
+    "open_question_answering"
    ],
    "role": "evaluation",
    "scope_reason": "R3_1_TSK applies because the benchmark's core logic embeds task-specific output parsing and metrics for anomaly detection, forecasting, imputation, classification, and reasoning; its evaluators and criteria must be redesigned when those task semantics change. The temporal data being evaluated does not make this a GTS mechanism because the module is bound to task objectives, and it is not GH because it is an evaluation resource rather than task-independent execution management.",

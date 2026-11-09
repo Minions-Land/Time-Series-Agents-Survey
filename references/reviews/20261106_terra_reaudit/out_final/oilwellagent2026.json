@@ -12,7 +12,11 @@
  "task_memberships": [
   "anomaly_detection_diagnosis"
  ],
- "other_tasks": [],
+ "other_tasks": [
+  "anomaly_detection",
+  "diagnostic_explanation",
+  "root_cause_identification"
+ ],
  "modules": [
   {
    "id": "oilwellagent2026:temporal-metric-computation",
@@ -29,7 +33,9 @@
    "tasks": [
     "anomaly_detection_diagnosis"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "anomaly_detection"
+   ],
    "role": "method",
    "scope_reason": "The module transforms baseline and event windows into numerical and categorical sensor features. R3_1_TSK is no because the same window-based feature operation does not embed an anomaly output objective; counterfactually changing task objectives does not require redesigning the temporal transformation. R3_2_GTS is yes because it explicitly depends on baseline/event windows and computes temporal statistics.",
    "rubric_path": [
@@ -72,7 +78,9 @@
    "tasks": [
     "anomaly_detection_diagnosis"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "root_cause_identification"
+   ],
    "role": "method",
    "scope_reason": "The profiles organize temporal sensor statistics and domain knowledge around nine anomaly classes. R3_1_TSK is yes because the profile schema embeds anomaly-class diagnostic criteria; changing task family would require redesigning the profiles. GTS is not selected because the module's controlling scope is the anomaly diagnosis objective rather than a task-agnostic temporal service.",
    "rubric_path": [
@@ -110,7 +118,9 @@
    "tasks": [
     "anomaly_detection_diagnosis"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "diagnostic_explanation"
+   ],
    "role": "method",
    "scope_reason": "The procedure requests ranked anomaly candidates, sensor-grounded explanations, validity judgments, and novelty names. R3_1_TSK is yes because these output and validation criteria are explicitly bound to anomaly diagnosis; changing task family requires changing the prompt and output schema. GTS is not selected because temporal order is input evidence, not the procedure's controlling objective.",
    "rubric_path": [

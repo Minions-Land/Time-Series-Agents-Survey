@@ -21,7 +21,8 @@
   "forecasting_prediction"
  ],
  "other_tasks": [
-  "value_forecasting"
+  "value_forecasting",
+  "point_forecast"
  ],
  "modules": [
   {
@@ -43,7 +44,8 @@
     "forecasting_prediction"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "infrastructure",
    "scope_reason": "R3_1 is false for the retrieval tools separated from forecast submission and scoring: historical bars, indicators and ranks do not embed a forecasting output or loss. R3_2 applies because windows, candle resolution and the decision-date cutoff define their semantics. Changing to anomaly diagnosis could retain these retrieval and cutoff semantics.",
@@ -98,7 +100,8 @@
     "forecasting_prediction"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "evaluation",
    "scope_reason": "R3_1 applies: the task fixes a stock, decision date and forecast horizon, terminates with a numerical log-return prediction, and scores direction and magnitude against its realized return. A different task family requires a new target, terminal action and scorer; chronology alone does not make this benchmark GTS.",
@@ -148,7 +151,8 @@
     "forecasting_prediction"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "training_data",
    "scope_reason": "R2 places data built to train model analysis, tool actions and numerical responses on the LLM side; R3 Harness tests do not apply. The teacher-only outcome context is removed from student prompts, but its generated trajectories and realized-return targets supervise the model.",
@@ -193,7 +197,8 @@
     "forecasting_prediction"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "model_training",
    "scope_reason": "R2 applies to parameter updates learning analysis, tool calls and terminal forecasts. These are LLM-side policy changes, not Harness Optimization and Evolution; R3 does not apply. SFT and PPO form the reported staged training recipe for one policy.",

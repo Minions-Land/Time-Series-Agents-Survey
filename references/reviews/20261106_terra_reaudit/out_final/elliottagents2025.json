@@ -28,7 +28,10 @@
  "other_tasks": [
   "temporal_analysis",
   "event_forecasting",
-  "value_forecasting"
+  "value_forecasting",
+  "advisory_decision",
+  "autonomous_control",
+  "point_forecast"
  ],
  "modules": [
   {
@@ -48,7 +51,9 @@
    "other_tasks": [
     "temporal_analysis",
     "event_forecasting",
-    "value_forecasting"
+    "value_forecasting",
+    "advisory_decision",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1: the hierarchy itself has no forecasting horizon, trading reward, or task-specific verifier; changing task family does not require redesigning delegation. R3_2: asynchronous decomposition and bidirectional reporting do not require temporal semantics. R3_3 therefore assigns GH.",
@@ -110,7 +115,9 @@
    "other_tasks": [
     "temporal_analysis",
     "event_forecasting",
-    "value_forecasting"
+    "value_forecasting",
+    "advisory_decision",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1: the dedicated interface prepares stock data without encoding a forecast or trading objective; it can serve another task without changing its inputs. R3_2: user-specified timeframe and sampling interval determine its temporal data interface, so GTS.",
@@ -166,7 +173,9 @@
    "other_tasks": [
     "temporal_analysis",
     "event_forecasting",
-    "value_forecasting"
+    "value_forecasting",
+    "advisory_decision",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1: this tool enumerates candidate wave structures and overlays them on historical charts; it does not select a future forecast, action, or reward. The same extraction can feed forecasting or decision support unchanged. R3_2: ordered price-wave relationships are temporal numerical processing, so GTS.",
@@ -224,7 +233,9 @@
     "decision_support"
    ],
    "other_tasks": [
-    "event_forecasting"
+    "event_forecasting",
+    "autonomous_control",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1: backtesting evaluates predictive wave patterns and learns buy/sell/hold strategies for long-term returns. Changing task family requires redesigning the trading actions, reward, and predictive criterion, so TSK takes precedence over temporal processing and retained historical experience. DRL is an external trading component; the packet does not show LLM-policy training.",
@@ -286,7 +297,9 @@
    ],
    "other_tasks": [
     "event_forecasting",
-    "value_forecasting"
+    "value_forecasting",
+    "advisory_decision",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1: the procedure selects a market-wave scenario using backtest results and synthesizes price targets, dates, buy/sell signals, and contingency plans. Another task family would require different outputs and selection objectives, so TSK. Merely consuming temporal analyses does not itself establish a separate temporal function.",

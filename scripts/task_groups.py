@@ -76,7 +76,16 @@ CELL = {
     'value_forecasting': ('regression', 'after'), 'event_forecasting': ('classification', 'after'),
     'decision_support': ('decision', 'after'), 'traffic_signal_control': ('decision', 'after'),
     'demand_optimization': ('decision', 'after'),
+    # second labels (fine): they replace the coarse label of the same record in the grid
+    'closed_question_answering': ('classification', 'before'), 'open_question_answering': ('generation', 'before'),
+    'anomaly_detection': ('classification', 'before'), 'root_cause_identification': ('classification', 'before'),
+    'diagnostic_explanation': ('generation', 'before'),
+    'advisory_decision': ('decision', 'after'), 'autonomous_control': ('decision', 'after'),
 }
+QA_FINE = {'closed_question_answering', 'open_question_answering', 'value_forecasting', 'event_forecasting'}
+FINE = {'temporal_question_answering': QA_FINE, 'temporal_analysis': QA_FINE,
+        'anomaly_detection_diagnosis': {'anomaly_detection', 'root_cause_identification', 'diagnostic_explanation'}}
+FORM = ('point_forecast', 'probabilistic_forecast')   # form of a forecast, orthogonal to the cell
 MODES = ['regression', 'classification', 'generation', 'decision']
 
 
@@ -124,12 +133,16 @@ def summary():
 
 def grid():
     """Works per (mode, time) cell; method-only labels (representation, transfer learning) have no cell."""
-    cells, none = Counter(), Counter()
+    cells, leaves, none = Counter(), Counter(), Counter()
     for r in records():
         labs = set(labels(r)) | {x for m in r.get('modules') or [] for x in labels(m)}
+        labs -= {c for c, fine in FINE.items() if labs & fine}
         for c in {CELL[x] for x in labs if x in CELL}: cells[c] += 1
-        for x in labs - set(CELL) - {'forecasting_prediction'}: none[x] += 1
-    return {'cells': {f'{m}:{t}': cells[(m, t)] for m in MODES for t in ('before', 'after')}, 'no_cell': dict(none)}
+        for x in labs:
+            if x in CELL or x in FORM: leaves[f'{CELL[x][0]}:{CELL[x][1]}:{x}' if x in CELL else f'form:{x}'] += 1
+        for x in labs - set(CELL) - set(FORM) - {'forecasting_prediction'}: none[x] += 1
+    return {'cells': {f'{m}:{t}': cells[(m, t)] for m in MODES for t in ('before', 'after')},
+            'leaves': dict(sorted(leaves.items())), 'no_cell': dict(none)}
 
 
 if __name__ == '__main__':

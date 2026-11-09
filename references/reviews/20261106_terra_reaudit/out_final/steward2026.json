@@ -18,7 +18,9 @@
   "decision_support"
  ],
  "other_tasks": [
-  "event_forecasting"
+  "event_forecasting",
+  "autonomous_control",
+  "point_forecast"
  ],
  "evaluation_evidence": {
   "process_validity": {
@@ -61,7 +63,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "method",
    "scope_reason": "R3_1_TSK applies because the roles produce market ratings, portfolio targets and trade approvals. If the task family changed, the portfolio state, role schemas and action semantics would need redesign; although the inputs include time series, the module is not task-agnostic GTS.",
    "rubric_path": [
@@ -106,7 +110,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "method",
    "scope_reason": "R3_1_TSK applies because the memory schema stores holdings, entry theses, risk verdicts, projected portfolio state and investment calibration. A different task family would require redesigning these state fields; its chronological organization is temporal but not a task-agnostic GTS memory.",
    "rubric_path": [
@@ -153,7 +159,9 @@
     "decision_support"
    ],
    "other_tasks": [
-    "event_forecasting"
+    "event_forecasting",
+    "autonomous_control",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK applies because the grading criteria score trading decisions and next-day investment calls against realized market outcomes. A different task family would require different outputs and reward criteria; this is task-specific feedback, not generic temporal validation.",
@@ -198,7 +206,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "method",
    "scope_reason": "R3_1 TSK: yes - the Meta Reflector reads a digest of alpha against SPY, size calibration, missed themes and root causes of wrong trades, targets the trading agents, and the replay harness compares symbols added, dropped or resized; with another task family the digest, target schema and replay comparison would be redesigned.",
    "rubric_path": [
@@ -237,7 +247,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "method",
    "scope_reason": "R3_1 TSK: no - the gate's checks (schema, allow-list, append-only marked section, absolute-word tripwire, Jaccard 0.6 similarity, FIFO cap of ten, three agents per cycle, one git commit per cycle) never refer to prices, portfolios or any task output. R3_2 GTS: no - none uses windows, frequency or information availability. R3_3 GH: yes - it governs state changes to agent prompts and would work unchanged for non-temporal agents.",
    "rubric_path": [
@@ -283,7 +295,9 @@
    "tasks": [
     "decision_support"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "autonomous_control"
+   ],
    "role": "method",
    "scope_reason": "R3_1_TSK applies because the core's order arithmetic, portfolio caps, stops and loss breaker enforce trading-specific objectives. Under a task-family change, the action space, temporal state and verifier would need redesign; the rules are not generic GTS validation.",
    "rubric_path": [

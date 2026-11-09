@@ -13,7 +13,8 @@
   "forecasting_prediction"
  ],
  "other_tasks": [
-  "value_forecasting"
+  "value_forecasting",
+  "point_forecast"
  ],
  "modules": [
   {
@@ -35,7 +36,8 @@
     "forecasting_prediction"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1 yes: the workspace state holds the immutable baseline forecast and the editable forecast Ft, and its action set and validity checks (revisions inside the forecast horizon, no overwriting baseline, no duplicate edits) are the forecast-revision output contract. Counterfactual: for another task family (e.g. anomaly diagnosis) the state fields, operators and verifier would be redesigned. Aligned index and immutable history alone would be GTS, but here they cannot be separated from the forecast-edit operators, which only function together with the state.",
@@ -86,7 +88,8 @@
     "forecasting_prediction"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1 no: retrieval and calendar-lookup tools do not embed a forecast objective. R3_2 yes: they depend on aligned past windows, same-period analogues and calendar information for event windows. Counterfactual: windowed retrieval would persist for other task families.",
@@ -127,7 +130,8 @@
     "forecasting_prediction"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1 yes: the horizon is decomposed into forecast event windows and the reducer emits forecast revisions into the editable forecast. Counterfactual: the planner and its output contract would change for a non-forecast task. Event windowing is the processing function.",
@@ -170,7 +174,8 @@
     "forecasting_prediction"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1 yes: reflection compares realized outcomes against the baseline and the revised forecast and writes forecast-calibration critiques. Counterfactual: the verifier (realized forecast error relative to baseline) must change for another task family. The availability of memory is incidental.",

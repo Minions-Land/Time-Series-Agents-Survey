@@ -18,7 +18,9 @@
  ],
  "other_tasks": [
   "temporal_question_answering",
-  "value_forecasting"
+  "value_forecasting",
+  "point_forecast",
+  "closed_question_answering"
  ],
  "modules": [
   {
@@ -37,7 +39,9 @@
    ],
    "other_tasks": [
     "temporal_question_answering",
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast",
+    "closed_question_answering"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK is no: retrying malformed or failing SQL does not itself encode either task's output objective. R3_2_GTS is no: repair state is SQL execution success or error, not temporal order, windows, units, or availability; the temporal-query counterfactual leaves this repair loop reusable. R3_3_GH applies because it manages bounded execution and repair.",
@@ -82,7 +86,8 @@
     "forecasting_prediction"
    ],
    "other_tasks": [
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK applies: the tool embeds a fixed historical-input-to-future-price forecasting objective and horizon; changing task family requires redesigning its prediction output and procedure. R3_2_GTS is not reached because the task-specific forecasting criterion is the first match (although the tool also processes temporal windows and missing values).",
@@ -121,7 +126,9 @@
    ],
    "other_tasks": [
     "temporal_question_answering",
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast",
+    "closed_question_answering"
    ],
    "role": "method",
    "scope_reason": "R3_1_TSK applies: the Analyzer selects task-specific prompts and derives task outputs from forecast values, including numerical forecasts and forecast-based comparisons. Switching task family requires changing its query classes, answer rules, and output format; temporal-value processing is embedded in the procedure.",
@@ -162,7 +169,9 @@
    ],
    "other_tasks": [
     "temporal_question_answering",
-    "value_forecasting"
+    "value_forecasting",
+    "point_forecast",
+    "closed_question_answering"
    ],
    "role": "evaluation",
    "scope_reason": "R3_1_TSK applies: the benchmark encodes forecast and forecast-based reasoning outputs with temporal ground-truth labels and task-specific evaluation. A different task family requires replacing its questions, labels, and scoring criteria; it is a resource-level test set under R5.",
