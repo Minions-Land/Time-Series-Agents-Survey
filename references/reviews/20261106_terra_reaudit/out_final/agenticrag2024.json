@@ -19,7 +19,8 @@
  ],
  "other_tasks": [
   "imputation",
-  "time_series_classification"
+  "time_series_classification",
+  "value_forecasting"
  ],
  "modules": [
   {
@@ -39,7 +40,8 @@
    ],
    "other_tasks": [
     "imputation",
-    "time_series_classification"
+    "time_series_classification",
+    "value_forecasting"
    ],
    "role": "method",
    "scope_reason": "R3_1 no: routing embeds no task output requirement; adding a task family only adds a sub-agent to the action set. R3_2 no: no temporal semantics. R3_3 yes: ReAct delegation to sub-agents invoked as tools (L112-L114).",
@@ -88,7 +90,8 @@
    ],
    "other_tasks": [
     "imputation",
-    "time_series_classification"
+    "time_series_classification",
+    "value_forecasting"
    ],
    "role": "model_training",
    "scope_reason": "R2 LLM: QLoRA/PEFT updates SLM parameters on task datasets. R6: supervision shaping analytical outputs, so instruction_reasoning. Scope is instruction tuning only; DPO is split out.",
@@ -124,7 +127,8 @@
    ],
    "other_tasks": [
     "imputation",
-    "time_series_classification"
+    "time_series_classification",
+    "value_forecasting"
    ],
    "role": "model_training",
    "scope_reason": "R2 LLM: preference optimization updates SLM parameters; the masked binary classification supplies the preference signal. R6: aligns analytical outputs, so instruction_reasoning. Ablated separately (W/O DPO) in the paper.",
@@ -160,7 +164,8 @@
    ],
    "other_tasks": [
     "imputation",
-    "time_series_classification"
+    "time_series_classification",
+    "value_forecasting"
    ],
    "role": "method",
    "scope_reason": "R2 LLM: the pool values are continuous embeddings concatenated with the input embedding and projected by a learnable matrix W, trained with the SLM (differentiable); this changes how the model receives temporal input. A Harness memory reading is the alternative, but R2's boundary (parameter-trained, not an external store) favours LLM.",

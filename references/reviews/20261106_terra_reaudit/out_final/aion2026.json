@@ -1,380 +1,387 @@
 {
-  "citation_key": "aion2026",
-  "status": "paper_verified",
-  "role_of_work": "feedback_driven_agent",
-  "claim_summary": "Aion formalizes next-generation time-series tasks and contributes a governed harness that grounds execution in temporal constraints, evidence, and review.",
-  "claim_evidence": [
-    {
-      "line": 99,
-      "quote": "We introduce next-generation time series tasks defined by task files, workspaces, and validation interfaces."
-    },
-    {
-      "line": 102,
-      "quote": "We present Aion ∞ as a time series harness built from agents, skills, rules, memory, evaluation, and protocols."
-    }
-  ],
-  "task_memberships": [
-    "forecasting_prediction"
-  ],
-  "other_tasks": [
-    "temporal_analysis"
-  ],
-  "modules": [
-    {
-      "id": "aion2026:task_specification",
-      "name": "Task, workspace, and validation specification",
-      "layer": "TSK",
-      "dimensions": [
-        "Interface and Interaction"
-      ],
-      "functions": [
-        "validation"
-      ],
-      "view_status": "task_procedure",
-      "llm_route": [],
-      "tasks": [
-        "forecasting_prediction"
-      ],
-      "other_tasks": [
-        "temporal_analysis"
-      ],
-      "role": "method",
-      "scope_reason": "R3_1_TSK applies because the task file declares output form, constraints, and evaluation criteria; changing the task family changes those requirements. The schema organizes task-specific outputs and validation, rather than temporal state or tools that can remain unchanged across task families.",
-      "rubric_path": [
-        "R1:contributed",
-        "R2:Harness",
-        "R3_1_TSK:yes - embeds output requirements and validation criteria"
-      ],
-      "reuse_evidence": {
-        "level": "not_applicable",
-        "tasks": [],
-        "basis": "module"
-      },
-      "evidence": [
-        {
-          "line": 152,
-          "quote": "A Next-Generation Time Series Task is a tuple in Eq. (1) that contains three components: a task file ϕ, a workspace W, and a validation interface V."
-        },
-        {
-          "line": 184,
-          "quote": "ϕ is the explicit statement of the problem. It declares the access scope T, the prior knowledge Σ, the output form O, the constraints C, and the performance evaluation metrics A in Eq. (2)."
-        }
-      ],
-      "confidence": "high"
-    },
-    {
-      "id": "aion2026:lifecycle",
-      "name": "Harness roles and execution protocols",
-      "layer": "GH",
-      "dimensions": [
-        "Planning and Orchestration"
-      ],
-      "functions": [],
-      "view_status": "general_runtime",
-      "llm_route": [],
-      "tasks": [
-        "forecasting_prediction"
-      ],
-      "other_tasks": [
-        "temporal_analysis"
-      ],
-      "role": "method",
-      "scope_reason": "R3_1_TSK does not apply because dispatch and lifecycle communication do not encode a task-family objective. R3_2_GTS does not apply because the shared state and handoff mechanisms can operate without temporal semantics; changing the task family does not require redesigning them. R3_3_GH applies to general execution coordination.",
-      "rubric_path": [
-        "R1:contributed",
-        "R2:Harness",
-        "R3_1_TSK:no - no task-family objective",
-        "R3_2_GTS:no - generic execution state and communication",
-        "R3_3_GH:yes - manages execution and coordination"
-      ],
-      "reuse_evidence": {
-        "level": "demonstrated",
-        "tasks": [
-          "forecasting_prediction",
-          "temporal_analysis"
-        ],
-        "basis": "module",
-        "rule": "two or more task groups (scripts/task_groups.py)"
-      },
-      "evidence": [
-        {
-          "line": 209,
-          "quote": "Aion ∞ is built from six component groups: agents, skills, rules, memory, evaluation, and protocols."
-        },
-        {
-          "line": 1946,
-          "quote": "In Aion ∞ , the lifecycle model requires states such as assignment, context alignment, input validation, execution, self-review, report preparation, completion, and blockage, together with transition reasons and expected next states."
-        }
-      ],
-      "confidence": "high"
-    },
-    {
-      "id": "aion2026:memory",
-      "name": "Persistent workflow memory",
-      "layer": "GH",
-      "dimensions": [
-        "Memory and Context"
-      ],
-      "functions": [],
-      "view_status": "general_runtime",
-      "llm_route": [],
-      "tasks": [
-        "forecasting_prediction"
-      ],
-      "other_tasks": [
-        "temporal_analysis"
-      ],
-      "role": "method",
-      "scope_reason": "R3_1_TSK does not apply because these records preserve reusable priors and runtime state rather than a task-family objective. R3_2_GTS does not apply because the memory structures are general workflow records, not temporal retrieval tied to availability time; they can persist across tasks without redesign. R3_3_GH applies to general harness state.",
-      "rubric_path": [
-        "R1:contributed",
-        "R2:Harness",
-        "R3_1_TSK:no - no task-family objective",
-        "R3_2_GTS:no - generic workflow memory",
-        "R3_3_GH:yes - manages persistent state"
-      ],
-      "reuse_evidence": {
-        "level": "demonstrated",
-        "tasks": [
-          "forecasting_prediction",
-          "temporal_analysis"
-        ],
-        "basis": "module",
-        "rule": "two or more task groups (scripts/task_groups.py)"
-      },
-      "evidence": [
-        {
-          "line": 1694,
-          "quote": "Memory is the persistent layer of the harness."
-        },
-        {
-          "line": 1710,
-          "quote": "In Aion ∞ , positive memory records validated priors, useful strategies, recommended defaults, and reusable experience, always with scope and limits attached."
-        }
-      ],
-      "confidence": "high"
-    },
-    {
-      "id": "aion2026:validation",
-      "name": "Temporal admissibility checks",
-      "layer": "GTS",
-      "dimensions": [
-        "Planning and Orchestration"
-      ],
-      "functions": [
-        "validation"
-      ],
-      "view_status": "mapped",
-      "llm_route": [],
-      "tasks": [
-        "forecasting_prediction"
-      ],
-      "other_tasks": [
-        "temporal_analysis"
-      ],
-      "role": "method",
-      "scope_reason": "R3_1_TSK does not apply to the temporal checks themselves: the core check is temporal admissibility, not a task-family-specific score or output objective. R3_2_GTS applies because checks depend on forecast windows, cutoffs, alignment, and leakage boundaries; changing task family can preserve these temporal checks. R3_3_GH is less specific because temporal semantics govern acceptance and recheck.",
-      "rubric_path": [
-        "R1:contributed",
-        "R2:Harness",
-        "R3_1_TSK:no - checks temporal admissibility rather than task score",
-        "R3_2_GTS:yes - depends on temporal windows and information boundaries"
-      ],
-      "reuse_evidence": {
-        "level": "demonstrated",
-        "tasks": [
-          "forecasting_prediction",
-          "temporal_analysis"
-        ],
-        "basis": "module",
-        "rule": "two or more task groups (scripts/task_groups.py)"
-      },
-      "evidence": [
-        {
-          "line": 195,
-          "quote": "where g records validity checks such as timestamp alignment, leakage boundaries, or format compliance, and s records scored metrics such as forecasting error, profit, or report quality."
-        },
-        {
-          "line": 769,
-          "quote": "but it does not turn the forecast boundary into an explicit constraint check. The core distinction is that Aion ∞ does not only use temporal features; it uses the forecast horizon and history boundary to govern strategy selection and execution."
-        }
-      ],
-      "confidence": "high"
-    },
-    {
-      "id": "aion2026:grounding",
-      "name": "Temporal task and data interface",
-      "layer": "GTS",
-      "dimensions": [
-        "Interface and Interaction",
-        "Tools and Execution"
-      ],
-      "functions": [
-        "data_management"
-      ],
-      "view_status": "mapped",
-      "llm_route": [],
-      "tasks": [
-        "forecasting_prediction"
-      ],
-      "other_tasks": [
-        "temporal_analysis"
-      ],
-      "role": "method",
-      "scope_reason": "R3_1_TSK does not apply because the normalized interface exposes temporal data and boundaries across task objectives. R3_2_GTS applies because the interface depends on timestamps, frequency, granularity, and cutoff; changing task family may change the target but not the temporal data-management mechanism. R3_3_GH is less specific because temporal semantics are built into the interface.",
-      "rubric_path": [
-        "R1:contributed",
-        "R2:Harness",
-        "R3_1_TSK:no - not bound to one task-family objective",
-        "R3_2_GTS:yes - manages temporal data and boundaries"
-      ],
-      "reuse_evidence": {
-        "level": "demonstrated",
-        "tasks": [
-          "forecasting_prediction",
-          "temporal_analysis"
-        ],
-        "basis": "module",
-        "rule": "two or more task groups (scripts/task_groups.py)"
-      },
-      "evidence": [
-        {
-          "line": 307,
-          "quote": "Once the task requirements are clear, Aion ∞ defines the data interface that will support those task requirements."
-        },
-        {
-          "line": 1326,
-          "quote": "A normalized time-series interface should make the following fields explicit before downstream work begins."
-        }
-      ],
-      "confidence": "high"
-    },
-    {
-      "id": "aion2026:evaluation",
-      "name": "Evaluation and release-readiness framework",
-      "layer": "GH",
-      "dimensions": [
-        "Planning and Orchestration"
-      ],
-      "functions": [],
-      "view_status": "general_runtime",
-      "llm_route": [],
-      "tasks": [
-        "forecasting_prediction"
-      ],
-      "other_tasks": [
-        "temporal_analysis"
-      ],
-      "role": "evaluation",
-      "scope_reason": "R3_1_TSK does not apply to the generic suite, grading, aggregation, and release-gate framework; task-specific metrics are configured as criteria. R3_2_GTS does not apply to the framework mechanism itself, which operates on run artifacts and verdicts without temporal state assumptions. R3_3_GH applies to general evaluation and acceptance control.",
-      "rubric_path": [
-        "R1:contributed",
-        "R2:Harness",
-        "R3_1_TSK:no - general evaluation framework, configurable task criteria",
-        "R3_2_GTS:no - generic run evaluation and acceptance",
-        "R3_3_GH:yes - governs evaluation and release control"
-      ],
-      "reuse_evidence": {
-        "level": "demonstrated",
-        "tasks": [
-          "forecasting_prediction",
-          "temporal_analysis"
-        ],
-        "basis": "module",
-        "rule": "two or more task groups (scripts/task_groups.py)"
-      },
-      "evidence": [
-        {
-          "line": 1853,
-          "quote": "Evaluation is the measurement and acceptance layer of the harness."
-        },
-        {
-          "line": 1865,
-          "quote": "In Aion ∞ , a suite specification includes the goal, metric requirements, task types, task selection policy, local validation policy, platform prior policy, error analysis policy, modeling reflection policy, iteration policy, trial policy, and required artifacts."
-        }
-      ],
-      "confidence": "medium"
-    }
-  ],
-  "evaluation_evidence": {
-    "process_validity": {
-      "present": true,
-      "line": 735,
-      "quote": "The harnessed execution runs for 47.9 minutes, modifies 9 files, and goes through 3 critique rounds with 3 review interruptions."
-    },
-    "temporal_validity": {
-      "present": true,
-      "line": 758,
-      "quote": "The second distinction is temporal grounding. In the reconstructed task, the forecasting window covers 2017-07-31 to 2017-08-15, while the observable training history ends on 2017-07-30."
-    },
-    "task_performance": {
-      "present": true,
-      "line": 695,
-      "quote": "Table 2 Recorded outcome summary for the local Kaggle case. Lower RMSLE is better."
-    },
-    "decision_utility": {
-      "present": false,
-      "line": null,
-      "quote": null
-    }
+ "citation_key": "aion2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "Aion formalizes next-generation time-series tasks and contributes a governed harness that grounds execution in temporal constraints, evidence, and review.",
+ "claim_evidence": [
+  {
+   "line": 99,
+   "quote": "We introduce next-generation time series tasks defined by task files, workspaces, and validation interfaces."
   },
-  "reconciliation": [
+  {
+   "line": 102,
+   "quote": "We present Aion ∞ as a time series harness built from agents, skills, rules, memory, evaluation, and protocols."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "temporal_analysis",
+  "value_forecasting"
+ ],
+ "modules": [
+  {
+   "id": "aion2026:task_specification",
+   "name": "Task, workspace, and validation specification",
+   "layer": "TSK",
+   "dimensions": [
+    "Interface and Interaction"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_analysis",
+    "value_forecasting"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies because the task file declares output form, constraints, and evaluation criteria; changing the task family changes those requirements. The schema organizes task-specific outputs and validation, rather than temporal state or tools that can remain unchanged across task families.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - embeds output requirements and validation criteria"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
     {
-      "existing_id": "aion2026:lifecycle",
-      "decision": "split",
-      "new_ids": [
-        "aion2026:lifecycle",
-        "aion2026:memory"
-      ],
-      "changes": [
-        "dimensions: Planning and Workflow, Coordination and Scaling -> Planning and Orchestration",
-        "split persistent workflow memory into a separate module"
-      ],
-      "reason": "The packet describes execution protocols and persistent memory as distinct harness mechanisms. The protocols coordinate role handoffs and lifecycle control; the separate memory records preserve priors and runtime state."
+     "line": 152,
+     "quote": "A Next-Generation Time Series Task is a tuple in Eq. (1) that contains three components: a task file ϕ, a workspace W, and a validation interface V."
     },
     {
-      "existing_id": "aion2026:validation",
-      "decision": "change",
-      "new_ids": [
-        "aion2026:validation"
-      ],
-      "changes": [
-        "dimension: Control, Verification, and Feedback -> Planning and Orchestration"
-      ],
-      "reason": "The source supports temporal admissibility checks based on alignment, leakage boundaries, forecast horizons, and history cutoffs. The retired dimension maps to Planning and Orchestration for within-episode checking and control."
-    },
-    {
-      "existing_id": "aion2026:grounding",
-      "decision": "keep",
-      "new_ids": [
-        "aion2026:grounding"
-      ],
-      "changes": [],
-      "reason": "The source supports temporal data interfaces with explicit timestamp granularity, variable meaning, temporal boundaries, and leakage constraints."
-    },
-    {
-      "existing_id": null,
-      "decision": "split",
-      "new_ids": [
-        "aion2026:task_specification"
-      ],
-      "changes": [
-        "added TSK task specification module"
-      ],
-      "reason": "The task tuple and task file specify task outputs, constraints, and evaluation metrics, a distinct task procedure from reusable temporal admissibility checks."
-    },
-    {
-      "existing_id": null,
-      "decision": "keep",
-      "new_ids": [
-        "aion2026:evaluation"
-      ],
-      "changes": [
-        "added evaluation and release-readiness module"
-      ],
-      "reason": "The packet describes a concrete evaluation framework with suites, graders, aggregation, regression comparison, and release gates."
+     "line": 184,
+     "quote": "ϕ is the explicit statement of the problem. It declares the access scope T, the prior knowledge Σ, the output form O, the constraints C, and the performance evaluation metrics A in Eq. (2)."
     }
-  ],
-  "needs_human_review": false,
-  "notes": "The packet describes both a general task formulation and a harness; the case study is a forecasting task, while the broader task coverage is described as design scope."
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aion2026:lifecycle",
+   "name": "Harness roles and execution protocols",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_analysis",
+    "value_forecasting"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not apply because dispatch and lifecycle communication do not encode a task-family objective. R3_2_GTS does not apply because the shared state and handoff mechanisms can operate without temporal semantics; changing the task family does not require redesigning them. R3_3_GH applies to general execution coordination.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-family objective",
+    "R3_2_GTS:no - generic execution state and communication",
+    "R3_3_GH:yes - manages execution and coordination"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "temporal_analysis"
+    ],
+    "basis": "module",
+    "rule": "two or more task groups (scripts/task_groups.py)"
+   },
+   "evidence": [
+    {
+     "line": 209,
+     "quote": "Aion ∞ is built from six component groups: agents, skills, rules, memory, evaluation, and protocols."
+    },
+    {
+     "line": 1946,
+     "quote": "In Aion ∞ , the lifecycle model requires states such as assignment, context alignment, input validation, execution, self-review, report preparation, completion, and blockage, together with transition reasons and expected next states."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aion2026:memory",
+   "name": "Persistent workflow memory",
+   "layer": "GH",
+   "dimensions": [
+    "Memory and Context"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_analysis",
+    "value_forecasting"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not apply because these records preserve reusable priors and runtime state rather than a task-family objective. R3_2_GTS does not apply because the memory structures are general workflow records, not temporal retrieval tied to availability time; they can persist across tasks without redesign. R3_3_GH applies to general harness state.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task-family objective",
+    "R3_2_GTS:no - generic workflow memory",
+    "R3_3_GH:yes - manages persistent state"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "temporal_analysis"
+    ],
+    "basis": "module",
+    "rule": "two or more task groups (scripts/task_groups.py)"
+   },
+   "evidence": [
+    {
+     "line": 1694,
+     "quote": "Memory is the persistent layer of the harness."
+    },
+    {
+     "line": 1710,
+     "quote": "In Aion ∞ , positive memory records validated priors, useful strategies, recommended defaults, and reusable experience, always with scope and limits attached."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aion2026:validation",
+   "name": "Temporal admissibility checks",
+   "layer": "GTS",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "validation"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_analysis",
+    "value_forecasting"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not apply to the temporal checks themselves: the core check is temporal admissibility, not a task-family-specific score or output objective. R3_2_GTS applies because checks depend on forecast windows, cutoffs, alignment, and leakage boundaries; changing task family can preserve these temporal checks. R3_3_GH is less specific because temporal semantics govern acceptance and recheck.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - checks temporal admissibility rather than task score",
+    "R3_2_GTS:yes - depends on temporal windows and information boundaries"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "temporal_analysis"
+    ],
+    "basis": "module",
+    "rule": "two or more task groups (scripts/task_groups.py)"
+   },
+   "evidence": [
+    {
+     "line": 195,
+     "quote": "where g records validity checks such as timestamp alignment, leakage boundaries, or format compliance, and s records scored metrics such as forecasting error, profit, or report quality."
+    },
+    {
+     "line": 769,
+     "quote": "but it does not turn the forecast boundary into an explicit constraint check. The core distinction is that Aion ∞ does not only use temporal features; it uses the forecast horizon and history boundary to govern strategy selection and execution."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aion2026:grounding",
+   "name": "Temporal task and data interface",
+   "layer": "GTS",
+   "dimensions": [
+    "Interface and Interaction",
+    "Tools and Execution"
+   ],
+   "functions": [
+    "data_management"
+   ],
+   "view_status": "mapped",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_analysis",
+    "value_forecasting"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK does not apply because the normalized interface exposes temporal data and boundaries across task objectives. R3_2_GTS applies because the interface depends on timestamps, frequency, granularity, and cutoff; changing task family may change the target but not the temporal data-management mechanism. R3_3_GH is less specific because temporal semantics are built into the interface.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - not bound to one task-family objective",
+    "R3_2_GTS:yes - manages temporal data and boundaries"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "temporal_analysis"
+    ],
+    "basis": "module",
+    "rule": "two or more task groups (scripts/task_groups.py)"
+   },
+   "evidence": [
+    {
+     "line": 307,
+     "quote": "Once the task requirements are clear, Aion ∞ defines the data interface that will support those task requirements."
+    },
+    {
+     "line": 1326,
+     "quote": "A normalized time-series interface should make the following fields explicit before downstream work begins."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "aion2026:evaluation",
+   "name": "Evaluation and release-readiness framework",
+   "layer": "GH",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_analysis",
+    "value_forecasting"
+   ],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK does not apply to the generic suite, grading, aggregation, and release-gate framework; task-specific metrics are configured as criteria. R3_2_GTS does not apply to the framework mechanism itself, which operates on run artifacts and verdicts without temporal state assumptions. R3_3_GH applies to general evaluation and acceptance control.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - general evaluation framework, configurable task criteria",
+    "R3_2_GTS:no - generic run evaluation and acceptance",
+    "R3_3_GH:yes - governs evaluation and release control"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "temporal_analysis"
+    ],
+    "basis": "module",
+    "rule": "two or more task groups (scripts/task_groups.py)"
+   },
+   "evidence": [
+    {
+     "line": 1853,
+     "quote": "Evaluation is the measurement and acceptance layer of the harness."
+    },
+    {
+     "line": 1865,
+     "quote": "In Aion ∞ , a suite specification includes the goal, metric requirements, task types, task selection policy, local validation policy, platform prior policy, error analysis policy, modeling reflection policy, iteration policy, trial policy, and required artifacts."
+    }
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 735,
+   "quote": "The harnessed execution runs for 47.9 minutes, modifies 9 files, and goes through 3 critique rounds with 3 review interruptions."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 758,
+   "quote": "The second distinction is temporal grounding. In the reconstructed task, the forecasting window covers 2017-07-31 to 2017-08-15, while the observable training history ends on 2017-07-30."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 695,
+   "quote": "Table 2 Recorded outcome summary for the local Kaggle case. Lower RMSLE is better."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "aion2026:lifecycle",
+   "decision": "split",
+   "new_ids": [
+    "aion2026:lifecycle",
+    "aion2026:memory"
+   ],
+   "changes": [
+    "dimensions: Planning and Workflow, Coordination and Scaling -> Planning and Orchestration",
+    "split persistent workflow memory into a separate module"
+   ],
+   "reason": "The packet describes execution protocols and persistent memory as distinct harness mechanisms. The protocols coordinate role handoffs and lifecycle control; the separate memory records preserve priors and runtime state."
+  },
+  {
+   "existing_id": "aion2026:validation",
+   "decision": "change",
+   "new_ids": [
+    "aion2026:validation"
+   ],
+   "changes": [
+    "dimension: Control, Verification, and Feedback -> Planning and Orchestration"
+   ],
+   "reason": "The source supports temporal admissibility checks based on alignment, leakage boundaries, forecast horizons, and history cutoffs. The retired dimension maps to Planning and Orchestration for within-episode checking and control."
+  },
+  {
+   "existing_id": "aion2026:grounding",
+   "decision": "keep",
+   "new_ids": [
+    "aion2026:grounding"
+   ],
+   "changes": [],
+   "reason": "The source supports temporal data interfaces with explicit timestamp granularity, variable meaning, temporal boundaries, and leakage constraints."
+  },
+  {
+   "existing_id": null,
+   "decision": "split",
+   "new_ids": [
+    "aion2026:task_specification"
+   ],
+   "changes": [
+    "added TSK task specification module"
+   ],
+   "reason": "The task tuple and task file specify task outputs, constraints, and evaluation metrics, a distinct task procedure from reusable temporal admissibility checks."
+  },
+  {
+   "existing_id": null,
+   "decision": "keep",
+   "new_ids": [
+    "aion2026:evaluation"
+   ],
+   "changes": [
+    "added evaluation and release-readiness module"
+   ],
+   "reason": "The packet describes a concrete evaluation framework with suites, graders, aggregation, regression comparison, and release gates."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The packet describes both a general task formulation and a harness; the case study is a forecasting task, while the broader task coverage is described as design scope."
 }

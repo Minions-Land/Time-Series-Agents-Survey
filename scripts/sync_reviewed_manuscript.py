@@ -21,6 +21,8 @@ FAMILIES = {"forecasting_prediction": "Forecasting and prediction",
             "data_augmentation_synthesis": "Data augmentation and synthesis",
             "anomaly_detection_diagnosis": "Anomaly detection and diagnosis",
             "decision_support": "Decision support"}
+# second label of a forecasting work: rendered in place of the family name
+FORECAST = {"value_forecasting": "Value forecasting", "event_forecasting": "Event forecasting"}
 ROLES = [("feedback_driven_agent", "feedback-driven Agents"), ("fixed_workflow", "fixed workflows"),
          ("llm_side_technique", "LLM-side techniques"), ("resource", "resources")]
 CRITERIA = [("process_validity", "process validity"), ("temporal_validity", "temporal validity"),
@@ -46,8 +48,13 @@ def in_scope(r):
 def task_label(r):
     """Task families in canonical wording, then other task labels in lower case (e.g. time series classification)."""
     tasks = r['tasks']
-    labels = [FAMILIES[a] for a in tasks.get('axes', []) if a in FAMILIES]
-    labels += [o.replace('_', ' ') for o in tasks.get('other_labels', [])]
+    other = tasks.get('other_labels', [])
+    fc = [FORECAST[o] for o in FORECAST if o in other]
+    labels = []
+    for a in tasks.get('axes', []):
+        if a == 'forecasting_prediction' and fc: labels += fc
+        elif a in FAMILIES: labels.append(FAMILIES[a])
+    labels += [o.replace('_', ' ') for o in other if o not in FORECAST]
     return '; '.join(dict.fromkeys(labels))
 
 
@@ -89,7 +96,7 @@ def snapshot(records, active, mods):
     roles = Counter(r.get('role_of_work') for r in active)
     criteria = Counter(c for r in active for c, v in (r.get('evaluation_evidence') or {}).items() if v.get('present'))
     families = Counter(a for r in active for a in r['tasks'].get('axes', []))
-    others = Counter(o for r in active for o in r['tasks'].get('other_labels', []))
+    others = Counter(o for r in active for o in r['tasks'].get('other_labels', []) if o not in FORECAST)
     top_other = [o.replace('_', ' ') for o, _ in others.most_common(4)]
     listing = lambda items: ', '.join(items[:-1]) + ', and ' + items[-1]
     return (r'\textbf{Current ledger snapshot.} The database contains \textbf{' + str(len(records)) + r'} examined records: '

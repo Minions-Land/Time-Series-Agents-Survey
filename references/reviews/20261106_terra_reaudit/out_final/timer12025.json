@@ -16,7 +16,9 @@
  "task_memberships": [
   "forecasting_prediction"
  ],
- "other_tasks": [],
+ "other_tasks": [
+  "value_forecasting"
+ ],
  "modules": [
   {
    "id": "timer12025:forecast-template",
@@ -33,7 +35,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "method",
    "scope_reason": "R2 makes the parameter-free prompt Harness. R3_1_TSK matches because its task definition and output format require a complete future forecast over a specified horizon; changing task family requires redesigning those requirements, so temporal input formatting does not make the whole template GTS.",
    "rubric_path": [
@@ -81,7 +85,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "training_data",
    "scope_reason": "R2 explicitly places data built to train the model on the LLM side. Candidate forecasts are selected by MSE and reasoning is revised using true labels to construct forecasting supervision; this is not runtime memory or a GTS validator.",
    "rubric_path": [
@@ -129,7 +135,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "model_training",
    "scope_reason": "R2 assigns SFT and RL parameter optimization to LLM. The warmup, forecasting-specific rewards, and GRIP trajectory sampling and weighting constitute the contributed training recipe; no observation-conditioned tool policy is trained, so workflow_learning does not apply.",
    "rubric_path": [

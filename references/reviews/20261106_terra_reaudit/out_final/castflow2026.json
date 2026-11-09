@@ -12,7 +12,9 @@
  "task_memberships": [
   "forecasting_prediction"
  ],
- "other_tasks": [],
+ "other_tasks": [
+  "value_forecasting"
+ ],
  "modules": [
   {
    "id": "castflow2026:forecast-workflow",
@@ -27,7 +29,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "method",
    "scope_reason": "The planner schedules forecast diagnostics and the reflection gate returns failures to planning; forecasting criteria shape the procedure. For another task family the forecast horizon, baseline and output checks would change, so the core is TSK.",
    "rubric_path": [
@@ -69,7 +73,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "method",
    "scope_reason": "It selects an ensemble of forecasters by historical validation loss and produces the task's forecast baseline. Changing task family changes the forecast objective, model pool and horizon, so this is TSK.",
    "rubric_path": [
@@ -111,7 +117,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "method",
    "scope_reason": "The profiler computes distribution statistics and spectral entropy over the observed series, without defining a task output criterion. If the task changed, the same temporal computations would still characterize the input series, so it is GTS.",
    "rubric_path": [
@@ -157,7 +165,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "method",
    "scope_reason": "These tools compute time-dependent trends, changes, cross-channel dependencies and residual evidence. They operate on temporal sequence properties independently of task output criteria; the residual tool also guards against future-data leakage. Another task could reuse the same computations, so GTS.",
    "rubric_path": [
@@ -202,7 +212,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "method",
    "scope_reason": "The memory stores and retrieves forecast tool schedules, diagnostics and responses, with entries selected by horizon MSE. Its purpose embeds forecasting quality; another task would require a different stored trajectory and selection objective, so it is TSK.",
    "rubric_path": [
@@ -242,7 +254,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "model_training",
    "scope_reason": "This is the parameter-tuned LLM that produces evidence-conditioned numerical forecasts, so its mechanism changes model responses on the LLM side (R2), rather than an external Harness module.",
    "rubric_path": [
@@ -280,7 +294,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "training_data",
    "scope_reason": "The work constructs teacher-generated input, reasoning-trace and forecast pairs to train the forecasting LLM. Since this is purpose-built model training data, it is on the LLM side under R2.",
    "rubric_path": [

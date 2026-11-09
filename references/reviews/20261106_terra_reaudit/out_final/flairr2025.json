@@ -16,7 +16,9 @@
  "task_memberships": [
   "forecasting_prediction"
  ],
- "other_tasks": [],
+ "other_tasks": [
+  "value_forecasting"
+ ],
  "modules": [
   {
    "id": "flairr2025:refinement",
@@ -32,7 +34,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "method",
    "scope_reason": "R3_1_TSK applies: the loop scores forecasts against horizon ground truth, retains prompt/error history, revises instructions, and stops or selects prompts by MAE. Changing task family requires redesigning the output, error criterion, and refiner instructions. Prompting without parameter updates is Harness under R2; refinement is within a session, not demonstrated evolution across episodes.",
    "rubric_path": [
@@ -83,7 +87,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "method",
    "scope_reason": "R3_1_TSK does not apply to the retrieval mechanism itself: it ranks past windows by Pearson similarity rather than a forecast objective. Under the task-change counterfactual, historical-window matching and return of observed historical context can remain intact. R3_2_GTS applies because ordered windows and historical availability define its inputs. Count the specified integration into the forecaster context, not RAFT as a separately invented method.",
    "rubric_path": [
@@ -136,7 +142,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "method",
    "scope_reason": "R3_1_TSK applies: these contributed in-context procedures instruct forecast decomposition, scenario generation, and recombination. Changing task family requires redesigning their forecast output and reasoning objectives. They remain Harness under R2 because they are prompt templates, not trained model capabilities. Processing is supported by the STL decomposition/recombination strategy.",
    "rubric_path": [

@@ -7,6 +7,12 @@ Time-MQA: question answering). Groups:
   generation   - Generation: the output is a new series
   decision     - Decision Making: the output is an action
 
+Forecasting modules carry a second label: value_forecasting (numerical values after tau) or event_forecasting
+(a discrete outcome or event probability after tau); a module may carry both.
+
+CELL places each label in the output-mode x time grid: mode in {regression, classification, generation, decision},
+time in {before, after} the current time tau (decision is always after). `--grid` prints works per cell.
+
 usage: python3 scripts/task_groups.py            -> summary (works and modules per group, reuse by group)
        python3 scripts/task_groups.py --json     -> the same as JSON
 Import: from task_groups import GROUPS, LEAF, group_of, module_groups
@@ -45,12 +51,33 @@ LEAF = {
     'temporal_representation_learning': ('analysis', 'other'),
     'transfer_learning': ('analysis', 'other'),
     'forecasting_prediction': ('forecasting', 'forecasting'),
+    'value_forecasting': ('forecasting', 'value forecasting'),
+    'event_forecasting': ('forecasting', 'event forecasting'),
     'hydrologic_model_calibration': ('forecasting', 'forecasting'),
     'data_augmentation_synthesis': ('generation', 'generation'),
     'decision_support': ('decision', 'decision making'),
     'traffic_signal_control': ('decision', 'decision making'),
     'demand_optimization': ('decision', 'decision making'),
 }
+
+
+# label -> (output mode, time relative to tau); forecasting_prediction alone is resolved by its second label
+CELL = {
+    'imputation': ('regression', 'before'), 'reconstruction': ('regression', 'before'),
+    'physiological_signal_estimation': ('regression', 'before'), 'hydrologic_model_calibration': ('regression', 'before'),
+    'time_series_classification': ('classification', 'before'), 'anomaly_detection_diagnosis': ('classification', 'before'),
+    'change_point_detection': ('classification', 'before'), 'time_series_event_detection': ('classification', 'before'),
+    'data_quality': ('classification', 'before'), 'time_series_segmentation': ('classification', 'before'),
+    'temporal_question_answering': ('generation', 'before'), 'temporal_analysis': ('generation', 'before'),
+    'time_series_reporting': ('generation', 'before'), 'time_series_captioning': ('generation', 'before'),
+    'time_series_annotation': ('generation', 'before'), 'temporal_causal_analysis': ('generation', 'before'),
+    'etiological_reasoning': ('generation', 'before'), 'causal_discovery': ('generation', 'before'),
+    'traffic_simulation_analysis': ('generation', 'before'), 'data_augmentation_synthesis': ('generation', 'before'),
+    'value_forecasting': ('regression', 'after'), 'event_forecasting': ('classification', 'after'),
+    'decision_support': ('decision', 'after'), 'traffic_signal_control': ('decision', 'after'),
+    'demand_optimization': ('decision', 'after'),
+}
+MODES = ['regression', 'classification', 'generation', 'decision']
 
 
 def group_of(label):
@@ -95,6 +122,18 @@ def summary():
             'reuse_gh_gts': {f'{l}:{e}': c for (l, e), c in sorted(reuse.items())}, 'unmapped_labels': dict(unmapped)}
 
 
+def grid():
+    """Works per (mode, time) cell; method-only labels (representation, transfer learning) have no cell."""
+    cells, none = Counter(), Counter()
+    for r in records():
+        labs = set(labels(r)) | {x for m in r.get('modules') or [] for x in labels(m)}
+        for c in {CELL[x] for x in labs if x in CELL}: cells[c] += 1
+        for x in labs - set(CELL) - {'forecasting_prediction'}: none[x] += 1
+    return {'cells': {f'{m}:{t}': cells[(m, t)] for m in MODES for t in ('before', 'after')}, 'no_cell': dict(none)}
+
+
 if __name__ == '__main__':
+    if '--grid' in sys.argv:
+        print(json.dumps(grid(), indent=1)); sys.exit()
     s = summary()
     print(json.dumps(s, indent=1, ensure_ascii=False))

@@ -12,7 +12,9 @@
  "task_memberships": [
   "forecasting_prediction"
  ],
- "other_tasks": [],
+ "other_tasks": [
+  "event_forecasting"
+ ],
  "modules": [
   {
    "id": "timexl2025:multimodal-prototype-encoder",
@@ -27,7 +29,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "event_forecasting"
+   ],
    "role": "method",
    "scope_reason": "R2: the encoder is a separate convolutional prototype classifier; the LLM never receives its embeddings, only selected prototype text, so it does not change how the model represents temporal inputs and is a Harness tool, not LLM side. R3_1_TSK: its objective is cross-entropy on discrete labels with class-wise prototypes; a different task family needs a different output head and loss.",
    "rubric_path": [
@@ -68,7 +72,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "event_forecasting"
+   ],
    "role": "method",
    "scope_reason": "Top-omega prototype-segment pairs are retrieved and added to the prediction LLM prompt, then encoder and LLM probabilities are linearly fused with alpha tuned on validation data; R3_1_TSK: fusion target is the task's prediction probability, and the retrieved cases are class prototypes.",
    "rubric_path": [
@@ -111,7 +117,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "event_forecasting"
+   ],
    "role": "method",
    "scope_reason": "The reflection compares prediction with ground truth and the refinement changes text and retrains the encoder for later prediction iterations; changing the prediction task changes the validation target and refinement objective, so R3_1_TSK applies.",
    "rubric_path": [

@@ -16,7 +16,9 @@
  "task_memberships": [
   "forecasting_prediction"
  ],
- "other_tasks": [],
+ "other_tasks": [
+  "value_forecasting"
+ ],
  "modules": [
   {
    "id": "castr12026:forecast-policy-training",
@@ -32,7 +34,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "model_training",
    "scope_reason": "R2 places the parameter-updating SFT and GRPO recipe on the LLM side: it teaches forecast reasoning and selection of tools and models from intermediate feedback. The reward and difficulty curriculum are components of this training recipe, not runtime evolution.",
    "rubric_path": [
@@ -82,7 +86,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "method",
    "scope_reason": "R3_1 wins because the implemented state explicitly contains analysis history and intermediate forecast results, and its availability determines the forecasting stage and context contents. Changing task family requires redesigning the prediction-result state and stage-dependent context contract; generic retention alone is not the contributed implementation.",
    "rubric_path": [
@@ -133,7 +139,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "method",
    "scope_reason": "R3_1 does not match: quality checks, statistical profiles, changepoints and event summaries do not encode forecast outputs or a horizon-specific objective. Under the counterfactual these diagnostics retain their time-series inputs and tool semantics for another task. R3_2 matches their dependence on temporal order, frequency and series structure.",
    "rubric_path": [
@@ -191,7 +199,9 @@
    "tasks": [
     "forecasting_prediction"
    ],
-   "other_tasks": [],
+   "other_tasks": [
+    "value_forecasting"
+   ],
    "role": "method",
    "scope_reason": "R3_1 matches the diagnostic-to-model-routing-to-forecast-refinement protocol, including a unified forecasting interface and checks against historical constraints. Changing task family requires redesigning prediction actions, final timestamp-value outputs and the forecast plausibility criterion. Tool feedback selects the model and changes numerical refinement despite the fixed outer stages.",
    "rubric_path": [

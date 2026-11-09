@@ -1,252 +1,258 @@
 {
-  "citation_key": "timefore2026",
-  "status": "paper_verified",
-  "role_of_work": "feedback_driven_agent",
-  "claim_summary": "ODTQA-FoRe introduces a forecasting and forecast-based reasoning benchmark, while TimeFore retrieves historical prices, invokes a specialized imputation-forecast tool, and synthesizes standardized answers.",
-  "claim_evidence": [
-    {
-      "line": 24,
-      "quote": "To solve the above challenges, we propose TimeFore, an LLM agent-based framework that decomposes the problem into three collaborative roles: a Retriever autonomously generates SQL to fetch data, a Forecaster invokes external time-series models for higher accuracy, and an Analyzer synthesizes the results to construct a precise and consistent final answer."
-    },
-    {
-      "line": 95,
-      "quote": "Specifically, ODTQA-FoRe comprises 28,507 QA pairs constructed from real estate transaction records spanning 2022–2024 across 10 Chinese cities."
-    }
-  ],
-  "task_memberships": [
-    "forecasting_prediction"
-  ],
-  "other_tasks": [
-    "temporal_question_answering"
-  ],
-  "modules": [
-    {
-      "id": "timefore2026:sql-repair",
-      "name": "Execution-feedback SQL repair",
-      "layer": "GH",
-      "dimensions": [
-        "Tools and Execution",
-        "Planning and Orchestration"
-      ],
-      "functions": [],
-      "view_status": "general_runtime",
-      "llm_route": [],
-      "tasks": [
-        "forecasting_prediction"
-      ],
-      "other_tasks": [
-        "temporal_question_answering"
-      ],
-      "role": "method",
-      "scope_reason": "R3_1_TSK is no: retrying malformed or failing SQL does not itself encode either task's output objective. R3_2_GTS is no: repair state is SQL execution success or error, not temporal order, windows, units, or availability; the temporal-query counterfactual leaves this repair loop reusable. R3_3_GH applies because it manages bounded execution and repair.",
-      "rubric_path": [
-        "R1:contributed",
-        "R2:Harness",
-        "R3_1_TSK:no - no task output objective in retry logic",
-        "R3_2_GTS:no - execution errors do not depend on temporal semantics",
-        "R3_3_GH:yes - manages execution and repair"
-      ],
-      "reuse_evidence": {
-        "level": "demonstrated",
-        "tasks": [
-          "forecasting_prediction",
-          "temporal_question_answering"
-        ],
-        "basis": "work",
-        "rule": "two or more task groups (scripts/task_groups.py)"
-      },
-      "evidence": [
-        {
-          "line": 470,
-          "quote": "If execution fails, the agent refines the SQL based on the error feedback. This loop continues until success is achieved or a maximum of 25 iterations is reached, ensuring reliable data retrieval."
-        }
-      ],
-      "confidence": "high"
-    },
-    {
-      "id": "timefore2026:forecast-tool",
-      "name": "Imputation-then-prediction tool workflow",
-      "layer": "TSK",
-      "dimensions": [
-        "Tools and Execution",
-        "Planning and Orchestration"
-      ],
-      "functions": [
-        "processing"
-      ],
-      "view_status": "task_procedure",
-      "llm_route": [],
-      "tasks": [
-        "forecasting_prediction"
-      ],
-      "other_tasks": [],
-      "role": "method",
-      "scope_reason": "R3_1_TSK applies: the tool embeds a fixed historical-input-to-future-price forecasting objective and horizon; changing task family requires redesigning its prediction output and procedure. R3_2_GTS is not reached because the task-specific forecasting criterion is the first match (although the tool also processes temporal windows and missing values).",
-      "rubric_path": [
-        "R1:contributed",
-        "R2:Harness",
-        "R3_1_TSK:yes - forecasting objective and output are embedded"
-      ],
-      "reuse_evidence": {
-        "level": "not_applicable",
-        "tasks": [],
-        "basis": "module"
-      },
-      "evidence": [
-        {
-          "line": 499,
-          "quote": "Its core action is to invoke a predefined function, the imputationThenPredictionTool. This function encapsulates a sophisticated forecasting pipeline: it first validates and cleans the input time series, then employs the TimesNet model (Wu et al., 2023) for robust data imputation. Based on this complete and imputed sequence, the TimeXer model (Wang et al., 2024b) is then used to generate a price trend forecast for the subsequent 12 months."
-        }
-      ],
-      "confidence": "high"
-    },
-    {
-      "id": "timefore2026:analyzer-response",
-      "name": "Query-routed answer synthesis and normalization",
-      "layer": "TSK",
-      "dimensions": [
-        "Planning and Orchestration"
-      ],
-      "functions": [
-        "processing"
-      ],
-      "view_status": "task_procedure",
-      "llm_route": [],
-      "tasks": [
-        "forecasting_prediction"
-      ],
-      "other_tasks": [
-        "temporal_question_answering"
-      ],
-      "role": "method",
-      "scope_reason": "R3_1_TSK applies: the Analyzer selects task-specific prompts and derives task outputs from forecast values, including numerical forecasts and forecast-based comparisons. Switching task family requires changing its query classes, answer rules, and output format; temporal-value processing is embedded in the procedure.",
-      "rubric_path": [
-        "R1:contributed",
-        "R2:Harness",
-        "R3_1_TSK:yes - task-specific answer objectives and formats are embedded"
-      ],
-      "reuse_evidence": {
-        "level": "not_applicable",
-        "tasks": [],
-        "basis": "module"
-      },
-      "evidence": [
-        {
-          "line": 525,
-          "quote": "To this end, the Analyzer first employs a BERT-based classifier to categorize the user’s query as either direct time-series forecasting (e.g., \"What will the price be in June 2024?\") or forecast-based reasoning (e.g., \"Will the price in June exceed the price in January?\"). Based on this classification, a distinct and tailored prompt, enriched with five illustrative examples via in-context learning, is selected to guide the LLM’s response generation process."
-        },
-        {
-          "line": 538,
-          "quote": "To mitigate this, we introduce an LLM-driven numerical extraction module, which employs in-context learning with five examples, explicitly prompting the model to return only the essential numerical results."
-        }
-      ],
-      "confidence": "high"
-    },
-    {
-      "id": "timefore2026:future-table-evaluation",
-      "name": "Future-table forecasting and reasoning benchmark",
-      "layer": "TSK",
-      "dimensions": [
-        "Planning and Orchestration"
-      ],
-      "functions": [],
-      "view_status": "resource_level",
-      "llm_route": [],
-      "tasks": [
-        "forecasting_prediction"
-      ],
-      "other_tasks": [
-        "temporal_question_answering"
-      ],
-      "role": "evaluation",
-      "scope_reason": "R3_1_TSK applies: the benchmark encodes forecast and forecast-based reasoning outputs with temporal ground-truth labels and task-specific evaluation. A different task family requires replacing its questions, labels, and scoring criteria; it is a resource-level test set under R5.",
-      "rubric_path": [
-        "R1:contributed",
-        "R2:Harness/resource",
-        "R3_1_TSK:yes - task-specific questions, labels, and evaluation criteria"
-      ],
-      "reuse_evidence": {
-        "level": "not_applicable",
-        "tasks": [],
-        "basis": "module"
-      },
-      "evidence": [
-        {
-          "line": 261,
-          "quote": "To prevent data leakage and ensure a fair evaluation, we first partition the 11,149 filtered projects into training, validation, and test subsets. This project-level split is performed using a 6:2:2 ratio, resulting in 6,562 projects for the training set, 2,278 for the validation set, and 2,309 for the test set. This partitioning guarantees that there is no overlap of projects between the sets."
-        },
-        {
-          "line": 325,
-          "quote": "The final ODTQA-FoRe dataset includes, for each QA instance: a natural language question, either a natural language answer (for reasoning queries) or a numerical answer (for forecasting queries), an SQL query to retrieve historical data, and an SQL query for retrieving future data labels."
-        }
-      ],
-      "confidence": "high"
-    }
-  ],
-  "evaluation_evidence": {
-    "process_validity": {
-      "present": true,
-      "line": 1233,
-      "quote": "To evaluate the performance of SQL generation in the Retriever module, we employ two metrics: Executable Code Ratio (ECR) and Execution Accuracy (EA) (Yu et al., 2018). ECR measures the proportion of generated code that can be executed, thus reflecting the model’s ability to produce runnable SQL statements."
-    },
-    "temporal_validity": {
-      "present": true,
-      "line": 253,
-      "quote": "December 31, 2023, serves as the reference date, with data from 2022–2023 designated as historical observations and data from 2024 treated as future ground truth, which is strictly withheld during model inference."
-    },
-    "task_performance": {
-      "present": true,
-      "line": 585,
-      "quote": "We evaluate time-series forecasting using Mean Squared Error (MSE), Mean Absolute Error (MAE), and Mean Relative Error (MRE). For forecast-based reasoning, we use Accuracy, Precision (P), Recall (R), and F1-score (F1)."
-    },
-    "decision_utility": {
-      "present": false,
-      "line": null,
-      "quote": null
-    }
+ "citation_key": "timefore2026",
+ "status": "paper_verified",
+ "role_of_work": "feedback_driven_agent",
+ "claim_summary": "ODTQA-FoRe introduces a forecasting and forecast-based reasoning benchmark, while TimeFore retrieves historical prices, invokes a specialized imputation-forecast tool, and synthesizes standardized answers.",
+ "claim_evidence": [
+  {
+   "line": 24,
+   "quote": "To solve the above challenges, we propose TimeFore, an LLM agent-based framework that decomposes the problem into three collaborative roles: a Retriever autonomously generates SQL to fetch data, a Forecaster invokes external time-series models for higher accuracy, and an Analyzer synthesizes the results to construct a precise and consistent final answer."
   },
-  "reconciliation": [
+  {
+   "line": 95,
+   "quote": "Specifically, ODTQA-FoRe comprises 28,507 QA pairs constructed from real estate transaction records spanning 2022–2024 across 10 Chinese cities."
+  }
+ ],
+ "task_memberships": [
+  "forecasting_prediction"
+ ],
+ "other_tasks": [
+  "temporal_question_answering",
+  "value_forecasting"
+ ],
+ "modules": [
+  {
+   "id": "timefore2026:sql-repair",
+   "name": "Execution-feedback SQL repair",
+   "layer": "GH",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "general_runtime",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "value_forecasting"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK is no: retrying malformed or failing SQL does not itself encode either task's output objective. R3_2_GTS is no: repair state is SQL execution success or error, not temporal order, windows, units, or availability; the temporal-query counterfactual leaves this repair loop reusable. R3_3_GH applies because it manages bounded execution and repair.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:no - no task output objective in retry logic",
+    "R3_2_GTS:no - execution errors do not depend on temporal semantics",
+    "R3_3_GH:yes - manages execution and repair"
+   ],
+   "reuse_evidence": {
+    "level": "demonstrated",
+    "tasks": [
+     "forecasting_prediction",
+     "temporal_question_answering"
+    ],
+    "basis": "work",
+    "rule": "two or more task groups (scripts/task_groups.py)"
+   },
+   "evidence": [
     {
-      "existing_id": "timefore2026:sql-repair",
-      "decision": "change",
-      "new_ids": [
-        "timefore2026:sql-repair"
-      ],
-      "changes": [
-        "dimensions: Control, Verification, and Feedback -> Planning and Orchestration",
-        "added Tools and Execution",
-        "added current rubric path and source quotes"
-      ],
-      "reason": "Preserve the same execution-feedback SQL repair mechanism; the retry logic is a general GH execution mechanism, and error feedback changes later SQL actions."
-    },
-    {
-      "existing_id": "timefore2026:forecast-tool",
-      "decision": "change",
-      "new_ids": [
-        "timefore2026:forecast-tool"
-      ],
-      "changes": [
-        "dimensions: Planning and Workflow -> Planning and Orchestration",
-        "removed mapped status; set task_procedure",
-        "functions: processing retained as a task procedure function",
-        "added current rubric path and source quotes"
-      ],
-      "reason": "The imputationThenPredictionTool embeds a forecasting objective and returns future prices, so R3 assigns TSK; the temporal processing remains part of the task procedure."
-    },
-    {
-      "existing_id": "timefore2026:future-table-evaluation",
-      "decision": "change",
-      "new_ids": [
-        "timefore2026:future-table-evaluation"
-      ],
-      "changes": [
-        "dimensions: Control, Verification, and Feedback -> Planning and Orchestration",
-        "view_status: task_procedure -> resource_level",
-        "added benchmark task coverage and source quotes"
-      ],
-      "reason": "ODTQA-FoRe is a paper-level benchmark contribution with task-specific questions and future labels, so retain its ID and classify it as an evaluation resource."
+     "line": 470,
+     "quote": "If execution fails, the agent refines the SQL based on the error feedback. This loop continues until success is achieved or a maximum of 25 iterations is reached, ensuring reliable data retrieval."
     }
-  ],
-  "needs_human_review": false,
-  "notes": "The packet supports two task families within one paper: numerical future-price forecasting and forecast-based reasoning/temporal QA. TimeFore is feedback-driven because SQL errors alter later SQL-generation actions. The dataset is a primary benchmark contribution, not merely an auxiliary evaluation dataset."
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timefore2026:forecast-tool",
+   "name": "Imputation-then-prediction tool workflow",
+   "layer": "TSK",
+   "dimensions": [
+    "Tools and Execution",
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "value_forecasting"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies: the tool embeds a fixed historical-input-to-future-price forecasting objective and horizon; changing task family requires redesigning its prediction output and procedure. R3_2_GTS is not reached because the task-specific forecasting criterion is the first match (although the tool also processes temporal windows and missing values).",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - forecasting objective and output are embedded"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 499,
+     "quote": "Its core action is to invoke a predefined function, the imputationThenPredictionTool. This function encapsulates a sophisticated forecasting pipeline: it first validates and cleans the input time series, then employs the TimesNet model (Wu et al., 2023) for robust data imputation. Based on this complete and imputed sequence, the TimeXer model (Wang et al., 2024b) is then used to generate a price trend forecast for the subsequent 12 months."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timefore2026:analyzer-response",
+   "name": "Query-routed answer synthesis and normalization",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [
+    "processing"
+   ],
+   "view_status": "task_procedure",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "value_forecasting"
+   ],
+   "role": "method",
+   "scope_reason": "R3_1_TSK applies: the Analyzer selects task-specific prompts and derives task outputs from forecast values, including numerical forecasts and forecast-based comparisons. Switching task family requires changing its query classes, answer rules, and output format; temporal-value processing is embedded in the procedure.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness",
+    "R3_1_TSK:yes - task-specific answer objectives and formats are embedded"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 525,
+     "quote": "To this end, the Analyzer first employs a BERT-based classifier to categorize the user’s query as either direct time-series forecasting (e.g., \"What will the price be in June 2024?\") or forecast-based reasoning (e.g., \"Will the price in June exceed the price in January?\"). Based on this classification, a distinct and tailored prompt, enriched with five illustrative examples via in-context learning, is selected to guide the LLM’s response generation process."
+    },
+    {
+     "line": 538,
+     "quote": "To mitigate this, we introduce an LLM-driven numerical extraction module, which employs in-context learning with five examples, explicitly prompting the model to return only the essential numerical results."
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "id": "timefore2026:future-table-evaluation",
+   "name": "Future-table forecasting and reasoning benchmark",
+   "layer": "TSK",
+   "dimensions": [
+    "Planning and Orchestration"
+   ],
+   "functions": [],
+   "view_status": "resource_level",
+   "llm_route": [],
+   "tasks": [
+    "forecasting_prediction"
+   ],
+   "other_tasks": [
+    "temporal_question_answering",
+    "value_forecasting"
+   ],
+   "role": "evaluation",
+   "scope_reason": "R3_1_TSK applies: the benchmark encodes forecast and forecast-based reasoning outputs with temporal ground-truth labels and task-specific evaluation. A different task family requires replacing its questions, labels, and scoring criteria; it is a resource-level test set under R5.",
+   "rubric_path": [
+    "R1:contributed",
+    "R2:Harness/resource",
+    "R3_1_TSK:yes - task-specific questions, labels, and evaluation criteria"
+   ],
+   "reuse_evidence": {
+    "level": "not_applicable",
+    "tasks": [],
+    "basis": "module"
+   },
+   "evidence": [
+    {
+     "line": 261,
+     "quote": "To prevent data leakage and ensure a fair evaluation, we first partition the 11,149 filtered projects into training, validation, and test subsets. This project-level split is performed using a 6:2:2 ratio, resulting in 6,562 projects for the training set, 2,278 for the validation set, and 2,309 for the test set. This partitioning guarantees that there is no overlap of projects between the sets."
+    },
+    {
+     "line": 325,
+     "quote": "The final ODTQA-FoRe dataset includes, for each QA instance: a natural language question, either a natural language answer (for reasoning queries) or a numerical answer (for forecasting queries), an SQL query to retrieve historical data, and an SQL query for retrieving future data labels."
+    }
+   ],
+   "confidence": "high"
+  }
+ ],
+ "evaluation_evidence": {
+  "process_validity": {
+   "present": true,
+   "line": 1233,
+   "quote": "To evaluate the performance of SQL generation in the Retriever module, we employ two metrics: Executable Code Ratio (ECR) and Execution Accuracy (EA) (Yu et al., 2018). ECR measures the proportion of generated code that can be executed, thus reflecting the model’s ability to produce runnable SQL statements."
+  },
+  "temporal_validity": {
+   "present": true,
+   "line": 253,
+   "quote": "December 31, 2023, serves as the reference date, with data from 2022–2023 designated as historical observations and data from 2024 treated as future ground truth, which is strictly withheld during model inference."
+  },
+  "task_performance": {
+   "present": true,
+   "line": 585,
+   "quote": "We evaluate time-series forecasting using Mean Squared Error (MSE), Mean Absolute Error (MAE), and Mean Relative Error (MRE). For forecast-based reasoning, we use Accuracy, Precision (P), Recall (R), and F1-score (F1)."
+  },
+  "decision_utility": {
+   "present": false,
+   "line": null,
+   "quote": null
+  }
+ },
+ "reconciliation": [
+  {
+   "existing_id": "timefore2026:sql-repair",
+   "decision": "change",
+   "new_ids": [
+    "timefore2026:sql-repair"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration",
+    "added Tools and Execution",
+    "added current rubric path and source quotes"
+   ],
+   "reason": "Preserve the same execution-feedback SQL repair mechanism; the retry logic is a general GH execution mechanism, and error feedback changes later SQL actions."
+  },
+  {
+   "existing_id": "timefore2026:forecast-tool",
+   "decision": "change",
+   "new_ids": [
+    "timefore2026:forecast-tool"
+   ],
+   "changes": [
+    "dimensions: Planning and Workflow -> Planning and Orchestration",
+    "removed mapped status; set task_procedure",
+    "functions: processing retained as a task procedure function",
+    "added current rubric path and source quotes"
+   ],
+   "reason": "The imputationThenPredictionTool embeds a forecasting objective and returns future prices, so R3 assigns TSK; the temporal processing remains part of the task procedure."
+  },
+  {
+   "existing_id": "timefore2026:future-table-evaluation",
+   "decision": "change",
+   "new_ids": [
+    "timefore2026:future-table-evaluation"
+   ],
+   "changes": [
+    "dimensions: Control, Verification, and Feedback -> Planning and Orchestration",
+    "view_status: task_procedure -> resource_level",
+    "added benchmark task coverage and source quotes"
+   ],
+   "reason": "ODTQA-FoRe is a paper-level benchmark contribution with task-specific questions and future labels, so retain its ID and classify it as an evaluation resource."
+  }
+ ],
+ "needs_human_review": false,
+ "notes": "The packet supports two task families within one paper: numerical future-price forecasting and forecast-based reasoning/temporal QA. TimeFore is feedback-driven because SQL errors alter later SQL-generation actions. The dataset is a primary benchmark contribution, not merely an auxiliary evaluation dataset."
 }
