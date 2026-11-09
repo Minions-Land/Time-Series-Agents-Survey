@@ -5,6 +5,7 @@ Examples
   python3 scripts/query_cards.py --layer GTS --function context_memory          # shared temporal memory modules
   python3 scripts/query_cards.py --task anomaly_detection_diagnosis --layer TSK  # anomaly procedures
   python3 scripts/query_cards.py --text "information cutoff"                      # keyword over names, reasons, quotes
+  python3 scripts/query_cards.py --cell regression:after --layer GTS --reuse demonstrated   # one cell of the task grid
   python3 scripts/query_cards.py --work aion2026                                  # one full card
   python3 scripts/query_cards.py --role feedback_driven_agent --criterion temporal_validity --layer GTS
   python3 scripts/query_cards.py --stats                                          # counts by layer, function, task,
@@ -16,6 +17,9 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from task_groups import module_cells, MODES   # noqa: E402  cells of the task grid (manuscript Tables 7-8)
+CELLS = [f'{m}:{t}' for m in MODES for t in ('before', 'after')]
 LEDGER = ROOT / 'paper_classification_ledger.json'
 
 
@@ -46,6 +50,7 @@ def matches(r, m, a):
     if a.layer and m['layer'] != a.layer: return False
     if a.function and a.function not in fv: return False
     if a.task and a.task not in tasks: return False
+    if a.cell and tuple(a.cell.split(':')) not in module_cells(m): return False
     if a.dimension and not any(a.dimension.lower() in d.lower() for d in m.get('dimensions') or []): return False
     if a.reuse and (m.get('reuse_evidence') or {}).get('level') != a.reuse: return False
     if a.role and r.get('role_of_work') != a.role: return False
@@ -64,6 +69,7 @@ def row(r, m):
             'dimensions': m.get('dimensions'), 'functions': functions(m), 'llm_route': m.get('llm_route'),
             'role_of_work': r.get('role_of_work'), 'confidence': m.get('confidence'),
             'tasks': (m.get('tasks') or []) + (m.get('other_tasks') or []),
+            'cells': sorted(f'{c[0]}:{c[1]}' for c in module_cells(m)),
             'reuse': (m.get('reuse_evidence') or {}).get('level'), 'scope_reason': m.get('scope_reason'),
             'evidence': {'locator': ev.get('locator'), 'quote': (ev.get('quote') or '')[:240]}}
 
@@ -73,6 +79,7 @@ def main():
     p.add_argument('--layer', choices=['LLM', 'GH', 'GTS', 'TSK'])
     p.add_argument('--function', choices=['data_management', 'processing', 'context_memory', 'validation'])
     p.add_argument('--task', help='e.g. forecasting_prediction, anomaly_detection_diagnosis, decision_support')
+    p.add_argument('--cell', choices=CELLS, help='task grid cell: output mode and time (before/after the current time)')
     p.add_argument('--dimension', help='substring of a mechanism dimension, e.g. "Memory"')
     p.add_argument('--reuse', choices=['demonstrated', 'inferred'])
     p.add_argument('--role', choices=['llm_side_technique', 'fixed_workflow', 'feedback_driven_agent', 'resource'],

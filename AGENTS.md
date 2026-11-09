@@ -15,7 +15,7 @@ Architectures, and Evaluation*. People open this repository with a coding agent 
 | Bibliography | `TS_AGENT_HARNESS_SURVEY.bib` |
 
 `query_cards.py` is the fastest entry point: `--layer {LLM,GH,GTS,TSK}`, `--function {data_management,processing,
-context_memory,validation}`, `--task <family label>` (ledger labels; group them with `scripts/task_groups.py`), `--dimension <text>`, `--reuse {demonstrated,inferred}`, `--text <kw>`,
+context_memory,validation}`, `--task <label>` (ledger labels, e.g. `value_forecasting`, `anomaly_detection`), `--cell <mode>:<before|after>` (a cell of the task grid, e.g. `regression:after`; counts with `python3 scripts/task_groups.py --grid`), `--dimension <text>`, `--reuse {demonstrated,inferred}`, `--text <kw>`,
 `--role <role_of_work>`, `--criterion <evaluation criterion>`, `--work <key>` (full card), `--stats`, `--json`.
 
 ## How to answer
@@ -24,9 +24,11 @@ context_memory,validation}`, `--task <family label>` (ledger labels; group them 
    recorded passage when it matters. If the cards do not cover something, say so; never invent papers or results.
 2. Use the survey's terms exactly: Time Series Agent = LLM + General Harness + Time Series Harness, where Time Series
    Harness = General Time Series Harness + Task-Specific Harness; LLM side; General Harness; General Time Series Harness;
-   Task-Specific Harness; the five mechanism dimensions; the four temporal functions; the four task groups (analysis of observed series, forecasting, generation, decision
-   making; mapping in `scripts/task_groups.py`); their second-level classes (Tables 5-7 of `main.tex`, `second_level` in
-   `references/taxonomy_schema.json`); the four
+   Task-Specific Harness; the five mechanism dimensions; the four temporal functions; the task grid of four output modes (regression,
+   classification, generation, decision making) on the observed record or after the current time (Table 7 of `main.tex`,
+   `task_grid` in `references/taxonomy_schema.json`, mapping in `scripts/task_groups.py`), with projection and hindsight
+   decision as defined but unstudied cells; the second-level classes of Tables 5-6 (`second_level` in the schema); the
+   LLM is the caller of the Harness and has no vocabulary, and time series foundation models are Harness tools; the four
    evaluation criteria (process validity, temporal validity, task performance, decision utility). "time series" is
    never hyphenated.
 3. Distinguish what a source demonstrates from what is inferred (`reuse_evidence`: demonstrated vs inferred).
@@ -37,13 +39,16 @@ context_memory,validation}`, `--task <family label>` (ledger labels; group them 
 Follow the construction order of Section 2 of `main.tex` and produce a short design document:
 
 1. **Scenario.** Data sources, event and availability times, channels, units, missingness, and the decision that follows.
-2. **Task contract.** Output, horizon, admissible information at the current time τ (the forecast origin), constraints, metric, reviewer.
-3. **Reuse (General Harness).** For each needed dimension, candidate modules from the cards (`--layer GH`).
+2. **Task contract.** Output, horizon, admissible information at the current time τ (the forecast origin), constraints, metric, reviewer;
+   locate each output in a cell of the task grid (Table 7). Table 8 lists reference modules in every layer for each cell.
+3. **Reuse (General Harness).** For each needed dimension, candidate modules from the cards (`--layer GH --cell <cell>`;
+   prefer `--reuse demonstrated`).
 4. **Adapt (General Time Series Harness).** Temporal data management, processing, context and memory, and validation:
-   which shared modules apply (`--layer GTS --function ...`) and where an information-cutoff check is needed.
-5. **Redesign (Task-Specific Harness).** Task procedures closest to the contract (`--layer TSK --task ...`) and what
-   must change for the user's objective.
-6. **LLM side.** Whether a trained capability is needed (`--layer LLM`) or a general model suffices.
+   which shared modules apply (`--layer GTS --function ... --cell <cell>`) and where an information-cutoff check is needed.
+5. **Redesign (Task-Specific Harness).** Task procedures closest to the contract (`--layer TSK --cell <cell>` or `--task ...`)
+   and what must change for the user's objective.
+6. **LLM side.** Whether the caller needs a trained capability (`--layer LLM`) or a general model suffices; forecasting
+   models (foundation, statistical, lightweight) are chosen as Harness tools.
 7. **Evaluation.** Which of the four criteria must be tested, with benchmarks from Section 7 and their official links.
 
 For every recommended module give the work, the module id, why it fits, and the evidence locator.

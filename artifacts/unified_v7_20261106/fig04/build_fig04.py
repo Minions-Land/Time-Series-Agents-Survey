@@ -1,11 +1,13 @@
 """Figure 4 (fig:task-function-grid), V7 house style: from task requirements to Harness modules.
 
-(a) Columns are the four task groups (scripts/task_groups.py, Section 6), rows the four temporal functions (Section 5). Each cell
+(a) Columns are the four output modes of the task grid (scripts/task_groups.py, Section 6), rows the four temporal
+functions (Section 5). Each cell
 names what that function supplies for that task (wording kept from the approved semantic revision, Figure04_Semantic).
 Shaded regions with solid boundaries mark the forecast horizon, the diagnostic interval, the information beyond the
 forecast origin t0 and the admissible action range, as the caption states.
-(b) The demand-planning workflow: general execution -> shared temporal preparation -> forecasting -> inventory decision,
-each step tagged with its Harness layer.
+(b) Assembling a demand-planning Agent cell by cell: general execution and shared temporal preparation serve any cell;
+forecasting (regression after the current time) and the inventory decision (decision after the current time) are
+task modules. Each step is tagged with its Harness layer and its cell.
 
 usage: python3 build_fig04.py [out.pptx]
 """
@@ -35,7 +37,7 @@ def row_y(i):
 
 
 # Task groups (scripts/task_groups.py, ORDER) and their clay icons; header lines as displayed.
-TASKS = [('anomaly', ['Analysis of', 'Observed Series']), ('forecast', ['Forecasting']), ('synthesis', ['Generation']),
+TASKS = [('timeseries', ['Regression']), ('anomaly', ['Classification']), ('synthesis', ['Generation']),
          ('decision', ['Decision', 'Making'])]
 # Shared temporal functions (Section 5 headings), icons as on the General Time Series Harness plate of Figure 1.
 FUNCS = [('calendar', ['Temporal Data', 'Management']), ('window', ['Temporal', 'Processing']),
@@ -43,11 +45,11 @@ FUNCS = [('calendar', ['Temporal Data', 'Management']), ('window', ['Temporal', 
 # Cell content: (glyph, label). Labels are those of the approved semantic revision of this figure.
 # Columns follow TASKS: the former anomaly-diagnosis cells serve Analysis of Observed Series, synthesis -> Generation.
 CELLS = [
-    [('streams', 'Streams'), ('history', 'History'), ('icon:data', 'Samples'), ('icon:inventory_stock', 'State')],
-    [('interval', 'Intervals'), ('horizon', 'Horizon'), ('transforms', 'Transforms'), ('icon:policy', 'Actions')],
-    [('icon:incident_report', 'Incidents'), ('events', 'Events'), ('icon:reference_lookup', 'References'),
+    [('history', 'History'), ('streams', 'Streams'), ('icon:data', 'Samples'), ('icon:inventory_stock', 'State')],
+    [('horizon', 'Horizon'), ('interval', 'Intervals'), ('transforms', 'Transforms'), ('icon:policy', 'Actions')],
+    [('events', 'Events'), ('icon:incident_report', 'Incidents'), ('icon:reference_lookup', 'References'),
      ('icon:memory', 'Experience')],
-    [('icon:evidence_check', 'Evidence'), ('cutoff', 'Cutoff'), ('fidelity', 'Fidelity'), ('constraints', 'Constraints')],
+    [('cutoff', 'Cutoff'), ('icon:evidence_check', 'Evidence'), ('fidelity', 'Fidelity'), ('constraints', 'Constraints')],
 ]
 TK, TS = HUE['tsk'], HUE['gts']
 
@@ -137,7 +139,7 @@ def series(sh, x, y, w, h, color=INK, phase=0.0, amp=1.0, lw=1.6, smooth=False, 
 
 # ---- panel (a) ------------------------------------------------------------------------------------------------
 def panel_a(slide):
-    zone(slide, 0.2, 0.42, W - 0.4, 4.56, '(a)  Task Groups × Temporal Functions', key='ink', size=18, bw=6.4)
+    zone(slide, 0.2, 0.42, W - 0.4, 4.56, '(a)  Output Modes × Temporal Functions', key='ink', size=18, bw=6.4)
     # reading key in the empty corner
     g = group(slide); sh = g.shapes
     x, y = GX0 + 0.12, HDR_Y + 0.08
@@ -168,11 +170,11 @@ def panel_a(slide):
 
 # ---- panel (b) ------------------------------------------------------------------------------------------------
 BY, BH = 5.66, 1.55
-STEPS = [  # (title, layer key, layer name, width)
-    ('Execute', 'gh', 'General Harness', 2.25),
-    ('Prepare', 'gts', 'General Time Series Harness', 3.2),
-    ('Forecast', 'tsk', 'Task-Specific Harness', 3.05),
-    ('Decide', 'tsk', 'Task-Specific Harness', 2.45),
+STEPS = [  # (title, layer key, layer name, width, cell)
+    ('Execute', 'gh', 'General Harness', 2.25, 'Any Cell'),
+    ('Prepare', 'gts', 'General Time Series Harness', 3.2, 'Any Cell'),
+    ('Forecast', 'tsk', 'Task-Specific Harness', 3.05, 'Regression · After'),
+    ('Decide', 'tsk', 'Task-Specific Harness', 2.55, 'Decision · After'),
 ]
 
 
@@ -185,15 +187,16 @@ def pair(sh, names, cx, y, col, s=0.62, span=1.15):
 
 
 def panel_b(slide):
-    zone(slide, 0.2, BY - 0.3, W - 0.4, BH + 0.48, '(b)  Demand-Planning Workflow', key='data', size=18)
+    zone(slide, 0.2, BY - 0.3, W - 0.4, BH + 0.48, '(b)  Assembling a Demand-Planning Agent by Cell', key='data', size=18)
     gapw = (GX1 - GX0 - sum(s[3] for s in STEPS)) / 3
     x = GX0
     xs = []
-    for k, (title, key, layer, w) in enumerate(STEPS):
+    for k, (title, key, layer, w, cellname) in enumerate(STEPS):
         g = group(slide); sh = g.shapes
         dk, md, lt = HUE[key]
         card(sh, x, BY, w, BH, key=key, radius=0.1)
         tx(sh, x + 0.16, BY + 0.06, w - 0.3, 0.36, title, size=16.5, bold=True, color=dk, align='l')
+        tx(sh, x + 0.16, BY + 0.08, w - 0.3, 0.34, cellname, size=12.5, bold=True, color=MUTE, align='r')
         pill(sh, x + 0.14, BY + BH - 0.42, w - 0.28, 0.32, layer, key=key, size=12.5, light=True)
         mid = BY + 0.43
         if title == 'Execute':

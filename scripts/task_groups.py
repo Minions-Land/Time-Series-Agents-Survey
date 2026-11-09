@@ -1,4 +1,6 @@
-"""Task groups: the task axis of the survey, grouped by what a task output refers to relative to the current time tau.
+"""Task grid of the survey (manuscript Tables 7-8): CELL maps each task label to (output mode, time relative to the
+current time tau); module_cells and reuse_level are the functions the paper, figures and query_cards.py use.
+The four task groups below (GROUPS, LEAF, module_groups) are retired and kept only for older scripts.
 
 Leaves keep the standard task names (TimesNet/TSLib: forecasting, imputation, classification, anomaly detection;
 Time-MQA: question answering). Groups:

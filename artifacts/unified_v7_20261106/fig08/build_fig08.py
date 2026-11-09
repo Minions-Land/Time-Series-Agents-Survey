@@ -1,30 +1,33 @@
-"""Figure 8 (fig:task-specific-harness), V7 house style.
+"""Figure 8 (fig:task-specific-harness): the task grid, V7 house style.
 
-Four task panels, one per task group (scripts/task_groups.py, in its order: Analysis of Observed Series, Forecasting,
-Generation, Decision Making); a subtitle under each title lists the group's second-level tasks. The Analysis of
-Observed Series panel uses anomaly diagnosis with a localized interval; Forecasting shows a value path and an event
-path; Generation shows Conditioned Synthesis and Augmentation; Decision Making shows Autonomous Control (act in a
-simulator) and Decision Support (recommend to an operator). Each panel reads from the input series through the
-procedure to the resulting artifact; dashed indigo paths are feedback that revises the procedure; the indigo strip
-at the bottom names the evaluation target.
+Rows are the four output modes (regression, classification, generation, decision making); columns are the two sides
+of the current time (observed record | after the current time), separated by a dashed Now divider. Each cell is a card
+with a schematic output glyph, the cell name with its number of works, its second-level tasks, and how the output is
+checked (Table tab:tsk-vocab). The two empty cells (projection, hindsight decision) are dashed cards marked as open
+problems. Wording follows Table tab:tsk-vocab of main.tex; counts follow scripts/task_groups.py --grid.
 """
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'kit')))
 from v7kit import *
 from PIL import ImageFont
 
-DP = 0.28          # extra panel height for the subtitle that lists the second-level tasks
-H = 8.5 + 2 * DP
-MATH = 'Times New Roman'
 TK, TKm, TKl = HUE['tsk']
 EV, EVm, EVl = HUE['ev']
+GT = HUE['gts'][0]
 SD, SDm, SDl = HUE['data']
-PW, PH = 6.366, 3.72 + DP
-PX = [0.2, 0.2 + PW + 0.2]
-PY = [0.42, 0.42 + PH + 0.5]
 FONTS = {False: '/System/Library/Fonts/Supplemental/Comic Sans MS.ttf',
          True: '/System/Library/Fonts/Supplemental/Comic Sans MS Bold.ttf'}
 WARN = []
+
+H = 8.15
+X0, HW = 0.2, 1.78            # row-header column
+GAP = 0.34                    # gap between the two cell columns (holds the Now divider)
+CW = (W - 0.2 - X0 - HW - 0.12 - GAP) / 2
+CX = [X0 + HW + 0.12, X0 + HW + 0.12 + CW + GAP]
+DIV = CX[0] + CW + GAP / 2
+Y0, RH, RG = 0.98, 1.62, 0.14
+RY = [Y0 + k * (RH + RG) for k in range(4)]
+GW, GH = 1.55, 1.12           # glyph box
 
 
 def width(t, size, bold):
@@ -38,10 +41,6 @@ def T(sh, x, y, w, h, t, size=13, bold=True, color=INK, align='c', anchor='m', i
     return tx(sh, x, y, w, h, t, size=size, bold=bold, color=color, align=align, anchor=anchor, italic=italic)
 
 
-def dot(sh, cx, cy, r, fill, line=None):
-    return box(sh, cx - r, cy - r, 2 * r, 2 * r, fill=fill, line=line, lw=1.0, shape=MSO_SHAPE.OVAL)
-
-
 def pline(sh, x, y, w, h, vals, color=INK, lw=1.6, dash=None):
     n = len(vals) - 1
     pts = [(x + w * k / n, y + h * (1 - v)) for k, v in enumerate(vals)]
@@ -49,287 +48,146 @@ def pline(sh, x, y, w, h, vals, color=INK, lw=1.6, dash=None):
     return pts
 
 
-def head(shape):
-    e = etree.SubElement(shape.line._get_or_add_ln(), qn('a:tailEnd')); e.set('type', 'triangle'); e.set('w', 'med'); e.set('len', 'med')
-    return shape
-
-
-def go(sh, pts, color=TK, lw=2.0, dash=None, tip=True):
-    """Orthogonal (or any) polyline arrow through pts."""
-    s = poly(sh, pts, color, lw=lw, dash=dash)
-    return head(s) if tip else s
-
-
-def fb(sh, pts):
-    return go(sh, pts, color=EV, lw=2.2, dash=MSO_LINE.DASH)
-
-
-def step(sh, x, y, w, label, icon=None, h=0.5, size=13, cy=None):
-    """Procedure card: (x, y) top-left, or centred vertically on cy."""
-    if cy is not None: y = cy - h / 2
-    c = card(sh, x, y, w, h, key='tsk', lw=1.3, radius=0.22)
-    if icon:
-        ic(sh, icon, x + 0.06, y + (h - 0.42) / 2, 0.42)
-        T(sh, x + 0.5, y, w - 0.54, h, label, size=size, align='c')
-    else:
-        T(sh, x, y, w, h, label, size=size)
-    return c
-
-
-def sheet(sh, x, y, w, h, vals, color=INK, n=2):
-    """Input series on a small stack of paper."""
-    paper(sh, x, y, w, h, line='B9A98A', n=n)
-    pline(sh, x + 0.08, y + 0.1, w - 0.16, h - 0.2, vals, color, lw=1.6)
-
-
-def caption(sh, cx, y, t, w=1.3, color=MUTE, size=13):
-    return T(sh, cx - w / 2, y, w, 0.26, t, size=size, color=color)
-
-
-def evaluation(sh, u, vz, t):
-    """Evaluation strip at the bottom of the panel whose zone starts at vz."""
-    y = vz + PH - 0.52
-    b = box(sh, u + 0.15, y, PW - 0.3, 0.4, fill=EVl, line=EVm, lw=1.0, radius=0.5)
-    p = box(sh, u + 0.2, y + 0.04, 1.2, 0.32, fill=EV, radius=0.5)
-    label_in(p, 'Evaluation', size=13)
-    T(sh, u + 1.45, y, PW - 1.7, 0.4, t, size=13.5, color=EV, align='l')
-
-
-def panel(slide, i, j, title, hero, sub, dy=DP):
-    """Zone with title pill, hero icon and the subtitle of second-level tasks; returns the content origin (zone top + dy)."""
-    u, v = PX[j], PY[i]
-    zone(slide, u, v, PW, PH, title, 'tsk')
-    g = group(slide); sh = g.shapes
-    ic(sh, hero, u + 0.12, v - 0.33, 0.64)
-    lines = sub if isinstance(sub, list) else [sub]
-    T(sh, u + 0.2, v + 0.27, PW - 0.4, 0.24 * len(lines), lines, size=12.5, color=TK)
-    return g, sh, u, v + dy, v
-
-
-def fc_glyph(sh, x, y, w, h, cut=0.55):
-    """History (ink) up to t0, then a dashed forecast inside a widening band; returns t0."""
-    hist = [0.25, 0.5, 0.35, 0.58, 0.42, 0.66, 0.5, 0.62]
-    fut = [0.62, 0.74, 0.6, 0.8, 0.66, 0.86]
-    t0 = x + w * cut
-    hp = [(x + (t0 - x) * k / (len(hist) - 1), y + h * (1 - v)) for k, v in enumerate(hist)]
-    fp = [(t0 + (x + w - t0) * k / (len(fut) - 1), y + h * (1 - v)) for k, v in enumerate(fut)]
-    m = len(fut) - 1
-    up = [(px, py - 0.02 - 0.13 * k / m) for k, (px, py) in enumerate(fp)]
-    lo = [(px, py + 0.02 + 0.13 * k / m) for k, (px, py) in enumerate(fp)]
-    poly(sh, up + lo[::-1], None, fill=TK, alpha=22, closed=True)
-    poly(sh, hp, INK, lw=1.6)
-    poly(sh, fp, TK, lw=1.8, dash=MSO_LINE.DASH)
-    arrow(sh, t0, y - 0.08, t0, y + h + 0.04, color=HUE['gts'][0], lw=1.3, dash=MSO_LINE.DASH, head=None)
-    p = box(sh, t0 - 0.29, y + h + 0.04, 0.58, 0.25, fill=HUE['gts'][0], radius=0.5)   # forecast origin = current time (Now)
-    tf = p.text_frame; tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
-    r = tf.paragraphs[0].add_run(); r.text = 'Now'; tf.paragraphs[0].alignment = PP_ALIGN.CENTER
-    r.font.size = Pt(12); r.font.bold = True; r.font.name = F; r.font.color.rgb = rgb('FFFFFF')
-    return t0
+def now_line(sh, x, y, h):
+    arrow(sh, x, y, x, y + h, color=GT, lw=1.3, dash=MSO_LINE.DASH, head=None)
 
 
 SER = [0.35, 0.55, 0.4, 0.7, 0.5, 0.62, 0.45, 0.8, 0.55, 0.72, 0.5, 0.66]
 
 
-# ------------------------------------------------------------------------------------------------ forecasting
-def forecasting(slide):
-    g, sh, u, v, vz = panel(slide, 0, 1, 'Forecasting', 'forecast', 'Value Forecasting · Event and Probability Forecasting')
-    ya, yb = v + 1.22, v + 2.6
-    # history -> select models -> baseline -> revise (+context) -> revised forecast with its horizon
-    sheet(sh, u + 0.18, ya - 0.3, 0.92, 0.6, SER)
-    caption(sh, u + 0.64, ya + 0.33, 'History')
-    arrow(sh, u + 1.2, ya, u + 1.4, ya, color=TK, lw=2.0)
-    card(sh, u + 1.42, ya - 0.5, 1.34, 1.0, key='tsk', lw=1.3, radius=0.15)
-    T(sh, u + 1.42, ya - 0.47, 1.34, 0.34, 'Select Models', size=13)
+# --------------------------------------------------------------------------------------------- glyphs
+def g_impute(sh, x, y):
+    vals = SER
+    n = len(vals) - 1
+    pts = [(x + GW * k / n, y + GH * (1 - v)) for k, v in enumerate(vals)]
+    poly(sh, pts[:5], INK, lw=1.6); poly(sh, pts[8:], INK, lw=1.6)
+    poly(sh, pts[4:9], TK, lw=2.0, dash=MSO_LINE.DASH)
+    b = box(sh, pts[4][0], y + 0.02, pts[8][0] - pts[4][0], GH - 0.04, fill=TK, radius=0.15); alpha_fill(b, 14)
+
+
+def g_forecast(sh, x, y):
+    mini_forecast(sh, x, y + 0.05, GW, GH - 0.3, cut=0.6)
+
+
+def g_detect(sh, x, y):
+    vals = [0.35, 0.5, 0.38, 0.52, 0.4, 0.95, 0.42, 0.5, 0.36, 0.48, 0.4, 0.5]
+    pts = pline(sh, x, y + 0.1, GW, GH - 0.2, vals, INK, lw=1.6)
+    b = box(sh, pts[4][0], y + 0.02, pts[6][0] - pts[4][0], GH - 0.06, fill=TK, line=TK, lw=1.0, radius=0.1,
+            dash=MSO_LINE.DASH); alpha_fill(b, 20)
+    for k, (lab, c) in enumerate((('A', TK), ('B', EV))):
+        p = box(sh, x + 0.02 + 0.36 * k, y + GH - 0.3, 0.3, 0.26, fill=c, radius=0.5); label_in(p, lab, size=12)
+
+
+def g_event(sh, x, y):
+    pline(sh, x, y + 0.2, GW * 0.55, GH - 0.55, SER[:7], INK, lw=1.6)
+    t0 = x + GW * 0.55
+    now_line(sh, t0, y + 0.02, GH - 0.1)
+    bx, bw, bh = t0 + 0.22, 0.34, GH - 0.3
+    box(sh, bx, y + 0.12, bw, bh, fill='FFFFFF', line=EVm, lw=1.0, shape=MSO_SHAPE.RECTANGLE)
+    box(sh, bx, y + 0.12 + bh * 0.3, bw, bh * 0.7, fill=TK, shape=MSO_SHAPE.RECTANGLE)
+    T(sh, bx - 0.25, y + GH - 0.16, bw + 0.5, 0.22, '0.7', size=12, color=TK)
+
+
+def g_describe(sh, x, y):
+    s = paper(sh, x + 0.05, y + 0.12, GW - 0.2, GH - 0.18, n=2)
+    pline(sh, x + 0.14, y + 0.18, GW - 0.38, 0.38, SER, INK, lw=1.4)
     for k in range(3):
-        c = box(sh, u + 1.49 + k * 0.41, ya + 0.0, 0.38, 0.34, fill=TKl, line=TKm, lw=1.0, radius=0.3)
-        runs(c, [('M', TK, True, False), (str(k + 1), TK, True, True)], 13)
-    arrow(sh, u + 2.78, ya, u + 2.96, ya, color=TK, lw=2.0)
-    pline(sh, u + 3.0, ya - 0.28, 0.62, 0.42, [0.2, 0.35, 0.3, 0.5, 0.45, 0.65, 0.6, 0.8], INK, lw=1.6)
-    caption(sh, u + 3.31, ya + 0.33, 'Baseline')
-    arrow(sh, u + 3.66, ya, u + 3.84, ya, color=TK, lw=2.0)
-    step(sh, u + 3.86, 0, 0.84, 'Revise', cy=ya)
-    p = box(sh, u + 3.78, v + 0.42, 1.0, 0.34, fill=SDl, line=SDm, lw=1.2, radius=0.5); shadow(p)
-    label_in(p, 'Context', size=13, color=INK)
-    arrow(sh, u + 4.28, v + 0.77, u + 4.28, ya - 0.26, color=SD, lw=2.0)
-    arrow(sh, u + 4.72, ya, u + 4.9, ya, color=TK, lw=2.0)
-    fx, fw = u + 4.95, 1.1
-    t0 = fc_glyph(sh, fx, ya - 0.27, fw, 0.5, cut=0.46)
-    caption(sh, fx + fw / 2 - 0.12, ya + 0.5, 'Revised Value', w=1.3)
-    yh = ya - 0.42   # horizon bracket over the forecast part
-    poly(sh, [(t0 + 0.02, yh + 0.06), (t0 + 0.02, yh), (fx + fw, yh), (fx + fw, yh + 0.06)], TK, lw=1.4)
-    T(sh, (t0 + fx + fw) / 2 - 0.5, yh - 0.29, 1.0, 0.26, 'Horizon', size=12.5, color=TK)
-    # event prediction
-    arrow(sh, u + 0.64, ya + 0.6, u + 0.64, yb - 0.27, color=TK, lw=2.0)
-    step(sh, u + 0.18, 0, 1.86, 'Predict Event', icon='timeline', cy=yb)
-    arrow(sh, u + 2.06, yb, u + 2.26, yb, color=TK, lw=2.0)
-    box(sh, u + 2.32, yb - 0.27, 0.24, 0.5, fill='FFFFFF', line=TKm, lw=1.0, shape=MSO_SHAPE.RECTANGLE)
-    box(sh, u + 2.32, yb - 0.27 + 0.5 * 0.3, 0.24, 0.5 * 0.7, fill=TK, shape=MSO_SHAPE.RECTANGLE)
-    arrow(sh, u + 2.26, yb + 0.23, u + 2.62, yb + 0.23, color=MUTE, lw=1.2, head=None)
-    T(sh, u + 2.62, yb - 0.15, 1.05, 0.3, 'Probability', size=13, color=MUTE, align='l')
-    # feedback: observed error -> refine prompt -> revise
-    rx = u + 3.88
-    step(sh, rx, 0, 1.9, 'Refine Prompt', icon='document', cy=yb)
-    fb(sh, [(fx + fw + 0.08, ya), (fx + fw + 0.08, yb), (rx + 1.92, yb)])
-    T(sh, u + 4.4, yb + 0.28, 1.7, 0.26, 'Observed Error', size=13, italic=True, color=EV, align='r')
-    fb(sh, [(u + 4.28, yb - 0.27), (u + 4.28, ya + 0.27)])
-    evaluation(sh, u, vz, 'Forecast Error · Calibration')
-    return g
+        arrow(sh, x + 0.16, y + 0.68 + 0.13 * k, x + GW - 0.3 - 0.25 * (k == 2), y + 0.68 + 0.13 * k, color=TKm, lw=2.2, head=None)
 
 
-# ------------------------------------------------------------------------------------------------ generation
-def synthesis(slide):
-    g, sh, u, v, vz = panel(slide, 1, 0, 'Generation', 'synthesis', 'Augmentation · Conditioned Synthesis')
-    ys = [v + 1.25, v + 2.25]
-    ym = (ys[0] + ys[1]) / 2
-    sheet(sh, u + 0.18, ym - 0.3, 0.86, 0.6, SER[::-1])
-    caption(sh, u + 0.61, ym + 0.33, 'Examples')
-    bx = u + 1.24
-    arrow(sh, u + 1.1, ym, bx, ym, color=TK, lw=2.0, head=None)
-    poly(sh, [(bx, ys[0]), (bx, ys[1])], TK, lw=2.0)
-    c1, c2 = u + 1.4, u + 3.02
-    for y, a, b, cls in ((ys[0], 'Set Conditions', 'Generator', 'Conditioned Synthesis'),
-                         (ys[1], 'Configure', 'Transform', 'Augmentation')):
-        T(sh, c1 + 0.84, y - 0.56, 2.1, 0.26, cls, size=12.5, italic=True, color=TK, align='l')
-        arrow(sh, bx, y, c1 - 0.02, y, color=TK, lw=2.0)
-        step(sh, c1, 0, 1.44, a, cy=y)
-        arrow(sh, c1 + 1.46, y, c2 - 0.02, y, color=TK, lw=2.0)
-        step(sh, c2, 0, 1.08, b, cy=y)
-    # generated samples and transformed views
-    sx, sw, mx = u + 4.2, 0.42, u + 4.74
-    for k, y in enumerate(ys):
-        arrow(sh, c2 + 1.1, y, sx - 0.04, y, color=TK, lw=2.0, head=None)
-        n = 3 - k
-        for m in range(n):
-            yy = y - 0.075 * (n - 1) + m * 0.15
-            pts = [(sx + sw * q / 24, yy - 0.05 * math.sin(2 * math.pi * (q / 24 * 1.6 + 0.3 * m))) for q in range(25)]
-            poly(sh, pts, [INK, TK, HUE['gts'][0]][m], lw=1.5)
-        arrow(sh, sx + sw + 0.04, y, mx, y, color=TK, lw=2.0, head=None)
-    poly(sh, [(mx, ys[0]), (mx, ys[1])], TK, lw=2.0)
-    rx = u + 4.88
-    arrow(sh, mx, ym, rx - 0.02, ym, color=TK, lw=2.0)
-    step(sh, rx, 0, 1.34, 'Review', icon='evidence_check', cy=ym)
-    yl = ym + 0.86
-    arrow(sh, rx + 0.67, ym + 0.27, rx + 0.67, yl - 0.29, color=TK, lw=2.0)
-    step(sh, rx, 0, 1.34, 'Learner', icon='learner', cy=yl)
-    # refine loop back to the conditions
-    yt = v + 0.46
-    fb(sh, [(rx + 1.1, ym - 0.27), (rx + 1.1, yt), (c1 + 0.72, yt), (c1 + 0.72, ys[0] - 0.27)])
-    T(sh, rx + 0.2, yt + 0.04, 0.84, 0.28, 'Refine', size=13, italic=True, color=EV, align='r')
-    evaluation(sh, u, vz, 'Fidelity · Downstream Learning Utility')
-    return g
+def g_projection(sh, x, y):
+    pline(sh, x, y + 0.25, GW * 0.45, GH - 0.6, SER[:6], INK, lw=1.6)
+    t0 = x + GW * 0.45
+    now_line(sh, t0, y + 0.02, GH - 0.1)
+    yc = y + 0.25 + (GH - 0.6) * (1 - SER[5])
+    for dy, lab in ((-0.32, 'If X'), (0.3, 'If Y')):
+        curve(sh, [(t0, yc), (t0 + 0.35, yc + dy * 0.5), (x + GW - 0.05, yc + dy)], MUTE, lw=1.6, dash=MSO_LINE.DASH, head=False)
+    T(sh, x + GW - 0.55, y - 0.02, 0.6, 0.22, 'If X', size=12, color=MUTE)
+    T(sh, x + GW - 0.55, y + GH - 0.22, 0.6, 0.22, 'If Y', size=12, color=MUTE)
 
 
-# ------------------------------------------------------------------------------------------------ analysis of observed series
-def anomaly(slide):
-    g, sh, u, v, vz = panel(slide, 0, 0, 'Analysis of Observed Series', 'anomaly',
-                            ['Classification · Imputation', 'Anomaly Detection and Diagnosis · Question Answering'], dy=0.38)
-    ya, yb = v + 1.55, v + 2.55
-    spike = [0.35, 0.45, 0.3, 0.42, 0.36, 0.5, 0.95, 0.4, 0.38, 0.5, 0.33, 0.45]
-    sheet(sh, u + 0.18, ya - 0.3, 0.9, 0.6, spike)
-    caption(sh, u + 0.63, ya + 0.33, 'Series')
-    # choose probes -> diagnostics / detector -> refine intervals -> intervals
-    dx, dw = u + 1.42, 1.2
-    step(sh, dx + 0.6 - 0.95, v + 0.44, 1.9, 'Choose Probes', icon='reference_lookup', h=0.44)
-    arrow(sh, dx + 0.6, v + 0.89, dx + 0.6, ya - 0.52, color=TK, lw=2.0)
-    fx = u + 1.26
-    arrow(sh, u + 1.14, ya, fx, ya, color=TK, lw=2.0, head=None)
-    poly(sh, [(fx, ya - 0.27), (fx, ya + 0.27)], TK, lw=2.0)
-    for y, lab in ((ya - 0.27, 'Diagnostics'), (ya + 0.27, 'Detector')):
-        arrow(sh, fx, y, dx - 0.02, y, color=TK, lw=2.0)
-        step(sh, dx, 0, dw, lab, h=0.44, cy=y)
-        arrow(sh, dx + dw + 0.02, y, dx + dw + 0.16, y, color=TK, lw=2.0, head=None)
-    mx = dx + dw + 0.16
-    poly(sh, [(mx, ya - 0.27), (mx, ya + 0.27)], TK, lw=2.0)
-    rx = mx + 0.16
-    arrow(sh, mx, ya, rx - 0.02, ya, color=TK, lw=2.0)
-    step(sh, rx, 0, 1.62, 'Refine Intervals', cy=ya)
-    arrow(sh, rx + 1.64, ya, rx + 1.82, ya, color=TK, lw=2.0)
-    ix, iw = rx + 1.86, 1.0
-    b = box(sh, ix + 0.42, ya - 0.34, 0.26, 0.62, fill=TK, line=TK, lw=1.0, dash=MSO_LINE.DASH, shape=MSO_SHAPE.RECTANGLE)
-    alpha_fill(b, 18)
-    pline(sh, ix, ya - 0.3, iw, 0.52, [0.3, 0.42, 0.28, 0.4, 0.35, 0.55, 0.95, 0.45, 0.3, 0.42, 0.32], INK, lw=1.6)
-    caption(sh, ix + iw / 2, ya + 0.32, 'Intervals', w=1.0)
-    # build detector from data / labels
-    p = box(sh, u + 0.14, yb - 0.18, 1.42, 0.36, fill=SDl, line=SDm, lw=1.2, radius=0.5); shadow(p)
-    T(sh, u + 0.14, yb - 0.18, 1.42, 0.36, 'Data / Labels', size=12.5, color=INK)
-    bx = u + 1.72
-    arrow(sh, u + 1.58, yb, bx - 0.02, yb, color=TK, lw=2.0)
-    step(sh, bx, 0, 1.5, 'Build Detector', cy=yb)
-    arrow(sh, dx + 0.6, yb - 0.27, dx + 0.6, ya + 0.5, color=TK, lw=2.0)
-    # diagnose with logs -> candidate causes
-    gx = u + 3.4
-    ic(sh, 'logs', gx, yb - 0.3, 0.46)
-    T(sh, gx - 0.17, yb + 0.15, 0.8, 0.26, 'Logs', size=12.5, color=MUTE)
-    qx = u + 4.12
-    arrow(sh, gx + 0.5, yb, qx - 0.02, yb, color=TK, lw=2.0)
-    step(sh, qx, 0, 1.0, 'Diagnose', cy=yb)
-    arrow(sh, ix + 0.3, ya + 0.6, ix + 0.3, yb - 0.27, color=TK, lw=2.0)
-    arrow(sh, qx + 1.02, yb, qx + 1.14, yb, color=TK, lw=2.0)
-    c = box(sh, qx + 1.16, yb - 0.36, 0.94, 0.72, fill='FFFFFF', line=TK, lw=1.3, dash=MSO_LINE.DASH, radius=0.12)
-    T(sh, qx + 1.16, yb - 0.34, 0.94, 0.68, ['Cause A?', 'Cause B?'], size=12.5, bold=True, color=TK)
-    evaluation(sh, u, vz, 'Detection · Validation of Proposed Causes')
-    return g
+def g_hindsight(sh, x, y):
+    vals = [0.4, 0.5, 0.45, 0.55, 0.5, 0.35, 0.25, 0.2, 0.15]
+    pts = pline(sh, x, y + 0.18, GW * 0.82, GH - 0.42, vals, INK, lw=1.6)
+    k0 = 4
+    curve(sh, [pts[k0], (pts[6][0], pts[k0][1] - 0.2), (pts[-1][0], pts[k0][1] - 0.4)], MUTE, lw=1.6, dash=MSO_LINE.DASH, head=False)
+    d = box(sh, pts[k0][0] - 0.08, pts[k0][1] - 0.08, 0.16, 0.16, fill=TK, shape=MSO_SHAPE.OVAL)
+    now_line(sh, x + GW - 0.06, y + 0.02, GH - 0.1)
+    T(sh, pts[k0][0] - 0.45, y + GH - 0.24, 0.9, 0.22, 'Earlier', size=12, color=TK)
 
 
-# ------------------------------------------------------------------------------------------------ decision making
-def decision(slide):
-    g, sh, u, v, vz = panel(slide, 1, 1, 'Decision Making', 'decision', 'Decision Support · Autonomous Control')
-    ya, yb = v + 1.42, v + 2.42
-    yr = yb + 0.64
-    sheet(sh, u + 0.26, ya - 0.3, 0.84, 0.6, SER)
-    caption(sh, u + 0.68, ya + 0.33, 'State')
-    ic(sh, 'memory', u + 0.43, yb - 0.32, 0.5)
-    caption(sh, u + 0.68, yb + 0.17, 'Memory', w=1.0)
-    rx = u + 1.34
-    arrow(sh, u + 1.18, ya, rx - 0.02, ya, color=TK, lw=2.0)
-    step(sh, rx, 0, 0.9, 'Retrieve', cy=ya)
-    go(sh, [(u + 0.97, yb - 0.07), (rx + 0.45, yb - 0.07), (rx + 0.45, ya + 0.27)])
-    px = rx + 1.06
-    arrow(sh, rx + 0.92, ya, px - 0.02, ya, color=TK, lw=2.0)
-    step(sh, px, 0, 1.5, 'Predict Futures', cy=ya)
-    fx = px + 1.6
-    arrow(sh, px + 1.52, ya, fx, ya, color=TK, lw=2.0, head=None)
-    poly(sh, [(fx, ya - 0.4), (fx, ya + 0.4)], TK, lw=2.0)
-    ax, aw = fx + 0.44, 0.4
-    mx = ax + aw + 0.08
-    for y, lab, vals, dash in ((ya - 0.4, 'A', [0.2, 0.35, 0.3, 0.55, 0.5, 0.8], None),
-                               (ya + 0.4, 'B', [0.7, 0.6, 0.65, 0.4, 0.45, 0.2], MSO_LINE.DASH)):
-        arrow(sh, fx, y, fx + 0.1, y, color=TK, lw=2.0, head=None)
-        c = box(sh, fx + 0.1, y - 0.15, 0.3, 0.3, fill='FFFFFF', line=TK, lw=1.4, shape=MSO_SHAPE.OVAL)
-        runs(c, [(lab, TK, True, False)], 12.5)
-        pline(sh, ax, y - 0.16, aw, 0.32, vals, INK, lw=1.6, dash=dash)
-        arrow(sh, ax + aw + 0.02, y, mx, y, color=TK, lw=2.0, head=None)
-    poly(sh, [(mx, ya - 0.4), (mx, ya + 0.4)], TK, lw=2.0)
-    sx = mx + 0.12
-    xr = u + PW - 0.14
-    arrow(sh, mx, ya, sx - 0.02, ya, color=TK, lw=2.0)
-    step(sh, sx, 0, xr - sx, ['Select /', 'Check Risk'], h=0.74, size=12.5, cy=ya)
-    # decision support: recommend to an operator, who reviews the choice
-    ow = 0.86
-    oy = v + 0.38
-    step(sh, xr - ow, 0, ow, ['Operator', 'Review'], h=0.52, size=12.5, cy=oy)
-    rcx = sx + 0.16
-    go(sh, [(rcx, ya - 0.38), (rcx, oy), (xr - ow - 0.02, oy)])
-    T(sh, rcx - 1.06, oy + 0.12, 1.0, 0.26, 'Recommend', size=12.5, italic=True, color=TK, align='r')
-    # autonomous control: act in the environment, observe the outcome
-    sim_w = 1.5
-    smx = xr - sim_w
-    acx = (sx + xr) / 2
-    arrow(sh, acx, ya + 0.38, acx, yb - 0.27, color=TK, lw=2.0)
-    T(sh, acx - 0.82, (ya + 0.38 + yb - 0.27) / 2 - 0.14, 0.76, 0.28, 'Action', size=13, italic=True, color=TK, align='r')
-    step(sh, smx, 0, sim_w, 'Simulator', icon='simulator', cy=yb)
-    fb(sh, [(smx + sim_w / 2, yb + 0.27), (smx + sim_w / 2, yr), (u + 0.12, yr), (u + 0.12, ya), (u + 0.24, ya)])
-    T(sh, u + 1.6, yr - 0.31, 2.2, 0.28, 'Observed Outcome', size=13, italic=True, color=EV)
-    evaluation(sh, u, vz, 'Action Utility · Risk · Latency')
+def g_decide(sh, x, y):
+    pline(sh, x, y + 0.25, GW * 0.42, GH - 0.6, SER[:6], INK, lw=1.6)
+    t0 = x + GW * 0.42
+    now_line(sh, t0, y + 0.02, GH - 0.1)
+    yc = y + 0.25 + (GH - 0.6) * (1 - SER[5])
+    for dy, lab in ((-0.3, 'A'), (0.3, 'B')):
+        arrow(sh, t0 + 0.04, yc, t0 + 0.55, yc + dy, color=TK, lw=1.8)
+        p = box(sh, t0 + 0.58, yc + dy - 0.14, 0.28, 0.28, fill='FFFFFF', line=TK, lw=1.3, shape=MSO_SHAPE.OVAL)
+        label_in(p, lab, size=12, color=TK)
+
+
+# ------------------------------------------------------------------------------------------------ cells
+ROWS = [  # (mode, icon, [observed cell, future cell])
+    ('Regression', 'timeseries', [
+        (g_impute, 'Imputation and Estimation', 15, 'Imputation · Reconstruction · Estimation', 'Error Against Observed Values'),
+        (g_forecast, 'Value Forecasting', 74, 'Point and Probabilistic Forecasts', 'Error · Proper Scoring Rules')]),
+    ('Classification', 'anomaly', [
+        (g_detect, 'Classification and Detection', 65, ['Classification · Anomaly Detection', 'Root Cause · Closed Questions'],
+         'Accuracy · F1 · AUC'),
+        (g_event, 'Event Forecasting', 14, 'Event Label · Event Probability', 'Accuracy · Brier Score')]),
+    ('Generation', 'synthesis', [
+        (g_describe, 'Description and Synthesis', 40, ['Open Questions · Explanation', 'Annotation · Synthesis'],
+         'Quality · Fidelity · Use'),
+        (g_projection, 'Projection', 0, 'Futures Under Assumed Conditions', 'No Realized Future to Score')]),
+    ('Decision Making', 'decision', [
+        (g_hindsight, 'Hindsight Decision', 0, 'Action That Should Have Been Taken', 'Replay · Counterfactual Estimate'),
+        (g_decide, 'Decision', 46, 'Advisory Decision · Autonomous Control', 'Utility · Cost · Risk')]),
+]
+
+
+def cell(slide, x, y, spec):
+    glyph, name, n, tasks, check = spec
+    g = group(slide); sh = g.shapes
+    empty = n == 0
+    if empty:
+        box(sh, x, y, CW, RH, fill=EVl, line=EVm, lw=1.4, radius=0.08, dash=MSO_LINE.DASH)
+    else:
+        card(sh, x, y, CW, RH, 'tsk')
+    glyph(sh, x + 0.16, y + (RH - GH) / 2)
+    tx0, tw = x + 0.16 + GW + 0.18, CW - GW - 0.42
+    T(sh, tx0, y + 0.1, tw, 0.36, name if empty else f'{name} ({n})', size=15.5, color=EV if empty else TK, align='l')
+    lines = tasks if isinstance(tasks, list) else [tasks]
+    T(sh, tx0, y + 0.48, tw, 0.24 * len(lines) + 0.04, lines, size=12.5, bold=False, color=INK, align='l', anchor='t')
+    cy = y + RH - 0.44
+    b = box(sh, tx0, cy, tw, 0.32, fill=EVl if not empty else 'FFFFFF', line=EVm, lw=0.9, radius=0.5)
+    T(sh, tx0 + 0.12, cy, tw - 0.2, 0.32, check, size=12.5, color=EV, align='l')
+    if empty:
+        p = box(sh, x + CW - 1.5, y + 0.12, 1.36, 0.3, fill=EV, radius=0.5); label_in(p, 'Open Problem', size=12.5)
     return g
 
 
 def build(out):
     p, slide = new_slide(H)
-    forecasting(slide); synthesis(slide); anomaly(slide); decision(slide)
+    g = group(slide); sh = g.shapes
+    # column banners
+    for k, (t, key) in enumerate((('Observed Record', 'data'), ('After the Current Time', 'tsk'))):
+        banner(sh, CX[k] + CW / 2, 0.22, 3.6, t, HUE[key][0], size=18, h=0.48)
+    # Now divider
+    arrow(sh, DIV, 0.82, DIV, RY[-1] + RH + 0.05, color=GT, lw=2.0, dash=MSO_LINE.DASH, head=None)
+    pn = box(sh, DIV - 0.36, 0.3, 0.72, 0.32, fill=GT, radius=0.5); label_in(pn, 'Now', size=14)
+    # row headers
+    for (mode, icon, cells), y in zip(ROWS, RY):
+        h = group(slide).shapes
+        b = box(h, X0, y, HW, RH, fill=ZONE_FILL['tsk'], radius=0.08)
+        ic(h, icon, X0 + (HW - 0.62) / 2, y + 0.2, 0.62)
+        T(h, X0, y + 0.9, HW, 0.5, mode, size=15.5, color=TK)
+        for k, spec in enumerate(cells):
+            cell(slide, CX[k], y, spec)
     save(p, out)
     for w in WARN: print('WARN', w)
 
 
 if __name__ == '__main__':
-    build(sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Figure08_V7.pptx'))
+    here = os.path.dirname(os.path.abspath(__file__))
+    build(sys.argv[1] if len(sys.argv) > 1 else os.path.join(here, 'Figure08_V7.pptx'))

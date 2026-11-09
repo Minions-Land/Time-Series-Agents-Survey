@@ -230,7 +230,7 @@ def main():
 
     # LLM wedge content: label, inner-ring name, five representative LLM-side works (logos reused from the figure)
     llm_label = next(s for s in g.shapes if sid(s) in keep and s.shape_type == 17)
-    set_lines(llm_label, ['Align, Reason', 'and Operate'], HUE['llm'][0])   # the three routes of Section 3
+    set_lines(llm_label, ['LLM as', 'the Caller'], HUE['llm'][0])   # Section 3: the LLM is the caller of the Harness
     inner = clone(by_id[47]._element); by_id[47]._element.addnext(inner)
     name = next(s for s in g.shapes if s._element is inner)
     set_lines(name, ['LLM Side'], HUE['llm'][0], align=PP_ALIGN.CENTER)
@@ -375,7 +375,7 @@ CELL = {'interface': ('GH', 'Interface and Interaction'), 'memory': ('GH', 'Memo
         'tools': ('GH', 'Tools and Execution'), 'planning': ('GH', 'Planning and Orchestration'),
         'optimization': ('GH', 'Optimization and Evolution'), 'gts1': ('GTS', 'data_management'),
         'gts2': ('GTS', 'processing'), 'gts3': ('GTS', 'context_memory'), 'gts4': ('GTS', 'validation'),
-        'tsk1': ('TSK', 'analysis'), 'tsk2': ('TSK', 'forecasting'), 'tsk3': ('TSK', 'generation'),
+        'tsk1': ('TSK', 'classification'), 'tsk2': ('TSK', 'regression'), 'tsk3': ('TSK', 'generation'),
         'tsk4': ('TSK', 'decision'), 'llm': ('LLM', None)}
 # figure tag name -> ledger key where the name is not the ledger's work name (None: not a reviewed contribution)
 TAG_KEY = {'TS-Scientist': 'timeseriesscientist2025', 'AURA': 'auraforecaster2026', 'TS-Gym': 'timeseriesgym2025',
@@ -507,13 +507,14 @@ def ledger_tags(g, outer, kx):
 
     A tag in wedge w is valid when its work has a module in w's cell: an LLM-side module (LLM wedge), a General Harness
     module with that mechanism dimension, a General Time Series Harness module with that temporal function, or a
-    Task-Specific Harness module applied to that task group (scripts/task_groups.py). Valid tags stay. An invalid tag
+    Task-Specific Harness module applied to that output mode (scripts/task_groups.py, module_cells). Valid tags stay. An invalid tag
     keeps its slot and is rewritten (name, year, logo) to the valid work, among the works already shown in the figure
     (their logos are known), with the most modules in that cell and the fewest appearances so far; a slot with no
     valid candidate is removed. Years follow the ledger's first public version."""
     import csv, json, re
     sys.path.insert(0, os.path.join(HERE, '..', '..', '..', 'scripts'))
-    from task_groups import module_groups
+    from task_groups import module_cells
+    module_groups = lambda m: {c[0] for c in module_cells(m)}   # output modes of the task grid
     recs = {r['citation']['key']: r for r in json.load(open(LEDGER)) if r.get('inclusion') == 'reviewed_contribution'}
     norm = lambda t: re.sub(r'[^a-z0-9]', '', t.lower())
     by_work = {}
@@ -767,7 +768,7 @@ def arched_layer_names(slide, rpr, to_slide, kx, ky, labels, size_max=21.5, line
 
 
 # Task-Specific Harness wedges (scripts/task_groups.py, ORDER): new boundaries in degrees, from 50 (GTS | TSK) to 0.
-TSK_GROUPS = [('Analysis', 'of Observed', 'Series'), ('Forecasting',), ('Generation',), ('Decision', 'Making')]
+TSK_GROUPS = [('Classification',), ('Regression',), ('Generation',), ('Decision', 'Making')]   # output modes; order keeps the wedge icons
 TSK_BOUNDS = [50.0, 37.5, 25.0, 12.5, 0.0]                 # four equal wedges
 # Representative works per group. A work goes to the group of its Task-Specific Harness modules (ledger task labels
 # mapped by task_groups.LEAF); a work whose modules span two groups stays in the group that matches its former family

@@ -39,7 +39,14 @@ GROUP_LINKS: list[tuple[str, str]] = []                       # (layer, task gro
 LAYER_MODULES: Counter = Counter()                            # Harness modules per layer
 PAIRS: list[tuple[str, str, str]] = []                        # (mechanism dimension, task group, layer) of one module
 sys.path.insert(0, str(ROOT / "scripts"))
-from task_groups import GROUPS, ORDER as GROUP_ORDER, module_groups   # noqa: E402  task groups of the survey
+from task_groups import MODES as GROUP_ORDER, module_cells   # noqa: E402  output modes of the task grid
+GROUPS = {'regression': 'Regression', 'classification': 'Classification', 'generation': 'Generation',
+          'decision': 'Decision Making'}
+
+
+def module_groups(module):
+    """Output modes a module is applied to (the rows of the task grid)."""
+    return {cell[0] for cell in module_cells(module)}
 # The five mechanism dimensions of the General Harness (Table tab:component-vocab), in the order of Section 4.
 DIMENSIONS = ["Interface and Interaction", "Memory and Context", "Tools and Execution",
               "Planning and Orchestration", "Optimization and Evolution"]
@@ -133,7 +140,7 @@ def main() -> None:
             writer.writerow([dimension, *(DIM_LINKS.count((dimension, layer)) for layer in HARNESS)])
     with OUT_GROUPS.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle, lineterminator="\n")
-        writer.writerow(["task group", *HARNESS])
+        writer.writerow(["output mode", *HARNESS])
         for g in GROUP_ORDER:
             writer.writerow([GROUPS[g], *(GROUP_LINKS.count((layer, g)) for layer in HARNESS)])
         writer.writerow(["Harness modules", *(LAYER_MODULES[layer] for layer in HARNESS)])
@@ -193,7 +200,7 @@ OY = CH + 0.35                       # the top row sits above panel (c)
 ZONES = {"a": (0.12, OY + 0.10, 6.88, 5.10), "b": (7.16, OY + 0.10, 6.05, 5.10), "c": (0.12, 0.10, 13.09, CH - 0.1)}
 AXES = {"a": (1.02, OY + 0.80, 5.36, 3.98), "b": (8.16, OY + 1.12, 4.92, 3.48)}
 TITLES = {"a": "(a)  Cumulative Module Contributions", "b": "(b)  Share of New Modules by Period",
-          "c": "(c)  Harness Modules by Layer, Mechanism Dimension and Task Group"}
+          "c": "(c)  Harness Modules by Layer, Mechanism Dimension and Output Mode"}
 
 
 def zone_panel(fig, key):
@@ -322,7 +329,7 @@ DIM_LABEL = {"Interface and Interaction": "Interface and\nInteraction", "Memory 
              "Tools and Execution": "Tools and\nExecution", "Planning and Orchestration": "Planning and\nOrchestration",
              "Optimization and Evolution": "Optimization\nand Evolution"}
 LAYER_NAME = {"GH": "General Harness", "GTS": "General Time Series Harness", "TSK": "Task-Specific Harness"}
-GROUP_LABEL = {"analysis": "Analysis of\nObserved Series", "forecasting": "Forecasting", "generation": "Generation",
+GROUP_LABEL = {"regression": "Regression", "classification": "Classification", "generation": "Generation",
                "decision": "Decision\nMaking"}
 NODE_FILL, NODE_EDGE = "#FFFFFF", "#D9DBE8"
 
@@ -350,7 +357,7 @@ def parallel_paths(fig, months):
     axes = [("Layer", HARNESS, lambda k: LAYER_NAME[k].replace("General Time Series ", "General Time Series\n")
                                                      .replace("Task-Specific ", "Task-Specific\n")),
             ("Mechanism Dimension", DIMENSIONS, lambda k: DIM_LABEL[k]),
-            ("Task Group", GROUP_ORDER, lambda k: GROUP_LABEL[k])]
+            ("Output Mode", GROUP_ORDER, lambda k: GROUP_LABEL[k])]
     split = [None, Counter(DIM_LINKS), Counter((g, l) for l, g in GROUP_LINKS)]   # (key, layer) -> modules
     size = [LAYER_MODULES, Counter(d for d, _ in DIM_LINKS), Counter(g for _, g in GROUP_LINKS)]
     XS, BWS = [0.45, 5.05, 9.85], [2.45, 2.75, 2.75]       # left edge and width of each axis' boxes

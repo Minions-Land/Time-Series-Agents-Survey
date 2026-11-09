@@ -64,7 +64,7 @@ This formula is the one concept the survey introduces. Each concrete module a pa
 ```mermaid
 flowchart LR
     M["Module contributed by a paper"] --> Q0{"Changes the model itself?"}
-    Q0 -- yes --> LLM["LLM side<br/>align · reason · operate"]
+    Q0 -- yes --> LLM["LLM side<br/>the caller"]
     Q0 -- no --> Q1{"Embeds a task's output,<br/>objective or validator?"}
     Q1 -- yes --> TSK["Task-Specific Harness<br/>REDESIGN"]
     Q1 -- no --> Q2{"Depends on time order, windows,<br/>units or information availability?"}
@@ -72,18 +72,18 @@ flowchart LR
     Q2 -- no --> GH["General Harness<br/>REUSE"]
 ```
 
-Every other label describes one term, and none is a new classification:
+Every other label describes one term, and none is a new classification. The LLM is the caller of the Harness and needs no vocabulary of its own:
 
 | Term | Vocabulary | Basis |
 |---|---|---|
-| **LLM side** | Temporal representation and alignment · temporal instruction and reasoning · learning to operate temporal workflows | Where the model enters the Agent loop $a_k=\pi_\theta(s_k)$: the state it reads, its parameters, its action policy |
+| **LLM side** | None: the LLM is the caller $\pi_\theta$ | Every LLM-side contribution changes the same policy in $a_k=\pi_\theta(s_k)$, which reads the state and makes function calls; time series foundation models are tools in the Harness |
 | **General Harness** | Interface and Interaction · Memory and Context · Tools and Execution · Planning and Orchestration · Optimization and Evolution | Synthesized from Agent and Harness research (CoALA, Wang et al., code-harness and agentic-harness surveys) |
-| **General Time Series Harness** | Temporal Data Management · Temporal Processing · Temporal Context and Memory · Temporal Validation | The availability record $(x_i,t_i,v_i)$: store it, operate on it over windows, admit outside context, check $v_i\le\tau$ |
-| **Task-Specific Harness** | Analysis of Observed Series (classification · imputation · anomaly detection · question answering) · Forecasting · Generation · Decision Making | What the output refers to relative to the current time; task names from TimesNet/TSLib and Time-MQA |
+| **General Time Series Harness** | Temporal Data Management · Temporal Processing · Temporal Context and Memory · Temporal Validation | The availability record $(x_i,t_i,v_i)$ (valid and transaction time of temporal databases): store it, operate on it over windows, admit outside context, check $v_i\le\tau$; the structures, operators and integrity rules of a data model plus the record's scope |
+| **Task-Specific Harness** | Task grid: Regression · Classification · Generation · Decision Making, each on the observed record or after the current time | Output type and its scoring rule (ESL, Bishop, Gneiting) × the classical split at the current time (Wiener, Kalman); standard task names (TimesNet/TSLib, Time-MQA) in each cell |
 | **Evaluation** | Process Validity · Temporal Validity · Task Performance · Decision Utility | One check per term |
 
 <details>
-<summary><strong>Second-level classes</strong> (manuscript Tables 5–7)</summary>
+<summary><strong>Second-level classes and the task grid</strong> (manuscript Tables 5–7; reference modules per cell in Table 8)</summary>
 
 | First level | Second-level classes | Criterion |
 |---|---|---|
@@ -96,10 +96,10 @@ Every other label describes one term, and none is a new classification:
 | Temporal Processing | Preprocessing and transformation · statistical and spectral analysis · series views for the LLM · operator and skill libraries | Returned object |
 | Temporal Context and Memory | External events and text · historical analogues · procedural experience | Admitted information |
 | Temporal Validation | Availability checks ($v$) · past-only computation ($t$) · data and schema checks ($x$) · temporal claim verification | Checked component |
-| Analysis of Observed Series | Classification · imputation · anomaly detection and diagnosis · question answering | Standard task names |
-| Forecasting | Value forecasting · event and probability forecasting | Output contract |
-| Generation | Augmentation · conditioned synthesis | Source of the new series |
-| Decision Making | Decision support · autonomous control | Who executes the action |
+| Regression | Observed: imputation and estimation (15 works) · After: value forecasting, point or probabilistic (74) | Checked against observed values |
+| Classification | Observed: classification · anomaly detection · root cause identification · closed question answering (65) · After: event forecasting (14) | Checked against observed classes |
+| Generation | Observed: open question answering · explanation · annotation · synthesis (40) · After: projection, open problem (0) | No single reference: quality, fidelity, use |
+| Decision Making | Observed: hindsight decision, open problem (0) · After: advisory decision · autonomous control (46) | Consequences of the action |
 
 </details>
 
@@ -154,7 +154,7 @@ A Paper Card records what a work contributes, module by module, with the passage
 ## 📈 What the records show
 
 <p align="center">
-  <img src="docs/assets/trends.png" width="88%" alt="Module contributions over time: cumulative counts and doubling times by layer, share of new modules by period, and a classification of every Harness module from its layer through its mechanism dimensions to its task groups.">
+  <img src="docs/assets/trends.png" width="88%" alt="Module contributions over time: cumulative counts and doubling times by layer, share of new modules by period, and a classification of every Harness module from its layer through its mechanism dimensions to its output modes.">
 </p>
 
 - **How to assess a new work.** Place its modules in the formula; check the claimed scope (a general mechanism
@@ -163,7 +163,7 @@ A Paper Card records what a work contributes, module by module, with the passage
 - **Most works automate; fewer meet a time series requirement under test.** 136 of 162 works automate an analysis.
   Only 70 of the 143 method works test the requirement their modules address (leakage, regime change, data quality,
   context, decision consequences, verifiability or deployment).
-- **Generality is often claimed, less often shown.** Reuse across at least two task groups is demonstrated for 82 of
+- **Generality is often claimed, less often shown.** Reuse across at least two cells of the task grid is demonstrated for 95 of
   the 189 General Harness and General Time Series Harness modules; the generality of the rest is inferred from their
   interfaces.
 - **Effort is moving from the model to the runtime.** The LLM side supplied about a third of new modules until the
@@ -172,7 +172,10 @@ A Paper Card records what a work contributes, module by module, with the passage
   execution; only 18 plan or orchestrate and 2 optimize the Harness, so temporal workflow control is still written as a
   general mechanism or inside a task. Decision making relies on task modules in every mechanism dimension.
 - **Solutions stay inside tasks.** There are 325 task-specific modules for 97 shared temporal ones. Of the module
-  links to a tested requirement, 108 of 181 are task modules. Generation has no shared data-management module.
+  links to a tested requirement, 108 of 181 are task modules.
+- **Two task cells are well defined but unstudied.** Projection (futures under assumed conditions) and hindsight
+  decision (the action that should have been taken earlier) appear only inside decision procedures and reflection
+  memories, never as evaluated outputs.
 
 ## 🤝 Contribute
 
