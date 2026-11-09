@@ -163,7 +163,7 @@ A Paper Card records what a work contributes, module by module, with the passage
 - **Most works automate; fewer meet a time series requirement under test.** 136 of 162 works automate an analysis.
   Only 70 of the 143 method works test the requirement their modules address (leakage, regime change, data quality,
   context, decision consequences, verifiability or deployment).
-- **Generality is often claimed, less often shown.** Reuse across at least two task groups is demonstrated for 83 of
+- **Generality is often claimed, less often shown.** Reuse across at least two task groups is demonstrated for 82 of
   the 189 General Harness and General Time Series Harness modules; the generality of the rest is inferred from their
   interfaces.
 - **Effort is moving from the model to the runtime.** The LLM side supplied about a third of new modules until the
