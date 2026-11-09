@@ -247,7 +247,7 @@ At an abstract level, the runtime can be written as
 \end{equation}
 where $s_k$ is the visible state at execution step $k$, $a_k$ is a tool or environment action, $o_{k+1}$ is the returned observation, and $\mathcal{H}$ is the Harness transition. Time Series Harness modules add temporal type information to each state, action, and observation.
 
-Each term is described with one vocabulary, listed in Table~\ref{tab:term-basis} with its basis. None of these vocabularies is a new classification: the mechanism dimensions are taken from prior surveys, the task names inside each task group are standard in time series analysis, and the LLM intervention points, temporal functions, task groups, and evaluation criteria follow from the definition of their term. The labels are many-to-many annotations of a module, so a module may carry several mechanism, function, or task labels while counting once at its assigned term. A module keeps its term when another task calls it; a new task objective instead motivates a distinct task module.
+Each term is described with one vocabulary, listed in Table~\ref{tab:term-basis} with its basis. None of these vocabularies is a new classification: the mechanism dimensions are taken from prior surveys, the task names inside each task group are standard in time series analysis, and the temporal functions, task groups, and evaluation criteria follow from the definition of their term. The LLM term needs no vocabulary, because every LLM-side contribution changes the same caller. The labels are many-to-many annotations of a module, so a module may carry several mechanism, function, or task labels while counting once at its assigned term. A module keeps its term when another task calls it; a new task objective instead motivates a distinct task module.
 
 \begin{table}[H]
 \centering\small
@@ -258,7 +258,7 @@ Each term is described with one vocabulary, listed in Table~\ref{tab:term-basis}
 \toprule
 \textbf{Term} & \textbf{Vocabulary} & \textbf{Basis}\\
 \midrule
-LLM & Representation and alignment; temporal instruction and reasoning; operating temporal workflows (Section~\ref{sec:llm-side}). & The three places where the model enters Eq.~\eqref{eq:agent-loop}: the state $s_k$ it reads, the parameters $\theta$ trained on temporal tasks, and the policy $\pi_\theta$ that selects $a_k$ from returned observations.\\
+LLM & None: the LLM is the caller $\pi_\theta$ (Section~\ref{sec:llm-side}). & Every LLM-side contribution changes the same policy in Eq.~\eqref{eq:agent-loop}, which reads the state, selects function calls, and interprets their results. Time series foundation models are tools in the Harness, not part of this term.\\
 General Harness & Interface and interaction; memory and context; tools and execution; planning and orchestration; optimization and evolution (Section~\ref{sec:general-harness}). & Synthesized from Agent architecture and Harness research \citep{sumers2024coala,wang2024agentsurvey,ning2026codeharness,lin2026agenticharness}.\\
 General Time Series Harness & Temporal data management; processing; context and memory; validation (Section~\ref{sec:general-ts-harness}). & The availability record $(x_i,t_i,v_i)$ of Eq.~\eqref{eq:temporal-availability}: storing and versioning records, operating on values over windows, admitting information other than the series into $\mathcal{I}_\tau$, and checking availability, windows, and units. The temporal runtimes of AION \citep{aion2026} and TimeClaw-Harness \citep{timeclaw2026harness} separate the same responsibilities.\\
 Task-Specific Harness & Analysis of observed series (classification, imputation, anomaly detection, question answering); forecasting; generation; decision making (Section~\ref{sec:task-specific-harness}). & What the output refers to relative to the current time: the series observed so far, values after the current time, a new series, or an action. Task names follow TimesNet and TSLib \citep{wu2023timesnet,wang2024tslib} and Time-MQA \citep{kong2025timemqa}.\\
@@ -336,12 +336,12 @@ $(\widehat{z},\widehat{y},\widetilde{x},a^{\star})$ & Analysis output such as an
 
 
 Sections~3--7 develop these choices from model interfaces and reusable runtime mechanisms to temporal modules, task procedures, and evaluation resources.
-\section{LLM-Side Contributions for Time Series Agents}
+\section{LLM Side: The Caller of the Harness}
 \label{sec:llm-side}
 
-Within the Agent loop, the LLM interprets observations, selects actions, and responds to tool or environment feedback. Temporal model adaptation provides one way to improve particular parts of this interaction. We review three intervention points, which are the three places where the model enters Eq.~\eqref{eq:agent-loop}: the representation of the state $s_k$ presented to the model, the temporal instructions used to train its parameters $\theta$, and the policy $\pi_\theta$ for operating an analytical workflow. The design question is which capability the application needs from the model and which interface connects it to the runtime. A learned encoder needs matching numerical preprocessing; a trained workflow policy needs the tools, observations, and feedback used to define its actions.
+In Eq.~\eqref{eq:agent-loop}, the LLM is the policy $\pi_\theta$: it reads the visible state $s_k$, selects the next action $a_k$, usually a function call with its arguments, and interprets the returned observation $o_{k+1}$. Every LLM-side contribution we review serves this role, so the LLM side is not divided into categories. Two questions organize it instead: what training adds to the model that makes the calls, and which time series capabilities remain with the tools it calls. Training has been used to let the model read time series directly (Section~\ref{sec:llm-read}) and to make it a better caller of temporal workflows (Section~\ref{sec:llm-caller}). Time series foundation models, by contrast, enter the Agent as forecasting tools (Section~\ref{sec:llm-tsfm}). A model that perceives time series natively, as multimodal LLMs perceive images, is the prospect that connects these lines (Section~\ref{sec:llm-native}).
 
-Figure~\ref{fig:llm-contributions} locates these interventions within the interaction loop. The upper row distinguishes input alignment, temporal supervision, and workflow learning; the lower loop shows how the resulting model still relies on Harness execution, state, and feedback. The four evaluation targets at the bottom connect each learned capability to the evidence needed to assess it.
+Figure~\ref{fig:llm-contributions} places these contributions in the interaction loop: training changes the model, while execution, state, and feedback remain in the Harness.
 
 \begin{figure}[!t]
 \centering
@@ -350,7 +350,8 @@ Figure~\ref{fig:llm-contributions} locates these interventions within the intera
 \label{fig:llm-contributions}
 \end{figure}
 
-\subsection{Temporal representation and alignment}
+\subsection{Reading time series inside the model}
+\label{sec:llm-read}
 
 Time-LLM \citep{jin2024timellm} makes a frozen language backbone operate on temporal patches. It constructs a compact set of text prototypes $E'$ from the pretrained word-embedding space and uses the temporal patch embeddings as attention queries. For channel $i$ and attention head $k$, its reprogramming operation is
 \begin{equation}
@@ -373,11 +374,7 @@ Agentic Retrieval-Augmented Generation for Time Series Analysis \citep{agenticra
 
 For numerical forecasting, Time-LLM \citep{jin2024timellm} offers prototype-based reprogramming of a frozen backbone, whereas ChatTS \citep{chatts2025} learns a direct patch-to-language interface for conversational analysis. Eq.~\eqref{eq:timellm-reprogramming} identifies where numerical patches interact with language prototypes; Eq.~\eqref{eq:chatts-value-preserved} identifies the scale information that must accompany normalized inputs. The choice therefore depends on the required output: a numerical forecast head or answers to temporal questions. The Harness supplies window construction, channel and unit metadata, consistent preprocessing, and routing between the learned interface and downstream tools.
 
-\subsection{Temporal instruction and reasoning}
-
 A temporal encoder becomes useful for analysis through supervision that links signal structure to questions and explanations. ChatTS \citep{chatts2025} generates synthetic series with selected temporal attributes, constructs matching text, and evolves instructions for understanding and reasoning. Controlling the generated attributes supplies known temporal properties around which analytical instructions can be built.
-
-
 
 \textit{Towards Time Series Reasoning with LLMs} \citep{chow2024tsreasoning} follows a related learning route through temporal encoding and reasoning supervision. Its encoder warm-up and subsequent language-model adaptation connect temporal perception to explicit reasoning traces. Time-R1 \citep{timer12025} specializes this idea for forecasting: supervised warm-up teaches structured reasoning and complete forecast outputs, followed by reinforcement fine-tuning with format, length, and numerical feedback. Its MSE-based reward maps normalized forecast error to a bounded signal,
 \begin{equation}
@@ -385,26 +382,6 @@ A temporal encoder becomes useful for analysis through supervision that links si
   \label{eq:timer1-reward}
 \end{equation}
 which equals one at zero error and approaches zero as error grows. This bounded transformation compresses differences among high-error forecasts; the normalization of predictions and targets consequently determines the effective sensitivity of the reward. Eq.~\eqref{eq:timer1-reward} illustrates an outcome-based training choice: forecast error supplies a continuous signal alongside format, output-length, and temporal-structure rewards. The accompanying GRIP optimizer uses nonuniform sampling and adaptive weighting over reasoning paths. Time-R1 \citep{timer12025} evaluates forecasting with MSE and MAE and ablates its reward components (Tables~2, 4, and 6); these experiments support comparisons of numerical performance and training choices. Explanation faithfulness requires an additional test of whether the stated reasoning reflects the evidence and computation that produced the forecast.
-
-STRIDE \citep{stride2026} connects language reasoning to a separate numerical foundation model. A teacher constructs reference reasoning from training windows and their pseudo-future targets; a smaller language model learns this reasoning. Its last hidden states $H$ are mean-pooled and projected into a numerical-model-compatible reasoning vector $e_R$, which is fused with native time series embeddings $E_{\mathrm{TS}}$:
-\begin{equation}
-  h_R=\frac{1}{L}\sum_{i=1}^{L}H_i,\qquad
-  e_R=h_R W_{\mathrm{proj}},\qquad
-  E_{\mathrm{fused}}=e_R\oplus E_{\mathrm{TS}},\qquad
-  \mathcal{L}_{\mathrm{total}}=\alpha\mathcal{L}_{\mathrm{CE}}+\beta\mathcal{L}_{\mathrm{Quantile}}.
-  \label{eq:stride-fusion}
-\end{equation}
-The fusion operation uses sequence prefixing or initial-state substitution according to the forecaster architecture. The joint objective updates the numerical model and projection together with LoRA parameters in the language model. This design lets a language-derived reasoning representation influence continuous forecasts while retaining a dedicated numerical decoder.
-
-The practical choice is between supervising temporal descriptions, rewarding completed forecasts, and coupling language representations to a numerical decoder. ChatTS \citep{chatts2025} supplies attribute-based supervision for temporal questions; Time-R1 \citep{timer12025} ties learning to forecast outcomes; STRIDE \citep{stride2026} retains a dedicated forecaster while injecting a learned reasoning representation. In Eq.~\eqref{eq:stride-fusion}, the language and quantile losses make this joint adaptation explicit. Their use requires different Harness support: preservation of series--text correspondence, parsing and chronological scoring of forecasts, or synchronization of language features with the numerical model's inputs.
-
-Evaluation follows the capability being selected. Forecast accuracy concerns predicted values; explanation faithfulness concerns whether the explanation reflects the model's actual computation; evidence grounding concerns whether its claims are supported by the supplied series or documents; and action-selection quality concerns feasible, useful tool or environment actions. These distinctions motivate complementary checks: held-out numerical errors, controlled interventions on claimed reasoning factors, verification of cited observations and their availability times, and execution-based action evaluation. Section~\ref{sec:evaluation} connects these requirements to evaluation resources.
-
-\subsection{Learning to operate temporal workflows}
-
-Workflow training changes the model that selects or assesses actions. TSOrchestra, introduced in \textit{Conversational Time Series Foundation Models} \citep{conversationaltsfm2025}, trains a language-model judge for iterative ensemble optimization. A numerical optimizer proposes nonnegative weights over forecasting models that sum to one. The judge inspects metrics, weights, and optimization history to decide whether to continue or accept a configuration. Supervised fine-tuning uses real trajectories and augmented boundary cases; subsequent GRPO training incorporates held-out forecasting performance and explanation feedback. The trained judge controls numerical optimization by deciding when an ensemble configuration is ready to accept.
-
-CastFSR \citep{castfsr2026} trains a broader policy over the Fast--Slow--Reflect workflow. Supervised distillation teaches executable stage sequences, followed by multi-turn reinforcement learning over complete trajectories. Training checks tool calls, stage order, timestamps, and completed forecasts before applying forecasting feedback. At inference, the policy still interacts with the numerical forecasting and contextual-retrieval tools described in Section~\ref{sec:task-specific-harness}. TimeART \citep{timeart2026} similarly combines a trained reasoner with an analytical toolkit, connecting policy learning to explicit temporal operations.
 
 ChatAD \citep{chatad2026}, Section~4.2, develops an anomaly-reasoning model through LoRA-based supervised training and TKTO preference optimization. Feedback combines format compliance, task correctness, fluency, and human preference into score $S$. A smooth preference weight mixes desirable and undesirable response losses:
 \begin{equation}
@@ -415,7 +392,42 @@ ChatAD \citep{chatad2026}, Section~4.2, develops an anomaly-reasoning model thro
 \end{equation}
 At $S=\eta$, the two losses receive equal weight; increasing $\kappa$ makes the transition between preferred and rejected responses sharper. ChatAD \citep{chatad2026} uses this soft assignment to address noise near a hard preference threshold (Section~4.2.2, Eqs.~3--5). The composite score combines LLM assessments of format, correctness, and fluency with human preference. Thus Eq.~\eqref{eq:chatad-tkto} compares graded preference supervision with a binary accept/reject decision: its practical requirements include a consistent scoring rubric and calibration of the score relative to $\eta$. ChatAD's evaluation separates detection accuracy, F1, and false-positive rate from open-ended reasoning scores and format-parsing rates (Section~4.3.2, Tables~3--4). The latter measure judged answer quality and parseability; checking explanation faithfulness additionally requires evidence about how the answer was produced. The synthetic-dialogue agents create supervision, while the resulting ChatAD model supplies the learned anomaly-reasoning capability. AnomaMind \citep{anomamind2026} also combines a trained detector with an external evidence-acquisition workflow; its task-specific feedback and detection equations are developed in the anomaly section.
 
-These methods differ in the learned role and the feedback available to train it. TSOrchestra \citep{conversationaltsfm2025} is useful when a judge must accept or continue numerical ensemble optimization; CastFSR \citep{castfsr2026} learns decisions across a prescribed tool workflow; ChatAD \citep{chatad2026} adapts generated analytical responses using graded preferences. A developer therefore selects both a model and its required feedback interface. The Harness must expose optimizer histories or tool observations, retain intermediate state, enforce valid calls and temporal boundaries, and record outcomes for evaluation. For a workflow policy, action quality is tested through executed trajectories and their task outcomes, while the accompanying explanation is assessed separately.
+The practical choice is between supervising temporal descriptions, rewarding completed forecasts, and grading analytical responses. ChatTS \citep{chatts2025} supplies attribute-based supervision for temporal questions; Time-R1 \citep{timer12025} ties learning to forecast outcomes; ChatAD \citep{chatad2026} weights preferred and rejected answers by a graded score. Their use requires different Harness support: preservation of series--text correspondence, parsing and chronological scoring of forecasts, or a consistent scoring rubric.
+
+These models still act as the caller once they are placed in an Agent. ChatTS \citep{chatts2025} answers questions about the shape and scale of a series, and Time-R1 \citep{timer12025} emits a forecast together with its reasoning, but neither replaces the operations on which an Agent's output depends: exact statistics over declared windows, forecasts with calibrated uncertainty, and checks of availability time remain tool calls (Sections~\ref{sec:general-ts-harness} and~\ref{sec:task-specific-harness}). Temporal training improves what the caller perceives and how it reasons about a result; the Harness keeps what must be computed exactly and audited.
+
+Evaluation follows the capability being selected. Forecast accuracy concerns predicted values; explanation faithfulness concerns whether the explanation reflects the model's actual computation; evidence grounding concerns whether its claims are supported by the supplied series or documents; and action-selection quality concerns feasible, useful tool or environment actions. These distinctions motivate complementary checks: held-out numerical errors, controlled interventions on claimed reasoning factors, verification of cited observations and their availability times, and execution-based action evaluation. Section~\ref{sec:evaluation} connects these requirements to evaluation resources.
+
+\subsection{Training the caller}
+\label{sec:llm-caller}
+
+Workflow training changes the model that selects or assesses actions. TSOrchestra, introduced in \textit{Conversational Time Series Foundation Models} \citep{conversationaltsfm2025}, trains a language-model judge for iterative ensemble optimization. A numerical optimizer proposes nonnegative weights over forecasting models that sum to one. The judge inspects metrics, weights, and optimization history to decide whether to continue or accept a configuration. Supervised fine-tuning uses real trajectories and augmented boundary cases; subsequent GRPO training incorporates held-out forecasting performance and explanation feedback. The trained judge controls numerical optimization by deciding when an ensemble configuration is ready to accept.
+
+CastFSR \citep{castfsr2026} trains a broader policy over the Fast--Slow--Reflect workflow. Supervised distillation teaches executable stage sequences, followed by multi-turn reinforcement learning over complete trajectories. Training checks tool calls, stage order, timestamps, and completed forecasts before applying forecasting feedback. At inference, the policy still interacts with the numerical forecasting and contextual-retrieval tools described in Section~\ref{sec:task-specific-harness}. TimeART \citep{timeart2026} similarly combines a trained reasoner with an analytical toolkit, connecting policy learning to explicit temporal operations.
+
+These methods train the function-calling role directly. TSOrchestra \citep{conversationaltsfm2025} is useful when a judge must accept or continue numerical ensemble optimization; CastFSR \citep{castfsr2026} learns decisions across a prescribed tool workflow; TimeART \citep{timeart2026} learns tool use from experience and reflection trajectories. A developer therefore selects both a model and its required feedback interface. The Harness must expose optimizer histories or tool observations, retain intermediate state, enforce valid calls and temporal boundaries, and record outcomes for evaluation. Action quality is tested through executed trajectories and their task outcomes, while any accompanying explanation is assessed separately.
+
+\subsection{Time series foundation models as tools}
+\label{sec:llm-tsfm}
+
+Time series foundation models such as TimesFM \citep{das2024timesfm}, Chronos \citep{ansari2024chronos}, and Moirai \citep{woo2024moirai} are pretrained on large collections of series and map a context window to a forecast. In a Time Series Agent they do not belong to the LLM term: they take a series and return values, whereas the LLM decides which model to call, on which window, and whether to accept the result. Last-Mile \citep{lastmile2026} lets an Agent revise a TimesFM baseline forecast through constrained, evidence-backed actions; MoiraiAgent\RepoMoirai{} lets an LLM select a forecasting expert; TimeCopilot \citep{timecopilot2025} exposes statistical, machine-learning, and foundation models behind one forecasting interface and combines them in ensembles; and the evolved forecasting code of \citet{promptevolutionforecast2026} receives a default TabPFN forecast before a final LLM pass.
+
+Because a foundation model is a tool, it is also replaceable. MetaCaster \citep{metacaster2026} notes that foundation models remain uneconomical in resource-constrained settings; its Harness instead generates few-shot training series and trains lightweight forecasters as scheduled jobs. TSFLab \citep{tsflab2026} moves forecasting models out of any single Agent: its agent-agnostic workbench integrates 323 forecasting models and 93 datasets that any compatible Agent can call. The choice among foundation, statistical, and lightweight forecasters is therefore a Harness decision about cost and accuracy rather than a property of the LLM.
+
+STRIDE \citep{stride2026} connects language reasoning to a separate numerical foundation model. A teacher constructs reference reasoning from training windows and their pseudo-future targets; a smaller language model learns this reasoning. Its last hidden states $H$ are mean-pooled and projected into a numerical-model-compatible reasoning vector $e_R$, which is fused with native time series embeddings $E_{\mathrm{TS}}$:
+\begin{equation}
+  h_R=\frac{1}{L}\sum_{i=1}^{L}H_i,\qquad
+  e_R=h_R W_{\mathrm{proj}},\qquad
+  E_{\mathrm{fused}}=e_R\oplus E_{\mathrm{TS}},\qquad
+  \mathcal{L}_{\mathrm{total}}=\alpha\mathcal{L}_{\mathrm{CE}}+\beta\mathcal{L}_{\mathrm{Quantile}}.
+  \label{eq:stride-fusion}
+\end{equation}
+The fusion operation uses sequence prefixing or initial-state substitution according to the forecaster architecture. The joint objective updates the numerical model and projection together with LoRA parameters in the language model. This design lets a language-derived reasoning representation influence continuous forecasts while retaining a dedicated numerical decoder. The language model here contributes a representation rather than a call, so the trained model belongs to the LLM side while its numerical decoder remains a foundation model; STRIDE marks the boundary between the two.
+
+\subsection{Toward native temporal perception}
+\label{sec:llm-native}
+
+Vision followed a comparable path: image understanding first reached LLM agents through captioning and recognition tools and later became a native modality of multimodal LLMs. Time series show the first steps of the same path. ChatTS \citep{chatts2025} inserts patch embeddings among text tokens, as vision encoders do for image patches; TimeMaster \citep{timemaster2025} and Zephyrus-R1 \citep{zephyrusr12026} train vision-language models that read plotted series; and TimeOmni-1 \citep{timeomni2026} trains one model for temporal reasoning across four tasks. If time series become a native modality of omni-modal LLMs, perception will move from the series views of Section~\ref{sec:temporal-processing} into the model. Operations whose results must be exact and auditable, namely statistics over declared windows, calibrated forecast distributions, and checks of availability time, should remain Harness tools. Which temporal capabilities belong in the model and which in the Harness is an open problem (Section~\ref{sec:open-problems}).
 
 \section{General Harness}
 \label{sec:general-harness}
