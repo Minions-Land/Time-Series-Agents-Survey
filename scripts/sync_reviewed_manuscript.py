@@ -71,8 +71,7 @@ def render_profiles(s, bykey):
         if '& \\textbf{' not in line:
             new.append(line); continue
         match = re.search(r'\\citep\{([^}]+)\}', line)
-        key = match.group(1) if match else ('moiraiagent2026' if '\\RepoMoirai' in line
-                                            else 'zhang2025llm' if '\\RepoLLMTSFD' in line else None)
+        key = match.group(1) if match else None          # every profile row cites its source
         if key not in bykey:
             new.append(line); continue
         r = bykey[key]

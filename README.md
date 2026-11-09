@@ -161,7 +161,7 @@ A Paper Card records what a work contributes, module by module, with the passage
   presented as task-specific, or a task procedure presented as general); then read the contribution off the map:
   automation, another implementation, a filled empty cell, or consolidation into a shared time series module.
 - **Most works automate; fewer meet a time series requirement under test.** 136 of 162 works automate an analysis.
-  Only 70 of the 143 method works test the requirement their modules address (leakage, regime change, data quality,
+  Only 70 of the 143 works that propose methods test the requirement their modules address (leakage, regime change, data quality,
   context, decision consequences, verifiability or deployment).
 - **Generality is often claimed, less often shown.** Reuse across at least two cells of the task grid is demonstrated for 95 of
   the 189 General Harness and General Time Series Harness modules; the generality of the rest is inferred from their
@@ -173,7 +173,7 @@ A Paper Card records what a work contributes, module by module, with the passage
   general mechanism or inside a task. Decision making relies on task modules in every mechanism dimension.
 - **Solutions stay inside tasks.** There are 325 task-specific modules for 97 shared temporal ones. Of the module
   links to a tested requirement, 108 of 181 are task modules.
-- **Two task cells are well defined but unstudied.** Projection (futures under assumed conditions) and hindsight
+- **Two task cells have no evaluated task output.** Projection (futures under assumed conditions) and hindsight
   decision (the action that should have been taken earlier) appear only inside decision procedures and reflection
   memories, never as evaluated outputs.
 
