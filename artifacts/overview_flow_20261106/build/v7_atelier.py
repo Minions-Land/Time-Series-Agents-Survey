@@ -24,11 +24,11 @@ GLYPHS = dict(
     # captions follow the subsection headings of Sections 4-6
     gh=[('chat', 'Interaction'), ('memory', 'Memory'), ('tools', 'Tools'), ('planning', 'Planning'), ('runtime', 'Evolution')],
     gts=[('calendar', 'Data'), ('window', 'Processing'), ('timeline', 'Context'), ('cutoff', 'Validation')],
-    # the four task groups (scripts/task_groups.py, ORDER); two-line names break where the plate needs it
-    tsk=[('anomaly', ['Analysis of', 'Observed Series']), ('forecast', 'Forecasting'), ('synthesis', 'Generation'),
+    # the four output modes of the task grid (Section 6, Table 7); 'Decision Making' breaks onto two lines
+    tsk=[('timeseries', 'Regression'), ('anomaly', 'Classification'), ('synthesis', 'Generation'),
          ('decision', ['Decision', 'Making'])])
 SPREAD = {4: [0.11, 0.33, 0.67, 0.89], 5: [0.1, 0.3, 0.5, 0.7, 0.9]}
-SPREAD_TSK = [0.16, 0.37, 0.67, 0.865]     # first lines share one row; "Observed Series" runs on below it
+SPREAD_TSK = [0.10, 0.335, 0.67, 0.885]      # four output modes; first lines share one row
 
 
 def tx(sh, x, y, w, h, t, size=12, bold=False, color=INK, align='c', italic=False, anchor='m'):
@@ -151,9 +151,8 @@ def mini_forecast(sh, x, y, w, h, cut=0.62):
     poly(sh, list(zip(xs[kc:], ys[kc:])), HUE['tsk'][0], lw=1.8, dash=MSO_LINE.DASH)
     t0 = xs[kc]
     arrow(sh, t0, y - 0.06, t0, y + h + 0.02, color=HUE['gts'][0], lw=1.4, dash=MSO_LINE.DASH, head=None)
-    pill = box(sh, t0 - 0.22, y + h + 0.02, 0.44, 0.24, fill=HUE['gts'][0], radius=0.5)
-    runs(pill, [('τ', 'FFFFFF', True, False)], 15)
-    r = pill.text_frame.paragraphs[0].runs[0]; r.font.name = 'Times New Roman'; r.font.italic = True   # matches $\tau$ in the text
+    pill = box(sh, t0 - 0.29, y + h + 0.02, 0.58, 0.24, fill=HUE['gts'][0], radius=0.5)
+    runs(pill, [('Now', 'FFFFFF', True, False)], 12)   # the current time, as in every other figure
 
 
 def inputs(slide):
@@ -189,8 +188,8 @@ def llm_block(slide):
     g = group(slide); sh = g.shapes
     dk, md, lt = HUE['llm']
     pedestal(sh, 3.42, 1.3, 2.3, 0.36, 'llm')
-    st = box(sh, 3.48, 0.66, 1.62, 0.38, fill=dk, radius=0.5); label_in(st, 'LLM Side', size=16, font=F)
-    for k, (nm, cap) in enumerate([('encode', 'Align'), ('reason', 'Reason'), ('policy', 'Operate')]):   # Section 3
+    st = box(sh, 3.48, 0.66, 1.62, 0.38, fill=dk, radius=0.5); label_in(st, 'LLM: Caller', size=16, font=F)
+    for k, (nm, cap) in enumerate([('window', 'Read'), ('tools', 'Call'), ('reason', 'Interpret')]):   # Section 3: reads the state, calls functions, interprets results
         cx = 3.85 + k * 0.74
         ic(sh, nm, cx - 0.26, 1.03, 0.52)
         tx(sh, cx - 0.45, 1.64, 0.9, 0.26, cap, size=13, color=dk, bold=True)

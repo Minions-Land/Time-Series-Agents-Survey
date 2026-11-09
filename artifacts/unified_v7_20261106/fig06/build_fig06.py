@@ -87,7 +87,7 @@ def episode(slide):
     halo(sh, rx, ry + 0.66, 1.9, 1.62)
     pedestal(sh, rx - 0.64, ry + rs - 0.2, 1.28, 0.32, 'llm')
     ic(sh, 'robot', rx - rs / 2, ry, rs)
-    lab = box(sh, rx - 0.36, ry + rs + 0.17, 0.72, 0.32, fill=LD, radius=0.5); label_in(lab, 'LLM', size=14)
+    lab = box(sh, rx - 0.7, ry + rs + 0.17, 1.4, 0.32, fill=LD, radius=0.5); label_in(lab, 'LLM: Caller', size=14)
     # spokes: amber = LLM acts, dashed blue = Harness returns
     sh = root.add_group_shape().shapes
     my_ = ry + 0.62

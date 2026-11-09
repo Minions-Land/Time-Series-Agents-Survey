@@ -42,14 +42,15 @@ TASKS = [('timeseries', ['Regression']), ('anomaly', ['Classification']), ('synt
 # Shared temporal functions (Section 5 headings), icons as on the General Time Series Harness plate of Figure 1.
 FUNCS = [('calendar', ['Temporal Data', 'Management']), ('window', ['Temporal', 'Processing']),
          ('timeline', ['Temporal Context', 'and Memory']), ('cutoff', ['Temporal', 'Validation'])]
-# Cell content: (glyph, label). Labels are those of the approved semantic revision of this figure.
-# Columns follow TASKS: the former anomaly-diagnosis cells serve Analysis of Observed Series, synthesis -> Generation.
+# Cell content: (glyph, label) per output mode. Regression: forecasting and imputation needs; Classification: labeled
+# windows, candidate intervals, exemplars (FETA, MarsTSC) and evidence; Generation: synthesis and description
+# (transforms and series views, references, fidelity and claim checks); Decision Making: state, actions, experience.
 CELLS = [
-    [('history', 'History'), ('streams', 'Streams'), ('icon:data', 'Samples'), ('icon:inventory_stock', 'State')],
-    [('horizon', 'Horizon'), ('interval', 'Intervals'), ('transforms', 'Transforms'), ('icon:policy', 'Actions')],
-    [('events', 'Events'), ('icon:incident_report', 'Incidents'), ('icon:reference_lookup', 'References'),
+    [('history', 'History'), ('streams', ['Labeled', 'Windows']), ('icon:data', 'Samples'), ('icon:inventory_stock', 'State')],
+    [('horizon', 'Horizon'), ('interval', 'Intervals'), ('transforms', ['Transforms', 'and Views']), ('icon:policy', 'Actions')],
+    [('events', 'Events'), ('icon:papers', 'Exemplars'), ('icon:reference_lookup', 'References'),
      ('icon:memory', 'Experience')],
-    [('cutoff', 'Cutoff'), ('icon:evidence_check', 'Evidence'), ('fidelity', 'Fidelity'), ('constraints', 'Constraints')],
+    [('cutoff', 'Cutoff'), ('icon:evidence_check', 'Evidence'), ('fidelity', ['Fidelity', 'and Claims']), ('constraints', 'Constraints')],
 ]
 TK, TS = HUE['tsk'], HUE['gts']
 

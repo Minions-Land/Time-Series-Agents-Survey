@@ -129,37 +129,37 @@ def _pred(t):
 
 
 def performance(slide):
+    """Task performance is scored by the output mode of the task grid (Section 6): one row per mode with a reference.
+    Decision making is scored by decision utility, a separate criterion."""
     g = group(slide); sh = g.shapes
     x0 = ZX[2]
     card(sh, x0 + 0.22, ZY + 0.5, ZW - 0.44, 2.5, key='ev')
-    # prediction vs held-out reference
-    ax, ay, aw, ah = x0 + 0.45, ZY + 0.72, 1.95, 1.36
-    arrow(sh, ax, ay, ax, ay + ah, color=MUTE, lw=1.2, head=None)
-    arrow(sh, ax, ay + ah, ax + aw, ay + ah, color=MUTE, lw=1.2, head='triangle')
-    n = 60
-    def pts(f):
-        return [(ax + 0.08 + (aw - 0.2) * k / n, ay + ah * 0.78 - ah * 0.42 * f(k / n)) for k in range(n + 1)]
-    poly(sh, pts(_ref), EV, lw=2.0, dash=MSO_LINE.DASH)
-    poly(sh, pts(_pred), INK, lw=2.0)
-    # residual bars
-    rx, rw = x0 + 2.6, 1.1
-    zy = ay + ah * 0.5
-    arrow(sh, rx, ay, rx, ay + ah, color=MUTE, lw=1.2, head=None)
-    arrow(sh, rx, zy, rx + rw, zy, color=MUTE, lw=1.0, head=None)
-    m = 8
-    for k in range(m):
-        t = (k + 0.5) / m
-        r = (_pred(t) - _ref(t)) * 1.35
-        bx = rx + 0.07 + k * (rw - 0.1) / m
-        top, bot = (zy - r, zy) if r > 0 else (zy, zy - r)
-        box(sh, bx, top, 0.1, max(bot - top, 0.02), fill=EV if r > 0 else EVM, shape=MSO_SHAPE.RECTANGLE)
-    tx(sh, rx - 0.05, ay + ah + 0.04, rw + 0.1, 0.28, 'Residuals', size=13, bold=True, color=MUTE)
-    # legend
-    ly = ZY + 2.22
-    arrow(sh, ax + 0.02, ly + 0.15, ax + 0.4, ly + 0.15, color=INK, lw=2.0, head=None)
-    tx(sh, ax + 0.48, ly, 1.6, 0.3, 'Prediction', size=13, bold=True, color=INK, align='l')
-    arrow(sh, ax + 0.02, ly + 0.5, ax + 0.4, ly + 0.5, color=EV, lw=2.0, dash=MSO_LINE.DASH, head=None)
-    tx(sh, ax + 0.48, ly + 0.35, 2.4, 0.3, 'Held-Out Reference', size=13, bold=True, color=EV, align='l')
+    gx, gw, gh = x0 + 0.42, 1.15, 0.52
+    rows = [('Regression', 'Error · CRPS'), ('Classification', 'Accuracy · F1 · Brier'),
+            ('Generation', 'Rubric · Fidelity · Claims')]
+    for k, (mode, metric) in enumerate(rows):
+        y = ZY + 0.66 + k * 0.78
+        if k == 0:      # prediction against the held-out reference
+            n = 40
+            pts = lambda f: [(gx + gw * j / n, y + gh * 0.92 - gh * 0.5 * f(j / n)) for j in range(n + 1)]
+            poly(sh, pts(_ref), EV, lw=1.8, dash=MSO_LINE.DASH)
+            poly(sh, pts(_pred), INK, lw=1.8)
+        elif k == 1:    # predicted labels against true labels
+            for j, (lab, ok) in enumerate((('A', True), ('B', False))):
+                bx = gx + 0.05 + j * 0.58
+                b = box(sh, bx, y + 0.1, 0.3, 0.3, fill=EV if ok else EVM, radius=0.5); label_in(b, lab, size=12)
+                cx, cy = bx + 0.42, y + 0.25
+                if ok: poly(sh, [(cx - 0.07, cy), (cx - 0.01, cy + 0.07), (cx + 0.09, cy - 0.07)], EV, lw=2.2)
+                else:
+                    poly(sh, [(cx - 0.06, cy - 0.06), (cx + 0.06, cy + 0.06)], HUE['alert'][0], lw=2.2)
+                    poly(sh, [(cx - 0.06, cy + 0.06), (cx + 0.06, cy - 0.06)], HUE['alert'][0], lw=2.2)
+        else:           # generated text or series judged without a single reference
+            paper(sh, gx + 0.1, y + 0.06, gw - 0.3, gh - 0.06, line=PAPER_LINE, n=2)
+            for j in range(3):
+                arrow(sh, gx + 0.2, y + 0.16 + 0.11 * j, gx + gw - 0.32 - 0.2 * (j == 2), y + 0.16 + 0.11 * j,
+                      color=EVM, lw=2.0, head=None)
+        tx(sh, gx + gw + 0.18, y - 0.02, 2.3, 0.3, mode, size=14, bold=True, color=EV, align='l')
+        tx(sh, gx + gw + 0.18, y + 0.26, 2.3, 0.28, metric, size=12.5, bold=False, color=INK, align='l')
     return g
 
 

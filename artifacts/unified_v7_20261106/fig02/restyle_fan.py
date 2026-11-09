@@ -770,17 +770,16 @@ def arched_layer_names(slide, rpr, to_slide, kx, ky, labels, size_max=21.5, line
 # Task-Specific Harness wedges (scripts/task_groups.py, ORDER): new boundaries in degrees, from 50 (GTS | TSK) to 0.
 TSK_GROUPS = [('Classification',), ('Regression',), ('Generation',), ('Decision', 'Making')]   # output modes; order keeps the wedge icons
 TSK_BOUNDS = [50.0, 37.5, 25.0, 12.5, 0.0]                 # four equal wedges
-# Representative works per group. A work goes to the group of its Task-Specific Harness modules (ledger task labels
-# mapped by task_groups.LEAF); a work whose modules span two groups stays in the group that matches its former family
-# wedge (MarsTSC, AgentFM, AQuA, AgriWorld), else its first source task decides (GenAutoML, ChatAD). MOSAIC has no
-# Task-Specific Harness module; its source tasks are forecasting and synthesis, and it fills the Generation wedge.
+# Representative works per output mode: each source tag goes to a mode in which the work has Task-Specific Harness
+# modules (task_groups.module_cells); description and explanation works (Time-RA, WeatherTGD, ChatAD, AgentFM) now sit
+# in Generation. ledger_tags() replaces any tag whose work has no Task-Specific module in that mode.
 # Stacks: (centre x of the top tag, top y, x shift per row, names), child inches; rows 0.26 in apart (as before).
 # The positions were searched so that every tag stays inside its wedge and the outer band (checked against the wedge spokes and the ring edges).
-TSK_STACKS = [
-    [(21.0, 4.30, -0.32, ['ARTIST', 'TS-Exam Agent', 'WeatherTGD', 'Time-RA', 'ChatAD', 'TraceBench']),
-     (22.15, 5.46, -0.5, ['SAGE-AD', 'AnomaMind', 'Argos', 'AgentFM', 'SAGE-Sleep'])],
-    [(23.1, 6.66, -0.5, ['MemCast', 'Dr-CiK', 'MarsTSC', 'MoiraiAgent', 'GenAutoML'])],
-    [(23.9, 8.22, -0.8, ['MERIT', 'MOSAIC'])],
+TSK_STACKS = [   # output modes (2026-11-09): classification, regression, generation, decision making
+    [(21.0, 4.30, -0.32, ['ARTIST', 'TS-Exam Agent', 'TraceBench', 'SAGE-AD']),
+     (22.15, 5.46, -0.5, ['AnomaMind', 'Argos', 'MarsTSC', 'SAGE-Sleep'])],
+    [(23.1, 6.66, -0.5, ['MemCast', 'Dr-CiK', 'MoiraiAgent', 'GenAutoML', 'MOSAIC'])],
+    [(23.9, 8.22, -0.8, ['Time-RA', 'WeatherTGD', 'ChatAD', 'MERIT', 'AgentFM'])],
     [(23.9, 9.48, 0.0, ['AgriWorld', 'Fin-Analyst', 'LLMTraveler']), (21.6, 9.70, 0.0, ['AQuA', 'PandaAI'])],
 ]
 

@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(
 from v7kit import *
 from PIL import ImageFont
 
-DH = 0.67          # extra card height for the class lists
+DH = 0.81          # vertical offset below the cards: class lists (0.67) plus room for the role pills (0.14)
 H = 7.65 + DH
 MATH = 'Times New Roman'
 GT, GTm, GTl = HUE['gts']
@@ -124,16 +124,19 @@ def release(slide):
 
 
 # ---------------------------------------------------------------- middle: the four shared functions
-CW, CH, CY, GAP = 2.98, 2.85 + DH, 3.28, 0.2
+CW, CH, CY, GAP = 2.98, 2.85 + 0.67, 3.42, 0.2
 X = [0.42 + k * (CW + GAP) for k in range(4)]
 LP = 0.225                      # class list line pitch
 I0 = CY + 0.88 + 4 * LP + 0.12  # top of the illustration
 
 
-def fcard(slide, k, icon, title, classes):
+def fcard(slide, k, icon, title, classes, role):
+    """role: the data-model component the function supplies (Codd: structures, operators, integrity rules; plus scope)."""
     g = group(slide); sh = g.shapes
     x = X[k]
     card(sh, x, CY, CW, CH, key='gts', lw=1.4)
+    rw = 0.36 + 0.105 * len(role)
+    pill(sh, x + CW - rw - 0.12, CY - 0.17, rw, 0.3, role, 'gts', size=12.5)
     ic(sh, icon, x + 0.12, CY + 0.1, 0.62)
     T(sh, x + 0.82, CY + 0.07, CW - 0.86, 0.64, title, size=15, color=GT, align='l')
     arrow(sh, x + 0.15, CY + 0.8, x + CW - 0.15, CY + 0.8, color=GTm, lw=1.0, dash=MSO_LINE.ROUND_DOT, head=None)
@@ -147,7 +150,7 @@ def fcard(slide, k, icon, title, classes):
 
 def data_card(slide):
     g, sh, x = fcard(slide, 0, 'data', ['Temporal Data', 'Management'],
-                     ['Measurement Schema', 'Time Index and Alignment', 'Point-in-Time Access', 'Temporal Workspace'])
+                     ['Measurement Schema', 'Time Index and Alignment', 'Point-in-Time Access', 'Temporal Workspace'], 'Structures')
     x0, y0, cw, rh = x + 0.2, I0, 0.86, 0.235
     rows = [[('Time', 0), ('Value', 0), ('Unit', 0)],
             [('t', '1'), ('x', '1'), ('u', None)], [('t', '2'), ('—', None), ('u', None)], [('t', '3'), ('x', '3'), ('u', None)]]
@@ -180,7 +183,7 @@ def data_card(slide):
 def processing_card(slide):
     g, sh, x = fcard(slide, 1, 'window', ['Temporal', 'Processing'],
                      ['Preprocessing and Transformation', 'Statistical and Spectral Analysis', 'Series Views for the LLM',
-                      'Operator and Skill Libraries'])
+                      'Operator and Skill Libraries'], 'Operators')
     gx, gw = x + 1.15, 1.7
     for i, lab in enumerate(['Transform', 'Analyze', 'LLM View']):
         ry = I0 + 0.02 + i * 0.52
@@ -208,7 +211,7 @@ def processing_card(slide):
 
 def context_card(slide):
     g, sh, x = fcard(slide, 2, 'timeline', ['Temporal Context', 'and Memory'],
-                     ['External Events and Text', 'Historical Analogues', 'Procedural Experience'])
+                     ['External Events and Text', 'Historical Analogues', 'Procedural Experience'], 'Scope')
     # events aligned to the series
     vals = [0.3, 0.5, 0.35, 0.55, 0.4, 0.2, 0.5, 0.8, 0.45, 0.55, 0.35, 0.6]
     pts = pline(sh, x + 0.2, I0 + 0.38, 2.58, 0.26, vals, INK, lw=1.4, r=0.03)
@@ -231,7 +234,7 @@ def context_card(slide):
 
 def validation_card(slide):
     g, sh, x = fcard(slide, 3, 'cutoff', ['Temporal', 'Validation'],
-                     ['Availability Checks', 'Past-Only Computation', 'Data and Schema Checks', 'Temporal Claim Verification'])
+                     ['Availability Checks', 'Past-Only Computation', 'Data and Schema Checks', 'Temporal Claim Verification'], 'Integrity Rules')
     R(sh, x, I0, CW, 0.32, [('v', INK, True, False, True), (' ≤ Now', INK, True, False, False)], 16)
     for i, (lab, res, cap, col) in enumerate([('Available', 'validate', 'Admit', GT), ('Late', 'reject', 'Exclude', TK)]):
         ry = I0 + 0.38 + i * 0.6

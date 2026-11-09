@@ -2,25 +2,26 @@
 
 Three zones read left to right per row: Open Question -> Controlled Comparison (paired objects showing the
 intervention) -> Evidence to Record. Footer: what to match across the paired conditions.
-Row wording follows the old figure and the Open problems subsection.
+Row wording follows the Open Problems section: the five original questions (the first renamed to the model-versus-
+Harness division) plus projection, hindsight decision and probabilistic outputs (2026-11-09).
 """
 import os, sys
 sys.path.insert(0, '/Users/mjm/Papers/Qingsong/IJCAI2027-Time-Series-Agents-Survey/artifacts/unified_v7_20261106/kit')
 from v7kit import *
 
-H = 7.18
+H = 7.18 + 3 * 1.03
 DD, DM, DL = HUE['data']
 ED, EM, EL = HUE['ev']
 TD = HUE['tsk'][0]
-ZY, ZH = 0.42, 5.62
+ZY, ZH = 0.42, 5.62 + 3 * 1.03
 QZ, CZ, EZ = (0.2, 3.25), (3.65, 5.85), (9.7, 3.43)   # (x, w) of the three zones
 R0, PITCH, RH = 0.83, 1.03, 0.88                      # first row top, row pitch, row height
 AX, BX = 5.02, 8.13                                   # centres of the paired objects
 MID = (AX + BX) / 2
 ROWS = [
     # (question lines, icon), comparison kind, (A caption, B caption), evidence lines
-    ((['Perception or', 'Execution'], 'reason'), 'vs', ('Model Judgment', 'Numerical Tool'),
-     ['Numerical Error', 'Execution Cost']),
+    ((['Model or', 'Harness'], 'reason'), 'vs', ('Native Perception', 'Harness Tool'),
+     ['Changed Outputs', 'Verifiability']),
     ((['Memory Under', 'Change'], 'memory'), 'to', ('Prior Evidence', 'Revised Values'),
      ['Revalidation', 'Updated Conclusions']),
     ((['Procedure', 'Transfer'], 'trajectory_path'), 'vs', ('Seen Setting', 'Held-Out Setting'),
@@ -29,6 +30,12 @@ ROWS = [
      ['Response to Removal', 'Grounded Claims']),
     ((['Prediction to', 'Decision'], 'decision'), 'to', ('Forecast', 'Inventory Action'),
      ['Forecast Error', 'Action Utility']),
+    ((['Projection as', 'Output'], 'simulator'), 'vs', ('Rollout Under A', 'Rollout Under B'),
+     ['Agreement with', 'Known Effects']),
+    ((['Hindsight', 'Decision'], 'policy'), 'to', ('Earlier State', 'Action Replayed'),
+     ['Outcome Change', 'Regret']),
+    ((['Probabilistic', 'Outputs'], 'forecast'), 'vs', ('Point Forecast', 'Distribution'),
+     ['CRPS', 'Calibration']),
 ]
 
 
@@ -85,6 +92,23 @@ def row(sh, r, spec):
     elif r == 4:
         mini_forecast(sh, AX - 0.72, gy + 0.03, 1.44, 0.4)
         ic(sh, ico('inventory_boxes', 'decision'), BX - 0.29, gy, 0.58)
+    elif r == 5:      # the same state rolled out under two actions
+        for cx, dy in ((AX, -0.16), (BX, 0.16)):
+            x = cx - 0.68
+            series(sh, x, gy + 0.08, 0.7, 0.36, color=INK, lw=1.6)
+            arrow(sh, x + 0.7, gy + 0.03, x + 0.7, gy + 0.53, color=HUE['gts'][0], lw=1.2, dash=MSO_LINE.DASH, head=None)
+            curve(sh, [(x + 0.7, gy + 0.26), (x + 1.0, gy + 0.26 + dy * 0.5), (x + 1.36, gy + 0.26 + dy)], TD, lw=1.8,
+                  dash=MSO_LINE.DASH, head=False)
+    elif r == 6:      # replay the earlier state, then execute the proposed action
+        ic(sh, ico('simulator', 'data'), AX - 0.29, gy, 0.58); ic(sh, ico('policy', 'decision'), BX - 0.29, gy, 0.58)
+    elif r == 7:      # one value per time against a predictive band
+        x = AX - 0.72                     # point forecast: history, then one dashed path and no band
+        pts = series(sh, x, gy + 0.05, 0.8, 0.44, color=INK, lw=1.5)
+        arrow(sh, x + 0.8, gy, x + 0.8, gy + 0.52, color=HUE['gts'][0], lw=1.2, dash=MSO_LINE.DASH, head=None)
+        y0 = pts[-1][1]
+        poly(sh, [(x + 0.8, y0), (x + 1.0, y0 - 0.08), (x + 1.2, y0 + 0.02), (x + 1.44, y0 - 0.1)], TD, lw=1.8,
+             dash=MSO_LINE.DASH)
+        mini_forecast(sh, BX - 0.72, gy + 0.05, 1.44, 0.44, t0_label=False)
     if kind == 'vs':
         v = box(sh, MID - 0.25, cy - 0.2, 0.5, 0.4, fill=DL, line=DM, lw=1.0, radius=0.5)
         label_in(v, 'vs.', size=13, color=DD)
@@ -100,7 +124,7 @@ def row(sh, r, spec):
 
 def footer(slide):
     g = group(slide); sh = g.shapes
-    y, h = 6.28, 0.7
+    y, h = 6.28 + 3 * 1.03, 0.7
     items = [('llm', 'Backbone'), ('cutoff', 'Information Boundary'), ('utility', 'Resource Budget')]
     widths = [1.75, 2.95, 2.45]
     total = 1.3 + 0.35 + sum(widths) + 0.3 * 2

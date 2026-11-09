@@ -173,7 +173,7 @@ Figure~\ref{fig:survey-organization} shows how a Time Series Agent is built, and
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/overview_flow_20261106/V7_Atelier_Build.pdf}
-\caption{Building a Time Series Agent. The task request goes to the LLM side, and the scenario's context and observed series enter the Harness. The Harness is composed from general to specific: General Harness modules are reused, General Time Series Harness modules adapt them to temporal semantics, and Task-Specific Harness modules are redesigned around the task objective. The LLM side acts through each layer and receives its observations. Evaluation checks a candidate output for process validity, temporal validity, task performance, and decision utility; a failed check returns the Agent to revision, and the final output is a forecast, diagnosis, or decision for the period after the current time.}
+\caption{Building a Time Series Agent. The task request goes to the LLM, the caller that reads the state, calls functions, and interprets their results, while the scenario's context and observed series enter the Harness. The Harness is composed from general to specific: General Harness modules are reused, General Time Series Harness modules adapt them to temporal semantics, and Task-Specific Harness modules are redesigned around the task objective. The LLM side acts through each layer and receives its observations. Evaluation checks a candidate output for process validity, temporal validity, task performance, and decision utility; a failed check returns the Agent to revision. Task-Specific Harness modules are organized by output mode (regression, classification, generation, decision making), and the final output, such as a forecast, a diagnosis, or a decision, falls in one cell of the task grid.}
 \label{fig:survey-organization}
 \end{figure}
 
@@ -458,7 +458,7 @@ Figure~\ref{fig:general-harness-functions} follows an interaction episode around
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig06/Figure06_V7.pdf}
-\caption{Five mechanism dimensions of the General Harness and their second-level classes (Table~\ref{tab:component-vocab}), synthesized from Agent and Harness research \citep{sumers2024coala,ning2026codeharness,lin2026agenticharness}. The central LLM interacts with the interface, planning, tools, and memory during execution; each card lists its classes. Optimization and evolution use recorded trajectories to update the four reusable assets across episodes.}
+\caption{Five mechanism dimensions of the General Harness and their second-level classes (Table~\ref{tab:component-vocab}), synthesized from Agent and Harness research \citep{sumers2024coala,ning2026codeharness,lin2026agenticharness}. The LLM, the caller, interacts with the interface, planning, tools, and memory during execution; each card lists its classes. Optimization and evolution use recorded trajectories to update the four reusable assets across episodes.}
 \label{fig:general-harness-functions}
 \end{figure}
 
@@ -546,7 +546,7 @@ Figure~\ref{fig:temporal-harness-functions} connects the four shared functions t
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig07/Figure07_V7.pdf}
-\caption{A temporal workspace connecting sources, operations, and the LLM. The upper timeline separates available evidence from a late release at the current time. The middle row gives the four shared functions, each with its second-level classes (Table~\ref{tab:gts-vocab}) and one illustration. Requests and observations connect these shared functions to the LLM. AION \citep{aion2026} and TimeClaw-Harness \citep{timeclaw2026harness} implement these functions in their runtimes.}
+\caption{A temporal workspace connecting sources, operations, and the LLM. The upper timeline separates available evidence from a late release at the current time. The middle row gives the four shared functions, each tagged with the data-model component it supplies (structures, operators, scope of the record, integrity rules) and listing its second-level classes (Table~\ref{tab:gts-vocab}) and one illustration. Requests and observations connect these shared functions to the LLM. AION \citep{aion2026} and TimeClaw-Harness \citep{timeclaw2026harness} implement these functions in their runtimes.}
 \label{fig:temporal-harness-functions}
 \end{figure}
 
@@ -778,7 +778,7 @@ AD-AGENT \citep{adagent2025} constructs a pipeline from a natural-language reque
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig10/Figure10_V7.pdf}
-\caption{AnomaMind\textquotesingle s evidence acquisition, state construction, interval detection, and refinement \citep{anomamind2026}. Read the upper sequence from knowledge and numerical diagnostics to the evidence state and candidate intervals. The paired plots use the same schematic signal to show how refinement changes the interval boundaries; the return path updates the evidence state. The separate lower band identifies detector-training signals: parse validity, agreement with labeled intervals, and a false-positive penalty. Adapted from the method\textquotesingle s workflow.}
+\caption{AnomaMind\textquotesingle s evidence acquisition, state construction, interval detection, and refinement \citep{anomamind2026}, an example of anomaly detection on the observed record (classification, Table~\ref{tab:tsk-vocab}). Read the upper sequence from knowledge and numerical diagnostics to the evidence state and candidate intervals. The paired plots use the same schematic signal to show how refinement changes the interval boundaries; the return path updates the evidence state. The separate lower band identifies detector-training signals: parse validity, agreement with labeled intervals, and a false-positive penalty. Adapted from the method\textquotesingle s workflow.}
 \label{fig:anomamind-workflow}
 \end{figure}
 
@@ -836,7 +836,7 @@ Figure~\ref{fig:merit-augmentation} makes the design choice explicit: retrieval 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig09/Figure09_V7.pdf}
-\caption{MERIT\textquotesingle s construction of positive samples for representation learning \citep{merit2025}. Similarity retrieval and LLM relevance review produce a reference set $R$, which informs transformation selection. The schematic candidates contrast small jitter that preserves peak order with a permutation that changes it; these illustrate possible review outcomes. The review agent compares each view with the target sequence and returns a judgment and rationale. Accepted views enter memory $M$, while rejection restarts retrieval. The lower band shows the downstream role of these choices: accepted views and retrieved neighbors form positive samples for contrastive learning with a shared encoder. Adapted from the original retrieval, augmentation, review, and learning mechanisms.}
+\caption{MERIT\textquotesingle s construction of positive samples for representation learning \citep{merit2025}, an example of synthesis and augmentation on the observed record (generation, Table~\ref{tab:tsk-vocab}). Similarity retrieval and LLM relevance review produce a reference set $R$, which informs transformation selection. The schematic candidates contrast small jitter that preserves peak order with a permutation that changes it; these illustrate possible review outcomes. The review agent compares each view with the target sequence and returns a judgment and rationale. Accepted views enter memory $M$, while rejection restarts retrieval. The lower band shows the downstream role of these choices: accepted views and retrieved neighbors form positive samples for contrastive learning with a shared encoder. Adapted from the original retrieval, augmentation, review, and learning mechanisms.}
 \label{fig:merit-augmentation}
 \end{figure}
 
@@ -1027,7 +1027,7 @@ Figure~\ref{fig:evaluation-stack} follows an episode from its task contract and 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig11/Figure11_V7.pdf}
-\caption{An evaluation episode and three complementary forms of evidence, synthesized from AION \citep{aion2026} and TimeSeriesGym \citep{timeseriesgym2025}. The upper sequence connects the contract, resources, execution, and submitted artifact. The lower views distinguish the execution record through calls, status, artifact references, and resource use; artifact validity through file, schema, and execution checks; and task performance through prediction and residual plots. Evidence links connect each assessment to the object it examines, allowing poor predictions, invalid submissions, and execution failures to be diagnosed separately.}
+\caption{An evaluation episode and three complementary forms of evidence, synthesized from AION \citep{aion2026} and TimeSeriesGym \citep{timeseriesgym2025}. The upper sequence connects the contract, resources, execution, and submitted artifact. The lower views distinguish the execution record through calls, status, artifact references, and resource use; artifact validity through file, schema, and execution checks; and task performance by the scoring rule of each output mode: error and CRPS for regression, accuracy, F1, and Brier score for classification, and rubrics, fidelity, and claim checks for generation; decision making is scored by decision utility. Evidence links connect each assessment to the object it examines, allowing poor predictions, invalid submissions, and execution failures to be diagnosed separately.}
 \label{fig:evaluation-stack}
 \end{figure}
 
@@ -1085,7 +1085,7 @@ TS-Agent \citep{tsagent2025} illustrates this connection through analytical oper
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig13/Figure13_V7.pdf}
-\caption{An evidence-conditioned answer in TS-Agent \citep{tsagent2025}. The anomaly-location question and its required predicates follow the original method; the sequence and middle-region outcome are illustrative. A numerical tool analyzes the native series and records an observation. The evidence gate checks both anomaly presence and location before accepting the answer; an uncovered requirement triggers another analytical action. The lower chain identifies the records needed to trace the answer to the series, tool invocation, and structured observation. This example shows how temporal question answering can evaluate evidence acquisition and answer verification within a larger Agent workflow.}
+\caption{An evidence-conditioned answer in TS-Agent \citep{tsagent2025} to a closed question about the observed series, which the task grid treats as classification (Table~\ref{tab:tsk-vocab}). The anomaly-location question and its required predicates follow the original method; the sequence and middle-region outcome are illustrative. A numerical tool analyzes the native series and records an observation. The evidence gate checks both anomaly presence and location before accepting the answer; an uncovered requirement triggers another analytical action. The lower chain identifies the records needed to trace the answer to the series, tool invocation, and structured observation. This example shows how temporal question answering can evaluate evidence acquisition and answer verification within a larger Agent workflow.}
 \label{fig:benchmark-qa}
 \end{figure}
 
@@ -1136,12 +1136,12 @@ The assessment in Section~\ref{sec:task-impact} suggests what counts as an open 
 
 \noindent\textbf{Probabilistic outputs.} Only 18 of the 84 works that forecast a value or an event report a probabilistic forecast; the others report point forecasts. A downstream decision under risk needs a calibrated distribution rather than a single value, and proper scoring rules evaluate it \citep{gneiting2007scoring}. Agents that revise forecasts with context, such as Last-Mile \citep{lastmile2026} and CastFSR \citep{castfsr2026}, could be compared on the calibration of the revised distribution as well as on its point error.
 
-Figure~\ref{fig:open-problems-cases} connects the first five questions to the system interfaces they affect. Read each of the five rows from the open question to the controlled comparison and the evidence to record. Changing the information release, task setting, evidence, or output criterion exposes a different aspect of reuse and reliability. The three design analyses below isolate complementary choices along that path: the numerical input interface, retained execution experience, and the forecasting substrate.
+Figure~\ref{fig:open-problems-cases} connects the eight questions to the system interfaces they affect. Read each row from the open question to the controlled comparison and the evidence to record. Changing the information release, task setting, evidence, or output criterion exposes a different aspect of reuse and reliability. The three design analyses below isolate complementary choices along that path: the numerical input interface, retained execution experience, and the forecasting substrate.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig15/Figure15_V7.pdf}
-\caption{Controlled comparisons for reusable Time Series Agents. The five rows pair an open problem with a testable contrast: model judgment and tool use, old and revised evidence, seen and held-out settings, supporting evidence and its removal, and forecast quality and downstream action utility. The paired objects show the intervention: a tool call, a revised release, a held-out series, evidence removal, or an inventory action. The right column identifies the outcomes to examine. Matching the backbone and resource budget helps isolate the factor under study. This agenda synthesizes temporal interfaces \citep{chatts2025}, evolving execution \citep{timeclaw2026harness,timesageev2026}, controlled evidence \citep{drcik2026}, and decision workflows \citep{fincon2024}.}
+\caption{Controlled comparisons for reusable Time Series Agents. The eight rows pair an open problem with a testable contrast: native perception and a Harness tool, old and revised evidence, seen and held-out settings, supporting evidence and its removal, forecast quality and downstream action utility, rollouts of the same state under different actions, a replayed earlier state and the proposed action, and a point forecast and a predictive distribution. The paired objects show the intervention. The right column identifies the outcomes to examine. Matching the backbone and resource budget helps isolate the factor under study. This agenda synthesizes temporal interfaces \citep{chatts2025}, evolving execution \citep{timeclaw2026harness,timesageev2026}, controlled evidence \citep{drcik2026}, and decision workflows \citep{fincon2024}.}
 \label{fig:open-problems-cases}
 \end{figure}
 
