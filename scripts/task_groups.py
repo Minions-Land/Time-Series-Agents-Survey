@@ -121,7 +121,7 @@ def summary():
             gs = module_groups(m)
             for g in gs: mods[(g, m.get('layer'))] += 1
             if m.get('layer') in ('GH', 'GTS'):
-                reuse[(m['layer'], 'demonstrated' if len(gs) >= 2 else 'inferred')] += 1
+                reuse[(m['layer'], reuse_level(m))] += 1
         for g in {group_of(x) for x in labs} - {None}: works[g] += 1
         for lf in {LEAF[x][1] for x in labs if x in LEAF}: leaves[lf] += 1
         for x in labs:
@@ -129,6 +129,32 @@ def summary():
     return {'works': n, 'works_by_group': {GROUPS[g]: works[g] for g in ORDER}, 'works_by_leaf': dict(leaves.most_common()),
             'modules_by_group_layer': {f'{GROUPS[g]}:{l}': c for (g, l), c in sorted(mods.items())},
             'reuse_gh_gts': {f'{l}:{e}': c for (l, e), c in sorted(reuse.items())}, 'unmapped_labels': dict(unmapped)}
+
+
+FAMILY_CELL = {'forecasting_prediction': ('regression', 'after'), 'anomaly_detection_diagnosis': ('classification', 'before'),
+               'data_augmentation_synthesis': ('generation', 'before'), 'decision_support': ('decision', 'after')}
+
+
+def module_cells(m):
+    """Grid cells (mode, time) a module is applied to in its source: its own labels plus its reuse-evidence tasks.
+    A coarse label refined by a second label counts only through the second label; a forecasting family label
+    without a second label counts as value forecasting."""
+    labs = set(labels(m))
+    labs -= {c for c, fine in FINE.items() if labs & fine}
+    cells = {CELL[x] for x in labs if x in CELL}
+    fc = {('regression', 'after'), ('classification', 'after')}
+    if 'forecasting_prediction' in labs and not cells & fc: cells.add(FAMILY_CELL['forecasting_prediction'])
+    for t in (m.get('reuse_evidence') or {}).get('tasks') or []:
+        if t == 'forecasting_prediction':
+            if not cells & fc: cells.add(FAMILY_CELL[t])
+        elif t in FAMILY_CELL: cells.add(FAMILY_CELL[t])
+        elif t in CELL: cells.add(CELL[t])
+    return cells
+
+
+def reuse_level(m):
+    """Demonstrated reuse: the source applies a GH or GTS module to tasks in at least two grid cells."""
+    return 'demonstrated' if len(module_cells(m)) >= 2 else 'inferred'
 
 
 def grid():
