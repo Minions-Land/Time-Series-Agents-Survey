@@ -261,7 +261,7 @@ Each term is described with one vocabulary, listed in Table~\ref{tab:term-basis}
 LLM & None: the LLM is the caller $\pi_\theta$ (Section~\ref{sec:llm-side}). & Every LLM-side contribution changes the same policy in Eq.~\eqref{eq:agent-loop}, which reads the state, selects function calls, and interprets their results. Time series foundation models are tools in the Harness, not part of this term.\\
 General Harness & Interface and interaction; memory and context; tools and execution; planning and orchestration; optimization and evolution (Section~\ref{sec:general-harness}). & Synthesized from Agent architecture and Harness research \citep{sumers2024coala,wang2024agentsurvey,ning2026codeharness,lin2026agenticharness}.\\
 General Time Series Harness & Temporal data management; processing; context and memory; validation (Section~\ref{sec:general-ts-harness}). & The availability record $(x_i,t_i,v_i)$ of Eq.~\eqref{eq:temporal-availability}: storing and versioning records, operating on values over windows, admitting information other than the series into $\mathcal{I}_\tau$, and checking availability, windows, and units. The record follows the valid and transaction times of temporal databases \citep{snodgrass1985taxonomy,jensen1999temporal}; the four functions are the structures, operators, and integrity rules of a data model \citep{codd1980datamodels}, together with the scope of the record.\\
-Task-Specific Harness & Analysis of observed series (classification, imputation, anomaly detection, question answering); forecasting; generation; decision making (Section~\ref{sec:task-specific-harness}). & What the output refers to relative to the current time: the series observed so far, values after the current time, a new series, or an action. Task names follow TimesNet and TSLib \citep{wu2023timesnet,wang2024tslib} and Time-MQA \citep{kong2025timemqa}.\\
+Task-Specific Harness & Task grid: regression, classification, generation, and decision making, each on the observed record or after the current time (Section~\ref{sec:task-specific-harness}). & Two standard axes: how the output is checked, against observed values or classes, without a single reference, or by the consequences of an action \citep{hastie2009esl,gneiting2007scoring}; and whether it refers to the record observed by the current time or to what comes after it \citep{wiener1949extrapolation}. Task names in each cell follow TimesNet and TSLib \citep{wu2023timesnet,wang2024tslib} and Time-MQA \citep{kong2025timemqa}.\\
 Evaluation & Process validity; temporal validity; task performance; decision utility (Section~\ref{sec:evaluation}). & One check per term: whether the General Harness executed as intended, whether the time series modules preserved windows, numerical meaning, and availability, and whether the task output is accurate and useful once acted on.\\
 \bottomrule
 \end{tabularx}
@@ -326,7 +326,7 @@ $t,\tau,H$ & Event time, current time (forecast origin), and forecast horizon. &
 $\mathcal{I}_{\tau}$ & Information admissible at time $\tau$, including availability and provenance. & GTS & Governs retrieval, memory, validation, and leakage control.\\
 $s_k,a_k,o_{k+1}$ & Agent state, action or tool call, and returned observation at step $k$. & GH & Describe the reusable state--action loop.\\
 $\mathcal{V}$ & Validator or verifier that returns a pass, fail, finding, or escalation decision. & GH / GTS / TSK & Checks process, temporal, and task-specific obligations.\\
-$(\widehat{z},\widehat{y},\widetilde{x},a^{\star})$ & Analysis output such as an anomaly decision, forecast, generated series, and selected action. & TSK & One representative output per task group in Section~6.\\
+$(\widehat{z},\widehat{y},\widetilde{x},a^{\star})$ & Task output such as an anomaly decision, forecast, generated series, and selected action. & TSK & One representative output per output mode in Section~\ref{sec:task-specific-harness}.\\
 \bottomrule
 \end{tabularx}
 \caption{Unified notation for the module-level method descriptions. GH denotes General Harness, GTS denotes General Time Series Harness, and TSK denotes Task-Specific Harness.}
@@ -335,7 +335,7 @@ $(\widehat{z},\widehat{y},\widetilde{x},a^{\star})$ & Analysis output such as an
 
 
 
-Sections~3--7 develop these choices from model interfaces and reusable runtime mechanisms to temporal modules, task procedures, and evaluation resources.
+Sections~\ref{sec:llm-side}--\ref{sec:evaluation} develop these choices from model interfaces and reusable runtime mechanisms to temporal modules, task procedures, and evaluation resources.
 \section{LLM Side: The Caller of the Harness}
 \label{sec:llm-side}
 
@@ -539,7 +539,7 @@ At the current time $\tau$, when the Agent issues its output, the admissible inf
   \mathcal{I}_{\tau} = \{(x_i,t_i,v_i): v_i \leq \tau\},
   \label{eq:temporal-availability}
 \end{equation}
-where $t_i$ is the event time and $v_i$ is the time at which the value became available. In a backtest, $\tau$ is the simulated origin rather than the time the experiment is run. The record keeps the two times that temporal databases distinguish, the valid time at which a fact holds and the transaction time at which it is recorded \citep{snodgrass1985taxonomy,jensen1999temporal}. Real-time macroeconomic data sets keep every released vintage of a series for the same reason \citep{croushore2001realtime}, and LLM forecasts that use information published after $\tau$ show look-ahead bias \citep{glasserman2023lookahead,gao2025lookahead}. The information boundary admits information published by $\tau$, including a known future calendar event; the task specifies which observation and target windows may be used.
+where $t_i$ is the event time and $v_i$ is the time at which the value became available. In a backtest, $\tau$ is the simulated origin rather than the time the experiment is run. The record keeps the two times that temporal databases distinguish, the valid time at which a fact holds and the transaction time at which it is recorded \citep{snodgrass1985taxonomy,jensen1999temporal}. Real-time macroeconomic data sets keep every released vintage of a series for the same reason \citep{croushore2001realtime}, and LLM forecasts that use information published after the current time show look-ahead bias \citep{glasserman2023lookahead,gao2025lookahead}. The information boundary admits information published by $\tau$, including a known future calendar event; the task specifies which observation and target windows may be used.
 
 Figure~\ref{fig:temporal-harness-functions} connects the four shared functions through the objects they manage. Read the upper timeline first: availability time determines whether a source can be used at the current time. Each card of the middle row lists the second-level classes of its function (Table~\ref{tab:gts-vocab}) above one illustration: a record of time, value, and unit; a transformed, analyzed, and LLM-viewed window; external events and a past case; and an availability check that admits or excludes a source. The lower paths connect the LLM to requests and returned observations. AION \citep{aion2026} and TimeClaw-Harness \citep{timeclaw2026harness} implement these functions in their temporal runtimes.
 
@@ -890,10 +890,11 @@ A new decision-making Agent should specify these quantities before choosing its 
 
 A reader who knows the cell of a task can look up reference modules in every layer (Table~\ref{tab:cell-lookup}). For each cell with task outputs, the table gives the leading mechanism dimensions of its General Harness modules and the leading temporal functions of its General Time Series Harness modules, with module counts; two shared modules whose sources apply them to tasks in at least two cells, so that their reuse is demonstrated; the task procedures discussed in the subsections above; and the evaluation resources that test the cell. Complete lists for each cell can be queried in the Paper Cards with the companion tool.
 
-\begin{table}[!htbp]
+\begin{table}[!t]
 \centering\scriptsize
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{1.15}
+\renewcommand{\tabularxcolumn}[1]{p{#1}}
 \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.2\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}@{}}
 \toprule
 \textbf{Cell (works)} & \textbf{General Harness} & \textbf{General Time Series Harness} & \textbf{Task-Specific Harness} & \textbf{Evaluation}\\
@@ -1213,7 +1214,7 @@ Claim & The central claim and concrete contribution stated by the work.\\
 Evidence & Page or section locator, quotation, and figure or table.\\
 Modules & LLM-side capability, General Harness, General Time Series Harness, and Task-Specific Harness entries.\\
 Reuse evidence & For General Harness and General Time Series Harness modules, whether the source applies the module to tasks in two or more cells of the task grid (demonstrated) or in one (inferred).\\
-Task contract & Task group (analysis of observed series, forecasting, generation, or decision making) and the standard task names within it.\\
+Task contract & Task cell (output mode and time relative to the current time) and the standard task names within it.\\
 Evaluation & Process validity, temporal validity, task performance, and decision utility.
 \end{tabularx}
 \end{tcolorbox}
@@ -1359,7 +1360,7 @@ EpiWorld \citep{epiworld2026} Oct'26; \typeSMshort{}\newline Value forecasting; 
 TradeGrad \citep{textualgradienttrading2026}\selfclaim{} Oct'26; \typeSMshort{}\newline Autonomous control & \textbf{GH:} Periodic global optimization memory; Sampling-based textual-gradient estimation; Multi-scale strategy revision.\newline\textbf{TSK:} Cross-period lower-tail robust objective.\\\midrule
 SEER \citep{seer2026} Oct'26; \typeSMshort{}\newline Value forecasting; Event forecasting & \textbf{TSK:} Error-driven reflective retrieval memory; Forecast-error causal knowledge distillation.\\\midrule
 EvoCast \citep{evocast2026} Oct'26; \typeSMshort{}\newline Value forecasting & \textbf{GH:} Cognition-authority separated execution loop; Outcome-typed research evidence and failure memory.\newline\textbf{TSK:} Canonical evaluation and promotion gate; Forecasting task protocol grounding; Executed baseline mechanism diagnosis.\\\midrule
-TSHarness \citep{tsharness2026} Oct'26; \typeSMshort{}\newline Time series classification; anomaly detection; closed question answering; advisory decision & \textbf{GH:} Evidence-gap re-perception loop.\newline\textbf{GTS:} Tool-grounded Time-Series Perception State; Temporal numerical tool suite; Procedural analytical memory bank.\newline\textbf{LLM:} Cost-aware RL tool selector.\\\midrule
+TSHarness \citep{tsharness2026} Oct'26; \typeSMshort{}\newline Time series classification; anomaly detection; closed question answering; advisory decision & \textbf{GH:} Evidence-gap re-perception loop.\newline\textbf{GTS:} Tool-grounded Time Series Perception State; Temporal numerical tool suite; Procedural analytical memory bank.\newline\textbf{LLM:} Cost-aware RL tool selector.\\\midrule
 SOTA \citep{sotaoptions2026} Oct'26; \typeSMshort{}\newline Autonomous control & \textbf{GTS:} Point-in-time numerical market feature interface.\newline\textbf{TSK:} Strategy-quote trading interaction environment; Strategy-to-contract resolver; Scenario-risk position sizing; Portfolio delta-hedge execution integration.\newline\textbf{LLM:} Teacher-initialized portfolio-return policy; Anonymized filtered teacher trajectories.\\\midrule
 SciExam for ENSO \citep{sciexamenso2026} Oct'26; \typeBenchshort{}\newline Value forecasting; closed question answering & \textbf{GH:} Phased workflow with frozen self-written diagnostics.\newline\textbf{TSK:} Hidden period-split scientific graders.\\\midrule
 Lapras \citep{lapras2026}\selfclaim{} Oct'26; \typeSMshort{}\newline Time series classification; closed question answering; root cause identification & \textbf{LLM:} Teacher-student latent reasoning self-distillation; Reference reasoning training traces.\\\midrule
