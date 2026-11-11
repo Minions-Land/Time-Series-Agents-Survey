@@ -249,7 +249,7 @@ def main():
             if len(pics) == 1 and nm: logo_of.setdefault(nm[0], pics[0])
             else: scan(c_.shapes)
     scan(g.shapes)
-    works = [('ChatTS', '2025', 'HFMD'), ('Time-R1', '2025', 'MemCast'), ('ChatAD', '2026', 'ChatAD'),
+    works = [('ChatTS', '2024', 'HFMD'), ('Time-R1', '2025', 'MemCast'), ('ChatAD', '2026', 'ChatAD'),
              ('STRIDE', '2026', 'STRIDE'), ('CastFSR', '2026', 'MemCast')]   # (name, year, tag whose logo matches)
     new_tags = sorted((s for s in g.shapes if sid(s) in keep and s.shape_type == 6), key=lambda s: s.top)
     for t, (nm, yr, src) in zip(new_tags, works):
@@ -465,7 +465,7 @@ def slot_room(t, text, gap_in=0.06):
     return (ay * year.left + by) - (an * name.left + bn) - an * ins - gap_in * E - name_width(text, pt)
 
 
-SHORT = {'timeclaw2026harness': 'TC-Harness', 'timeclaw2026explore': 'TimeClaw', 'timeseriesscientist2025': 'TS-Scientist',
+SHORT = {'timeclaw2026harness': 'TC-Harness', 'timeclaw2026explore': 'TC-EEL', 'timeseriesscientist2025': 'TS-Scientist',
          'timeseriesexamagent2026': 'TS-Exam Agent'}               # last resort when the full name cannot be placed
 
 
