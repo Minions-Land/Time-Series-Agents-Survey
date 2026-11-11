@@ -99,6 +99,11 @@ Stephen~Wang~$^{3}$, and Qingsong~Wen~$^{6,7,*}$}
 \abstract{Time series analysis supports forecasting, diagnosis, and decision making in changing environments. Time Series Agents carry out these analyses through workflows in which an LLM reads the state, calls tools, and interprets the results. Building such an Agent requires deciding which mechanisms can be reused from a general Agent runtime, which need temporal semantics such as information availability, and which must be redesigned around a task. Existing surveys classify whole papers or systems by model adaptation, reasoning, or task family, leaving module-level reuse decisions implicit. This survey addresses that gap with one decomposition: a Time Series Agent consists of an LLM, a General Harness, and a Time Series Harness, which splits into a General Time Series Harness shared across tasks and a Task-Specific Harness bound to one task. We assign every module of each reviewed work to one of these terms by its scope of reuse. The LLM acts as the caller of the Harness, while each Harness term has a vocabulary grounded in prior work: mechanism dimensions for the General Harness, temporal functions of the availability record for the General Time Series Harness, and a task grid of output modes on the two sides of the current time for the Task-Specific Harness, with one evaluation criterion per term. Applied to the literature, this decomposition shows that most works automate an existing analysis, that solutions to time series requirements are rarely tested and mostly stay inside task modules, and that projection and hindsight decision have no evaluated output. Together, the decomposition and module-level classification offer a common basis for building Time Series Agents from reusable modules and evaluating each term against the requirement it serves.}
 \keyword{Time Series; Large Language Models; Agent Systems; Harness Engineering}
 
+% Float placement: every float uses [t]; allow tall top floats so none drift to the end.
+\renewcommand{\topfraction}{0.98}
+\renewcommand{\textfraction}{0.02}
+\setcounter{topnumber}{3}
+\setcounter{totalnumber}{4}
 \begin{document}
 \setlength{\headheight}{18pt}
 \addtolength{\topmargin}{-6pt}
@@ -115,7 +120,7 @@ Stephen~Wang~$^{3}$, and Qingsong~Wen~$^{6,7,*}$}
 
 Time series analysis supports decisions in environments that change as new observations arrive. Demand planning uses forecasts to set inventory, equipment monitoring uses anomalies to schedule maintenance, and traffic control uses current measurements to select actions \citep{lim2021deepts,collmllight2026}. In each setting, a numerical prediction or diagnostic result is one part of a longer workflow: the system must acquire data, inspect temporal context, call analytical tools, validate the result, and pass an admissible output to the next decision. Recent Agent systems make these steps executable through workspaces, evidence checks, and tool feedback \citep{tsagent2025,aion2026}. Research on such Agents is growing quickly, and its emphasis is shifting from adapting the model to engineering the surrounding runtime. Contributions to every part of an Agent grow approximately exponentially, and Harness modules now outnumber modifications to the LLM (Figure~\ref{fig:contribution-trend}).
 
-\begin{figure}[!t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig03/Figure03_V7.pdf}
 \caption{Module contributions by layer across the reviewed works. (a) Monthly cumulative counts (points) with least squares exponential fits (lines) and bands of one residual standard deviation; the legend gives each fitted doubling time. Open circles mark the months from which Task-Specific Harness and General Harness lead the LLM side. (b) Share of newly published modules in each period, with the number of modules above each bar; the 2026 Q3 bar covers July--September and the 2026 Q4 bar covers October 2026. (c) Classification of every Harness module in the vocabularies of Table~\ref{tab:term-basis}, read from its layer (left, in the layer color) through its mechanism dimensions (Table~\ref{tab:component-vocab}) to the output modes it is applied to. Each path is one pair of a mechanism dimension and an output mode of one module and keeps the layer color; a module with several labels draws several paths. Layer boxes give each layer's share of the Harness modules; the other boxes give the share of their modules in each layer. LLM-side modules carry no mechanism label and are not drawn; one General Harness module has no task label. Each module counts once at its assigned layer in (a) and (b), and dates follow the first public version.}
@@ -134,7 +139,7 @@ Six recent surveys review Time Series Agents directly. Whereas those surveys ass
 
 Our constructive focus yields six differences from these system-level and paper-level classifications (Table~\ref{tab:direct-prior-comparison}). First, the unit is a module, assigned by the scope over which it can be reused, so one paper can contribute to several terms. Second, the LLM is the caller of the Harness, and forecasting models are tools within the Harness. Third, temporal validity is the function of a shared Harness term, applied in data management, processing, context, and validation, rather than only a concern of evaluation. Fourth, the task grid crosses output modes with the current time and shows two well defined cells without an evaluated task output. Fifth, evaluation assigns one criterion to each term. Sixth, the formula yields a construction order, reference modules for each cell, and an assessment of a new work, with every classification linked to a source passage.
 
-\begin{table}[htbp]
+\begin{table}[t]
 \centering\footnotesize
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{1.2}
@@ -171,7 +176,7 @@ Applied to the reviewed works, the formula yields four findings. First, most wor
 
 Figures~\ref{fig:survey-organization} and~\ref{fig:overview} provide two complementary views of this framework. Figure~\ref{fig:survey-organization} shows the step-by-step construction and evaluation order of a Time Series Agent, moving from problem definition through the LLM side and the three Harness layers to evaluation and open problems. Each section of the paper answers the next design or evaluation question in this sequence.
 
-\begin{figure}[!t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/overview_flow_20261106/V7_Atelier_Build.pdf}
 \caption{Building a Time Series Agent. The task request goes to the LLM, the caller that reads the state, calls functions, and interprets their results, while the scenario's context and observed series enter the Harness. The Harness is composed from general to specific: General Harness modules are reused, General Time Series Harness modules adapt them to temporal semantics, and Task-Specific Harness modules are redesigned around the task objective. The LLM side acts through each layer and receives its observations. Evaluation checks a candidate output for process validity, temporal validity, task performance, and decision utility; a failed check returns the Agent to revision. Task-Specific Harness modules are organized by output mode (regression, classification, generation, decision making), and the final output, such as a forecast, a diagnosis, or a decision, falls in one cell of the task grid.}
@@ -180,7 +185,7 @@ Figures~\ref{fig:survey-organization} and~\ref{fig:overview} provide two complem
 
 Figure~\ref{fig:overview} maps the literature covered in this survey across those same terms. Reading outward from Time Series Agents at the center, each sector corresponds to the LLM side, the General Harness, the General Time Series Harness, or the Task-Specific Harness. Each sector is divided into wedges by its mechanism dimensions, temporal functions, or output modes, and the outer tags list representative works and resources. Thus, Figure~\ref{fig:overview} organizes the literature by term, while Figure~\ref{fig:survey-organization} shows how the parts are composed into an Agent.
 
-\begin{figure}[!t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig02/Figure02_V7.pdf}
 \caption{Landscape of Time Series Agents. The leftmost sector collects representative LLM-side work (Section~\ref{sec:llm-side}). The other three sectors correspond to the General Harness, General Time Series Harness, and Task-Specific Harness layers, and each uses its own axis: mechanism dimensions, temporal functions, and output modes, respectively. Line weight, dash, and fill fade from the center outwards. Outer tags place representative works in these coordinates: each tag is a work whose Paper Card has a module in that cell, dated by its first public version, and a work may appear in several sectors. Module-level assignments are recorded in the Paper Cards and discussed in the subsequent sections.}
@@ -237,7 +242,7 @@ where $s_k$ is the visible state at execution step $k$, $a_k$ is a tool or envir
 
 Each term is described with one vocabulary, listed in Table~\ref{tab:term-basis} with its basis. None of these vocabularies introduces a new classification: the mechanism dimensions come from prior Agent surveys, the task names inside each cell of the task grid are standard in time series analysis, the two axes of the grid combine standard output modes with the classical division at the current time, and the temporal functions and evaluation criteria follow directly from the definitions of their terms. The LLM term needs no vocabulary, because every LLM-side contribution changes the same caller. Each module is assigned to a single term of Eq.~\eqref{eq:tsa-formula} and counted once there by its unique identifier, even though it may carry multiple descriptive annotations for its mechanism dimensions, temporal functions, or tasks.
 
-\begin{table}[H]
+\begin{table}[t]
 \centering\small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.12}
@@ -261,7 +266,7 @@ Evaluation & Process validity; temporal validity; task performance; decision uti
 
 \noindent\textbf{Layer assignment.} Within the works that contribute Harness modules, we call the three Harness terms layers. Table~\ref{tab:layer-rules} states our module assignment rule, which follows the commonality and variability analysis of software product lines \citep{kang1990foda,clements2001spl}. We apply the tests from the most specific layer to the most general and assign each module to the first layer whose condition it meets. A layer reflects the scope of reuse implied by a module's inputs, state, and assumptions: a shared module keeps its assigned term when another task calls it, whereas a procedure bound to a new task objective forms a distinct Task-Specific Harness module. We record separately whether that scope has been tested across tasks: a General Harness or General Time Series Harness module has demonstrated reuse when its source paper applies it to tasks in at least two cells of the task grid (Table~\ref{tab:tsk-vocab}), and has inferred reuse otherwise. Among the 189 such modules, half (50\%) have demonstrated reuse, split almost evenly between the General Harness (26\%) and the General Time Series Harness (24\%), while the remaining half (50\%) have reuse inferred from their interfaces.
 
-\begin{table}[!htbp]
+\begin{table}[t]
 \centering\small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.12}
@@ -280,7 +285,7 @@ GH & The module manages execution, scheduling, or state without temporal semanti
 
 Once modules are assigned to layers, building an Agent for a task requires combining General Time Series Harness functions with Task-Specific Harness procedures. Figure~\ref{fig:task-function-grid}(a) provides two routes through the literature for doing so. Reading a row compares how a shared temporal function serves different tasks; reading a column identifies the functions that must be combined for a single task. Concrete examples illustrate this split: TimeSeriesScientist's Curator \citep{timeseriesscientist2025} and SAGE-AD's dual representation \citep{sagead2026} supply General Time Series Harness functions, whereas MERIT's positive view procedure \citep{merit2025} and FinMem's financial memory \citep{finmem2023} depend on specific task objectives. A single task column therefore draws on both General Time Series Harness and Task-Specific Harness modules.
 
-\begin{figure}[!t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig04/Figure04_V7.pdf}
 \caption{From task requirements to Harness modules. (a) Columns identify output modes and rows identify shared temporal functions. Read a column to assemble requirements for one task, or a row to compare how a function serves different tasks. Shaded regions and solid boundaries mark a forecast horizon, a diagnostic interval, information after the current time (Now), and an admissible action range. (b) A demand planning Agent assembled cell by cell: general execution and shared temporal preparation serve any cell, while forecasting (regression after the current time) and the inventory decision (decision making after the current time) are task modules. The forecast panel separates observed history from a schematic prediction and its range. The grid synthesizes requirements illustrated by TimeSeriesScientist \citep{timeseriesscientist2025}, SAGE-AD \citep{sagead2026}, MERIT \citep{merit2025}, and FinMem \citep{finmem2023}.}
@@ -301,7 +306,7 @@ These five steps follow Eq.~\eqref{eq:tsa-formula} from left to right. A single 
 
 To formalize these modules across the survey, Table~\ref{tab:unified-notation} defines the notation shared by our method descriptions. Temporal indices describe the data and information boundary, whereas execution indices describe the Agent loop; training variables specific to individual methods are defined where they are introduced. Using the notation in Table~\ref{tab:unified-notation}, Sections~\ref{sec:llm-side}--\ref{sec:evaluation} examine each term of Eq.~\eqref{eq:tsa-formula} in order: the LLM side, the General Harness, the General Time Series Harness, the Task-Specific Harness, and evaluation.
 
-\begin{table}[H]
+\begin{table}[t]
 \centering\small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.12}
@@ -325,7 +330,7 @@ $(\widehat{z},\widehat{y},\widetilde{x},a^{\star})$ & Task output such as an ano
 
 In Eq.~\eqref{eq:agent-loop}, the LLM is the policy $\pi_\theta$: it reads the visible state $s_k$, selects the next action $a_k$, usually a function call with its arguments, and interprets the returned observation $o_{k+1}$. Every LLM-side contribution we review serves this role, so the LLM side is not divided into categories. Two questions organize it instead: what training adds to the model that makes the calls, and which time series capabilities remain with the tools it calls. Training has been used to let the model read time series directly (Section~\ref{sec:llm-read}) and to make it a better caller of temporal workflows (Section~\ref{sec:llm-caller}). Time series foundation models, by contrast, enter the Agent as forecasting tools (Section~\ref{sec:llm-tsfm}). A model that perceives time series natively, as multimodal LLMs perceive images, is the prospect that connects these lines (Section~\ref{sec:llm-native}). Figure~\ref{fig:llm-contributions} places these contributions in the interaction loop: training changes the model, while execution, state, and feedback remain in the Harness.
 
-\begin{figure}[!t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig05/Figure05_V7.pdf}
 \caption{The LLM as the caller of the Harness. Top: what training adds to the caller, namely reading series inside the model, training the call policy, and, as an outlook, perceiving series as a native modality; dotted lines locate each in the loop. Middle: the LLM reads the state and makes function calls; the Harness executes them, returns observations, and holds the forecasting tools, whether foundation, statistical, or lightweight models. Bottom: forecast accuracy, explanation faithfulness, evidence grounding, and action quality require distinct evaluation evidence.}
@@ -418,7 +423,7 @@ The General Harness connects the LLM's action choices to executable operations, 
 
 Table~\ref{tab:component-vocab} gives each dimension a design question and divides it into second-level classes by one criterion: the part of the Agent loop an interface defines, the scope and lifetime of stored information, the object executed, the object organized by orchestration, and the reusable asset changed by an update. These classes follow the Harness mechanisms of \citet{ning2026codeharness}, the memory types of \citet{sumers2024coala}, and the editable Harness components of \citet{lin2026agenticharness}. Multiple dimensions often operate together within one analytical episode to retrieve context, plan a sequence, execute tools, and revise an artifact using validation feedback. The subsections below show how existing Time Series Agents implement these five mechanism dimensions and which modules transfer across tasks. Sections~\ref{sec:general-ts-harness} and \ref{sec:task-specific-harness} then show how temporal semantics and task objectives specialize these general runtime mechanisms.
 
-\begin{table}[!htbp]
+\begin{table}[t]
 \centering\small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.12}
@@ -439,7 +444,7 @@ Optimization and Evolution (asset changed) & How does the Agent or Harness impro
 
 Figure~\ref{fig:general-harness-functions} follows an interaction episode around the LLM: the interface supplies observations, planning organizes actions, tools execute them, and memory retains evidence. The lower band shows how recorded trajectories can improve prompts, memory, or tools across episodes. Each card lists the second-level classes of its dimension, so the five dimensions in Table~\ref{tab:component-vocab} describe both running a workflow and improving its reusable components.
 
-\begin{figure}[!t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig06/Figure06_V7.pdf}
 \caption{Five mechanism dimensions of the General Harness and their second-level classes (Table~\ref{tab:component-vocab}), synthesized from Agent and Harness research \citep{sumers2024coala,ning2026codeharness,lin2026agenticharness}. The LLM, the caller, interacts with the interface, planning, tools, and memory during execution; each card lists its classes. Optimization and evolution use recorded trajectories to update the four reusable assets across episodes.}
@@ -542,7 +547,7 @@ where $t_i$ is the event time and $v_i$ is the time at which the value became av
 
 Figure~\ref{fig:temporal-harness-functions} connects the four shared temporal functions through the objects they manage. Read the upper timeline first: availability time determines whether a source can be used at the current time. Each card of the middle row lists the second-level classes of its function (Table~\ref{tab:gts-vocab}) above one illustration: a record of time, value, and unit; a transformed, analyzed, and LLM-viewed window; external events and a past case; and an availability check that admits or excludes a source. The lower paths connect the LLM to requests and returned observations.
 
-\begin{figure}[!t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig07/Figure07_V7.pdf}
 \caption{A temporal workspace connecting sources, operations, and the LLM. The upper timeline separates available evidence from a late release at the current time. The middle row gives the four shared functions, each tagged with the data-model component it supplies (structures, operators, scope of the record, integrity rules) and listing its second-level classes (Table~\ref{tab:gts-vocab}) and one illustration. Requests and observations connect these shared functions to the LLM. AION \citep{aion2026} and TimeClaw-Harness \citep{timeclaw2026harness} implement these functions in their runtimes.}
@@ -555,7 +560,7 @@ Each function applies the General Harness mechanism dimensions of Table~\ref{tab
 
 Table~\ref{tab:gts-vocab} divides each temporal function using the same availability record. Data management and validation split by the component they handle: the value $x_i$ with its measurement, the event time $t_i$, and the availability time $v_i$. Data management adds the workspace that holds the records, and validation adds the claims made from them. Processing splits by what an operation returns: a transformed series, statistics about the series, a view of the series for the LLM, or a reusable library of operations. Context and memory splits by what enters the availability record $\mathcal{I}_\tau$: external events and text, historical analogues of the current series, and procedural experience from earlier analyses \citep{chen2026tsagentsurvey}. External events and procedural experience correspond to semantic and procedural memory in \citet{sumers2024coala}. Historical analogues instead follow weather prediction \citep{lorenz1969analogues}, retrieving past states of the observed system that resemble the present state rather than the Agent's own episodes. The availability and past-only checks of validation guard against the leakage defined by \citet{kaufman2012leakage}, and chronological evaluation follows the rolling-origin design of \citet{tashman2000outofsample}. The subsections below follow the rows of the table, and their paragraph heads follow its classes.
 
-\begin{table}[!htbp]
+\begin{table}[t]
 \centering\small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.12}
@@ -649,7 +654,7 @@ The two axes define the eight cells of the task grid (Table~\ref{tab:tsk-vocab})
 
 Among the 162 works in scope, regression appears in nearly half of the works after the current time (46\%) and in 9\% on the observed record; classification reverses that balance (40\% on the observed record and 9\% after the current time); generation appears only on the observed record (25\%), and decision making only after the current time (28\%); a work may occupy several cells. Classification is thus the second most common output mode, and most of it concerns the observed record: anomaly detection, classification of series, root cause identification, and closed questions. Among the 84 works that forecast a value or an event, 90\% report point forecasts and about one in five (21\%) report probabilistic forecasts; some report both. Two cells, projection (generating futures under assumed conditions) and hindsight decision (choosing after the fact the action that should have been taken at an earlier time), are well defined but have no evaluated task output. Both appear in the reviewed systems only as internal mechanisms (Sections~\ref{sec:task-generation} and~\ref{sec:task-decision}). The temporal data, processing, context, and validation functions of Section~\ref{sec:general-ts-harness} supply reusable building blocks for every cell, and Figure~\ref{fig:task-specific-harness} illustrates the eight cells of the task grid, their schematic outputs, and their evaluation checks, with the two empty cells marked as open problems.
 
-\begin{table}[!htbp]
+\begin{table}[t]
 \centering\small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.12}
@@ -667,7 +672,7 @@ Decision Making & Hindsight decision (0): the action that should have been taken
 \label{tab:tsk-vocab}
 \end{table}
 
-\begin{figure}[!t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig08/Figure08_V7.pdf}
 \caption{Task-Specific Harness tasks in eight cells: output mode (rows) by time relative to the current time (columns). Each cell shows a schematic output, its second-level tasks (Table~\ref{tab:tsk-vocab}), and how the output is checked. The two empty cells, projection and hindsight decision, are well defined but appear in the reviewed systems only as internal mechanisms.}
@@ -764,14 +769,15 @@ where $u_j=[\ell_j,r_j]$ is a candidate interval and $s_k=(S^{(k)},Z_{1:k},C_{1:
   \max_{\theta}\;\mathbb{E}_{\widehat{Y}^{(k)}\sim\pi_{\theta}(\cdot\mid s_k)}\left[\sum_{k=1}^{K}r_k\right].
   \label{eq:anomamind-reward}
 \end{equation}
-The reward supplies learning signals for a parseable and accurate interval decision. Figure~\ref{fig:anomamind-workflow} traces the four stages and shows how evidence acquisition and iterative revision support that output. The trained detector belongs to the LLM side, while the surrounding evidence acquisition and refinement procedure forms the Task-Specific Harness.
+The reward supplies learning signals for a parseable and accurate interval decision. The trained detector belongs to the LLM side, while the surrounding evidence acquisition and refinement procedure forms the Task-Specific Harness.
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig10/Figure10_V7.pdf}
-\caption{AnomaMind\textquotesingle s evidence acquisition, state construction, interval detection, and refinement \citep{anomamind2026}, an example of anomaly detection on the observed record (classification, Table~\ref{tab:tsk-vocab}). Read the upper sequence from knowledge and numerical diagnostics to the evidence state and candidate intervals. The paired plots use the same schematic signal to show how refinement changes the interval boundaries; the return path updates the evidence state. The separate lower band identifies detector-training signals: parse validity, agreement with labeled intervals, and a false positive penalty. Adapted from the method\textquotesingle s workflow.}
-\label{fig:anomamind-workflow}
-\end{figure}
+% Method-specific figure removed: the survey does not depict a single method's workflow.
+% \begin{figure}[!t]
+% \centering
+% \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig10/Figure10_V7.pdf}
+% \caption{AnomaMind\textquotesingle s evidence acquisition, state construction, interval detection, and refinement \citep{anomamind2026}, an example of anomaly detection on the observed record (classification, Table~\ref{tab:tsk-vocab}). Read the upper sequence from knowledge and numerical diagnostics to the evidence state and candidate intervals. The paired plots use the same schematic signal to show how refinement changes the interval boundaries; the return path updates the evidence state. The separate lower band identifies detector-training signals: parse validity, agreement with labeled intervals, and a false positive penalty. Adapted from the method\textquotesingle s workflow.}
+% \label{fig:anomamind-workflow}
+% \end{figure}
 
 SAGE-AD \citep{sagead2026} uses a complementary form of evidence. It preserves the original series for precise tools and passes a compressed representation to the LLM. Family-specific analyzers and diagnostic visualizations feed a detector that returns anomaly intervals, confidence, and anomaly types. To build its in-context reference database from normal training segments, the system clusters representative subsequences and applies rule-based perturbations to create normal and anomalous examples for nine anomaly types. Example retrieval thus becomes part of the detection procedure, with evidence specific to the anomaly family guiding the interpretation of a suspicious interval.
 
@@ -806,14 +812,15 @@ A generated output has no single reference: a description, an explanation, or a 
 
 \noindent\textbf{Synthesis and augmentation.}\label{sec:task-synthesis} Synthesis and augmentation create new series for learning or analysis. Augmentation derives new series from existing ones, such as a transformed positive view; conditioned synthesis produces series from text, domain context, or a small support set, such as additional training series. By contrast, temporal instruction dialogues generated to train a language model, as in ChatAD \citep{chatad2026} through TSEvol, are LLM-side training data (Section~\ref{sec:llm-side}). Comparing synthesis methods therefore requires identifying both the generated object and the learner or analysis it supports, because preserving a useful representation and training an accurate downstream model require different checks.
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig09/Figure09_V7.pdf}
-\caption{MERIT\textquotesingle s construction of positive samples for representation learning \citep{merit2025}, an example of synthesis and augmentation on the observed record (generation, Table~\ref{tab:tsk-vocab}). Similarity retrieval and LLM relevance review produce a reference set $R$, which informs transformation selection. The schematic candidates contrast small jitter that preserves peak order with a permutation that changes it; these illustrate possible review outcomes. The review agent compares each view with the target sequence and returns a judgment and rationale. Accepted views enter memory $M$, while rejection restarts retrieval. The lower band shows the downstream role of these choices: accepted views and retrieved neighbors form positive samples for contrastive learning with a shared encoder. Adapted from the original retrieval, augmentation, review, and learning mechanisms.}
-\label{fig:merit-augmentation}
-\end{figure}
+% Method-specific figure removed: the survey does not depict a single method's workflow.
+% \begin{figure}[!t]
+% \centering
+% \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig09/Figure09_V7.pdf}
+% \caption{MERIT\textquotesingle s construction of positive samples for representation learning \citep{merit2025}, an example of synthesis and augmentation on the observed record (generation, Table~\ref{tab:tsk-vocab}). Similarity retrieval and LLM relevance review produce a reference set $R$, which informs transformation selection. The schematic candidates contrast small jitter that preserves peak order with a permutation that changes it; these illustrate possible review outcomes. The review agent compares each view with the target sequence and returns a judgment and rationale. Accepted views enter memory $M$, while rejection restarts retrieval. The lower band shows the downstream role of these choices: accepted views and retrieved neighbors form positive samples for contrastive learning with a shared encoder. Adapted from the original retrieval, augmentation, review, and learning mechanisms.}
+% \label{fig:merit-augmentation}
+% \end{figure}
 
-MERIT \citep{merit2025} targets unsupervised time series representation learning. A retrieval role selects relevant series from a candidate set, an augmentation role uses those examples to choose transformations, and a review role assesses the resulting positive views. Accepted samples enter a memory bank, while rejection returns the workflow to retrieval for refinement. The retrieved neighbors and augmented views then supply positive pairs for contrastive learning. The review role filters generated examples during construction, while downstream experiments evaluate the learned representation. Figure~\ref{fig:merit-augmentation} traces these decisions through a schematic augmentation example and shows how the resulting positive set enters the representation learner.
+MERIT \citep{merit2025} targets unsupervised time series representation learning. A retrieval role selects relevant series from a candidate set, an augmentation role uses those examples to choose transformations, and a review role assesses the resulting positive views. Accepted samples enter a memory bank, while rejection returns the workflow to retrieval for refinement. The retrieved neighbors and augmented views then supply positive pairs for contrastive learning. The review role filters generated examples during construction, while downstream experiments evaluate the learned representation.
 
 BRIDGE \citep{bridge2025} (Section~3) defines text-controlled generation through
 \begin{equation}
@@ -835,7 +842,7 @@ MetaCaster \citep{metacaster2026} generates training series from a small support
 \end{equation}
 Here $\theta$ denotes the generator's prompt and skills, and $\omega$ measures forecasting error on the evaluation split of a dataset in the optimization corpus. The hinge discrepancy penalizes a forecaster trained on generated data when it performs worse than its counterpart trained on authentic data. This error gap updates the generator, while final generalization is assessed on separate in-domain and out-of-domain datasets. After optimization, the system removes the Harness Proposer and uses the learned prompts and skills to guide generation for a new support set. Generation and Harness optimization are coupled to the forecasting objective, whereas the job scheduler and recovery mechanism remain separately reusable General Harness modules. MetaCaster thus illustrates how one paper contributes distinct modules to different layers.
 
-Across series synthesis workflows, the target learner determines the review criterion: MERIT (Figure~\ref{fig:merit-augmentation}) filters augmented views to preserve signal structure for contrastive representation learning, whereas MetaCaster couples generation to downstream forecast error so that forecaster accuracy drives generator revision. Selecting a synthesis workflow therefore starts with the intended learner and the feedback available to improve its training data.
+Across series synthesis workflows, the target learner determines the review criterion: MERIT filters augmented views to preserve signal structure for contrastive representation learning, whereas MetaCaster couples generation to downstream forecast error so that forecaster accuracy drives generator revision. Selecting a synthesis workflow therefore starts with the intended learner and the feedback available to improve its training data.
 
 \noindent\textbf{Projection.} The cell after the current time is empty as a task output. A projection generates the future under an assumed condition, such as an intervention or a stress scenario. Climate science distinguishes such scenario-dependent projections from predictions, because the assumed condition may never occur \citep{ipcc2021glossary}; a projection therefore cannot be scored against the realized future, and generated trajectories that are scored in that way, as in SCENARIODIFF, are probabilistic forecasts. In the reviewed systems, projections appear only inside decision procedures: EpiWorld \citep{epiworld2026} rolls out a policy-conditioned epidemic world model, AgriWorld \citep{agriworld2026} checks the causal direction of what-if interventions, and NeuroAgentic \citep{neuroagentic2026} perturbs a TimesFM forecast according to each proposed control command. These rollouts select an action, and only the resulting action is evaluated; no reviewed work evaluates the projection itself.
 
@@ -885,7 +892,7 @@ Decision procedures also differ in how they map evidence to an action. Most revi
 
 A reader who knows the cell of a task can look up reference modules in every layer (Table~\ref{tab:cell-lookup}). For each cell with task outputs, the table gives the leading mechanism dimensions of its General Harness modules and the leading temporal functions of its General Time Series Harness modules, with module counts; two shared modules whose sources apply them to tasks in at least two cells, so that their reuse is demonstrated; the task procedures discussed in the subsections above; and the evaluation resources that test the cell. Complete lists for each cell can be queried in the Paper Cards with the companion tool.
 
-\begin{table}[!t]
+\begin{table}[t]
 \centering\scriptsize
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{1.15}
@@ -913,7 +920,7 @@ Projection; hindsight decision (0) & \multicolumn{4}{l}{No task output; used onl
 
 Whereas Table~\ref{tab:cell-lookup} indexes individual modules by task cell, Table~\ref{tab:representative-systems} compares eleven complete Time Series Agents assembled across layers, and Table~\ref{tab:representative-conditions} records the conditions and limitations stated in each source.
 
-\begin{table}[!t]
+\begin{table}[t]
 \centering\scriptsize
 \setlength{\tabcolsep}{2.5pt}\renewcommand{\arraystretch}{1.12}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}*{7}{>{\raggedright\arraybackslash}X}@{}}
@@ -944,7 +951,7 @@ CoLLMLight \citep{collmllight2026} & Traffic signal control & SFT on simulator-s
 \label{tab:representative-systems}
 \end{table}
 
-\begin{table}[!t]
+\begin{table}[t]
 \centering\footnotesize\setlength{\tabcolsep}{4pt}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.22\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
 \toprule
@@ -983,7 +990,7 @@ Across the temporal functions of Section~\ref{sec:general-ts-harness}, data mana
 
 Against this empirical baseline, Eq.~\eqref{eq:tsa-formula} also tells a reader how to assess a new work without any further taxonomy. Placing the work on the map of Sections~\ref{sec:llm-side}--\ref{sec:task-specific-harness} answers three questions in turn: where its modules sit, whether each module sits where the work claims, and how much the work adds to what the map already holds. Table~\ref{tab:assessment} summarizes the questions and the evidence the reviewed corpus provides for each.
 
-\begin{table}[!b]
+\begin{table}[t]
 \centering\footnotesize
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.15}
@@ -1031,7 +1038,7 @@ Measuring these four criteria requires observing different layers of the episode
 
 Figure~\ref{fig:evaluation-stack} follows an episode from its task contract and accessible resources through execution to the submitted artifact, and separates the three records needed to interpret its outcome. An inaccurate forecast can arise from a weak predictor, a failed tool call, or incorrectly aligned input; preserving the execution trace distinguishes these causes. Resource measurements add the cost of reaching the result and of recovering from failures.
 
-\begin{figure}[!t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig11/Figure11_V7.pdf}
 \caption{An evaluation episode and three complementary forms of evidence, synthesized from AION \citep{aion2026} and TimeSeriesGym \citep{timeseriesgym2025}. The upper sequence connects the contract, resources, execution, and submitted artifact. The lower views distinguish the execution record through calls, status, artifact references, and resource use; artifact validity through file, schema, and execution checks; and task performance by the scoring rule of each output mode: error and CRPS for regression, accuracy, F1, and Brier score for classification, and rubrics, fidelity, and claim checks for generation; decision making is scored by decision utility. Evidence links connect each assessment to the object it examines, allowing poor predictions, invalid submissions, and execution failures to be diagnosed separately.}
@@ -1041,14 +1048,15 @@ Figure~\ref{fig:evaluation-stack} follows an episode from its task contract and 
 
 \subsection{Existing benchmark landscape}
 
-End-to-end engineering benchmarks test whether an Agent can turn repository resources into a working model. TimeSeriesGym \citep{timeseriesgym2025} evaluates time series ML engineering through 34 challenges from 23 sources, spanning eight temporal problem types. Each challenge combines resources such as data, code, papers, and documentation with a task description and a grading function, and the Agent must produce a usable artifact within the execution budget. The protocol runs inside a Docker environment with default limits of four hours and 50 steps, separating submission validity from task performance. This executable setup suits Agents expected to inspect a repository, adapt a model, and deliver runnable analysis. Figure~\ref{fig:benchmark-landscape} summarizes the path from resources to artifacts, where the grader closes the loop between the requested engineering task and the submitted result.
+End-to-end engineering benchmarks test whether an Agent can turn repository resources into a working model. TimeSeriesGym \citep{timeseriesgym2025} evaluates time series ML engineering through 34 challenges from 23 sources, spanning eight temporal problem types. Each challenge combines resources such as data, code, papers, and documentation with a task description and a grading function, and the Agent must produce a usable artifact within the execution budget. The protocol runs inside a Docker environment with default limits of four hours and 50 steps, separating submission validity from task performance. This executable setup suits Agents expected to inspect a repository, adapt a model, and deliver runnable analysis. The grader closes the loop between the requested engineering task and the submitted result.
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig12/Figure12_V7.pdf}
-\caption{Executable evaluation in TimeSeriesGym \citep{timeseriesgym2025}. Challenge resources and instructions enter an execution environment in which an Agent produces code, models, or other outputs. A challenge-specific grader checks the submitted artifact and its task metrics. The shared challenge contract enables comparison across Agents; the workspace shows how working files, tool execution, and saved outputs connect the challenge package to its grader. Adapted from the benchmark\textquotesingle s evaluation structure.}
-\label{fig:benchmark-landscape}
-\end{figure}
+% Method-specific figure removed: the survey does not depict a single method's workflow.
+% \begin{figure}[!t]
+% \centering
+% \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig12/Figure12_V7.pdf}
+% \caption{Executable evaluation in TimeSeriesGym \citep{timeseriesgym2025}. Challenge resources and instructions enter an execution environment in which an Agent produces code, models, or other outputs. A challenge-specific grader checks the submitted artifact and its task metrics. The shared challenge contract enables comparison across Agents; the workspace shows how working files, tool execution, and saved outputs connect the challenge package to its grader. Adapted from the benchmark\textquotesingle s evaluation structure.}
+% \label{fig:benchmark-landscape}
+% \end{figure}
 
 Interactive analysis benchmarks test whether an Agent maintains state across user follow-ups. TimeSage-MT \citep{timesagemt2026} examines multi-turn analytical continuity across 240 tasks spanning four levels and eight domains; each task includes a visible series slice, dialogue, analysis trajectory, reference code, numerical ground truth, and output requirements. Outcome scoring measures whether the requested result is correct, while capability diagnostics examine the steps used to obtain it. Its reference system pairs an LLM Planner and Reporter with deterministic validation, profiling, execution, and evaluation across 226 analytical skills in 36 categories. Evaluators can therefore compare LLM backbones or runtime configurations while holding the temporal workflow fixed.
 
@@ -1062,7 +1070,7 @@ Diagnostic and data curation benchmarks isolate upstream prerequisites of reliab
 
 Table~\ref{tab:benchmark-families} condenses these differences into the output the Agent must produce, the evidence the evaluator observes, and the temporal control that bounds admissible information. The rows support concrete selection decisions: engineering artifacts call for an execution environment; multi-turn analysis calls for continuity checks; contextual forecasts call for evidence controls; and diagnosis calls for interventions with known causes.
 
-\begin{table}[htbp]
+\begin{table}[t]
 \centering\scriptsize
 \setlength{\tabcolsep}{3pt}
 \begin{tabularx}{\textwidth}{@{}L{0.16\textwidth}L{0.19\textwidth}XL{0.25\textwidth}@{}}
@@ -1089,14 +1097,15 @@ TSQBench \citep{tsqbench2026} & Data-quality judgments & Controlled degradations
 
 Whereas the benchmarks in Table~\ref{tab:benchmark-families} evaluate full analytical workflows, temporal question answering isolates whether a model or Agent can interpret temporal evidence in language, a capability that maps to classification or generation when evaluated alone or acts as an intermediate check inside a larger workflow. TSAQA \citep{tsaqa2026} covers six analytical tasks, including anomaly detection, characterization, comparison, and temporal relationships, using true/false, multiple-choice, and puzzling formats across thirteen domains. MMTS-Bench \citep{mmtsbench2026} contains 2,424 question--answer pairs in Base, InWild, Match, and Align subsets, testing structural perception, temporal reasoning, sequence matching, and cross-modal alignment. Such evaluations are useful when a user asks about a trend, a change, or an event visible in a series. In an operational Agent, the same question can initiate a tool workflow: inspect the series, calculate a statistic, retrieve relevant context, and return an answer tied to those observations.
 
-\begin{figure}[!b]
-\centering
-\includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig13/Figure13_V7.pdf}
-\caption{An evidence-conditioned answer in TS-Agent \citep{tsagent2025} to a closed question about the observed series, which the task grid treats as classification (Table~\ref{tab:tsk-vocab}). The anomaly location question and its required predicates follow the original method; the sequence and middle-region outcome are illustrative. A numerical tool analyzes the native series and records an observation. The evidence gate checks both anomaly presence and location before accepting the answer; an uncovered requirement triggers another analytical action. The lower chain identifies the records needed to trace the answer to the series, tool invocation, and structured observation. This example shows how temporal question answering can evaluate evidence acquisition and answer verification within a larger Agent workflow.}
-\label{fig:benchmark-qa}
-\end{figure}
+% Method-specific figure removed: the survey does not depict a single method's workflow.
+% \begin{figure}[!b]
+% \centering
+% \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig13/Figure13_V7.pdf}
+% \caption{An evidence-conditioned answer in TS-Agent \citep{tsagent2025} to a closed question about the observed series, which the task grid treats as classification (Table~\ref{tab:tsk-vocab}). The anomaly location question and its required predicates follow the original method; the sequence and middle-region outcome are illustrative. A numerical tool analyzes the native series and records an observation. The evidence gate checks both anomaly presence and location before accepting the answer; an uncovered requirement triggers another analytical action. The lower chain identifies the records needed to trace the answer to the series, tool invocation, and structured observation. This example shows how temporal question answering can evaluate evidence acquisition and answer verification within a larger Agent workflow.}
+% \label{fig:benchmark-qa}
+% \end{figure}
 
-TS-Agent \citep{tsagent2025} enforces this link between tool use and language output through analytical operations and evidence-conditioned answers. Figure~\ref{fig:benchmark-qa} instantiates the method's anomaly location question: the evidence must establish both that an anomaly exists and which part of the series contains it. The numerical observation fills these requirements in the evidence log, while an uncovered requirement directs the next action. Inspecting this trace reveals how the answer follows from the available observations. When embedded in a larger workflow, question answering tests whether the Agent can extract and verify intermediate evidence before issuing a forecast (which adds a horizon and numerical scoring rule) or a diagnosis (which adds event localization and cause verification).
+TS-Agent \citep{tsagent2025} enforces this link between tool use and language output through analytical operations and evidence-conditioned answers. For an anomaly location question, the evidence must establish both that an anomaly exists and which part of the series contains it. The numerical observation fills these requirements in the evidence log, while an uncovered requirement directs the next action. Inspecting this trace reveals how the answer follows from the available observations. When embedded in a larger workflow, question answering tests whether the Agent can extract and verify intermediate evidence before issuing a forecast (which adds a horizon and numerical scoring rule) or a diagnosis (which adds event localization and cause verification).
 
 
 \subsection{Infrastructure for reproducible evaluation}
@@ -1105,16 +1114,17 @@ TS-Agent \citep{tsagent2025} enforces this link between tool use and language ou
 
 Evaluation infrastructure determines which parts of an episode can be replayed. AION \citep{aion2026} specifies task files, workspaces, artifacts, and validation interfaces. TimeSeriesGym \citep{timeseriesgym2025} packages challenge resources and graders into executable environments. TimeClaw-Harness \citep{timeclaw2026harness} keeps numerical series in a workspace and exposes executable analytical tools, trajectories, and memory. Together, these platforms make three replay boundaries explicit: the task request, the execution environment, and the persistent analytical state.
 
-\begin{figure}[!b]
-\centering
-\includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig14/Figure14_V7.pdf}
-\caption{TimeClaw-Harness\textquotesingle s runtime and capability evolution \citep{timeclaw2026harness}. The generalist LLM selects an operation and its parameters; temporal tools execute on a full-precision numerical workspace and return compact observations. Episodic memory retrieves successful analytical traces using signal and contextual keys, together with a transferable rationale. The lower path converts recurring executed procedures into candidate tools, evaluates them on held-out similar tasks, and registers accepted tools for later episodes. The two paths identify the workspace, memory, and tool-set state needed to reproduce the system. Adapted from the original workspace, tool, memory, and evolution mechanisms.}
-\label{fig:benchmark-infrastructure}
-\end{figure}
+% Method-specific figure removed: the survey does not depict a single method's workflow.
+% \begin{figure}[!b]
+% \centering
+% \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig14/Figure14_V7.pdf}
+% \caption{TimeClaw-Harness\textquotesingle s runtime and capability evolution \citep{timeclaw2026harness}. The generalist LLM selects an operation and its parameters; temporal tools execute on a full-precision numerical workspace and return compact observations. Episodic memory retrieves successful analytical traces using signal and contextual keys, together with a transferable rationale. The lower path converts recurring executed procedures into candidate tools, evaluates them on held-out similar tasks, and registers accepted tools for later episodes. The two paths identify the workspace, memory, and tool-set state needed to reproduce the system. Adapted from the original workspace, tool, memory, and evolution mechanisms.}
+% \label{fig:benchmark-infrastructure}
+% \end{figure}
 
 Most Time Series Agents embed domain support inside their own Harness, where it serves a single Agent and must be rebuilt for the next. TSFLab \citep{tsflab2026}, the first workbench dedicated to time series forecasting research among the reviewed works, moves this infrastructure outside the Agent into four shared components: a forecasting guide that documents workflows, evaluation settings, and common pitfalls; multi-level knowledge cards covering 323 methods, 93 datasets, and 71 reusable model units at summary, card, and source levels; an experiment runner that executes declared protocols under one data, training, and evaluation specification; and a recursive improver that merges verified methods, datasets, and bug fixes against their papers and code after checking usability, complexity, and consistency. In paper reproduction and benchmarking, the workbench raised task completion by 20--163\% and reduced fresh tokens per completed task by 11--66\% relative to Agents without it. Because this substrate is decoupled from any single Agent, new coding Agents can use it without modification as their numerical tool layer while adding evidence retrieval, model selection, revision, and reporting, and the output of one task (such as a verified reproduction) becomes a reusable resource for the next. Logging the dataset version, model configuration, tool inputs and outputs, and resulting artifacts makes runs directly comparable across Harness designs: a direct forecasting baseline and an Agent-controlled run can share identical model routines, data windows, and compute budgets, ensuring that performance differences reflect the Agent's selection procedure and execution cost.
 
-As shown in Figure~\ref{fig:benchmark-infrastructure}, TimeClaw-Harness \citep{timeclaw2026harness} connects a numerical workspace to temporal tools and multimodal memory, making explicit where the series is stored, how analytical operations execute, and how past trajectories are retrieved. Along the lower path, the Harness promotes recurring executed procedures into candidate tools and validates them on held-out similar tasks before registration. Reproducing a run therefore requires saving the workspace, memory, and tool-set state alongside the model and task inputs. TimeClaw-EEL \citep{timeclaw2026explore} compares executed trajectories over this state to distill reusable experience, showing why the trajectory log and memory state must also be versioned when an Agent optimizes its own procedures.
+TimeClaw-Harness \citep{timeclaw2026harness} connects a numerical workspace to temporal tools and multimodal memory, making explicit where the series is stored, how analytical operations execute, and how past trajectories are retrieved. Along the lower path, the Harness promotes recurring executed procedures into candidate tools and validates them on held-out similar tasks before registration. Reproducing a run therefore requires saving the workspace, memory, and tool-set state alongside the model and task inputs. TimeClaw-EEL \citep{timeclaw2026explore} compares executed trajectories over this state to distill reusable experience, showing why the trajectory log and memory state must also be versioned when an Agent optimizes its own procedures.
 
 
 \subsection{Selecting a benchmark for a new scenario}
@@ -1149,7 +1159,7 @@ The assessment in Section~\ref{sec:task-impact} defines what counts as an open p
 
 \noindent\textbf{Probabilistic outputs.} Only about one in five (21\%) of the 84 works that forecast a value or an event report a probabilistic forecast; the remaining works report only point forecasts. Because decisions under risk require a calibrated distribution rather than a single point estimate, forecasting Agents should be evaluated with proper scoring rules \citep{gneiting2007scoring}. Agents that revise numerical forecasts using qualitative context, such as Last-Mile \citep{lastmile2026} and CastFSR \citep{castfsr2026}, should be compared on the calibration of their revised distributions as well as on point error.
 
-\begin{figure}[!t]
+\begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{artifacts/unified_v7_20261106/fig15/Figure15_V7.pdf}
 \caption{Controlled comparisons for reusable Time Series Agents. The eight rows pair an open problem with a testable contrast: native perception and a Harness tool, old and revised evidence, seen and held-out settings, supporting evidence and its removal, forecast quality and downstream action utility, rollouts of the same state under different actions, a replayed earlier state and the proposed action, and a point forecast and a predictive distribution. The paired objects show the intervention. The right column identifies the outcomes to examine. Matching the backbone and resource budget helps isolate the factor under study. This agenda synthesizes temporal interfaces \citep{chatts2025}, evolving execution \citep{timeclaw2026harness,timesageev2026}, controlled evidence \citep{drcik2026}, and decision workflows \citep{fincon2024}.}
@@ -1169,8 +1179,6 @@ Applied to the reviewed works, this decomposition shows that most of them automa
 
 \reftitle{References}
 \bibliography{TS_AGENT_HARNESS_SURVEY}
-
-\clearpage
 
 
 \appendixstart
